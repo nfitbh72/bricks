@@ -125,6 +125,8 @@ export class Game {
         this.levelCompleteScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.PLAYING) {
         this.useMouseControl = true;
+        // Ensure cursor stays hidden during gameplay
+        this.canvas.style.cursor = 'none';
       }
     });
 
@@ -400,8 +402,10 @@ export class Game {
     // Update cursor visibility based on game state
     if (this.gameState === GameState.PLAYING) {
       this.canvas.style.cursor = 'none'; // Hide cursor during gameplay
+      console.log('Setting cursor to none (PLAYING)');
     } else {
       this.canvas.style.cursor = 'default'; // Show cursor on menus
+      console.log('Setting cursor to default:', this.gameState);
     }
 
     // Render based on game state
