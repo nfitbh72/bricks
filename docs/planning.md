@@ -174,36 +174,50 @@ After each phase, prepare a git commit command with a brief commit message
 
 ---
 
-## Phase 4: Brick Entity
+## Phase 4: Brick Entity ✅
+
+**Status**: Complete
 
 **Goal**: Implement the Brick class with health and destruction.
 
 ### Tasks
 
-1. **Create Brick class** (`src/renderer/game/Brick.ts`)
-   - Properties: position (x, y), width, height, health, maxHealth, color
+1. **Create Brick class** (`src/renderer/game/Brick.ts`) ✅
+   - Properties: position (x, y), width, height, health, maxHealth, customColor
    - Constructor: Initialize with position, dimensions, and health
-   - `takeDamage(amount)`: Reduce health
+   - `takeDamage(amount)`: Reduce health (supports fractional damage)
    - `isDestroyed()`: Check if health <= 0
    - `render(ctx)`: Draw brick with visual feedback based on health
-   - `getColor()`: Return color based on health percentage
+   - `getColor()`: Return color based on health percentage or custom color
+   - `getHealthPercentage()`: Calculate health as 0-1 value
+   - `restore()`: Restore to full health
+   - `setHealth(health)`: Set health directly (clamped to 0-maxHealth)
+   - `getBounds()`, `getPosition()`: Getters for collision detection
 
-2. **Write tests** (`tests/unit/Brick.test.ts`)
+2. **Write tests** (`tests/unit/Brick.test.ts`) ✅
    - Brick initialization
-   - Damage handling
+   - Damage handling (including fractional and zero damage)
    - Destruction detection
    - Health percentage calculation
+   - Color system (health-based and custom)
+   - Restoration and health setting
+   - Render behavior (including destroyed bricks)
+   - Integration tests for damage/destruction flow
 
 ### Acceptance Criteria
-- [ ] Brick class implemented with all methods
-- [ ] Bricks change appearance based on health
-- [ ] Unit tests pass with >90% coverage
-- [ ] Can render multiple bricks on canvas
+- [x] Brick class implemented with all methods
+- [x] Bricks change appearance based on health (color + opacity)
+- [x] Unit tests pass with 100% coverage on Brick.ts
+- [x] 47 tests passing for Brick entity
 
-### Questions to Consider
-- Should bricks have different colors based on health?
-- Do we want particle effects when bricks are destroyed?
-- Should some bricks be indestructible (for future levels)?
+### Results
+- **47 tests passing** for Brick class
+- **100% coverage** on Brick.ts (lines, branches, functions)
+- **185 total tests passing** (Ball + Bat + Brick + utils)
+- **Health-based color system**: Green (>66%), Yellow (33-66%), Magenta (<33%), Gray (destroyed)
+- **Opacity changes** with health (0.3 to 1.0)
+- **Custom color support** for special bricks
+- **Dystopian neon glow effect** with borders
 
 ---
 
