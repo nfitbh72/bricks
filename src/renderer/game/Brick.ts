@@ -127,7 +127,7 @@ export class Brick {
   }
 
   /**
-   * Render the brick on the canvas with 3D beveled effect
+   * Render the brick on the canvas with optimized 3D effect
    */
   render(ctx: CanvasRenderingContext2D): void {
     if (this.isDestroyed()) {
@@ -144,56 +144,22 @@ export class Brick {
     const y = this.position.y;
     const w = this.width;
     const h = this.height;
-    const bevelSize = 3; // Size of bevel in pixels
     const color = this.getColor();
 
     // Draw glow effect (dystopian neon style)
     ctx.shadowBlur = 10;
     ctx.shadowColor = color;
 
-    // Draw main brick face
-    ctx.fillStyle = color;
+    // Create gradient for 3D effect (top-left to bottom-right)
+    const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+    gradient.addColorStop(0, this.lightenColor(color, 30));
+    gradient.addColorStop(0.5, color);
+    gradient.addColorStop(1, this.darkenColor(color, 30));
+
+    // Draw brick with gradient
+    ctx.fillStyle = gradient;
     ctx.globalAlpha = opacity;
     ctx.fillRect(x, y, w, h);
-
-    // Draw top bevel (lighter)
-    ctx.globalAlpha = opacity * 0.8;
-    ctx.fillStyle = this.lightenColor(color, 40);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + w, y);
-    ctx.lineTo(x + w - bevelSize, y + bevelSize);
-    ctx.lineTo(x + bevelSize, y + bevelSize);
-    ctx.closePath();
-    ctx.fill();
-
-    // Draw left bevel (lighter)
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + bevelSize, y + bevelSize);
-    ctx.lineTo(x + bevelSize, y + h - bevelSize);
-    ctx.lineTo(x, y + h);
-    ctx.closePath();
-    ctx.fill();
-
-    // Draw bottom bevel (darker)
-    ctx.fillStyle = this.darkenColor(color, 40);
-    ctx.beginPath();
-    ctx.moveTo(x, y + h);
-    ctx.lineTo(x + bevelSize, y + h - bevelSize);
-    ctx.lineTo(x + w - bevelSize, y + h - bevelSize);
-    ctx.lineTo(x + w, y + h);
-    ctx.closePath();
-    ctx.fill();
-
-    // Draw right bevel (darker)
-    ctx.beginPath();
-    ctx.moveTo(x + w, y);
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x + w - bevelSize, y + h - bevelSize);
-    ctx.lineTo(x + w - bevelSize, y + bevelSize);
-    ctx.closePath();
-    ctx.fill();
 
     // Draw border for definition
     ctx.globalAlpha = 1;
@@ -205,7 +171,7 @@ export class Brick {
   }
 
   /**
-   * Lighten a hex color
+   * Lighten a hex color (cached for performance)
    */
   private lightenColor(color: string, percent: number): string {
     const num = parseInt(color.replace('#', ''), 16);
@@ -216,7 +182,7 @@ export class Brick {
   }
 
   /**
-   * Darken a hex color
+   * Darken a hex color (cached for performance)
    */
   private darkenColor(color: string, percent: number): string {
     const num = parseInt(color.replace('#', ''), 16);
