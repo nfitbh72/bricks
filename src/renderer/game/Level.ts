@@ -4,11 +4,12 @@
 
 import { LevelConfig, BrickConfig } from './types';
 import { Brick } from './Brick';
-import { BRICK_WIDTH, BRICK_SPACING } from '../config/constants';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
 
 export class Level {
   private readonly config: LevelConfig;
   private bricks: Brick[];
+  private static readonly TOP_MARGIN_ROWS = 3; // 3 brick heights gap at top
 
   constructor(config: LevelConfig, canvasWidth?: number) {
     this.config = config;
@@ -18,11 +19,18 @@ export class Level {
   /**
    * Create Brick instances from level configuration
    * Optionally centers bricks horizontally based on canvas width
+   * Always adds top margin of 3 brick heights
    */
   private createBricksFromConfig(canvasWidth?: number): Brick[] {
     let brickConfigs = this.config.bricks;
     
-    // If canvas width provided, center the bricks
+    // Apply top margin (3 brick heights)
+    brickConfigs = brickConfigs.map(bc => ({
+      ...bc,
+      row: bc.row + Level.TOP_MARGIN_ROWS,
+    }));
+    
+    // If canvas width provided, center the bricks horizontally
     if (canvasWidth !== undefined && brickConfigs.length > 0) {
       // Find the width of the brick layout
       const maxCol = Math.max(...brickConfigs.map(b => b.col));
@@ -35,7 +43,7 @@ export class Level {
       // Calculate offset to center
       const offsetCol = Math.max(0, Math.floor((canvasWidthCols - layoutWidth) / 2)) - minCol;
       
-      // Apply offset to all bricks
+      // Apply horizontal offset to all bricks
       brickConfigs = brickConfigs.map(bc => ({
         ...bc,
         col: bc.col + offsetCol,
