@@ -55,13 +55,14 @@ export class Game {
 
     // Initialize ball and bat
     const centerX = canvas.width / 2;
-    const batY = canvas.height - 50;
+    const batY = canvas.height - 100; // Bat higher up
+    const ballY = batY - 30; // Ball above the bat
     
     this.bat = new Bat(centerX - 50, batY, 100, 10, 300);
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
-    // Ball starts stationary on the bat
-    this.ball = new Ball(centerX, batY - 15, 10, 300);
+    // Ball starts stationary above the bat
+    this.ball = new Ball(centerX, ballY, 10, 300);
 
     // Initialize UI screens
     this.introScreen = new IntroScreen(
@@ -209,10 +210,11 @@ export class Game {
     
     // Reset ball and bat
     const centerX = this.canvas.width / 2;
-    const batY = this.canvas.height - 50;
+    const batY = this.canvas.height - 100; // Bat higher up
+    const ballY = batY - 30; // Ball above the bat
     this.bat.setPosition(centerX - 50, batY);
     this.ball.reset();
-    this.ball.setPosition(centerX, batY - 15);
+    this.ball.setPosition(centerX, ballY);
   }
 
   /**

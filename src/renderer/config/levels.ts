@@ -180,7 +180,7 @@ export function createWordBricks(
 export const LEVEL_1: LevelConfig = {
   id: 1,
   name: 'Level 1: BRICKS',
-  bricks: createWordBricks('BRICKS', 50, 100, 15, 8, 1, 12, 2),
+  bricks: createWordBricks('BRICKS', 100, 150, 40, 20, 1, 30, 5),
   ballSpeed: 300,
   batWidth: 100,
   batHeight: 10,
