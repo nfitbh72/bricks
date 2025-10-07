@@ -165,9 +165,52 @@ export function createWordBricks(
 
 /**
  * Create Level 1 configuration
- * Word "BRICKS" centered horizontally
+ * Simple block pattern for introductory level
  */
 export function createLevel1(canvasWidth: number): LevelConfig {
+  const pattern = [
+    [1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0],
+  ];
+  
+  const bricks: BrickConfig[] = [];
+  const patternWidth = 5;
+  
+  // Calculate canvas width in columns
+  const canvasWidthCols = Math.floor(canvasWidth / (BRICK_WIDTH + BRICK_SPACING));
+  
+  // Center the pattern
+  const startCol = Math.max(0, Math.floor((canvasWidthCols - patternWidth) / 2));
+  const startRow = 5;
+  
+  // Create bricks from pattern
+  for (let row = 0; row < pattern.length; row++) {
+    for (let col = 0; col < pattern[row].length; col++) {
+      if (pattern[row][col] === 1) {
+        bricks.push({
+          col: startCol + col,
+          row: startRow + row,
+          health: 1,
+        });
+      }
+    }
+  }
+  
+  return {
+    id: 1,
+    name: 'Level 1: Simple Blocks',
+    bricks,
+    playerHealth: 3,
+  };
+}
+
+/**
+ * Create Level 2 configuration
+ * Word "BRICKS" centered horizontally
+ */
+export function createLevel2(canvasWidth: number): LevelConfig {
   const word = 'BRICKS';
   
   // Calculate word width in columns
@@ -182,8 +225,8 @@ export function createLevel1(canvasWidth: number): LevelConfig {
   const startRow = 5; // Start at row 5
   
   return {
-    id: 1,
-    name: 'Level 1: BRICKS',
+    id: 2,
+    name: 'Level 2: BRICKS',
     bricks: createWordBricks(word, startCol, startRow, 1),
     playerHealth: 3,
   };
@@ -197,6 +240,8 @@ export function getLevel(id: number, canvasWidth: number): LevelConfig | undefin
   switch (id) {
     case 1:
       return createLevel1(canvasWidth);
+    case 2:
+      return createLevel2(canvasWidth);
     default:
       return undefined;
   }
