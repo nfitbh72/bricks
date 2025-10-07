@@ -3,8 +3,6 @@
  */
 
 import { LevelConfig, BrickConfig } from '../game/types';
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING } from './constants';
-import { calculateWordWidth } from './brickLayout';
 
 /**
  * Create a brick layout from text
@@ -131,6 +129,7 @@ export function createLetterBricks(
 /**
  * Create bricks for a word using letter patterns
  * Returns grid coordinates (row/col)
+ * Each letter is 5 columns wide, with 1 column spacing between letters
  */
 export function createWordBricks(
   word: string,
@@ -140,11 +139,12 @@ export function createWordBricks(
 ): BrickConfig[] {
   const bricks: BrickConfig[] = [];
   let colOffset = 0;
-  const letterSpacingCols = Math.ceil(LETTER_SPACING / (BRICK_WIDTH + BRICK_SPACING));
+  const LETTER_WIDTH_COLS = 5;
+  const LETTER_SPACING_COLS = 1;
 
   for (const letter of word.toUpperCase()) {
     if (letter === ' ') {
-      colOffset += 3 + letterSpacingCols;
+      colOffset += 3 + LETTER_SPACING_COLS;
       continue;
     }
 
@@ -156,8 +156,8 @@ export function createWordBricks(
     );
 
     bricks.push(...letterBricks);
-    // Each letter is 5 columns wide, plus letter spacing
-    colOffset += 5 + letterSpacingCols;
+    // Move to next letter position
+    colOffset += LETTER_WIDTH_COLS + LETTER_SPACING_COLS;
   }
 
   return bricks;
