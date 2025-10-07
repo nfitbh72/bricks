@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
@@ -19,6 +19,11 @@ function createWindow(): void {
     mainWindow = null;
   });
 }
+
+// Handle quit request from renderer
+ipcMain.on('quit-app', () => {
+  app.quit();
+});
 
 app.whenReady().then(() => {
   createWindow();

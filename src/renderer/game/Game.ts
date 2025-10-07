@@ -7,6 +7,11 @@ import { Bat } from './Bat';
 import { Level } from './Level';
 import { GameState, LevelConfig } from './types';
 import { checkCircleRectCollision } from './utils';
+import { IntroScreen } from '../ui/IntroScreen';
+import { GameOverScreen } from '../ui/GameOverScreen';
+import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
+import { TransitionScreen } from '../ui/TransitionScreen';
+import { getLevel } from '../config/levels';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -14,12 +19,25 @@ export class Game {
   private ball: Ball;
   private bat: Bat;
   private level: Level | null = null;
-  private gameState: GameState = GameState.PLAYING;
+  private gameState: GameState = GameState.INTRO;
   private playerHealth: number = 3;
   private animationFrameId: number | null = null;
   private lastTime: number = 0;
   private accumulator: number = 0;
   private readonly fixedTimeStep: number = 1 / 60; // 60 FPS
+
+  // UI Screens
+  private introScreen: IntroScreen;
+  private gameOverScreen: GameOverScreen;
+  private levelCompleteScreen: LevelCompleteScreen;
+  private transitionScreen: TransitionScreen;
+  private isTransitioning: boolean = false;
+
+  // Game stats
+  private currentLevelId: number = 1;
+  private totalBricksDestroyed: number = 0;
+  private gameOverDelay: number = 1000; // 1 second delay
+  private gameOverTimer: number = 0;
 
   // Input state
   private keys: Set<string> = new Set();
@@ -45,6 +63,23 @@ export class Game {
     // Ball starts stationary on the bat
     this.ball = new Ball(centerX, batY - 15, 10, 300);
 
+    // Initialize UI screens
+    this.introScreen = new IntroScreen(
+      canvas,
+      () => this.handleStartGame(),
+      () => this.handleQuit()
+    );
+    this.gameOverScreen = new GameOverScreen(
+      canvas,
+      () => this.handleRestart(),
+      () => this.handleQuit()
+    );
+    this.levelCompleteScreen = new LevelCompleteScreen(
+      canvas,
+      () => this.handleContinue()
+    );
+    this.transitionScreen = new TransitionScreen(canvas);
+
     // Set up input listeners
     this.setupInputListeners();
   }
@@ -57,6 +92,15 @@ export class Game {
     window.addEventListener('keydown', (e) => {
       this.keys.add(e.key.toLowerCase());
       this.keys.add(e.key); // Also add original case for arrow keys
+      
+      // Handle screen-specific key presses
+      if (this.gameState === GameState.INTRO) {
+        this.introScreen.handleKeyPress(e.key);
+      } else if (this.gameState === GameState.GAME_OVER) {
+        this.gameOverScreen.handleKeyPress(e.key);
+      } else if (this.gameState === GameState.LEVEL_COMPLETE) {
+        this.levelCompleteScreen.handleKeyPress(e.key);
+      }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -69,8 +113,90 @@ export class Game {
       const rect = this.canvas.getBoundingClientRect();
       this.mouseX = e.clientX - rect.left;
       this.mouseY = e.clientY - rect.top;
-      this.useMouseControl = true;
+      
+      // Update screen hover states
+      if (this.gameState === GameState.INTRO) {
+        this.introScreen.handleMouseMove(this.mouseX, this.mouseY);
+      } else if (this.gameState === GameState.GAME_OVER) {
+        this.gameOverScreen.handleMouseMove(this.mouseX, this.mouseY);
+      } else if (this.gameState === GameState.LEVEL_COMPLETE) {
+        this.levelCompleteScreen.handleMouseMove(this.mouseX, this.mouseY);
+      } else if (this.gameState === GameState.PLAYING) {
+        this.useMouseControl = true;
+      }
     });
+
+    // Mouse click
+    this.canvas.addEventListener('click', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (this.gameState === GameState.INTRO) {
+        this.introScreen.handleClick(x, y);
+      } else if (this.gameState === GameState.GAME_OVER) {
+        this.gameOverScreen.handleClick(x, y);
+      } else if (this.gameState === GameState.LEVEL_COMPLETE) {
+        this.levelCompleteScreen.handleClick(x, y);
+      }
+    });
+  }
+
+  /**
+   * Handle start game from intro
+   */
+  private handleStartGame(): void {
+    this.startTransition(() => {
+      const levelConfig = getLevel(1);
+      if (levelConfig) {
+        this.currentLevelId = 1;
+        this.totalBricksDestroyed = 0;
+        this.loadLevel(levelConfig);
+      }
+    });
+  }
+
+  /**
+   * Handle restart from game over
+   */
+  private handleRestart(): void {
+    this.startTransition(() => {
+      this.gameState = GameState.INTRO;
+    });
+  }
+
+  /**
+   * Handle continue from level complete
+   */
+  private handleContinue(): void {
+    this.startTransition(() => {
+      const nextLevelConfig = getLevel(this.currentLevelId + 1);
+      if (nextLevelConfig) {
+        this.currentLevelId++;
+        this.loadLevel(nextLevelConfig);
+      } else {
+        // No more levels - show game over with "COMPLETE" message
+        this.gameState = GameState.GAME_OVER;
+        this.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
+      }
+    });
+  }
+
+  /**
+   * Handle quit
+   */
+  private handleQuit(): void {
+    if (window.electron) {
+      window.electron.quit();
+    }
+  }
+
+  /**
+   * Start transition animation
+   */
+  private startTransition(onComplete: () => void): void {
+    this.isTransitioning = true;
+    this.transitionScreen.start(onComplete);
   }
 
   /**
@@ -133,6 +259,22 @@ export class Game {
    * Update game state
    */
   private update(deltaTime: number): void {
+    // Handle transition
+    if (this.isTransitioning) {
+      return;
+    }
+
+    // Handle game over delay
+    if (this.gameState === GameState.PLAYING && this.playerHealth <= 0) {
+      this.gameOverTimer += deltaTime * 1000; // Convert to ms
+      if (this.gameOverTimer >= this.gameOverDelay) {
+        this.gameState = GameState.GAME_OVER;
+        this.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, false);
+        this.gameOverTimer = 0;
+      }
+      return;
+    }
+
     if (this.gameState !== GameState.PLAYING) {
       return; // Pause updates when not playing
     }
@@ -153,10 +295,6 @@ export class Game {
 
     if (hitBackWall) {
       this.playerHealth--;
-      if (this.playerHealth <= 0) {
-        this.gameState = GameState.GAME_OVER;
-        return;
-      }
     }
 
     // Check collisions
@@ -165,6 +303,7 @@ export class Game {
     // Check level completion
     if (this.level && this.level.isComplete()) {
       this.gameState = GameState.LEVEL_COMPLETE;
+      this.levelCompleteScreen.setLevel(this.currentLevelId);
     }
   }
 
@@ -222,7 +361,13 @@ export class Game {
         }
         
         // Damage brick
+        const wasDestroyed = brick.isDestroyed();
         brick.takeDamage(1);
+        
+        // Track destroyed bricks
+        if (!wasDestroyed && brick.isDestroyed()) {
+          this.totalBricksDestroyed++;
+        }
         
         // Restore ball to normal if it was grey
         if (this.ball.getIsGrey()) {
@@ -239,23 +384,43 @@ export class Game {
    * Render the game
    */
   private render(): void {
-    // Clear canvas
-    this.ctx.fillStyle = '#0a0a0a';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Render level (bricks)
-    if (this.level) {
-      this.level.render(this.ctx);
+    // Handle transition rendering
+    if (this.isTransitioning) {
+      const complete = this.transitionScreen.update(performance.now());
+      this.transitionScreen.render();
+      if (complete) {
+        this.isTransitioning = false;
+        this.transitionScreen.reset();
+      }
+      return;
     }
 
-    // Render bat
-    this.bat.render(this.ctx);
+    // Render based on game state
+    if (this.gameState === GameState.INTRO) {
+      this.introScreen.render();
+    } else if (this.gameState === GameState.GAME_OVER) {
+      this.gameOverScreen.render();
+    } else if (this.gameState === GameState.LEVEL_COMPLETE) {
+      this.levelCompleteScreen.render();
+    } else if (this.gameState === GameState.PLAYING) {
+      // Clear canvas
+      this.ctx.fillStyle = '#0a0a0a';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Render ball
-    this.ball.render(this.ctx);
+      // Render level (bricks)
+      if (this.level) {
+        this.level.render(this.ctx);
+      }
 
-    // Render UI
-    this.renderUI();
+      // Render bat
+      this.bat.render(this.ctx);
+
+      // Render ball
+      this.ball.render(this.ctx);
+
+      // Render UI
+      this.renderUI();
+    }
   }
 
   /**
