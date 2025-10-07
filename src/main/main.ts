@@ -15,6 +15,14 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
 
+  // Set fullscreen mode that hides Dock on macOS
+  mainWindow.setFullScreen(true);
+  
+  // Prevent Dock from appearing
+  if (process.platform === 'darwin') {
+    app.dock.hide();
+  }
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
