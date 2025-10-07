@@ -11,6 +11,7 @@ import { IntroScreen } from '../ui/IntroScreen';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
+import { ParticleSystem } from './ParticleSystem';
 import { getLevel, createLevel1 } from '../config/levels';
 
 export class Game {
@@ -32,6 +33,15 @@ export class Game {
   private levelCompleteScreen: LevelCompleteScreen;
   private transitionScreen: TransitionScreen;
   private isTransitioning: boolean = false;
+
+  // Visual effects
+  private particleSystem: ParticleSystem;
+  private screenShake: { x: number; y: number; intensity: number; duration: number } = {
+    x: 0,
+    y: 0,
+    intensity: 0,
+    duration: 0,
+  };
 
   // Game stats
   private currentLevelId: number = 1;
@@ -81,6 +91,9 @@ export class Game {
       () => this.handleContinue()
     );
     this.transitionScreen = new TransitionScreen(canvas);
+
+    // Initialize particle system
+    this.particleSystem = new ParticleSystem();
 
     // Set up input listeners
     this.setupInputListeners();
@@ -289,6 +302,23 @@ export class Game {
     // Update ball
     this.ball.update(deltaTime);
 
+    // Update particles
+    this.particleSystem.update(deltaTime);
+
+    // Update screen shake
+    if (this.screenShake.duration > 0) {
+      this.screenShake.duration -= deltaTime;
+      if (this.screenShake.duration <= 0) {
+        this.screenShake.x = 0;
+        this.screenShake.y = 0;
+        this.screenShake.intensity = 0;
+      } else {
+        // Random shake within intensity
+        this.screenShake.x = (Math.random() - 0.5) * 2 * this.screenShake.intensity;
+        this.screenShake.y = (Math.random() - 0.5) * 2 * this.screenShake.intensity;
+      }
+    }
+
     // Check wall collisions
     const hitBackWall = this.ball.checkWallCollisions(
       0,
@@ -299,6 +329,8 @@ export class Game {
 
     if (hitBackWall) {
       this.playerHealth--;
+      // Trigger screen shake on back wall hit
+      this.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
     }
 
     // Check collisions
@@ -368,9 +400,15 @@ export class Game {
         const wasDestroyed = brick.isDestroyed();
         brick.takeDamage(1);
         
-        // Track destroyed bricks
+        // Track destroyed bricks and create particles
         if (!wasDestroyed && brick.isDestroyed()) {
           this.totalBricksDestroyed++;
+          // Create particles at brick center
+          const brickPos = brick.getPosition();
+          const brickBounds = brick.getBounds();
+          const centerX = brickPos.x + brickBounds.width / 2;
+          const centerY = brickPos.y + brickBounds.height / 2;
+          this.particleSystem.createParticles(centerX, centerY, 10, brick.getColor(), 150);
         }
         
         // Restore ball to normal if it was grey
@@ -420,6 +458,10 @@ export class Game {
       this.ctx.fillStyle = '#0a0a0a';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+      // Apply screen shake
+      this.ctx.save();
+      this.ctx.translate(this.screenShake.x, this.screenShake.y);
+
       // Render level (bricks)
       if (this.level) {
         this.level.render(this.ctx);
@@ -431,8 +473,16 @@ export class Game {
       // Render ball
       this.ball.render(this.ctx);
 
-      // Render UI
+      // Render particles
+      this.particleSystem.render(this.ctx);
+
+      this.ctx.restore();
+
+      // Render UI (not affected by screen shake)
       this.renderUI();
+
+      // Render CRT scanline overlay
+      this.renderCRTOverlay();
     }
   }
 
@@ -494,5 +544,46 @@ export class Game {
    */
   setGameState(state: GameState): void {
     this.gameState = state;
+  }
+
+  /**
+   * Trigger screen shake effect
+   */
+  private triggerScreenShake(intensity: number, duration: number): void {
+    this.screenShake.intensity = intensity;
+    this.screenShake.duration = duration;
+  }
+
+  /**
+   * Render CRT scanline overlay effect
+   */
+  private renderCRTOverlay(): void {
+    this.ctx.save();
+    
+    // Draw scanlines
+    this.ctx.globalAlpha = 0.1;
+    this.ctx.fillStyle = '#000000';
+    
+    for (let y = 0; y < this.canvas.height; y += 2) {
+      this.ctx.fillRect(0, y, this.canvas.width, 1);
+    }
+    
+    // Add slight vignette effect
+    const gradient = this.ctx.createRadialGradient(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      0,
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      Math.max(this.canvas.width, this.canvas.height) / 2
+    );
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+    
+    this.ctx.globalAlpha = 1;
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    this.ctx.restore();
   }
 }
