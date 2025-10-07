@@ -3,6 +3,8 @@
  */
 
 import { Vector2D } from './types';
+import { reflect, normalize, magnitude, clamp } from './utils';
+import { Bat } from './Bat';
 
 export class Ball {
   private position: Vector2D;
@@ -132,5 +134,78 @@ export class Ball {
       y: this.position.y,
       radius: this.radius,
     };
+  }
+
+  /**
+   * Bounce off a surface with a given normal vector
+   */
+  bounce(normal: Vector2D): void {
+    const normalizedNormal = normalize(normal);
+    const reflectedVelocity = reflect(this.velocity, normalizedNormal);
+    this.velocity = reflectedVelocity;
+  }
+
+  /**
+   * Bounce off the bat with angle based on hit position
+   * The further from center, the steeper the angle
+   */
+  bounceOffBat(bat: Bat): void {
+    // Get relative hit position (-1 to 1)
+    const relativeHitPos = bat.getRelativeHitPosition(this.position.x);
+    
+    // Calculate bounce angle based on hit position
+    // Center = -90 degrees (straight up)
+    // Edges = up to ±60 degrees from vertical
+    const maxAngle = 60; // Maximum deflection angle in degrees
+    const bounceAngle = -90 + (relativeHitPos * maxAngle);
+    
+    // Convert to radians and set velocity
+    const radians = (bounceAngle * Math.PI) / 180;
+    const currentSpeed = magnitude(this.velocity);
+    
+    this.velocity = {
+      x: Math.cos(radians) * currentSpeed,
+      y: Math.sin(radians) * currentSpeed,
+    };
+  }
+
+  /**
+   * Check and handle wall collisions
+   * Returns true if ball hit the back wall (player loses health)
+   */
+  checkWallCollisions(
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number
+  ): boolean {
+    let hitBackWall = false;
+
+    // Left wall
+    if (this.position.x - this.radius < minX) {
+      this.position.x = minX + this.radius;
+      this.reverseX();
+    }
+
+    // Right wall
+    if (this.position.x + this.radius > maxX) {
+      this.position.x = maxX - this.radius;
+      this.reverseX();
+    }
+
+    // Top wall
+    if (this.position.y - this.radius < minY) {
+      this.position.y = minY + this.radius;
+      this.reverseY();
+    }
+
+    // Bottom wall (back wall - player loses health)
+    if (this.position.y + this.radius > maxY) {
+      this.position.y = maxY - this.radius;
+      this.reverseY();
+      hitBackWall = true;
+    }
+
+    return hitBackWall;
   }
 }
