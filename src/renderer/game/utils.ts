@@ -142,3 +142,24 @@ export function scale(vector: Vector2D, scalar: number): Vector2D {
     y: vector.y * scalar,
   };
 }
+
+/**
+ * Calculate scale factor for ball and bat based on canvas size
+ * At 1080p (1920x1080), scale is 0.5 (50% smaller)
+ * At larger resolutions, scale increases proportionally
+ * 
+ * Reference resolution: 1920x1080 = scale 0.5
+ * Base resolution (100% scale): 3840x2160 (4K)
+ */
+export function calculateGameElementScale(canvasWidth: number, canvasHeight: number): number {
+  // Reference: at 1920x1080, we want scale = 0.5
+  // So base resolution for scale = 1.0 would be 3840x2160
+  const baseWidth = 3840;
+  const baseHeight = 2160;
+  
+  // Calculate scale based on diagonal to handle different aspect ratios
+  const canvasDiagonal = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
+  const baseDiagonal = Math.sqrt(baseWidth * baseWidth + baseHeight * baseHeight);
+  
+  return canvasDiagonal / baseDiagonal;
+}

@@ -174,7 +174,7 @@ export function createWordBricks(
 }
 
 /**
- * Create Level 1 configuration based on canvas width
+ * Create Level 1 configuration based on canvas dimensions
  */
 export function createLevel1(canvasWidth: number): LevelConfig {
   // Calculate brick size to fill most of the screen width
@@ -198,9 +198,6 @@ export function createLevel1(canvasWidth: number): LevelConfig {
     id: 1,
     name: 'Level 1: BRICKS',
     bricks: createWordBricks('BRICKS', startX, 150, brickWidth, brickHeight, 1, letterSpacing, brickSpacing),
-    ballSpeed: 600,
-    batWidth: 150,
-    batHeight: 15,
     playerHealth: 3,
   };
 }
@@ -214,9 +211,6 @@ export const LEVEL_1: LevelConfig = {
   id: 1,
   name: 'Level 1: BRICKS',
   bricks: createWordBricks('BRICKS', 100, 150, 40, 20, 1, 30, 5),
-  ballSpeed: 300,
-  batWidth: 100,
-  batHeight: 10,
   playerHealth: 3,
 };
 

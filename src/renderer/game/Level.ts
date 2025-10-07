@@ -88,27 +88,6 @@ export class Level {
   }
 
   /**
-   * Get ball speed for this level
-   */
-  getBallSpeed(): number {
-    return this.config.ballSpeed;
-  }
-
-  /**
-   * Get bat width for this level
-   */
-  getBatWidth(): number {
-    return this.config.batWidth;
-  }
-
-  /**
-   * Get bat height for this level
-   */
-  getBatHeight(): number {
-    return this.config.batHeight;
-  }
-
-  /**
    * Get player health for this level
    */
   getPlayerHealth(): number {

@@ -59,9 +59,6 @@ export interface LevelConfig {
   id: number;
   name: string;
   bricks: BrickConfig[];
-  ballSpeed: number;
-  batWidth: number;
-  batHeight: number;
   playerHealth: number;
 }
 

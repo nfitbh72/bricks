@@ -6,11 +6,12 @@ import { Ball } from './Ball';
 import { Bat } from './Bat';
 import { Level } from './Level';
 import { GameState, LevelConfig } from './types';
-import { checkCircleRectCollision } from './utils';
+import { checkCircleRectCollision, calculateGameElementScale } from './utils';
 import { IntroScreen } from '../ui/IntroScreen';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
+import { PauseScreen } from '../ui/PauseScreen';
 import { ParticleSystem } from './ParticleSystem';
 import { getLevel, createLevel1 } from '../config/levels';
 
@@ -32,6 +33,7 @@ export class Game {
   private gameOverScreen: GameOverScreen;
   private levelCompleteScreen: LevelCompleteScreen;
   private transitionScreen: TransitionScreen;
+  private pauseScreen: PauseScreen;
   private isTransitioning: boolean = false;
 
   // Visual effects
@@ -63,17 +65,29 @@ export class Game {
     }
     this.ctx = context;
 
-    // Initialize ball and bat
+    // Calculate scale factor based on canvas size
+    const scaleFactor = calculateGameElementScale(canvas.width, canvas.height);
+    
+    // Initialize ball and bat with scaled dimensions
+    // Base sizes (at 4K): bat = 150x15, ball radius = 10, ball speed = 600
+    const baseRadius = 10;
+    const baseBatWidth = 150;
+    const baseBatHeight = 15;
+    const baseBallSpeed = 600;
+    
+    const ballRadius = baseRadius * scaleFactor;
+    const batWidth = baseBatWidth * scaleFactor;
+    const batHeight = baseBatHeight * scaleFactor;
+    const ballSpeed = baseBallSpeed * scaleFactor;
+    
     const centerX = canvas.width / 2;
     const batY = canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
     
-    // Bat is 50% bigger: 150x15 (was 100x10)
-    this.bat = new Bat(centerX - 75, batY, 150, 15, 300);
+    this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, 300);
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
-    // Ball speed is 100% faster: 600 (was 300)
-    this.ball = new Ball(centerX, ballY, 10, 600);
+    this.ball = new Ball(centerX, ballY, ballRadius, ballSpeed);
 
     // Initialize UI screens
     this.introScreen = new IntroScreen(
@@ -91,6 +105,11 @@ export class Game {
       () => this.handleContinue()
     );
     this.transitionScreen = new TransitionScreen(canvas);
+    this.pauseScreen = new PauseScreen(
+      canvas,
+      () => this.handleResume(),
+      () => this.handleQuitFromPause()
+    );
 
     // Initialize particle system
     this.particleSystem = new ParticleSystem();
@@ -108,6 +127,17 @@ export class Game {
       this.keys.add(e.key.toLowerCase());
       this.keys.add(e.key); // Also add original case for arrow keys
       
+      // Handle ESC key for pause/unpause
+      if (e.key === 'Escape') {
+        e.preventDefault(); // Prevent default ESC behavior
+        if (this.gameState === GameState.PLAYING) {
+          this.handlePause();
+        } else if (this.gameState === GameState.PAUSED) {
+          this.handleResume();
+        }
+        return; // Don't process other handlers for ESC
+      }
+      
       // Handle screen-specific key presses
       if (this.gameState === GameState.INTRO) {
         this.introScreen.handleKeyPress(e.key);
@@ -115,6 +145,8 @@ export class Game {
         this.gameOverScreen.handleKeyPress(e.key);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleKeyPress(e.key);
+      } else if (this.gameState === GameState.PAUSED) {
+        this.pauseScreen.handleKeyPress(e.key);
       }
     });
 
@@ -136,6 +168,8 @@ export class Game {
         this.gameOverScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleMouseMove(this.mouseX, this.mouseY);
+      } else if (this.gameState === GameState.PAUSED) {
+        this.pauseScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.PLAYING) {
         this.useMouseControl = true;
         // Ensure cursor stays hidden during gameplay
@@ -155,6 +189,8 @@ export class Game {
         this.gameOverScreen.handleClick(x, y);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleClick(x, y);
+      } else if (this.gameState === GameState.PAUSED) {
+        this.pauseScreen.handleClick(x, y);
       }
     });
   }
@@ -208,6 +244,35 @@ export class Game {
   }
 
   /**
+   * Handle pause
+   */
+  private handlePause(): void {
+    if (this.gameState === GameState.PLAYING) {
+      this.gameState = GameState.PAUSED;
+      this.canvas.style.cursor = 'default'; // Show cursor on pause
+    }
+  }
+
+  /**
+   * Handle resume from pause
+   */
+  private handleResume(): void {
+    if (this.gameState === GameState.PAUSED) {
+      this.gameState = GameState.PLAYING;
+      this.canvas.style.cursor = 'none'; // Hide cursor when resuming
+    }
+  }
+
+  /**
+   * Handle quit from pause menu
+   */
+  private handleQuitFromPause(): void {
+    this.startTransition(() => {
+      this.gameState = GameState.INTRO;
+    });
+  }
+
+  /**
    * Start transition animation
    */
   private startTransition(onComplete: () => void): void {
@@ -227,7 +292,8 @@ export class Game {
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
-    this.bat.setPosition(centerX - 75, batY); // Centered for 150 width bat
+    const batWidth = this.bat.getWidth();
+    this.bat.setPosition(centerX - batWidth / 2, batY); // Center bat
     this.ball.reset();
     this.ball.setPosition(centerX, ballY);
   }
@@ -293,7 +359,7 @@ export class Game {
     }
 
     if (this.gameState !== GameState.PLAYING) {
-      return; // Pause updates when not playing
+      return; // Pause updates when not playing or paused
     }
 
     // Handle input
@@ -440,10 +506,8 @@ export class Game {
     // Update cursor visibility based on game state
     if (this.gameState === GameState.PLAYING) {
       this.canvas.style.cursor = 'none'; // Hide cursor during gameplay
-      console.log('Setting cursor to none (PLAYING)');
     } else {
       this.canvas.style.cursor = 'default'; // Show cursor on menus
-      console.log('Setting cursor to default:', this.gameState);
     }
 
     // Render based on game state
@@ -453,37 +517,49 @@ export class Game {
       this.gameOverScreen.render();
     } else if (this.gameState === GameState.LEVEL_COMPLETE) {
       this.levelCompleteScreen.render();
+    } else if (this.gameState === GameState.PAUSED) {
+      // Render game in background
+      this.renderGameplay();
+      // Render pause overlay
+      this.pauseScreen.render();
     } else if (this.gameState === GameState.PLAYING) {
-      // Clear canvas
-      this.ctx.fillStyle = '#0a0a0a';
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-      // Apply screen shake
-      this.ctx.save();
-      this.ctx.translate(this.screenShake.x, this.screenShake.y);
-
-      // Render level (bricks)
-      if (this.level) {
-        this.level.render(this.ctx);
-      }
-
-      // Render bat
-      this.bat.render(this.ctx);
-
-      // Render ball
-      this.ball.render(this.ctx);
-
-      // Render particles
-      this.particleSystem.render(this.ctx);
-
-      this.ctx.restore();
-
-      // Render UI (not affected by screen shake)
-      this.renderUI();
-
-      // Render CRT scanline overlay
-      this.renderCRTOverlay();
+      this.renderGameplay();
     }
+  }
+
+  /**
+   * Render gameplay (used for both PLAYING and PAUSED states)
+   */
+  private renderGameplay(): void {
+    // Clear canvas
+    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Apply screen shake
+    this.ctx.save();
+    this.ctx.translate(this.screenShake.x, this.screenShake.y);
+
+    // Render level (bricks)
+    if (this.level) {
+      this.level.render(this.ctx);
+    }
+
+    // Render bat
+    this.bat.render(this.ctx);
+
+    // Render ball
+    this.ball.render(this.ctx);
+
+    // Render particles
+    this.particleSystem.render(this.ctx);
+
+    this.ctx.restore();
+
+    // Render UI (not affected by screen shake)
+    this.renderUI();
+
+    // Render CRT scanline overlay
+    this.renderCRTOverlay();
   }
 
   /**
