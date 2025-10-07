@@ -58,11 +58,12 @@ export class Game {
     const batY = canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
     
-    this.bat = new Bat(centerX - 50, batY, 100, 10, 300);
+    // Bat is 50% bigger: 150x15 (was 100x10)
+    this.bat = new Bat(centerX - 75, batY, 150, 15, 300);
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
-    // Ball starts stationary above the bat
-    this.ball = new Ball(centerX, ballY, 10, 300);
+    // Ball speed is 100% faster: 600 (was 300)
+    this.ball = new Ball(centerX, ballY, 10, 600);
 
     // Initialize UI screens
     this.introScreen = new IntroScreen(
@@ -211,7 +212,7 @@ export class Game {
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
-    this.bat.setPosition(centerX - 50, batY);
+    this.bat.setPosition(centerX - 75, batY); // Centered for 150 width bat
     this.ball.reset();
     this.ball.setPosition(centerX, ballY);
   }
@@ -394,6 +395,13 @@ export class Game {
         this.transitionScreen.reset();
       }
       return;
+    }
+
+    // Update cursor visibility based on game state
+    if (this.gameState === GameState.PLAYING) {
+      this.canvas.style.cursor = 'none'; // Hide cursor during gameplay
+    } else {
+      this.canvas.style.cursor = 'default'; // Show cursor on menus
     }
 
     // Render based on game state

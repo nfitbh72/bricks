@@ -198,9 +198,9 @@ export function createLevel1(canvasWidth: number): LevelConfig {
     id: 1,
     name: 'Level 1: BRICKS',
     bricks: createWordBricks('BRICKS', startX, 150, brickWidth, brickHeight, 1, letterSpacing, brickSpacing),
-    ballSpeed: 300,
-    batWidth: 100,
-    batHeight: 10,
+    ballSpeed: 600,
+    batWidth: 150,
+    batHeight: 15,
     playerHealth: 3,
   };
 }
