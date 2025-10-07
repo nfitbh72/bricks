@@ -18,10 +18,10 @@ function createWindow(): void {
   // Set fullscreen mode that hides Dock on macOS
   mainWindow.setFullScreen(true);
   
-  // Prevent Dock from appearing
-  if (process.platform === 'darwin') {
-    app.dock.hide();
-  }
+  // Prevent window from exiting fullscreen
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow?.setFullScreen(true);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
