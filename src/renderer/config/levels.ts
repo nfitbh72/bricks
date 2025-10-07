@@ -174,8 +174,41 @@ export function createWordBricks(
 }
 
 /**
+ * Create Level 1 configuration based on canvas width
+ */
+export function createLevel1(canvasWidth: number): LevelConfig {
+  // Calculate brick size to fill most of the screen width
+  // Word "BRICKS" = 6 letters, each letter is 5 bricks wide with spacing
+  const totalLetters = 6;
+  const bricksPerLetter = 5;
+  const letterSpacing = 30;
+  const brickSpacing = 5;
+  
+  // Calculate brick width to use ~80% of screen width
+  const usableWidth = canvasWidth * 0.8;
+  const totalSpacing = (totalLetters - 1) * letterSpacing + (totalLetters * bricksPerLetter - 1) * brickSpacing;
+  const brickWidth = Math.floor((usableWidth - totalSpacing) / (totalLetters * bricksPerLetter));
+  const brickHeight = Math.floor(brickWidth / 2); // 2:1 aspect ratio
+  
+  // Calculate starting X to center the word
+  const totalWidth = (totalLetters * bricksPerLetter * brickWidth) + totalSpacing;
+  const startX = (canvasWidth - totalWidth) / 2;
+  
+  return {
+    id: 1,
+    name: 'Level 1: BRICKS',
+    bricks: createWordBricks('BRICKS', startX, 150, brickWidth, brickHeight, 1, letterSpacing, brickSpacing),
+    ballSpeed: 300,
+    batWidth: 100,
+    batHeight: 10,
+    playerHealth: 3,
+  };
+}
+
+/**
  * Level 1: BRICKS
  * Forms the word "BRICKS" with bricks
+ * Note: This uses default values. Use createLevel1(canvasWidth) for responsive sizing.
  */
 export const LEVEL_1: LevelConfig = {
   id: 1,

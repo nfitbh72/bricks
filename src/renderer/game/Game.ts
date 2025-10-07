@@ -11,7 +11,7 @@ import { IntroScreen } from '../ui/IntroScreen';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
-import { getLevel } from '../config/levels';
+import { getLevel, createLevel1 } from '../config/levels';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -148,12 +148,11 @@ export class Game {
    */
   private handleStartGame(): void {
     this.startTransition(() => {
-      const levelConfig = getLevel(1);
-      if (levelConfig) {
-        this.currentLevelId = 1;
-        this.totalBricksDestroyed = 0;
-        this.loadLevel(levelConfig);
-      }
+      // Create level 1 with responsive brick sizing
+      const levelConfig = createLevel1(this.canvas.width);
+      this.currentLevelId = 1;
+      this.totalBricksDestroyed = 0;
+      this.loadLevel(levelConfig);
     });
   }
 

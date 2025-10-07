@@ -166,11 +166,13 @@ export class Ball {
     
     // Convert to radians and set velocity
     const radians = (bounceAngle * Math.PI) / 180;
+    // Use ball's speed if currently stationary, otherwise use current speed
     const currentSpeed = magnitude(this.velocity);
+    const useSpeed = currentSpeed > 0 ? currentSpeed : this.speed;
     
     this.velocity = {
-      x: Math.cos(radians) * currentSpeed,
-      y: Math.sin(radians) * currentSpeed,
+      x: Math.cos(radians) * useSpeed,
+      y: Math.sin(radians) * useSpeed,
     };
   }
 
