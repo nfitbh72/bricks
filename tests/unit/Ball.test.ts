@@ -352,13 +352,80 @@ describe('Ball', () => {
         shadowColor: '',
         fillStyle: '',
       } as unknown as CanvasRenderingContext2D;
-      
+
       ball.render(mockCtx);
-      
+
       expect(mockCtx.save).toHaveBeenCalled();
       expect(mockCtx.arc).toHaveBeenCalledWith(100, 200, 10, 0, Math.PI * 2);
       expect(mockCtx.fill).toHaveBeenCalled();
       expect(mockCtx.restore).toHaveBeenCalled();
+    });
+  });
+
+  describe('grey state', () => {
+    it('should start in normal (not grey) state', () => {
+      const ball = new Ball(100, 200, 10, 5);
+      expect(ball.getIsGrey()).toBe(false);
+    });
+
+    it('should turn grey when setGrey(true) is called', () => {
+      const ball = new Ball(100, 200, 10, 5);
+      ball.setGrey(true);
+      expect(ball.getIsGrey()).toBe(true);
+    });
+
+    it('should restore to normal when restoreToNormal is called', () => {
+      const ball = new Ball(100, 200, 10, 5);
+      ball.setGrey(true);
+      ball.restoreToNormal();
+      expect(ball.getIsGrey()).toBe(false);
+    });
+
+    it('should turn grey when hitting back wall', () => {
+      const ball = new Ball(400, 595, 10, 300);
+      ball.setVelocity(0, 100);
+      
+      const hitBackWall = ball.checkWallCollisions(0, 800, 0, 600);
+      
+      expect(hitBackWall).toBe(true);
+      expect(ball.getIsGrey()).toBe(true);
+    });
+
+    it('should restore to normal when hitting left wall while grey', () => {
+      const ball = new Ball(5, 300, 10, 300);
+      ball.setGrey(true);
+      ball.setVelocity(-100, 0);
+      
+      ball.checkWallCollisions(0, 800, 0, 600);
+      
+      expect(ball.getIsGrey()).toBe(false);
+    });
+
+    it('should restore to normal when hitting right wall while grey', () => {
+      const ball = new Ball(795, 300, 10, 300);
+      ball.setGrey(true);
+      ball.setVelocity(100, 0);
+      
+      ball.checkWallCollisions(0, 800, 0, 600);
+      
+      expect(ball.getIsGrey()).toBe(false);
+    });
+
+    it('should restore to normal when hitting top wall while grey', () => {
+      const ball = new Ball(400, 5, 10, 300);
+      ball.setGrey(true);
+      ball.setVelocity(0, -100);
+      
+      ball.checkWallCollisions(0, 800, 0, 600);
+      
+      expect(ball.getIsGrey()).toBe(false);
+    });
+
+    it('should reset grey state when reset is called', () => {
+      const ball = new Ball(100, 200, 10, 5);
+      ball.setGrey(true);
+      ball.reset();
+      expect(ball.getIsGrey()).toBe(false);
     });
   });
 });

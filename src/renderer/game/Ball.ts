@@ -12,6 +12,7 @@ export class Ball {
   private readonly initialPosition: Vector2D;
   private readonly radius: number;
   private readonly speed: number;
+  private isGrey: boolean = false;
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -36,12 +37,15 @@ export class Ball {
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
 
+    // Choose color based on state
+    const color = this.isGrey ? '#666666' : '#00ffff';
+
     // Draw glow effect (dystopian neon style)
     ctx.shadowBlur = 20;
-    ctx.shadowColor = '#00ffff';
+    ctx.shadowColor = color;
 
     // Draw ball
-    ctx.fillStyle = '#00ffff';
+    ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -76,6 +80,7 @@ export class Ball {
   reset(): void {
     this.position = { ...this.initialPosition };
     this.velocity = { x: 0, y: 0 };
+    this.isGrey = false;
   }
 
   /**
@@ -181,22 +186,31 @@ export class Ball {
   ): boolean {
     let hitBackWall = false;
 
-    // Left wall
+    // Left wall - restores ball to normal if grey
     if (this.position.x - this.radius < minX) {
       this.position.x = minX + this.radius;
       this.reverseX();
+      if (this.isGrey) {
+        this.isGrey = false;
+      }
     }
 
-    // Right wall
+    // Right wall - restores ball to normal if grey
     if (this.position.x + this.radius > maxX) {
       this.position.x = maxX - this.radius;
       this.reverseX();
+      if (this.isGrey) {
+        this.isGrey = false;
+      }
     }
 
-    // Top wall
+    // Top wall - restores ball to normal if grey
     if (this.position.y - this.radius < minY) {
       this.position.y = minY + this.radius;
       this.reverseY();
+      if (this.isGrey) {
+        this.isGrey = false;
+      }
     }
 
     // Bottom wall (back wall - player loses health)
@@ -204,8 +218,30 @@ export class Ball {
       this.position.y = maxY - this.radius;
       this.reverseY();
       hitBackWall = true;
+      this.isGrey = true; // Turn grey after hitting back wall
     }
 
     return hitBackWall;
+  }
+
+  /**
+   * Set ball to grey state (passes through bat)
+   */
+  setGrey(grey: boolean): void {
+    this.isGrey = grey;
+  }
+
+  /**
+   * Check if ball is in grey state
+   */
+  getIsGrey(): boolean {
+    return this.isGrey;
+  }
+
+  /**
+   * Restore ball to normal state (called when hitting brick or side/top walls)
+   */
+  restoreToNormal(): void {
+    this.isGrey = false;
   }
 }
