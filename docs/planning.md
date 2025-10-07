@@ -164,11 +164,13 @@ After each phase, prepare a git commit command with a brief commit message
 - [x] 45 tests passing for Bat entity
 
 ### Results
-- **45 tests passing** for Bat class
+- **66 tests passing** for Bat class
 - **100% coverage** on Bat.ts (lines, branches, functions)
-- **117 total tests passing** (Ball + Bat + utils)
+- **138 total tests passing** (Ball + Bat + utils)
 - Bat includes dystopian neon magenta glow effect
 - Relative hit position method ready for angle-based ball bouncing
+- **2D movement support**: moveUp(), moveDown(), setY(), setMousePosition()
+- Optional vertical bounds for flexible positioning
 
 ---
 

@@ -102,6 +102,74 @@ describe('Bat', () => {
     });
   });
 
+  describe('moveUp', () => {
+    it('should move bat up by speed * deltaTime', () => {
+      const bat = new Bat(100, 200, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveUp(1); // 1 second
+      const position = bat.getPosition();
+      expect(position.y).toBe(100); // 200 - (100 * 1) = 100
+    });
+
+    it('should handle fractional deltaTime', () => {
+      const bat = new Bat(100, 200, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveUp(0.5); // 0.5 seconds
+      const position = bat.getPosition();
+      expect(position.y).toBe(150); // 200 - (100 * 0.5) = 150
+    });
+
+    it('should not move beyond top boundary', () => {
+      const bat = new Bat(100, 10, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveUp(1);
+      const position = bat.getPosition();
+      expect(position.y).toBe(0);
+    });
+
+    it('should stop at top boundary exactly', () => {
+      const bat = new Bat(100, 50, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveUp(1);
+      const position = bat.getPosition();
+      expect(position.y).toBe(0);
+    });
+  });
+
+  describe('moveDown', () => {
+    it('should move bat down by speed * deltaTime', () => {
+      const bat = new Bat(100, 200, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveDown(1); // 1 second
+      const position = bat.getPosition();
+      expect(position.y).toBe(300); // 200 + (100 * 1) = 300
+    });
+
+    it('should handle fractional deltaTime', () => {
+      const bat = new Bat(100, 200, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveDown(0.5); // 0.5 seconds
+      const position = bat.getPosition();
+      expect(position.y).toBe(250); // 200 + (100 * 0.5) = 250
+    });
+
+    it('should not move beyond bottom boundary', () => {
+      const bat = new Bat(100, 550, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveDown(1);
+      const position = bat.getPosition();
+      expect(position.y).toBe(590); // 600 - 10 (height) = 590
+    });
+
+    it('should stop at bottom boundary exactly', () => {
+      const bat = new Bat(100, 500, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveDown(1);
+      const position = bat.getPosition();
+      expect(position.y).toBe(590);
+    });
+  });
+
   describe('setX', () => {
     it('should center bat on given x position', () => {
       const bat = new Bat(0, 200, 100, 10);
@@ -133,6 +201,68 @@ describe('Bat', () => {
       bat.setX(400);
       const centerX = bat.getCenterX();
       expect(centerX).toBe(400);
+    });
+  });
+
+  describe('setY', () => {
+    it('should center bat on given y position', () => {
+      const bat = new Bat(100, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setY(300); // Center at 300
+      const position = bat.getPosition();
+      expect(position.y).toBe(295); // 300 - 5 (half height) = 295
+    });
+
+    it('should constrain to top boundary when centering', () => {
+      const bat = new Bat(100, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setY(3); // Try to center at 3
+      const position = bat.getPosition();
+      expect(position.y).toBe(0); // Constrained to top edge
+    });
+
+    it('should constrain to bottom boundary when centering', () => {
+      const bat = new Bat(100, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setY(598); // Try to center at 598
+      const position = bat.getPosition();
+      expect(position.y).toBe(590); // Constrained to bottom edge (600 - 10)
+    });
+
+    it('should allow positioning in middle of screen', () => {
+      const bat = new Bat(100, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setY(300);
+      const centerY = bat.getCenterY();
+      expect(centerY).toBe(300);
+    });
+  });
+
+  describe('setMousePosition', () => {
+    it('should center bat on given mouse coordinates', () => {
+      const bat = new Bat(0, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setMousePosition(400, 300);
+      const position = bat.getPosition();
+      expect(position.x).toBe(350); // 400 - 50
+      expect(position.y).toBe(295); // 300 - 5
+    });
+
+    it('should constrain to boundaries', () => {
+      const bat = new Bat(0, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setMousePosition(10, 3);
+      const position = bat.getPosition();
+      expect(position.x).toBe(0);
+      expect(position.y).toBe(0);
+    });
+
+    it('should center bat at mouse position', () => {
+      const bat = new Bat(0, 0, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.setMousePosition(400, 300);
+      expect(bat.getCenterX()).toBe(400);
+      expect(bat.getCenterY()).toBe(300);
     });
   });
 
@@ -184,6 +314,28 @@ describe('Bat', () => {
       bat.setBounds(0, 100);
       const position = bat.getPosition();
       expect(position.x).toBe(0); // Width equals bounds, so x must be 0
+    });
+
+    it('should set vertical boundary constraints', () => {
+      const bat = new Bat(100, 200, 100, 10);
+      bat.setBounds(0, 800, 50, 400);
+      bat.moveUp(10); // Try to move far up
+      const position = bat.getPosition();
+      expect(position.y).toBe(50); // Constrained to minY
+    });
+
+    it('should immediately constrain vertical position when bounds are set', () => {
+      const bat = new Bat(100, 1000, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      const position = bat.getPosition();
+      expect(position.y).toBe(590); // Immediately constrained (600 - 10)
+    });
+
+    it('should handle optional vertical bounds', () => {
+      const bat = new Bat(100, 200, 100, 10);
+      bat.setBounds(0, 800); // No vertical bounds
+      const position = bat.getPosition();
+      expect(position.y).toBe(200); // Y position unchanged
     });
   });
 
@@ -376,6 +528,36 @@ describe('Bat', () => {
       bat.setX(400);
       const centerX = bat.getCenterX();
       expect(centerX).toBe(400);
+    });
+
+    it('should handle 2D movement (up and right)', () => {
+      const bat = new Bat(100, 300, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveRight(1);
+      bat.moveUp(1);
+      const position = bat.getPosition();
+      expect(position.x).toBe(200); // 100 + 100
+      expect(position.y).toBe(200); // 300 - 100
+    });
+
+    it('should handle 2D movement (down and left)', () => {
+      const bat = new Bat(400, 200, 100, 10, 100);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveLeft(1);
+      bat.moveDown(1);
+      const position = bat.getPosition();
+      expect(position.x).toBe(300); // 400 - 100
+      expect(position.y).toBe(300); // 200 + 100
+    });
+
+    it('should handle setMousePosition after keyboard movement', () => {
+      const bat = new Bat(100, 100, 100, 10);
+      bat.setBounds(0, 800, 0, 600);
+      bat.moveRight(1);
+      bat.moveDown(1);
+      bat.setMousePosition(400, 300);
+      expect(bat.getCenterX()).toBe(400);
+      expect(bat.getCenterY()).toBe(300);
     });
   });
 });

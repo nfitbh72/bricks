@@ -11,6 +11,8 @@ export class Bat {
   private readonly speed: number;
   private minX: number = 0;
   private maxX: number = 0;
+  private minY: number | null = null;
+  private maxY: number | null = null;
 
   constructor(x: number, y: number, width: number, height: number, speed: number = 300) {
     this.position = { x, y };
@@ -62,10 +64,43 @@ export class Bat {
   }
 
   /**
+   * Move bat up
+   */
+  moveUp(deltaTime: number): void {
+    this.position.y -= this.speed * deltaTime;
+    this.constrainToBounds();
+  }
+
+  /**
+   * Move bat down
+   */
+  moveDown(deltaTime: number): void {
+    this.position.y += this.speed * deltaTime;
+    this.constrainToBounds();
+  }
+
+  /**
    * Set horizontal position directly (for mouse control)
    */
   setX(x: number): void {
     this.position.x = x - this.width / 2; // Center bat on mouse position
+    this.constrainToBounds();
+  }
+
+  /**
+   * Set vertical position directly (for mouse control)
+   */
+  setY(y: number): void {
+    this.position.y = y - this.height / 2; // Center bat on mouse position
+    this.constrainToBounds();
+  }
+
+  /**
+   * Set position from mouse coordinates (centers bat on mouse)
+   */
+  setMousePosition(x: number, y: number): void {
+    this.position.x = x - this.width / 2;
+    this.position.y = y - this.height / 2;
     this.constrainToBounds();
   }
 
@@ -80,9 +115,11 @@ export class Bat {
   /**
    * Set the boundary constraints for the bat
    */
-  setBounds(minX: number, maxX: number): void {
+  setBounds(minX: number, maxX: number, minY?: number, maxY?: number): void {
     this.minX = minX;
     this.maxX = maxX;
+    if (minY !== undefined) this.minY = minY;
+    if (maxY !== undefined) this.maxY = maxY;
     this.constrainToBounds();
   }
 
@@ -95,6 +132,12 @@ export class Bat {
     }
     if (this.position.x + this.width > this.maxX) {
       this.position.x = this.maxX - this.width;
+    }
+    if (this.minY !== null && this.position.y < this.minY) {
+      this.position.y = this.minY;
+    }
+    if (this.maxY !== null && this.position.y + this.height > this.maxY) {
+      this.position.y = this.maxY - this.height;
     }
   }
 
