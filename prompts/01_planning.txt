@@ -1,0 +1,39 @@
+we are going to build a game where the objective of each level is to clear all of the bricks in the level.
+
+there is an intro screen with a "START" button, when the player clicks the "START" button, the game starts.
+
+eventually the player will be able to select a difficulty level, and progress through multiple game levels.
+
+a game over screen will be displayed when the player's health reaches 0 which also allows the player to restart
+
+the style for this game is dystopian with bright neon colours
+
+the game will have the following features:
+- fullscreen window
+- a "bat" that can be moved left and right either with a keyboard or mouse control
+- a "ball" that bounces off the bat and bricks
+- the bricks have individual health and can be destroyed by the ball
+- there is a wall behind the ball and when the ball hits the wall, the health of the player decreases
+- when the player's health reaches 0, the game is over
+- when all bricks are destroyed, the player wins the level
+- the game has multiple levels
+- at the end of each level, the player can choose between different upgrades
+- the angle of the ball when it bounces off the bat should be based on where it hits the bat - the further from the center, the steeper the angle
+- later in the game, multiple balls could spawn
+
+
+for the initial planning, focus on the above with the following rules for level one:
+- each brick has a health of 1, the player wall has a health of 3
+- the ball has a speed of 1
+- the bat has a width of 100 and a height of 10
+- the bat is centered towards the bottom of the screen
+- the bricks form the word "BRICKS" on the screen
+
+make sure that the rules for level one are configuration only and that the main game engine is doing all of the work.
+
+let's start by writing the README.md, architecture.md and planning.md files, remembering to ask questions instead of making assumptions.
+
+the planning.md file should be written as a sequence of prompts that will guide you through developing the game iteratively
+
+
+
