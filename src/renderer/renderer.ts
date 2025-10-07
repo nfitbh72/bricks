@@ -8,6 +8,8 @@ console.log('Bricks game renderer initialized');
 
 // Wait for DOM to be ready
 window.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM Content Loaded');
+  
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   
   if (!canvas) {
@@ -15,9 +17,13 @@ window.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  console.log('Canvas found:', canvas);
+
   // Set canvas size to window size
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
+  console.log('Canvas size:', canvas.width, 'x', canvas.height);
 
   // Handle window resize
   window.addEventListener('resize', () => {
@@ -25,9 +31,16 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.height = window.innerHeight;
   });
 
-  // Create and start the game
-  const game = new Game(canvas);
-  game.start();
-
-  console.log('Game started!');
+  // Wait a bit for fonts to load, then create and start the game
+  setTimeout(() => {
+    console.log('Creating game...');
+    try {
+      const game = new Game(canvas);
+      console.log('Game created, starting...');
+      game.start();
+      console.log('Game started! State:', game.getGameState());
+    } catch (error) {
+      console.error('Error creating/starting game:', error);
+    }
+  }, 100);
 });

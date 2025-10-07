@@ -5,7 +5,7 @@
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc && npm run copy-assets",
-    "copy-assets": "cp src/renderer/index.html dist/renderer/ && cp src/renderer/styles.css dist/renderer/",
+    "copy-assets": "cp src/renderer/index.html dist/renderer/ && cp src/renderer/styles.css dist/renderer/ && mkdir -p dist/renderer/assets/fonts && cp -r src/renderer/assets/fonts/* dist/renderer/assets/fonts/",
     "watch": "tsc --watch",
     "start": "npm run build && electron .",
     "dev": "npm run build && electron .",
