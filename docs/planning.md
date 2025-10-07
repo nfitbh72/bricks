@@ -467,42 +467,53 @@ After each phase, prepare a git commit command with a brief commit message
 
 ---
 
-## Phase 9: Visual Polish
+## Phase 9: Visual Polish ✅
+
+**Status**: Complete
 
 **Goal**: Add visual effects and polish to match dystopian aesthetic.
 
 ### Tasks
 
-1. **Enhance rendering**
-   - Add glow effects to ball and bat
-   - Add shadows and depth
-   - Implement brick destruction particles
-   - Add motion blur to ball
+1. **Create particle system** (`src/renderer/game/ParticleSystem.ts`) ✅
+   - Particle class with position, velocity, life, color, size
+   - 10 particles per destroyed brick
+   - Particles match brick color
+   - Fade out over 0.5 seconds with gravity
+   - Glow effect on particles
 
-2. **Create particle system** (`src/renderer/game/ParticleSystem.ts`)
-   - Particle class
-   - Emitter class
-   - Render particles on brick destruction
+2. **Implement screen shake** ✅
+   - Triggers on back wall hit (player loses health)
+   - Subtle intensity (3px)
+   - Duration: 0.2 seconds
+   - Random shake within intensity bounds
+   - Does not affect UI rendering
 
-3. **Add visual feedback**
-   - Screen shake on impacts
-   - Flash effects on damage
-   - Smooth color transitions
+3. **Add CRT/scanline overlay** ✅
+   - Horizontal scanlines every 2 pixels
+   - 10% opacity for authentic CRT look
+   - Radial vignette effect (darkens edges)
+   - Applied only during gameplay
 
-4. **Optimize rendering**
-   - Only render visible objects
-   - Use off-screen canvas for static elements
+4. **Enhanced glow effects** ✅
+   - Ball and bat already have neon glow (from Phase 2-3)
+   - Particles have matching glow effects
+   - Bricks have neon borders with glow
 
 ### Acceptance Criteria
-- [ ] Game has polished, dystopian visual style
-- [ ] Particle effects work on brick destruction
-- [ ] Visual feedback enhances gameplay
-- [ ] Game runs smoothly at 60 FPS
+- [x] Game has polished, dystopian visual style
+- [x] Particle effects work on brick destruction (10 particles, fade out, same color)
+- [x] Screen shake on back wall hit (subtle, 3px, 0.2s)
+- [x] CRT scanline overlay adds retro aesthetic
+- [x] Game runs smoothly at 60 FPS
 
-### Questions to Consider
-- How intense should the screen shake be?
-- Should we add a CRT/scanline effect?
-- Do we want background animations?
+### Results
+- **ParticleSystem.ts** created (100 lines)
+- **10 particles** spawn when brick is destroyed
+- **Screen shake** on health loss only (subtle 3px)
+- **CRT overlay** with scanlines and vignette
+- **Performance**: Smooth 60 FPS maintained
+- **Visual cohesion**: All effects match dystopian neon aesthetic
 
 ---
 
