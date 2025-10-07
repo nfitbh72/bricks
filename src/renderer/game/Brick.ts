@@ -2,28 +2,25 @@
  * Brick entity - represents a destructible brick in the game
  */
 
+import { BrickConfig } from './types';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
+import { gridToPixel } from '../config/brickLayout';
+
 export class Brick {
   private position: { x: number; y: number };
-  private readonly width: number;
-  private readonly height: number;
+  private readonly width: number = BRICK_WIDTH;
+  private readonly height: number = BRICK_HEIGHT;
   private health: number;
   private readonly maxHealth: number;
   private readonly customColor: string | null;
 
-  constructor(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    health: number,
-    color?: string
-  ) {
-    this.position = { x, y };
-    this.width = width;
-    this.height = height;
-    this.health = health;
-    this.maxHealth = health;
-    this.customColor = color || null;
+  constructor(config: BrickConfig) {
+    // Convert grid coordinates to pixel coordinates
+    const pixelPos = gridToPixel(config.col, config.row);
+    this.position = pixelPos;
+    this.health = config.health;
+    this.maxHealth = config.health;
+    this.customColor = config.color || null;
   }
 
   /**

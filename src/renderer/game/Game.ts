@@ -13,7 +13,7 @@ import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
 import { PauseScreen } from '../ui/PauseScreen';
 import { ParticleSystem } from './ParticleSystem';
-import { getLevel, createLevel1 } from '../config/levels';
+import { getLevel } from '../config/levels';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -201,7 +201,10 @@ export class Game {
   private handleStartGame(): void {
     this.startTransition(() => {
       // Create level 1 with responsive brick sizing
-      const levelConfig = createLevel1(this.canvas.width);
+      const levelConfig = getLevel(1, this.canvas.width);
+      if (!levelConfig) {
+        throw new Error('Level 1 not found');
+      }
       this.currentLevelId = 1;
       this.totalBricksDestroyed = 0;
       this.loadLevel(levelConfig);
@@ -222,7 +225,7 @@ export class Game {
    */
   private handleContinue(): void {
     this.startTransition(() => {
-      const nextLevelConfig = getLevel(this.currentLevelId + 1);
+      const nextLevelConfig = getLevel(this.currentLevelId + 1, this.canvas.width);
       if (nextLevelConfig) {
         this.currentLevelId++;
         this.loadLevel(nextLevelConfig);

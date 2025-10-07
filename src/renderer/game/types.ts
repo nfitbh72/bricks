@@ -42,12 +42,11 @@ export enum GameState {
 
 /**
  * Configuration for a single brick
+ * Uses grid coordinates (row/col) instead of pixel coordinates
  */
 export interface BrickConfig {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  row: number;      // Grid row position
+  col: number;      // Grid column position
   health: number;
   color?: string;
 }

@@ -3,46 +3,44 @@
  */
 
 import { LevelConfig, BrickConfig } from '../game/types';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING } from './constants';
+import { calculateWordWidth } from './brickLayout';
 
 /**
  * Create a brick layout from text
  * Each character becomes a brick, spaces are skipped
+ * Returns grid coordinates (row/col)
  */
 export function createTextLayout(
   text: string,
-  startX: number,
-  startY: number,
-  brickWidth: number,
-  brickHeight: number,
-  brickHealth: number = 1,
-  spacing: number = 2
+  startCol: number,
+  startRow: number,
+  brickHealth: number = 1
 ): BrickConfig[] {
   const bricks: BrickConfig[] = [];
   const lines = text.split('\n');
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
     const line = lines[lineIndex];
-    let xOffset = 0;
+    let colOffset = 0;
 
     for (let charIndex = 0; charIndex < line.length; charIndex++) {
       const char = line[charIndex];
       
       // Skip spaces
       if (char === ' ') {
-        xOffset += brickWidth + spacing;
+        colOffset++;
         continue;
       }
 
-      // Create brick for this character
+      // Create brick at grid position
       bricks.push({
-        x: startX + xOffset,
-        y: startY + (lineIndex * (brickHeight + spacing)),
-        width: brickWidth,
-        height: brickHeight,
+        col: startCol + colOffset,
+        row: startRow + lineIndex,
         health: brickHealth,
       });
 
-      xOffset += brickWidth + spacing;
+      colOffset++;
     }
   }
 
@@ -100,15 +98,13 @@ const LETTER_PATTERNS: { [key: string]: number[][] } = {
 
 /**
  * Create bricks from letter patterns
+ * Returns grid coordinates (row/col)
  */
 export function createLetterBricks(
   letter: string,
-  startX: number,
-  startY: number,
-  brickWidth: number,
-  brickHeight: number,
-  brickHealth: number = 1,
-  spacing: number = 2
+  startCol: number,
+  startRow: number,
+  brickHealth: number = 1
 ): BrickConfig[] {
   const pattern = LETTER_PATTERNS[letter.toUpperCase()];
   if (!pattern) {
@@ -121,10 +117,8 @@ export function createLetterBricks(
     for (let col = 0; col < pattern[row].length; col++) {
       if (pattern[row][col] === 1) {
         bricks.push({
-          x: startX + (col * (brickWidth + spacing)),
-          y: startY + (row * (brickHeight + spacing)),
-          width: brickWidth,
-          height: brickHeight,
+          col: startCol + col,
+          row: startRow + row,
           health: brickHealth,
         });
       }
@@ -136,92 +130,74 @@ export function createLetterBricks(
 
 /**
  * Create bricks for a word using letter patterns
+ * Returns grid coordinates (row/col)
  */
 export function createWordBricks(
   word: string,
-  startX: number,
-  startY: number,
-  brickWidth: number,
-  brickHeight: number,
-  brickHealth: number = 1,
-  letterSpacing: number = 10,
-  brickSpacing: number = 2
+  startCol: number,
+  startRow: number,
+  brickHealth: number = 1
 ): BrickConfig[] {
   const bricks: BrickConfig[] = [];
-  let xOffset = 0;
+  let colOffset = 0;
+  const letterSpacingCols = Math.ceil(LETTER_SPACING / (BRICK_WIDTH + BRICK_SPACING));
 
   for (const letter of word.toUpperCase()) {
     if (letter === ' ') {
-      xOffset += (brickWidth * 3) + letterSpacing;
+      colOffset += 3 + letterSpacingCols;
       continue;
     }
 
     const letterBricks = createLetterBricks(
       letter,
-      startX + xOffset,
-      startY,
-      brickWidth,
-      brickHeight,
-      brickHealth,
-      brickSpacing
+      startCol + colOffset,
+      startRow,
+      brickHealth
     );
 
     bricks.push(...letterBricks);
-    xOffset += (brickWidth * 5) + (brickSpacing * 4) + letterSpacing;
+    // Each letter is 5 columns wide, plus letter spacing
+    colOffset += 5 + letterSpacingCols;
   }
 
   return bricks;
 }
 
 /**
- * Create Level 1 configuration based on canvas dimensions
+ * Create Level 1 configuration
+ * Word "BRICKS" centered horizontally
  */
 export function createLevel1(canvasWidth: number): LevelConfig {
-  // Calculate brick size to fill most of the screen width
-  // Word "BRICKS" = 6 letters, each letter is 5 bricks wide with spacing
-  const totalLetters = 6;
-  const bricksPerLetter = 5;
-  const letterSpacing = 30;
-  const brickSpacing = 5;
+  const word = 'BRICKS';
   
-  // Calculate brick width to use ~80% of screen width
-  const usableWidth = canvasWidth * 0.8;
-  const totalSpacing = (totalLetters - 1) * letterSpacing + (totalLetters * bricksPerLetter - 1) * brickSpacing;
-  const brickWidth = Math.floor((usableWidth - totalSpacing) / (totalLetters * bricksPerLetter));
-  const brickHeight = Math.floor(brickWidth / 2); // 2:1 aspect ratio
+  // Calculate word width in columns
+  const letterSpacingCols = Math.ceil(LETTER_SPACING / (BRICK_WIDTH + BRICK_SPACING));
+  const wordWidthCols = (word.length * 5) + ((word.length - 1) * letterSpacingCols);
   
-  // Calculate starting X to center the word
-  const totalWidth = (totalLetters * bricksPerLetter * brickWidth) + totalSpacing;
-  const startX = (canvasWidth - totalWidth) / 2;
+  // Calculate canvas width in columns
+  const canvasWidthCols = Math.floor(canvasWidth / (BRICK_WIDTH + BRICK_SPACING));
+  
+  // Center the word
+  const startCol = Math.max(0, Math.floor((canvasWidthCols - wordWidthCols) / 2));
+  const startRow = 5; // Start at row 5
   
   return {
     id: 1,
     name: 'Level 1: BRICKS',
-    bricks: createWordBricks('BRICKS', startX, 150, brickWidth, brickHeight, 1, letterSpacing, brickSpacing),
+    bricks: createWordBricks(word, startCol, startRow, 1),
     playerHealth: 3,
   };
 }
 
 /**
- * Level 1: BRICKS
- * Forms the word "BRICKS" with bricks
- * Note: This uses default values. Use createLevel1(canvasWidth) for responsive sizing.
- */
-export const LEVEL_1: LevelConfig = {
-  id: 1,
-  name: 'Level 1: BRICKS',
-  bricks: createWordBricks('BRICKS', 100, 150, 40, 20, 1, 30, 5),
-  playerHealth: 3,
-};
-
-/**
- * All levels in order
- */
-export const LEVELS: LevelConfig[] = [LEVEL_1];
-
-/**
  * Get level by ID
+ * Creates level dynamically with canvas width for proper centering
  */
-export function getLevel(id: number): LevelConfig | undefined {
-  return LEVELS.find((level) => level.id === id);
+export function getLevel(id: number, canvasWidth: number): LevelConfig | undefined {
+  switch (id) {
+    case 1:
+      return createLevel1(canvasWidth);
+    default:
+      return undefined;
+  }
 }

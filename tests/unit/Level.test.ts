@@ -8,174 +8,188 @@ import {
   createTextLayout,
   createLetterBricks,
   createWordBricks,
-  LEVEL_1,
   getLevel,
+  createLevel1,
 } from '../../src/renderer/config/levels';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
 describe('Level Configuration Helpers', () => {
   describe('createTextLayout', () => {
     it('should create bricks for simple text', () => {
-      const bricks = createTextLayout('AB', 0, 0, 10, 5, 1, 2);
+      const bricks = createTextLayout('AB', 0, 0, 1);
       expect(bricks.length).toBe(2);
-      expect(bricks[0].x).toBe(0);
-      expect(bricks[1].x).toBe(12); // 10 + 2 spacing
+      expect(bricks[0].col).toBe(0);
+      expect(bricks[1].col).toBe(1);
     });
 
     it('should skip spaces in text', () => {
-      const bricks = createTextLayout('A B', 0, 0, 10, 5, 1, 2);
+      const bricks = createTextLayout('A B', 0, 0, 1);
       expect(bricks.length).toBe(2);
-      expect(bricks[0].x).toBe(0);
-      expect(bricks[1].x).toBe(24); // 0 + 10 + 2 + 10 + 2
+      expect(bricks[0].col).toBe(0);
+      expect(bricks[1].col).toBe(2); // Space skipped
     });
 
     it('should handle multi-line text', () => {
-      const bricks = createTextLayout('A\nB', 0, 0, 10, 5, 1, 2);
+      const bricks = createTextLayout('A\nB', 0, 0, 1);
       expect(bricks.length).toBe(2);
-      expect(bricks[0].y).toBe(0);
-      expect(bricks[1].y).toBe(7); // 5 + 2 spacing
+      expect(bricks[0].row).toBe(0);
+      expect(bricks[1].row).toBe(1);
     });
 
-    it('should use correct brick dimensions', () => {
-      const bricks = createTextLayout('A', 0, 0, 15, 8, 1, 2);
-      expect(bricks[0].width).toBe(15);
-      expect(bricks[0].height).toBe(8);
+    it('should return grid coordinates', () => {
+      const bricks = createTextLayout('A', 0, 0, 1);
+      expect(bricks[0].col).toBeDefined();
+      expect(bricks[0].row).toBeDefined();
+      expect(bricks[0].health).toBe(1);
     });
 
     it('should use correct brick health', () => {
-      const bricks = createTextLayout('A', 0, 0, 10, 5, 3, 2);
+      const bricks = createTextLayout('A', 0, 0, 3);
       expect(bricks[0].health).toBe(3);
     });
 
-    it('should apply startX and startY offsets', () => {
-      const bricks = createTextLayout('A', 100, 200, 10, 5, 1, 2);
-      expect(bricks[0].x).toBe(100);
-      expect(bricks[0].y).toBe(200);
+    it('should apply start col and row offsets', () => {
+      const bricks = createTextLayout('A', 5, 10, 1);
+      expect(bricks[0].col).toBe(5);
+      expect(bricks[0].row).toBe(10);
     });
   });
 
   describe('createLetterBricks', () => {
     it('should create bricks for letter B', () => {
-      const bricks = createLetterBricks('B', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('B', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter R', () => {
-      const bricks = createLetterBricks('R', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('R', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter I', () => {
-      const bricks = createLetterBricks('I', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('I', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter C', () => {
-      const bricks = createLetterBricks('C', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('C', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter K', () => {
-      const bricks = createLetterBricks('K', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('K', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter S', () => {
-      const bricks = createLetterBricks('S', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('S', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle lowercase letters', () => {
-      const bricks = createLetterBricks('b', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('b', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should return empty array for unknown letter', () => {
-      const bricks = createLetterBricks('Z', 0, 0, 10, 5, 1, 2);
+      const bricks = createLetterBricks('Z', 0, 0, 1);
       expect(bricks.length).toBe(0);
     });
 
-    it('should apply correct brick dimensions', () => {
-      const bricks = createLetterBricks('B', 0, 0, 15, 8, 1, 2);
-      expect(bricks[0].width).toBe(15);
-      expect(bricks[0].height).toBe(8);
+    it('should return grid coordinates', () => {
+      const bricks = createLetterBricks('B', 0, 0, 1);
+      expect(bricks[0].col).toBeDefined();
+      expect(bricks[0].row).toBeDefined();
     });
 
     it('should apply correct brick health', () => {
-      const bricks = createLetterBricks('B', 0, 0, 10, 5, 3, 2);
+      const bricks = createLetterBricks('B', 0, 0, 3);
       expect(bricks[0].health).toBe(3);
     });
 
-    it('should apply startX and startY offsets', () => {
-      const bricks = createLetterBricks('B', 100, 200, 10, 5, 1, 2);
-      expect(bricks[0].x).toBeGreaterThanOrEqual(100);
-      expect(bricks[0].y).toBeGreaterThanOrEqual(200);
+    it('should apply start col and row offsets', () => {
+      const bricks = createLetterBricks('B', 5, 10, 1);
+      expect(bricks[0].col).toBeGreaterThanOrEqual(5);
+      expect(bricks[0].row).toBeGreaterThanOrEqual(10);
     });
   });
 
   describe('createWordBricks', () => {
     it('should create bricks for word BRICKS', () => {
-      const bricks = createWordBricks('BRICKS', 0, 0, 10, 5, 1, 10, 2);
+      const bricks = createWordBricks('BRICKS', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle lowercase words', () => {
-      const bricks = createWordBricks('bricks', 0, 0, 10, 5, 1, 10, 2);
+      const bricks = createWordBricks('bricks', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle words with spaces', () => {
-      const bricks = createWordBricks('B R', 0, 0, 10, 5, 1, 10, 2);
+      const bricks = createWordBricks('B R', 0, 0, 1);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should apply correct brick health', () => {
-      const bricks = createWordBricks('B', 0, 0, 10, 5, 3, 10, 2);
+      const bricks = createWordBricks('B', 0, 0, 3);
       expect(bricks[0].health).toBe(3);
     });
   });
 
-  describe('LEVEL_1', () => {
+  describe('createLevel1', () => {
     it('should have correct id', () => {
-      expect(LEVEL_1.id).toBe(1);
+      const level1 = createLevel1(800);
+      expect(level1.id).toBe(1);
     });
 
     it('should have a name', () => {
-      expect(LEVEL_1.name).toBeTruthy();
-      expect(typeof LEVEL_1.name).toBe('string');
+      const level1 = createLevel1(800);
+      expect(level1.name).toBeTruthy();
+      expect(typeof level1.name).toBe('string');
     });
 
     it('should have bricks', () => {
-      expect(LEVEL_1.bricks).toBeDefined();
-      expect(LEVEL_1.bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should have ball speed of 300', () => {
-      expect(LEVEL_1.ballSpeed).toBe(300);
-    });
-
-    it('should have bat width of 100', () => {
-      expect(LEVEL_1.batWidth).toBe(100);
-    });
-
-    it('should have bat height of 10', () => {
-      expect(LEVEL_1.batHeight).toBe(10);
+      const level1 = createLevel1(800);
+      expect(level1.bricks).toBeDefined();
+      expect(level1.bricks.length).toBeGreaterThan(0);
     });
 
     it('should have player health of 3', () => {
-      expect(LEVEL_1.playerHealth).toBe(3);
+      const level1 = createLevel1(800);
+      expect(level1.playerHealth).toBe(3);
+    });
+
+    it('should center bricks based on canvas width', () => {
+      const level1 = createLevel1(1920); // Use wider canvas
+      const firstBrick = level1.bricks[0];
+      
+      // First brick should not be at col=0 (it's centered)
+      expect(firstBrick.col).toBeGreaterThan(0);
+      
+      // All bricks should have grid coordinates
+      level1.bricks.forEach(brick => {
+        expect(brick.col).toBeDefined();
+        expect(brick.row).toBeDefined();
+      });
     });
   });
 
   describe('getLevel', () => {
     it('should return level 1', () => {
-      const level = getLevel(1);
+      const level = getLevel(1, 800);
       expect(level).toBeDefined();
       expect(level?.id).toBe(1);
     });
 
     it('should return undefined for non-existent level', () => {
-      const level = getLevel(999);
+      const level = getLevel(999, 800);
       expect(level).toBeUndefined();
+    });
+
+    it('should create level with correct canvas width', () => {
+      const level = getLevel(1, 1024);
+      expect(level).toBeDefined();
+      expect(level?.bricks.length).toBeGreaterThan(0);
     });
   });
 });
@@ -185,13 +199,10 @@ describe('Level Class', () => {
     id: 1,
     name: 'Test Level',
     bricks: [
-      { x: 0, y: 0, width: 50, height: 20, health: 1 },
-      { x: 60, y: 0, width: 50, height: 20, health: 2 },
-      { x: 120, y: 0, width: 50, height: 20, health: 1 },
+      { col: 0, row: 0, health: 1 },
+      { col: 1, row: 0, health: 2 },
+      { col: 2, row: 0, health: 1 },
     ],
-    ballSpeed: 300,
-    batWidth: 100,
-    batHeight: 10,
     playerHealth: 3,
   };
 
@@ -330,26 +341,8 @@ describe('Level Class', () => {
     });
   });
 
-  describe('getBallSpeed', () => {
-    it('should return ball speed', () => {
-      const level = new Level(testConfig);
-      expect(level.getBallSpeed()).toBe(300);
-    });
-  });
-
-  describe('getBatWidth', () => {
-    it('should return bat width', () => {
-      const level = new Level(testConfig);
-      expect(level.getBatWidth()).toBe(100);
-    });
-  });
-
-  describe('getBatHeight', () => {
-    it('should return bat height', () => {
-      const level = new Level(testConfig);
-      expect(level.getBatHeight()).toBe(10);
-    });
-  });
+  // Ball speed, bat width, and bat height are now global constants
+  // No longer part of level config
 
   describe('getPlayerHealth', () => {
     it('should return player health', () => {
@@ -385,11 +378,15 @@ describe('Level Class', () => {
   describe('render', () => {
     it('should not throw when rendering', () => {
       const level = new Level(testConfig);
+      const mockGradient = {
+        addColorStop: jest.fn(),
+      };
       const mockCtx = {
         save: jest.fn(),
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
         fillStyle: '',
@@ -403,11 +400,15 @@ describe('Level Class', () => {
 
     it('should call render on all bricks', () => {
       const level = new Level(testConfig);
+      const mockGradient = {
+        addColorStop: jest.fn(),
+      };
       const mockCtx = {
         save: jest.fn(),
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
         fillStyle: '',
@@ -424,18 +425,17 @@ describe('Level Class', () => {
     });
   });
 
-  describe('integration with LEVEL_1', () => {
-    it('should create level from LEVEL_1 config', () => {
-      const level = new Level(LEVEL_1);
+  describe('integration with createLevel1', () => {
+    it('should create level from createLevel1 config', () => {
+      const level1Config = createLevel1(800);
+      const level = new Level(level1Config);
       expect(level.getId()).toBe(1);
       expect(level.getBricks().length).toBeGreaterThan(0);
     });
 
     it('should have correct game parameters', () => {
-      const level = new Level(LEVEL_1);
-      expect(level.getBallSpeed()).toBe(300);
-      expect(level.getBatWidth()).toBe(100);
-      expect(level.getBatHeight()).toBe(10);
+      const level1Config = createLevel1(800);
+      const level = new Level(level1Config);
       expect(level.getPlayerHealth()).toBe(3);
     });
   });

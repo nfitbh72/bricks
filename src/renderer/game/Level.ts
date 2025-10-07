@@ -18,17 +18,7 @@ export class Level {
    * Create Brick instances from level configuration
    */
   private createBricksFromConfig(): Brick[] {
-    return this.config.bricks.map(
-      (brickConfig) =>
-        new Brick(
-          brickConfig.x,
-          brickConfig.y,
-          brickConfig.width,
-          brickConfig.height,
-          brickConfig.health,
-          brickConfig.color
-        )
-    );
+    return this.config.bricks.map((brickConfig) => new Brick(brickConfig));
   }
 
   /**
