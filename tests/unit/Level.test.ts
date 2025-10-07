@@ -138,33 +138,30 @@ describe('Level Configuration Helpers', () => {
 
   describe('createLevel1', () => {
     it('should have correct id', () => {
-      const level1 = createLevel1(800);
+      const level1 = createLevel1();
       expect(level1.id).toBe(1);
     });
 
     it('should have a name', () => {
-      const level1 = createLevel1(800);
+      const level1 = createLevel1();
       expect(level1.name).toBeTruthy();
       expect(typeof level1.name).toBe('string');
     });
 
     it('should have bricks', () => {
-      const level1 = createLevel1(800);
+      const level1 = createLevel1();
       expect(level1.bricks).toBeDefined();
       expect(level1.bricks.length).toBeGreaterThan(0);
     });
 
     it('should have player health of 3', () => {
-      const level1 = createLevel1(800);
+      const level1 = createLevel1();
       expect(level1.playerHealth).toBe(3);
     });
 
-    it('should center bricks based on canvas width', () => {
-      const level1 = createLevel1(1920); // Use wider canvas
+    it('should have grid coordinates', () => {
+      const level1 = createLevel1();
       const firstBrick = level1.bricks[0];
-      
-      // First brick should not be at col=0 (it's centered)
-      expect(firstBrick.col).toBeGreaterThan(0);
       
       // All bricks should have grid coordinates
       level1.bricks.forEach(brick => {
@@ -176,20 +173,20 @@ describe('Level Configuration Helpers', () => {
 
   describe('getLevel', () => {
     it('should return level 1', () => {
-      const level = getLevel(1, 800);
+      const level = getLevel(1);
       expect(level).toBeDefined();
       expect(level?.id).toBe(1);
     });
 
-    it('should return undefined for non-existent level', () => {
-      const level = getLevel(999, 800);
-      expect(level).toBeUndefined();
+    it('should return level 2', () => {
+      const level = getLevel(2);
+      expect(level).toBeDefined();
+      expect(level?.id).toBe(2);
     });
 
-    it('should create level with correct canvas width', () => {
-      const level = getLevel(1, 1024);
-      expect(level).toBeDefined();
-      expect(level?.bricks.length).toBeGreaterThan(0);
+    it('should return undefined for non-existent level', () => {
+      const level = getLevel(999);
+      expect(level).toBeUndefined();
     });
   });
 });
@@ -427,16 +424,26 @@ describe('Level Class', () => {
 
   describe('integration with createLevel1', () => {
     it('should create level from createLevel1 config', () => {
-      const level1Config = createLevel1(800);
+      const level1Config = createLevel1();
       const level = new Level(level1Config);
       expect(level.getId()).toBe(1);
       expect(level.getBricks().length).toBeGreaterThan(0);
     });
 
     it('should have correct game parameters', () => {
-      const level1Config = createLevel1(800);
+      const level1Config = createLevel1();
       const level = new Level(level1Config);
       expect(level.getPlayerHealth()).toBe(3);
+    });
+    
+    it('should center bricks when canvas width provided', () => {
+      const level1Config = createLevel1();
+      const level = new Level(level1Config, 1920);
+      const bricks = level.getBricks();
+      const firstBrick = bricks[0];
+      
+      // Bricks should be centered (not at pixel x=0)
+      expect(firstBrick.getPosition().x).toBeGreaterThan(0);
     });
   });
 });

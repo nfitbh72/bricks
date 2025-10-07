@@ -167,7 +167,7 @@ export function createWordBricks(
  * Create Level 1 configuration
  * Simple block pattern for introductory level
  */
-export function createLevel1(canvasWidth: number): LevelConfig {
+export function createLevel1(): LevelConfig {
   const pattern = [
     [1, 1, 0, 0, 0],
     [1, 1, 1, 1, 1],
@@ -176,22 +176,14 @@ export function createLevel1(canvasWidth: number): LevelConfig {
   ];
   
   const bricks: BrickConfig[] = [];
-  const patternWidth = 5;
   
-  // Calculate canvas width in columns
-  const canvasWidthCols = Math.floor(canvasWidth / (BRICK_WIDTH + BRICK_SPACING));
-  
-  // Center the pattern
-  const startCol = Math.max(0, Math.floor((canvasWidthCols - patternWidth) / 2));
-  const startRow = 5;
-  
-  // Create bricks from pattern
+  // Create bricks from pattern (starting at origin)
   for (let row = 0; row < pattern.length; row++) {
     for (let col = 0; col < pattern[row].length; col++) {
       if (pattern[row][col] === 1) {
         bricks.push({
-          col: startCol + col,
-          row: startRow + row,
+          col,
+          row,
           health: 1,
         });
       }
@@ -208,40 +200,26 @@ export function createLevel1(canvasWidth: number): LevelConfig {
 
 /**
  * Create Level 2 configuration
- * Word "BRICKS" centered horizontally
+ * Word "BRICKS"
  */
-export function createLevel2(canvasWidth: number): LevelConfig {
-  const word = 'BRICKS';
-  
-  // Calculate word width in columns
-  const letterSpacingCols = Math.ceil(LETTER_SPACING / (BRICK_WIDTH + BRICK_SPACING));
-  const wordWidthCols = (word.length * 5) + ((word.length - 1) * letterSpacingCols);
-  
-  // Calculate canvas width in columns
-  const canvasWidthCols = Math.floor(canvasWidth / (BRICK_WIDTH + BRICK_SPACING));
-  
-  // Center the word
-  const startCol = Math.max(0, Math.floor((canvasWidthCols - wordWidthCols) / 2));
-  const startRow = 5; // Start at row 5
-  
+export function createLevel2(): LevelConfig {
   return {
     id: 2,
     name: 'Level 2: BRICKS',
-    bricks: createWordBricks(word, startCol, startRow, 1),
+    bricks: createWordBricks('BRICKS', 0, 5, 1),
     playerHealth: 3,
   };
 }
 
 /**
  * Get level by ID
- * Creates level dynamically with canvas width for proper centering
  */
-export function getLevel(id: number, canvasWidth: number): LevelConfig | undefined {
+export function getLevel(id: number): LevelConfig | undefined {
   switch (id) {
     case 1:
-      return createLevel1(canvasWidth);
+      return createLevel1();
     case 2:
-      return createLevel2(canvasWidth);
+      return createLevel2();
     default:
       return undefined;
   }

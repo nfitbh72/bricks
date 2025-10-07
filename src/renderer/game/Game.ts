@@ -200,8 +200,7 @@ export class Game {
    */
   private handleStartGame(): void {
     this.startTransition(() => {
-      // Create level 1 with responsive brick sizing
-      const levelConfig = getLevel(1, this.canvas.width);
+      const levelConfig = getLevel(1);
       if (!levelConfig) {
         throw new Error('Level 1 not found');
       }
@@ -225,7 +224,7 @@ export class Game {
    */
   private handleContinue(): void {
     this.startTransition(() => {
-      const nextLevelConfig = getLevel(this.currentLevelId + 1, this.canvas.width);
+      const nextLevelConfig = getLevel(this.currentLevelId + 1);
       if (nextLevelConfig) {
         this.currentLevelId++;
         this.loadLevel(nextLevelConfig);
@@ -285,9 +284,11 @@ export class Game {
 
   /**
    * Load a level
+   * Centers bricks horizontally on the canvas
    */
   loadLevel(levelConfig: LevelConfig): void {
-    this.level = new Level(levelConfig);
+    // Create level with canvas width for centering
+    this.level = new Level(levelConfig, this.canvas.width);
     this.playerHealth = levelConfig.playerHealth;
     this.gameState = GameState.PLAYING;
     
