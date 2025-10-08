@@ -5,6 +5,7 @@
 import { Ball } from './Ball';
 import { Bat } from './Bat';
 import { Level } from './Level';
+import { Laser } from './Laser';
 import { StatusBar } from './StatusBar';
 import { GameState, LevelConfig } from './types';
 import { checkCircleRectCollision, calculateGameElementScale } from './utils';
@@ -24,6 +25,7 @@ export class Game {
   private ctx: CanvasRenderingContext2D;
   private ball: Ball;
   private bat: Bat;
+  private lasers: Laser[] = [];
   private level: Level | null = null;
   private statusBar: StatusBar;
   private gameState: GameState = GameState.INTRO;
@@ -206,6 +208,11 @@ export class Game {
         this.upgradeTreeScreen.handleKeyPress(e.key);
       } else if (this.gameState === GameState.PAUSED) {
         this.pauseScreen.handleKeyPress(e.key);
+      } else if (this.gameState === GameState.PLAYING) {
+        // Shoot laser on Space key if shooter upgrade is unlocked
+        if (e.key === ' ') {
+          this.shootLaser();
+        }
       }
     });
 
@@ -254,6 +261,9 @@ export class Game {
         this.upgradeTreeScreen.handleClick(x, y);
       } else if (this.gameState === GameState.PAUSED) {
         this.pauseScreen.handleClick(x, y);
+      } else if (this.gameState === GameState.PLAYING) {
+        // Shoot laser if shooter upgrade is unlocked
+        this.shootLaser();
       }
     });
   }
@@ -423,13 +433,127 @@ export class Game {
   }
 
   /**
+   * Shoot a laser from the bat (if shooter upgrade is unlocked)
+   */
+  private shootLaser(): void {
+    // Check if shooter upgrade is unlocked
+    if (!this.gameUpgrades.hasBatShooter()) {
+      return;
+    }
+
+    // Get bat center position
+    const batPos = this.bat.getPosition();
+    const batWidth = this.bat.getWidth();
+    const centerX = batPos.x + batWidth / 2;
+    const centerY = batPos.y;
+
+    // Calculate laser properties
+    const ballSpeed = this.ball.getSpeed();
+    const laserSpeed = ballSpeed * 10; // 10x ball speed
+    const ballDamage = this.ball.getDamage();
+    const laserDamage = ballDamage * 0.1; // 1/10th ball damage
+
+    // Create and add laser
+    const laser = new Laser(centerX, centerY, laserSpeed, laserDamage);
+    this.lasers.push(laser);
+  }
+
+  /**
+   * Update all lasers
+   */
+  private updateLasers(deltaTime: number): void {
+    // Update laser positions
+    for (const laser of this.lasers) {
+      if (laser.isActive()) {
+        laser.update(deltaTime);
+
+        // Deactivate if off-screen
+        if (laser.isOffScreen(0)) {
+          laser.deactivate();
+        }
+      }
+    }
+
+    // Remove inactive lasers
+    this.lasers = this.lasers.filter(laser => laser.isActive());
+  }
+
+  /**
+   * Check laser-brick collisions
+   */
+  private checkLaserCollisions(): void {
+    if (!this.level) return;
+    if (this.gameState !== GameState.PLAYING) return;
+
+    const bricks = this.level.getActiveBricks();
+
+    // Create a copy of lasers array to avoid modification during iteration
+    const lasersToCheck = [...this.lasers];
+
+    for (const laser of lasersToCheck) {
+      if (!laser.isActive()) continue;
+
+      const laserBounds = laser.getBounds();
+
+      for (const brick of bricks) {
+        const brickBounds = brick.getBounds();
+
+        // Simple AABB collision
+        if (
+          laserBounds.x < brickBounds.x + brickBounds.width &&
+          laserBounds.x + laserBounds.width > brickBounds.x &&
+          laserBounds.y < brickBounds.y + brickBounds.height &&
+          laserBounds.y + laserBounds.height > brickBounds.y
+        ) {
+          // Damage brick
+          const wasDestroyed = brick.isDestroyed();
+          brick.takeDamage(laser.getDamage());
+
+          // Track destroyed bricks and create particles
+          if (!wasDestroyed && brick.isDestroyed()) {
+            this.totalBricksDestroyed++;
+            this.statusBar.setBrickCounts(
+              this.level.getRemainingBricks(),
+              this.level.getTotalBricks()
+            );
+
+            // Create particles
+            const brickPos = brick.getPosition();
+            const centerX = brickPos.x + brickBounds.width / 2;
+            const centerY = brickPos.y + brickBounds.height / 2;
+            this.particleSystem.createParticles(centerX, centerY, 5, brick.getColor(), 100);
+
+            // Play explosion sound
+            this.playSound(this.brickExplodeSound);
+          } else if (!brick.isDestroyed()) {
+            // Brick was hit but not destroyed - play ding sound
+            this.playSound(this.brickHitSound);
+          }
+
+          // Deactivate laser after hitting brick
+          laser.deactivate();
+          break;
+        }
+      }
+    }
+  }
+
+  /**
    * Load a level
    * Centers bricks horizontally on the canvas
    */
   loadLevel(levelConfig: LevelConfig): void {
     // Create level with canvas width for centering
     this.level = new Level(levelConfig, this.canvas.width);
-    this.playerHealth = levelConfig.playerHealth;
+    
+    // Set player health: base (1) + upgrade bonus
+    const baseHealth = 1;
+    const upgradeBonus = this.gameUpgrades.getHealthBonus();
+    this.playerHealth = baseHealth + upgradeBonus;
+    
+    // Clear any active lasers
+    this.lasers = [];
+    
     this.gameState = GameState.PLAYING;
     
     // Load background image for this level
@@ -523,6 +647,9 @@ export class Game {
     // Update ball
     this.ball.update(deltaTime);
 
+    // Update lasers
+    this.updateLasers(deltaTime);
+
     // Update particles
     this.particleSystem.update(deltaTime);
 
@@ -614,8 +741,12 @@ export class Game {
       const collision = checkCircleRectCollision(ballBounds, brickBounds);
       
       if (collision.collided) {
-        // Bounce ball
-        if (collision.normal) {
+        // Check for piercing
+        const piercingChance = this.gameUpgrades.getBallPiercingChance();
+        const pierced = piercingChance > 0 && Math.random() < piercingChance;
+        
+        // Bounce ball (unless piercing)
+        if (!pierced && collision.normal) {
           this.ball.bounce(collision.normal);
         }
         
@@ -650,10 +781,15 @@ export class Game {
           this.ball.restoreToNormal();
         }
         
-        // Only process one brick collision per frame
-        break;
+        // If piercing, continue to next brick; otherwise stop
+        if (!pierced) {
+          break;
+        }
       }
     }
+
+    // Laser-Brick collisions
+    this.checkLaserCollisions();
   }
 
   /**
@@ -728,6 +864,15 @@ export class Game {
 
     // Render ball
     this.ball.render(this.ctx);
+
+    // Render lasers
+    this.ctx.save();
+    for (const laser of this.lasers) {
+      if (laser.isActive()) {
+        laser.render(this.ctx);
+      }
+    }
+    this.ctx.restore();
 
     // Render particles
     this.particleSystem.render(this.ctx);

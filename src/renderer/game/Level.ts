@@ -21,18 +21,16 @@ export class Level {
    * Create a Level from a visual pattern
    * Convenience factory method for pattern-based levels
    */
-  static fromPattern(
+  static createFromPattern(
     id: number,
     name: string,
     pattern: string[],
-    playerHealth: number = 3,
     canvasWidth?: number
   ): Level {
     const config: LevelConfig = {
       id,
       name,
       bricks: createBricksFromPattern(pattern),
-      playerHealth,
     };
     return new Level(config, canvasWidth);
   }
@@ -41,25 +39,22 @@ export class Level {
    * Create a Level from a word
    * Uses letter patterns to spell out the word in bricks
    */
-  static fromWord(
+  static createFromWord(
     id: number,
     name: string,
     word: string,
     brickType: BrickType = BrickType.NORMAL,
-    playerHealth: number = 3,
     canvasWidth?: number
   ): Level {
     const config: LevelConfig = {
       id,
       name,
       bricks: createBricksFromWord(word, brickType),
-      playerHealth,
     };
     return new Level(config, canvasWidth);
   }
 
   /**
-   * Create Brick instances from level configuration
    * Optionally centers bricks horizontally based on canvas width
    * Always adds top margin of 3 brick heights
    */
@@ -153,9 +148,10 @@ export class Level {
 
   /**
    * Get player health for this level
+   * @deprecated Health is now managed centrally in Game class
    */
   getPlayerHealth(): number {
-    return this.config.playerHealth;
+    return 1; // Base health, actual health managed by Game
   }
 
   /**

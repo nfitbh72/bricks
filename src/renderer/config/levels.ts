@@ -27,7 +27,6 @@ export function createLevel1(): LevelConfig {
     id: 1,
     name: 'Level 1: Effective Design',
     bricks: createBricksFromPattern(pattern),
-    playerHealth: 3,
   };
 }
 
@@ -40,7 +39,6 @@ export function createLevel2(): LevelConfig {
     id: 2,
     name: 'Level 2: Says Hi',
     bricks: createBricksFromWord("UR MOM", BrickType.HEALTHY),
-    playerHealth: 3,
   };
 }
 

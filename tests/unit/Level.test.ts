@@ -121,9 +121,10 @@ describe('Level Configuration Helpers', () => {
       expect(level1.bricks.length).toBeGreaterThan(0);
     });
 
-    it('should have player health of 3', () => {
+    it('should have level configuration', () => {
       const level1 = createLevel1();
-      expect(level1.playerHealth).toBe(3);
+      expect(level1.id).toBe(1);
+      expect(level1.name).toBeDefined();
     });
 
     it('should have grid coordinates', () => {
@@ -167,7 +168,6 @@ describe('Level Class', () => {
       { col: 1, row: 0, type: BrickType.HEALTHY },
       { col: 2, row: 0, type: BrickType.NORMAL },
     ],
-    playerHealth: 3,
   };
 
   describe('constructor', () => {
@@ -308,12 +308,7 @@ describe('Level Class', () => {
   // Ball speed, bat width, and bat height are now global constants
   // No longer part of level config
 
-  describe('getPlayerHealth', () => {
-    it('should return player health', () => {
-      const level = new Level(testConfig);
-      expect(level.getPlayerHealth()).toBe(3);
-    });
-  });
+  // getPlayerHealth is deprecated - health is now managed centrally in Game class
 
   describe('reset', () => {
     it('should restore all bricks', () => {
@@ -397,10 +392,11 @@ describe('Level Class', () => {
       expect(level.getBricks().length).toBeGreaterThan(0);
     });
 
-    it('should have correct game parameters', () => {
+    it('should have correct level configuration', () => {
       const level1Config = createLevel1();
       const level = new Level(level1Config);
-      expect(level.getPlayerHealth()).toBe(3);
+      expect(level.getId()).toBe(1);
+      expect(level.getName()).toBeDefined();
     });
     
     it('should center bricks when canvas width provided', () => {
@@ -414,38 +410,27 @@ describe('Level Class', () => {
     });
   });
 
-  describe('Level.fromPattern factory method', () => {
+  describe('Level.createFromPattern factory method', () => {
     it('should create level from pattern', () => {
       const pattern = ["NNN", "NNN"];
-      const level = Level.fromPattern(1, "Test Level", pattern);
+      const level = Level.createFromPattern(1, "Test Level", pattern);
       
       expect(level.getId()).toBe(1);
       expect(level.getName()).toBe("Test Level");
       expect(level.getBricks().length).toBe(6);
     });
 
-    it('should use default player health', () => {
-      const pattern = ["N"];
-      const level = Level.fromPattern(1, "Test", pattern);
-      expect(level.getPlayerHealth()).toBe(3);
-    });
-
-    it('should accept custom player health', () => {
-      const pattern = ["N"];
-      const level = Level.fromPattern(1, "Test", pattern, 5);
-      expect(level.getPlayerHealth()).toBe(5);
-    });
 
     it('should center bricks when canvas width provided', () => {
       const pattern = ["N"];
-      const level = Level.fromPattern(1, "Test", pattern, 3, 1920);
+      const level = Level.createFromPattern(1, "Test", pattern, 1920);
       const brick = level.getBricks()[0];
       expect(brick.getPosition().x).toBeGreaterThan(0);
     });
 
     it('should handle mixed brick types', () => {
       const pattern = ["NHN"];
-      const level = Level.fromPattern(1, "Test", pattern);
+      const level = Level.createFromPattern(1, "Test", pattern);
       const bricks = level.getBricks();
       
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
@@ -454,9 +439,9 @@ describe('Level Class', () => {
     });
   });
 
-  describe('Level.fromWord factory method', () => {
+  describe('Level.createFromWord factory method', () => {
     it('should create level from word', () => {
-      const level = Level.fromWord(1, "Test Level", "HI");
+      const level = Level.createFromWord(1, "Test Level", "HI");
       
       expect(level.getId()).toBe(1);
       expect(level.getName()).toBe("Test Level");
@@ -464,35 +449,26 @@ describe('Level Class', () => {
     });
 
     it('should use default brick type (NORMAL)', () => {
-      const level = Level.fromWord(1, "Test", "B");
+      const level = Level.createFromWord(1, "Test", "B");
       const bricks = level.getBricks();
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
     });
 
     it('should accept custom brick type', () => {
-      const level = Level.fromWord(1, "Test", "B", BrickType.HEALTHY);
+      const level = Level.createFromWord(1, "Test", "B", BrickType.HEALTHY);
       const bricks = level.getBricks();
       expect(bricks[0].getHealth()).toBe(3); // HEALTHY
     });
 
-    it('should use default player health', () => {
-      const level = Level.fromWord(1, "Test", "B");
-      expect(level.getPlayerHealth()).toBe(3);
-    });
-
-    it('should accept custom player health', () => {
-      const level = Level.fromWord(1, "Test", "B", BrickType.NORMAL, 5);
-      expect(level.getPlayerHealth()).toBe(5);
-    });
 
     it('should center bricks when canvas width provided', () => {
-      const level = Level.fromWord(1, "Test", "B", BrickType.NORMAL, 3, 1920);
+      const level = Level.createFromWord(1, "Test", "B", BrickType.NORMAL, 1920);
       const brick = level.getBricks()[0];
       expect(brick.getPosition().x).toBeGreaterThan(0);
     });
 
     it('should handle multi-letter words', () => {
-      const level = Level.fromWord(1, "Test", "BRICKS");
+      const level = Level.createFromWord(1, "Test", "BRICKS");
       expect(level.getBricks().length).toBeGreaterThan(20); // Multiple letters worth of bricks
     });
   });

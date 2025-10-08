@@ -123,7 +123,7 @@ export class GameUpgrades {
    * Get health bonus from upgrades
    */
   getHealthBonus(): number {
-    const healthLevel = this.getUpgradeLevel(UpgradeType.BAT_HEALTH_INCREASE_1);
+    const healthLevel = this.getUpgradeLevel(UpgradeType.HEALTH_INCREASE_1);
     return healthLevel; // +1 health per level
   }
 

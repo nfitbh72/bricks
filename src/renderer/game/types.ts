@@ -67,7 +67,6 @@ export interface LevelConfig {
   id: number;
   name: string;
   bricks: BrickConfig[];
-  playerHealth: number;
 }
 
 /**
@@ -80,7 +79,7 @@ export enum UpgradeType {
     BALL_DAMAGE_INCREASE_INCREMENT_1 = 'BALL_DAMAGE_INCREASE_INCREMENT_1',
     BALL_ADD_PIERCING = 'BALL_ADD_PIERCING',
     BALL_CHANCE_PIERCING_10_PERCENT = 'BALL_CHANCE_PIERCING_10_PERCENT',
-    BAT_HEALTH_INCREASE_1 = 'BAT_HEALTH_INCREASE_1',
+    HEALTH_INCREASE_1 = 'HEALTH_INCREASE_1',
 }
 
 /**

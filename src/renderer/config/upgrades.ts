@@ -30,12 +30,12 @@ export function getUpgrades() : Upgrade[] {
                     ],
                 },
                 {
-                    name: 'Bat Health',
-                    description: 'Increase bat health by 1',
+                    name: 'Lives',
+                    description: 'Increase the number of lives by 1',
                     times: 3,
                     previewNextUpgrades: 0,
                     unlockNextUpgradesAfterTimes: 0,
-                    type: UpgradeType.BAT_HEALTH_INCREASE_1,
+                    type: UpgradeType.HEALTH_INCREASE_1,
                     nextUpgrades: [],
                 }
             ],
@@ -49,7 +49,7 @@ export function getUpgrades() : Upgrade[] {
             type: UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1,
             nextUpgrades: [
                 {
-                    name: 'Ball Piercing',
+                    name: 'Piercing',
                     description: 'One in 10 chance to pierce through a brick',
                     times: 1,
                     previewNextUpgrades: 0,

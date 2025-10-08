@@ -151,7 +151,8 @@ export class Brick {
     }
     
     // Use health modulo 16 to index into neon color palette
-    const colorIndex = this.health % 16;
+    // Floor the health to handle fractional damage (e.g., from lasers)
+    const colorIndex = Math.round(this.health) % 16;
     return Brick.NEON_COLORS[colorIndex];
   }
 
