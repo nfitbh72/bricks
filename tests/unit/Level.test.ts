@@ -4,13 +4,10 @@
 
 import { Level } from '../../src/renderer/game/Level';
 import {
-  createTextLayout,
-  createLetterBricks,
-  createWordBricks,
   getLevel,
   createLevel1,
 } from '../../src/renderer/config/levels';
-import { createBricksFromPattern } from '../../src/renderer/config/brickLayout';
+import { createBricksFromPattern, createBricksFromWord } from '../../src/renderer/config/brickLayout';
 import { BrickType, LevelConfig } from '../../src/renderer/game/types';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
@@ -72,125 +69,37 @@ describe('Level Configuration Helpers', () => {
     });
   });
 
-  describe('createTextLayout', () => {
-    it('should create bricks for simple text', () => {
-      const bricks = createTextLayout('AB', 0, 0);
-      expect(bricks.length).toBe(2);
-      expect(bricks[0].col).toBe(0);
-      expect(bricks[1].col).toBe(1);
-    });
-
-    it('should skip spaces in text', () => {
-      const bricks = createTextLayout('A B', 0, 0);
-      expect(bricks.length).toBe(2);
-      expect(bricks[0].col).toBe(0);
-      expect(bricks[1].col).toBe(2); // Space skipped
-    });
-
-    it('should handle multi-line text', () => {
-      const bricks = createTextLayout('A\nB', 0, 0);
-      expect(bricks.length).toBe(2);
-      expect(bricks[0].row).toBe(0);
-      expect(bricks[1].row).toBe(1);
-    });
-
-    it('should return grid coordinates', () => {
-      const bricks = createTextLayout('A', 0, 0);
-      expect(bricks[0].col).toBeDefined();
-      expect(bricks[0].row).toBeDefined();
-      expect(bricks[0].type).toBe(BrickType.NORMAL);
-    });
-
-    it('should use correct brick type', () => {
-      const bricks = createTextLayout('A', 0, 0, BrickType.HEALTHY);
-      expect(bricks[0].type).toBe(BrickType.HEALTHY);
-    });
-
-    it('should apply start col and row offsets', () => {
-      const bricks = createTextLayout('A', 5, 10);
-      expect(bricks[0].col).toBe(5);
-      expect(bricks[0].row).toBe(10);
-    });
-  });
-
-  describe('createLetterBricks', () => {
-    it('should create bricks for letter B', () => {
-      const bricks = createLetterBricks('B', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should create bricks for letter R', () => {
-      const bricks = createLetterBricks('R', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should create bricks for letter I', () => {
-      const bricks = createLetterBricks('I', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should create bricks for letter C', () => {
-      const bricks = createLetterBricks('C', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should create bricks for letter K', () => {
-      const bricks = createLetterBricks('K', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should create bricks for letter S', () => {
-      const bricks = createLetterBricks('S', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should handle lowercase letters', () => {
-      const bricks = createLetterBricks('b', 0, 0);
-      expect(bricks.length).toBeGreaterThan(0);
-    });
-
-    it('should return empty array for unknown letter', () => {
-      const bricks = createLetterBricks('Z', 0, 0);
-      expect(bricks.length).toBe(0);
-    });
-
-    it('should return grid coordinates', () => {
-      const bricks = createLetterBricks('B', 0, 0);
-      expect(bricks[0].col).toBeDefined();
-      expect(bricks[0].row).toBeDefined();
-    });
-
-    it('should apply correct brick type', () => {
-      const bricks = createLetterBricks('B', 0, 0, BrickType.HEALTHY);
-      expect(bricks[0].type).toBe(BrickType.HEALTHY);
-    });
-
-    it('should apply start col and row offsets', () => {
-      const bricks = createLetterBricks('B', 5, 10);
-      expect(bricks[0].col).toBeGreaterThanOrEqual(5);
-      expect(bricks[0].row).toBeGreaterThanOrEqual(10);
-    });
-  });
-
-  describe('createWordBricks', () => {
+  describe('createBricksFromWord', () => {
     it('should create bricks for word BRICKS', () => {
-      const bricks = createWordBricks('BRICKS', 0, 0);
+      const bricks = createBricksFromWord('BRICKS');
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle lowercase words', () => {
-      const bricks = createWordBricks('bricks', 0, 0);
+      const bricks = createBricksFromWord('bricks');
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle words with spaces', () => {
-      const bricks = createWordBricks('B R', 0, 0);
+      const bricks = createBricksFromWord('B R');
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should apply correct brick type', () => {
-      const bricks = createWordBricks('B', 0, 0, BrickType.HEALTHY);
+      const bricks = createBricksFromWord('B', BrickType.HEALTHY);
       expect(bricks[0].type).toBe(BrickType.HEALTHY);
+    });
+
+    it('should skip unknown letters', () => {
+      const bricks = createBricksFromWord('BZR'); // Z is not defined
+      // Should have bricks for B and R only
+      expect(bricks.length).toBeGreaterThan(0);
+    });
+
+    it('should start at column 0, row 0', () => {
+      const bricks = createBricksFromWord('B');
+      expect(bricks[0].col).toBe(0);
+      expect(bricks[0].row).toBe(0);
     });
   });
 
@@ -542,6 +451,49 @@ describe('Level Class', () => {
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
       expect(bricks[1].getHealth()).toBe(3); // HEALTHY
       expect(bricks[2].getHealth()).toBe(1); // NORMAL
+    });
+  });
+
+  describe('Level.fromWord factory method', () => {
+    it('should create level from word', () => {
+      const level = Level.fromWord(1, "Test Level", "HI");
+      
+      expect(level.getId()).toBe(1);
+      expect(level.getName()).toBe("Test Level");
+      expect(level.getBricks().length).toBeGreaterThan(0);
+    });
+
+    it('should use default brick type (NORMAL)', () => {
+      const level = Level.fromWord(1, "Test", "B");
+      const bricks = level.getBricks();
+      expect(bricks[0].getHealth()).toBe(1); // NORMAL
+    });
+
+    it('should accept custom brick type', () => {
+      const level = Level.fromWord(1, "Test", "B", BrickType.HEALTHY);
+      const bricks = level.getBricks();
+      expect(bricks[0].getHealth()).toBe(3); // HEALTHY
+    });
+
+    it('should use default player health', () => {
+      const level = Level.fromWord(1, "Test", "B");
+      expect(level.getPlayerHealth()).toBe(3);
+    });
+
+    it('should accept custom player health', () => {
+      const level = Level.fromWord(1, "Test", "B", BrickType.NORMAL, 5);
+      expect(level.getPlayerHealth()).toBe(5);
+    });
+
+    it('should center bricks when canvas width provided', () => {
+      const level = Level.fromWord(1, "Test", "B", BrickType.NORMAL, 3, 1920);
+      const brick = level.getBricks()[0];
+      expect(brick.getPosition().x).toBeGreaterThan(0);
+    });
+
+    it('should handle multi-letter words', () => {
+      const level = Level.fromWord(1, "Test", "BRICKS");
+      expect(level.getBricks().length).toBeGreaterThan(20); // Multiple letters worth of bricks
     });
   });
 });

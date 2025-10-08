@@ -37,6 +37,99 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
 }
 
 /**
+ * Letter patterns for word-based levels
+ * Each letter is a 5x5 grid where 1 = brick, 0 = empty
+ */
+const LETTER_PATTERNS: { [key: string]: number[][] } = {
+  B: [
+    [1, 1, 1, 1, 0],
+    [1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0],
+    [1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0],
+  ],
+  R: [
+    [1, 1, 1, 1, 0],
+    [1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0],
+    [1, 0, 1, 0, 0],
+    [1, 0, 0, 1, 0],
+  ],
+  I: [
+    [1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [1, 1, 1, 1, 1],
+  ],
+  C: [
+    [0, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1],
+  ],
+  K: [
+    [1, 0, 0, 0, 1],
+    [1, 0, 0, 1, 0],
+    [1, 1, 1, 0, 0],
+    [1, 0, 0, 1, 0],
+    [1, 0, 0, 0, 1],
+  ],
+  S: [
+    [0, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0],
+  ],
+};
+
+/**
+ * Create bricks for a word using letter patterns
+ * Each letter is 5 columns wide, with 1 column spacing between letters
+ */
+export function createBricksFromWord(
+  word: string,
+  brickType: BrickType = BrickType.NORMAL
+): BrickConfig[] {
+  const bricks: BrickConfig[] = [];
+  let colOffset = 0;
+  const LETTER_WIDTH_COLS = 5;
+  const LETTER_SPACING_COLS = 1;
+
+  for (const letter of word.toUpperCase()) {
+    if (letter === ' ') {
+      colOffset += 3 + LETTER_SPACING_COLS;
+      continue;
+    }
+
+    const pattern = LETTER_PATTERNS[letter];
+    if (!pattern) {
+      continue; // Skip unknown letters
+    }
+
+    // Create bricks from letter pattern
+    for (let row = 0; row < pattern.length; row++) {
+      for (let col = 0; col < pattern[row].length; col++) {
+        if (pattern[row][col] === 1) {
+          bricks.push({
+            col: colOffset + col,
+            row,
+            type: brickType,
+          });
+        }
+      }
+    }
+
+    // Move to next letter position
+    colOffset += LETTER_WIDTH_COLS + LETTER_SPACING_COLS;
+  }
+
+  return bricks;
+}
+
+/**
  * Convert grid position to pixel position
  */
 export function gridToPixel(gridX: number, gridY: number): { x: number; y: number } {

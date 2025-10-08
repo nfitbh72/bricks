@@ -2,10 +2,10 @@
  * Level class - manages level state and bricks
  */
 
-import { LevelConfig, BrickConfig } from './types';
+import { LevelConfig, BrickConfig, BrickType } from './types';
 import { Brick } from './Brick';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
-import { createBricksFromPattern } from '../config/brickLayout';
+import { createBricksFromPattern, createBricksFromWord } from '../config/brickLayout';
 
 export class Level {
   private readonly config: LevelConfig;
@@ -32,6 +32,27 @@ export class Level {
       id,
       name,
       bricks: createBricksFromPattern(pattern),
+      playerHealth,
+    };
+    return new Level(config, canvasWidth);
+  }
+
+  /**
+   * Create a Level from a word
+   * Uses letter patterns to spell out the word in bricks
+   */
+  static fromWord(
+    id: number,
+    name: string,
+    word: string,
+    brickType: BrickType = BrickType.NORMAL,
+    playerHealth: number = 3,
+    canvasWidth?: number
+  ): Level {
+    const config: LevelConfig = {
+      id,
+      name,
+      bricks: createBricksFromWord(word, brickType),
       playerHealth,
     };
     return new Level(config, canvasWidth);
