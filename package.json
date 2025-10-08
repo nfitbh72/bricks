@@ -7,7 +7,7 @@
     "build": "npm run build:main && npm run build:renderer && npm run copy-assets",
     "build:main": "tsc --project tsconfig.main.json",
     "build:renderer": "webpack",
-    "copy-assets": "cp src/renderer/index.html dist/renderer/ && cp src/renderer/styles.css dist/renderer/ && mkdir -p dist/renderer/assets/fonts && cp -r src/renderer/assets/fonts/* dist/renderer/assets/fonts/",
+    "copy-assets": "cp src/renderer/index.html dist/renderer/ && cp src/renderer/styles.css dist/renderer/ && mkdir -p dist/renderer/assets/fonts && cp -r src/renderer/assets/fonts/* dist/renderer/assets/fonts/ && mkdir -p dist/renderer/assets/images && cp -r src/renderer/assets/images/* dist/renderer/assets/images/",
     "watch": "npm run build:main -- --watch",
     "start": "npm run build && electron .",
     "dev": "npm run build && electron .",
