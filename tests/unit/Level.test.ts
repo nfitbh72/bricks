@@ -3,7 +3,6 @@
  */
 
 import { Level } from '../../src/renderer/game/Level';
-import { LevelConfig } from '../../src/renderer/game/types';
 import {
   createTextLayout,
   createLetterBricks,
@@ -11,45 +10,46 @@ import {
   getLevel,
   createLevel1,
 } from '../../src/renderer/config/levels';
+import { BrickType, LevelConfig } from '../../src/renderer/game/types';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
 describe('Level Configuration Helpers', () => {
   describe('createTextLayout', () => {
     it('should create bricks for simple text', () => {
-      const bricks = createTextLayout('AB', 0, 0, 1);
+      const bricks = createTextLayout('AB', 0, 0);
       expect(bricks.length).toBe(2);
       expect(bricks[0].col).toBe(0);
       expect(bricks[1].col).toBe(1);
     });
 
     it('should skip spaces in text', () => {
-      const bricks = createTextLayout('A B', 0, 0, 1);
+      const bricks = createTextLayout('A B', 0, 0);
       expect(bricks.length).toBe(2);
       expect(bricks[0].col).toBe(0);
       expect(bricks[1].col).toBe(2); // Space skipped
     });
 
     it('should handle multi-line text', () => {
-      const bricks = createTextLayout('A\nB', 0, 0, 1);
+      const bricks = createTextLayout('A\nB', 0, 0);
       expect(bricks.length).toBe(2);
       expect(bricks[0].row).toBe(0);
       expect(bricks[1].row).toBe(1);
     });
 
     it('should return grid coordinates', () => {
-      const bricks = createTextLayout('A', 0, 0, 1);
+      const bricks = createTextLayout('A', 0, 0);
       expect(bricks[0].col).toBeDefined();
       expect(bricks[0].row).toBeDefined();
-      expect(bricks[0].health).toBe(1);
+      expect(bricks[0].type).toBe(BrickType.NORMAL);
     });
 
-    it('should use correct brick health', () => {
-      const bricks = createTextLayout('A', 0, 0, 3);
-      expect(bricks[0].health).toBe(3);
+    it('should use correct brick type', () => {
+      const bricks = createTextLayout('A', 0, 0, BrickType.HEALTHY);
+      expect(bricks[0].type).toBe(BrickType.HEALTHY);
     });
 
     it('should apply start col and row offsets', () => {
-      const bricks = createTextLayout('A', 5, 10, 1);
+      const bricks = createTextLayout('A', 5, 10);
       expect(bricks[0].col).toBe(5);
       expect(bricks[0].row).toBe(10);
     });
@@ -57,58 +57,58 @@ describe('Level Configuration Helpers', () => {
 
   describe('createLetterBricks', () => {
     it('should create bricks for letter B', () => {
-      const bricks = createLetterBricks('B', 0, 0, 1);
+      const bricks = createLetterBricks('B', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter R', () => {
-      const bricks = createLetterBricks('R', 0, 0, 1);
+      const bricks = createLetterBricks('R', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter I', () => {
-      const bricks = createLetterBricks('I', 0, 0, 1);
+      const bricks = createLetterBricks('I', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter C', () => {
-      const bricks = createLetterBricks('C', 0, 0, 1);
+      const bricks = createLetterBricks('C', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter K', () => {
-      const bricks = createLetterBricks('K', 0, 0, 1);
+      const bricks = createLetterBricks('K', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should create bricks for letter S', () => {
-      const bricks = createLetterBricks('S', 0, 0, 1);
+      const bricks = createLetterBricks('S', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle lowercase letters', () => {
-      const bricks = createLetterBricks('b', 0, 0, 1);
+      const bricks = createLetterBricks('b', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should return empty array for unknown letter', () => {
-      const bricks = createLetterBricks('Z', 0, 0, 1);
+      const bricks = createLetterBricks('Z', 0, 0);
       expect(bricks.length).toBe(0);
     });
 
     it('should return grid coordinates', () => {
-      const bricks = createLetterBricks('B', 0, 0, 1);
+      const bricks = createLetterBricks('B', 0, 0);
       expect(bricks[0].col).toBeDefined();
       expect(bricks[0].row).toBeDefined();
     });
 
-    it('should apply correct brick health', () => {
-      const bricks = createLetterBricks('B', 0, 0, 3);
-      expect(bricks[0].health).toBe(3);
+    it('should apply correct brick type', () => {
+      const bricks = createLetterBricks('B', 0, 0, BrickType.HEALTHY);
+      expect(bricks[0].type).toBe(BrickType.HEALTHY);
     });
 
     it('should apply start col and row offsets', () => {
-      const bricks = createLetterBricks('B', 5, 10, 1);
+      const bricks = createLetterBricks('B', 5, 10);
       expect(bricks[0].col).toBeGreaterThanOrEqual(5);
       expect(bricks[0].row).toBeGreaterThanOrEqual(10);
     });
@@ -116,23 +116,23 @@ describe('Level Configuration Helpers', () => {
 
   describe('createWordBricks', () => {
     it('should create bricks for word BRICKS', () => {
-      const bricks = createWordBricks('BRICKS', 0, 0, 1);
+      const bricks = createWordBricks('BRICKS', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle lowercase words', () => {
-      const bricks = createWordBricks('bricks', 0, 0, 1);
+      const bricks = createWordBricks('bricks', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
     it('should handle words with spaces', () => {
-      const bricks = createWordBricks('B R', 0, 0, 1);
+      const bricks = createWordBricks('B R', 0, 0);
       expect(bricks.length).toBeGreaterThan(0);
     });
 
-    it('should apply correct brick health', () => {
-      const bricks = createWordBricks('B', 0, 0, 3);
-      expect(bricks[0].health).toBe(3);
+    it('should apply correct brick type', () => {
+      const bricks = createWordBricks('B', 0, 0, BrickType.HEALTHY);
+      expect(bricks[0].type).toBe(BrickType.HEALTHY);
     });
   });
 
@@ -196,9 +196,9 @@ describe('Level Class', () => {
     id: 1,
     name: 'Test Level',
     bricks: [
-      { col: 0, row: 0, health: 1 },
-      { col: 1, row: 0, health: 2 },
-      { col: 2, row: 0, health: 1 },
+      { col: 0, row: 0, type: BrickType.NORMAL },
+      { col: 1, row: 0, type: BrickType.HEALTHY },
+      { col: 2, row: 0, type: BrickType.NORMAL },
     ],
     playerHealth: 3,
   };
@@ -225,9 +225,9 @@ describe('Level Class', () => {
     it('should return bricks with correct health', () => {
       const level = new Level(testConfig);
       const bricks = level.getBricks();
-      expect(bricks[0].getHealth()).toBe(1);
-      expect(bricks[1].getHealth()).toBe(2);
-      expect(bricks[2].getHealth()).toBe(1);
+      expect(bricks[0].getHealth()).toBe(1); // NORMAL
+      expect(bricks[1].getHealth()).toBe(3); // HEALTHY
+      expect(bricks[2].getHealth()).toBe(1); // NORMAL
     });
   });
 
@@ -363,12 +363,12 @@ describe('Level Class', () => {
     it('should restore brick health', () => {
       const level = new Level(testConfig);
       const bricks = level.getBricks();
-      bricks[1].takeDamage(1);
-      expect(bricks[1].getHealth()).toBe(1);
+      bricks[1].takeDamage(1); // HEALTHY brick: 3 -> 2
+      expect(bricks[1].getHealth()).toBe(2);
       
       level.reset();
       const newBricks = level.getBricks();
-      expect(newBricks[1].getHealth()).toBe(2);
+      expect(newBricks[1].getHealth()).toBe(3); // Restored to HEALTHY max
     });
   });
 

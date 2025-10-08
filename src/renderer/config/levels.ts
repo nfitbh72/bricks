@@ -2,7 +2,7 @@
  * Level configurations for the Bricks game
  */
 
-import { LevelConfig, BrickConfig } from '../game/types';
+import { LevelConfig, BrickConfig, BrickType } from '../game/types';
 
 /**
  * Create a brick layout from text
@@ -13,7 +13,7 @@ export function createTextLayout(
   text: string,
   startCol: number,
   startRow: number,
-  brickHealth: number = 1
+  brickType: BrickType = BrickType.NORMAL
 ): BrickConfig[] {
   const bricks: BrickConfig[] = [];
   const lines = text.split('\n');
@@ -35,7 +35,7 @@ export function createTextLayout(
       bricks.push({
         col: startCol + colOffset,
         row: startRow + lineIndex,
-        health: brickHealth,
+        type: brickType,
       });
 
       colOffset++;
@@ -102,7 +102,7 @@ export function createLetterBricks(
   letter: string,
   startCol: number,
   startRow: number,
-  brickHealth: number = 1
+  brickType: BrickType = BrickType.NORMAL
 ): BrickConfig[] {
   const pattern = LETTER_PATTERNS[letter.toUpperCase()];
   if (!pattern) {
@@ -117,7 +117,7 @@ export function createLetterBricks(
         bricks.push({
           col: startCol + col,
           row: startRow + row,
-          health: brickHealth,
+          type: brickType,
         });
       }
     }
@@ -135,7 +135,7 @@ export function createWordBricks(
   word: string,
   startCol: number,
   startRow: number,
-  brickHealth: number = 1
+  brickType: BrickType = BrickType.NORMAL
 ): BrickConfig[] {
   const bricks: BrickConfig[] = [];
   let colOffset = 0;
@@ -152,7 +152,7 @@ export function createWordBricks(
       letter,
       startCol + colOffset,
       startRow,
-      brickHealth
+      brickType
     );
 
     bricks.push(...letterBricks);
@@ -184,7 +184,7 @@ export function createLevel1(): LevelConfig {
         bricks.push({
           col,
           row,
-          health: 1,
+          type: BrickType.NORMAL,
         });
       }
     }
@@ -206,7 +206,7 @@ export function createLevel2(): LevelConfig {
   return {
     id: 2,
     name: 'Level 2: BRICKS',
-    bricks: createWordBricks('BRICKS', 0, 5, 1),
+    bricks: createWordBricks('BRICKS', 0, 5, BrickType.NORMAL),
     playerHealth: 3,
   };
 }

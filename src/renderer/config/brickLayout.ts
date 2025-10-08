@@ -4,7 +4,7 @@
  */
 
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING } from './constants';
-import { BrickConfig } from '../game/types';
+import { BrickConfig, BrickType } from '../game/types';
 
 /**
  * Convert grid position to pixel position
@@ -35,12 +35,12 @@ export function getCenteredStartPosition(
 export function createBrickAtGrid(
   col: number,
   row: number,
-  health: number = 1
+  type: BrickType = BrickType.NORMAL
 ): BrickConfig {
   return {
     col,
     row,
-    health,
+    type,
   };
 }
 

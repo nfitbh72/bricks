@@ -41,14 +41,22 @@ export enum GameState {
 }
 
 /**
+ * Brick types available in the game
+ */
+export enum BrickType {
+  NORMAL = 'NORMAL',
+  HEALTHY = 'HEALTHY',
+}
+
+/**
  * Configuration for a single brick
  * Uses grid coordinates (row/col) instead of pixel coordinates
  */
 export interface BrickConfig {
   row: number;      // Grid row position
   col: number;      // Grid column position
-  health: number;
-  color?: string;
+  type: BrickType;  // Type of brick (determines health and behavior)
+  color?: string;   // Optional custom color override
 }
 
 /**

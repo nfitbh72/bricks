@@ -5,12 +5,12 @@
 import { Ball } from '../../src/renderer/game/Ball';
 import { Bat } from '../../src/renderer/game/Bat';
 import { Brick } from '../../src/renderer/game/Brick';
-import { BrickConfig } from '../../src/renderer/game/types';
+import { BrickConfig, BrickType } from '../../src/renderer/game/types';
 import { checkCircleRectCollision } from '../../src/renderer/game/utils';
 
 // Helper to create brick config from grid position
-function createBrickConfig(col: number, row: number, health: number): BrickConfig {
-  return { col, row, health };
+function createBrickConfig(col: number, row: number, type: BrickType): BrickConfig {
+  return { col, row, type };
 }
 
 describe('Collision Detection Integration', () => {
@@ -80,7 +80,7 @@ describe('Collision Detection Integration', () => {
   describe('Ball-Brick Collisions', () => {
     it('should detect collision when ball overlaps brick', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -91,7 +91,7 @@ describe('Collision Detection Integration', () => {
 
     it('should not detect collision when ball is far from brick', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(4, 9, 1));
+      const brick = new Brick(createBrickConfig(4, 9, BrickType.NORMAL));
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -102,7 +102,7 @@ describe('Collision Detection Integration', () => {
 
     it('should provide normal vector for brick collision', () => {
       const ball = new Ball(100, 85, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -115,7 +115,7 @@ describe('Collision Detection Integration', () => {
 
     it('should bounce ball correctly off brick top', () => {
       const ball = new Ball(100, 85, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       ball.setVelocity(0, 100); // Moving down
       
@@ -133,7 +133,7 @@ describe('Collision Detection Integration', () => {
 
     it('should bounce ball correctly off brick side', () => {
       const ball = new Ball(85, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       ball.setVelocity(100, 0); // Moving right
       
@@ -151,7 +151,7 @@ describe('Collision Detection Integration', () => {
 
     it('should damage brick on collision', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 3));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.HEALTHY));
       
       expect(brick.getHealth()).toBe(3);
       
@@ -168,7 +168,7 @@ describe('Collision Detection Integration', () => {
 
     it('should destroy brick when health reaches 0', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       expect(brick.isDestroyed()).toBe(false);
       
@@ -269,7 +269,7 @@ describe('Collision Detection Integration', () => {
     it('should handle ball bouncing between bat and brick', () => {
       const ball = new Ball(100, 500, 10, 300);
       const bat = new Bat(50, 560, 100, 10);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       // Ball moving down toward bat
       ball.setVelocity(0, 100);
@@ -300,8 +300,8 @@ describe('Collision Detection Integration', () => {
 
     it('should handle multiple brick collisions', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick1 = new Brick(createBrickConfig(2, 4, 1));
-      const brick2 = new Brick(createBrickConfig(3, 4, 1));
+      const brick1 = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brick2 = new Brick(createBrickConfig(3, 4, BrickType.NORMAL));
       
       ball.setVelocity(100, 0);
       
@@ -360,7 +360,7 @@ describe('Collision Detection Integration', () => {
 
     it('should handle zero velocity collisions', () => {
       const ball = new Ball(100, 100, 10, 300);
-      const brick = new Brick(createBrickConfig(2, 4, 1));
+      const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       
       ball.setVelocity(0, 0);
       
