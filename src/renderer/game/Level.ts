@@ -5,6 +5,7 @@
 import { LevelConfig, BrickConfig } from './types';
 import { Brick } from './Brick';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
+import { createBricksFromPattern } from '../config/brickLayout';
 
 export class Level {
   private readonly config: LevelConfig;
@@ -14,6 +15,26 @@ export class Level {
   constructor(config: LevelConfig, canvasWidth?: number) {
     this.config = config;
     this.bricks = this.createBricksFromConfig(canvasWidth);
+  }
+
+  /**
+   * Create a Level from a visual pattern
+   * Convenience factory method for pattern-based levels
+   */
+  static fromPattern(
+    id: number,
+    name: string,
+    pattern: string[],
+    playerHealth: number = 3,
+    canvasWidth?: number
+  ): Level {
+    const config: LevelConfig = {
+      id,
+      name,
+      bricks: createBricksFromPattern(pattern),
+      playerHealth,
+    };
+    return new Level(config, canvasWidth);
   }
 
   /**

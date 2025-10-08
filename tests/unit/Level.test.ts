@@ -10,10 +10,68 @@ import {
   getLevel,
   createLevel1,
 } from '../../src/renderer/config/levels';
+import { createBricksFromPattern } from '../../src/renderer/config/brickLayout';
 import { BrickType, LevelConfig } from '../../src/renderer/game/types';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
 describe('Level Configuration Helpers', () => {
+  describe('createBricksFromPattern', () => {
+    it('should create bricks from pattern with N (NORMAL)', () => {
+      const pattern = ["NNN"];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(3);
+      expect(bricks[0].type).toBe(BrickType.NORMAL);
+      expect(bricks[0].col).toBe(0);
+      expect(bricks[0].row).toBe(0);
+    });
+
+    it('should create bricks from pattern with H (HEALTHY)', () => {
+      const pattern = ["HHH"];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(3);
+      expect(bricks[0].type).toBe(BrickType.HEALTHY);
+    });
+
+    it('should skip spaces in pattern', () => {
+      const pattern = ["N N"];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(2);
+      expect(bricks[0].col).toBe(0);
+      expect(bricks[1].col).toBe(2);
+    });
+
+    it('should handle multi-row patterns', () => {
+      const pattern = [
+        "NN",
+        "NN"
+      ];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(4);
+      expect(bricks[0].row).toBe(0);
+      expect(bricks[2].row).toBe(1);
+    });
+
+    it('should handle mixed brick types', () => {
+      const pattern = ["NHN"];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(3);
+      expect(bricks[0].type).toBe(BrickType.NORMAL);
+      expect(bricks[1].type).toBe(BrickType.HEALTHY);
+      expect(bricks[2].type).toBe(BrickType.NORMAL);
+    });
+
+    it('should handle complex patterns', () => {
+      const pattern = [
+        "NN   ",
+        "NNNNN",
+        "NNNNN",
+        "NN   "
+      ];
+      const bricks = createBricksFromPattern(pattern);
+      expect(bricks.length).toBe(14); // 2+5+5+2
+    });
+  });
+
   describe('createTextLayout', () => {
     it('should create bricks for simple text', () => {
       const bricks = createTextLayout('AB', 0, 0);
@@ -444,6 +502,46 @@ describe('Level Class', () => {
       
       // Bricks should be centered (not at pixel x=0)
       expect(firstBrick.getPosition().x).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Level.fromPattern factory method', () => {
+    it('should create level from pattern', () => {
+      const pattern = ["NNN", "NNN"];
+      const level = Level.fromPattern(1, "Test Level", pattern);
+      
+      expect(level.getId()).toBe(1);
+      expect(level.getName()).toBe("Test Level");
+      expect(level.getBricks().length).toBe(6);
+    });
+
+    it('should use default player health', () => {
+      const pattern = ["N"];
+      const level = Level.fromPattern(1, "Test", pattern);
+      expect(level.getPlayerHealth()).toBe(3);
+    });
+
+    it('should accept custom player health', () => {
+      const pattern = ["N"];
+      const level = Level.fromPattern(1, "Test", pattern, 5);
+      expect(level.getPlayerHealth()).toBe(5);
+    });
+
+    it('should center bricks when canvas width provided', () => {
+      const pattern = ["N"];
+      const level = Level.fromPattern(1, "Test", pattern, 3, 1920);
+      const brick = level.getBricks()[0];
+      expect(brick.getPosition().x).toBeGreaterThan(0);
+    });
+
+    it('should handle mixed brick types', () => {
+      const pattern = ["NHN"];
+      const level = Level.fromPattern(1, "Test", pattern);
+      const bricks = level.getBricks();
+      
+      expect(bricks[0].getHealth()).toBe(1); // NORMAL
+      expect(bricks[1].getHealth()).toBe(3); // HEALTHY
+      expect(bricks[2].getHealth()).toBe(1); // NORMAL
     });
   });
 });

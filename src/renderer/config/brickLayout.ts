@@ -7,6 +7,36 @@ import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING } from './cons
 import { BrickConfig, BrickType } from '../game/types';
 
 /**
+ * Create bricks from a visual pattern
+ * ' ' = empty space
+ * 'N' = NORMAL brick (1 health)
+ * 'H' = HEALTHY brick (3 health)
+ */
+export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
+  const bricks: BrickConfig[] = [];
+  
+  for (let row = 0; row < pattern.length; row++) {
+    const line = pattern[row];
+    for (let col = 0; col < line.length; col++) {
+      const char = line[col];
+      
+      let type: BrickType | null = null;
+      if (char === 'N') {
+        type = BrickType.NORMAL;
+      } else if (char === 'H') {
+        type = BrickType.HEALTHY;
+      }
+      
+      if (type !== null) {
+        bricks.push({ col, row, type });
+      }
+    }
+  }
+  
+  return bricks;
+}
+
+/**
  * Convert grid position to pixel position
  */
 export function gridToPixel(gridX: number, gridY: number): { x: number; y: number } {

@@ -3,6 +3,7 @@
  */
 
 import { LevelConfig, BrickConfig, BrickType } from '../game/types';
+import { createBricksFromPattern } from './brickLayout';
 
 /**
  * Create a brick layout from text
@@ -169,48 +170,44 @@ export function createWordBricks(
  */
 export function createLevel1(): LevelConfig {
   const pattern = [
-    [1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1],
-    [1, 1, 0, 0, 0],
+    "NN   ",
+    "NNNNN",
+    "NNNNN",
+    "NN   ",
   ];
-  
-  const bricks: BrickConfig[] = [];
-  
-  // Create bricks from pattern (starting at origin)
-  for (let row = 0; row < pattern.length; row++) {
-    for (let col = 0; col < pattern[row].length; col++) {
-      if (pattern[row][col] === 1) {
-        bricks.push({
-          col,
-          row,
-          type: BrickType.NORMAL,
-        });
-      }
-    }
-  }
   
   return {
     id: 1,
     name: 'Level 1: Simple Blocks',
-    bricks,
+    bricks: createBricksFromPattern(pattern),
     playerHealth: 3,
   };
 }
 
 /**
  * Create Level 2 configuration
- * Word "BRICKS"
+ * Mixed brick types with pattern
  */
 export function createLevel2(): LevelConfig {
+  const pattern = [
+    "HHHHHHHHH",
+    "H       H",
+    "H NNNNN H",
+    "H NNNNN H",
+    "H NNNNN H",
+    "H       H",
+    "HHHHHHHHH",
+  ];
+  
   return {
     id: 2,
-    name: 'Level 2: BRICKS',
-    bricks: createWordBricks('BRICKS', 0, 5, BrickType.NORMAL),
+    name: 'Level 2: The Frame',
+    bricks: createBricksFromPattern(pattern),
     playerHealth: 3,
   };
 }
 
+//bricks: createWordBricks('BRICKS', 0, 5, BrickType.NORMAL)
 /**
  * Get level by ID
  */
