@@ -128,16 +128,22 @@ export class Game {
   }
 
   /**
-   * Load the background image
+   * Load the background image for a specific level
    */
-  private loadBackgroundImage(): void {
+  private loadBackgroundImage(levelId?: number): void {
     const img = new Image();
-    img.src = './assets/images/dystopian.jpg';
+    const id = levelId || this.currentLevelId;
+    img.src = `./assets/images/level${id}.jpg`;
     img.onload = () => {
       this.backgroundImage = img;
     };
     img.onerror = () => {
-      console.warn('Failed to load background image');
+      console.warn(`Failed to load background image for level ${id}`);
+      // Fallback: try to load a default background if specific level image fails
+      if (levelId !== undefined) {
+        // Don't retry if we already specified a level
+        this.backgroundImage = null;
+      }
     };
   }
 
@@ -314,6 +320,9 @@ export class Game {
     this.level = new Level(levelConfig, this.canvas.width);
     this.playerHealth = levelConfig.playerHealth;
     this.gameState = GameState.PLAYING;
+    
+    // Load background image for this level
+    this.loadBackgroundImage(levelConfig.id);
     
     // Update status bar
     this.statusBar.setLevelTitle(levelConfig.name);
