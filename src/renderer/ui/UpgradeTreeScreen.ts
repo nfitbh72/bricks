@@ -90,6 +90,50 @@ export class UpgradeTreeScreen extends Screen {
   }
 
   /**
+   * Reset all upgrades and points (for new game)
+   */
+  reset(): void {
+    // Reset all node levels and states
+    const resetNode = (node: UpgradeNode) => {
+      node.currentLevel = 0;
+      node.state = node.parent === null ? 'unlocked' : 'locked';
+      for (const child of node.children) {
+        resetNode(child);
+      }
+    };
+    
+    for (const rootNode of this.state.rootNodes) {
+      resetNode(rootNode);
+    }
+    
+    // Reset points
+    this.state.availablePoints = 0;
+  }
+
+  /**
+   * Get all upgrade levels as a Map of upgrade type to level
+   */
+  getUpgradeLevels(): Map<string, number> {
+    const upgradeLevels = new Map<string, number>();
+    
+    // Recursively collect upgrade levels from all nodes
+    const collectUpgrades = (node: UpgradeNode) => {
+      if (node.currentLevel > 0) {
+        upgradeLevels.set(node.upgrade.type, node.currentLevel);
+      }
+      for (const child of node.children) {
+        collectUpgrades(child);
+      }
+    };
+    
+    for (const rootNode of this.state.rootNodes) {
+      collectUpgrades(rootNode);
+    }
+    
+    return upgradeLevels;
+  }
+
+  /**
    * Capture the current game background
    */
   captureBackground(): void {

@@ -11,6 +11,8 @@ import { createBricksFromPattern, createBricksFromWord } from './brickLayout';
  */
 export function createLevel1(): LevelConfig {
   const pattern = [
+    'N',
+    /*
     "NNN",
     "N N",
     "NNNNNNH",
@@ -18,6 +20,7 @@ export function createLevel1(): LevelConfig {
     "NNNNNNH       N",
     "N N",
     "HHH",
+    */
   ];
   
   return {
@@ -36,7 +39,7 @@ export function createLevel2(): LevelConfig {
   return {
     id: 2,
     name: 'Level 2: Says Hi',
-    bricks: createBricksFromWord("UR MOM", BrickType.NORMAL),
+    bricks: createBricksFromWord("UR MOM", BrickType.HEALTHY),
     playerHealth: 3,
   };
 }

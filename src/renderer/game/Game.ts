@@ -15,6 +15,7 @@ import { TransitionScreen } from '../ui/TransitionScreen';
 import { PauseScreen } from '../ui/PauseScreen';
 import { UpgradeTreeScreen } from '../ui/UpgradeTreeScreen';
 import { ParticleSystem } from './ParticleSystem';
+import { GameUpgrades } from './GameUpgrades';
 import { getLevel } from '../config/levels';
 import { getUpgrades } from '../config/upgrades';
 
@@ -61,6 +62,9 @@ export class Game {
   private gameOverDelay: number = 1000; // 1 second delay
   private gameOverTimer: number = 0;
 
+  // Upgrades
+  private gameUpgrades: GameUpgrades;
+
   // Input state
   private keys: Set<string> = new Set();
   private mouseX: number = 0;
@@ -89,6 +93,10 @@ export class Game {
     const batWidth = baseBatWidth * scaleFactor;
     const batHeight = baseBatHeight * scaleFactor;
     const ballSpeed = baseBallSpeed * scaleFactor;
+    
+    // Initialize upgrade manager
+    this.gameUpgrades = new GameUpgrades();
+    this.gameUpgrades.setBaseValues(batWidth, batHeight, ballSpeed, ballRadius);
     
     const centerX = canvas.width / 2;
     const batY = canvas.height - 100; // Bat higher up
@@ -255,6 +263,10 @@ export class Game {
    */
   private handleStartGame(): void {
     this.startTransition(() => {
+      // Reset upgrades for new game
+      this.gameUpgrades.reset();
+      this.upgradeTreeScreen.reset();
+      
       const levelConfig = getLevel(1);
       if (!levelConfig) {
         throw new Error('Level 1 not found');
@@ -287,6 +299,9 @@ export class Game {
    */
   private handleRestart(): void {
     this.startTransition(() => {
+      // Reset upgrades when restarting
+      this.gameUpgrades.reset();
+      this.upgradeTreeScreen.reset();
       this.gameState = GameState.INTRO;
     });
   }
@@ -310,6 +325,9 @@ export class Game {
    * Handle continue from upgrade screen to next level
    */
   private handleUpgradeComplete(): void {
+    // Apply all purchased upgrades before transitioning
+    this.applyUpgrades();
+    
     this.startTransition(() => {
       const nextLevelConfig = getLevel(this.currentLevelId + 1);
       if (nextLevelConfig) {
@@ -321,6 +339,38 @@ export class Game {
         this.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
       }
     });
+  }
+
+  /**
+   * Apply all purchased upgrades from the upgrade tree
+   */
+  private applyUpgrades(): void {
+    // Get upgrade levels from the upgrade tree screen
+    const upgrades = this.upgradeTreeScreen.getUpgradeLevels();
+    
+    // Update upgrade manager
+    this.gameUpgrades.setUpgradeLevels(upgrades);
+    
+    // Apply bat upgrades
+    const batDimensions = this.gameUpgrades.applyBatUpgrades();
+    
+    const batPos = this.bat.getPosition();
+    const batSpeed = this.bat.getSpeed();
+    
+    // Recreate bat with new dimensions (centered at same position)
+    const centerX = batPos.x + this.bat.getWidth() / 2;
+    this.bat = new Bat(
+      centerX - batDimensions.width / 2,
+      batPos.y,
+      batDimensions.width,
+      batDimensions.height,
+      batSpeed
+    );
+    this.bat.setBounds(0, this.canvas.width, 0, this.canvas.height);
+    
+    // Apply ball upgrades
+    const ballProps = this.gameUpgrades.applyBallUpgrades();
+    this.ball.setDamage(ballProps.damage);
   }
 
   /**
@@ -357,6 +407,9 @@ export class Game {
    */
   private handleQuitFromPause(): void {
     this.startTransition(() => {
+      // Reset upgrades when quitting to menu
+      this.gameUpgrades.reset();
+      this.upgradeTreeScreen.reset();
       this.gameState = GameState.INTRO;
     });
   }
@@ -390,7 +443,7 @@ export class Game {
       this.level.getTotalBricks()
     );
     
-    // Reset ball and bat
+    // Reset ball and bat position (preserve bat size from upgrades)
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
@@ -566,9 +619,9 @@ export class Game {
           this.ball.bounce(collision.normal);
         }
         
-        // Damage brick
+        // Damage brick (use ball's damage value)
         const wasDestroyed = brick.isDestroyed();
-        brick.takeDamage(1);
+        brick.takeDamage(this.ball.getDamage());
         
         // Track destroyed bricks and create particles
         if (!wasDestroyed && brick.isDestroyed()) {

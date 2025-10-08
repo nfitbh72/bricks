@@ -13,6 +13,7 @@ export class Ball {
   private readonly radius: number;
   private readonly speed: number;
   private isGrey: boolean = false;
+  private damage: number = 1; // Base damage
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -245,5 +246,19 @@ export class Ball {
    */
   restoreToNormal(): void {
     this.isGrey = false;
+  }
+
+  /**
+   * Get ball damage
+   */
+  getDamage(): number {
+    return this.damage;
+  }
+
+  /**
+   * Set ball damage (from upgrades)
+   */
+  setDamage(damage: number): void {
+    this.damage = damage;
   }
 }
