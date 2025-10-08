@@ -66,7 +66,55 @@ export function getUpgrades() : Upgrade[] {
                             nextUpgrades: [],
                         }
                     ],
-                }
+                },
+                {
+                    name: 'Critical Hits',
+                    description: 'One in 10 chance to deal double damage',
+                    times: 1,
+                    previewNextUpgrades: 0,
+                    unlockNextUpgradesAfterTimes: 1,
+                    type: UpgradeType.BALL_ADD_CRITICAL_HITS,
+                    nextUpgrades: [
+                        {
+                            name: "Critical Hits+",
+                            description: 'Increase the chance to deal double damage by 10%',
+                            times: 3,
+                            previewNextUpgrades: 0,
+                            unlockNextUpgradesAfterTimes: 0,
+                            type: UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT,
+                            nextUpgrades: [],
+                        }
+                    ],
+                },
+                {
+                    name: 'Explosions',
+                    description: 'Ball hits now explode, doing splash damage',
+                    times: 1,
+                    previewNextUpgrades: 0,
+                    unlockNextUpgradesAfterTimes: 1,
+                    type: UpgradeType.BALL_EXPLOSIONS,
+                    nextUpgrades: [
+                        {
+                            name: "Explosions+",
+                            description: "Explosions do 10% more damage",
+                            times: 3,
+                            previewNextUpgrades: 0,
+                            unlockNextUpgradesAfterTimes: 1,
+                            type: UpgradeType.BALL_EXPLOSIONS,
+                            nextUpgrades: [
+                                {
+                                    name: "Explosions+",
+                                    description: "Explosions do 10% more damage",
+                                    times: 3,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    type: UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT,
+                                    nextUpgrades: [],
+                                },
+                            ]
+                        },
+                    ]
+                },
             ],
         }
     ]

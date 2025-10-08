@@ -240,6 +240,103 @@ describe('GameUpgrades', () => {
     });
   });
 
+  describe('ball explosions', () => {
+    it('should return false for hasBallExplosions with no upgrade', () => {
+      expect(gameUpgrades.hasBallExplosions()).toBe(false);
+    });
+
+    it('should return true for hasBallExplosions when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.hasBallExplosions()).toBe(true);
+    });
+
+    it('should return 0 explosion damage multiplier with no upgrade', () => {
+      expect(gameUpgrades.getBallExplosionDamageMultiplier()).toBe(0);
+    });
+
+    it('should return 10% base explosion damage multiplier when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionDamageMultiplier()).toBe(0.1);
+    });
+
+    it('should increase explosion damage by 10% per Explosions+ level', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionDamageMultiplier()).toBe(0.2); // 10% base + 10% bonus
+    });
+
+    it('should stack explosion damage bonuses', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT, 3);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionDamageMultiplier()).toBe(0.4); // 10% base + 30% bonus
+    });
+  });
+
+  describe('critical hits', () => {
+    it('should return false for hasCriticalHits with no upgrade', () => {
+      expect(gameUpgrades.hasCriticalHits()).toBe(false);
+    });
+
+    it('should return true for hasCriticalHits when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.hasCriticalHits()).toBe(true);
+    });
+
+    it('should return 0 critical hit chance with no upgrade', () => {
+      expect(gameUpgrades.getCriticalHitChance()).toBe(0);
+    });
+
+    it('should return 10% base critical hit chance when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getCriticalHitChance()).toBe(0.1);
+    });
+
+    it('should increase critical hit chance by 10% per level', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
+      upgrades.set(UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getCriticalHitChance()).toBe(0.2); // 10% base + 10% bonus
+    });
+
+    it('should stack critical hit chance bonuses', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
+      upgrades.set(UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT, 3);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getCriticalHitChance()).toBe(0.4); // 10% base + 30% bonus
+    });
+
+    it('should cap critical hit chance at 100%', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
+      upgrades.set(UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT, 20);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getCriticalHitChance()).toBe(1.0); // Capped at 100%
+    });
+  });
+
   describe('getSummary', () => {
     it('should return empty array with no upgrades', () => {
       const summary = gameUpgrades.getSummary();

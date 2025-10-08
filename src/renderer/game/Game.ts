@@ -19,6 +19,7 @@ import { ParticleSystem } from './ParticleSystem';
 import { GameUpgrades } from './GameUpgrades';
 import { getLevel } from '../config/levels';
 import { getUpgrades } from '../config/upgrades';
+import { BRICK_WIDTH } from '../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -57,12 +58,14 @@ export class Game {
   // Sound effects
   private brickHitSound: HTMLAudioElement;
   private brickExplodeSound: HTMLAudioElement;
+  private backgroundMusic: HTMLAudioElement;
 
   // Game stats
   private currentLevelId: number = 1;
   private totalBricksDestroyed: number = 0;
   private gameOverDelay: number = 1000; // 1 second delay
   private gameOverTimer: number = 0;
+  private isDevUpgradeMode: boolean = false;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -149,6 +152,14 @@ export class Game {
     this.brickHitSound.volume = 0.3;
     this.brickExplodeSound = new Audio('./assets/sounds/explosion-107629.mp3');
     this.brickExplodeSound.volume = 0.4;
+    
+    // Load and start background music
+    this.backgroundMusic = new Audio('./assets/sounds/lulu-swing-giulio-fazio-main-version-02-18-3209.mp3');
+    this.backgroundMusic.volume = 0.2;
+    this.backgroundMusic.loop = true;
+    this.backgroundMusic.play().catch(err => {
+      console.warn('Background music autoplay blocked. Will start on first user interaction:', err);
+    });
 
     // Load background image
     this.loadBackgroundImage();
@@ -292,6 +303,9 @@ export class Game {
    * @TODO: Remove this entire method before production
    */
   private handleDevUpgrades(): void {
+    // Mark that we're in dev upgrade mode
+    this.isDevUpgradeMode = true;
+    
     // Capture a dark background for the upgrade screen
     this.ctx.fillStyle = '#0a0a0a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -339,14 +353,26 @@ export class Game {
     this.applyUpgrades();
     
     this.startTransition(() => {
-      const nextLevelConfig = getLevel(this.currentLevelId + 1);
-      if (nextLevelConfig) {
-        this.currentLevelId++;
-        this.loadLevel(nextLevelConfig);
+      // If coming from DEV UPGRADES, always start at level 1
+      if (this.isDevUpgradeMode) {
+        this.isDevUpgradeMode = false;
+        this.currentLevelId = 1;
+        this.totalBricksDestroyed = 0;
+        const levelConfig = getLevel(1);
+        if (levelConfig) {
+          this.loadLevel(levelConfig);
+        }
       } else {
-        // No more levels - show game over with "COMPLETE" message
-        this.gameState = GameState.GAME_OVER;
-        this.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
+        // Normal flow: go to next level
+        const nextLevelConfig = getLevel(this.currentLevelId + 1);
+        if (nextLevelConfig) {
+          this.currentLevelId++;
+          this.loadLevel(nextLevelConfig);
+        } else {
+          // No more levels - show game over with "COMPLETE" message
+          this.gameState = GameState.GAME_OVER;
+          this.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
+        }
       }
     });
   }
@@ -449,7 +475,7 @@ export class Game {
 
     // Calculate laser properties
     const ballSpeed = this.ball.getSpeed();
-    const laserSpeed = ballSpeed * 10; // 10x ball speed
+    const laserSpeed = ballSpeed * 3; // 3x ball speed
     const ballDamage = this.ball.getDamage();
     const laserDamage = ballDamage * 0.1; // 1/10th ball damage
 
@@ -572,6 +598,12 @@ export class Game {
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
     const batWidth = this.bat.getWidth();
+    const batHeight = this.bat.getHeight();
+    
+    // Move mouse pointer to bat spawn position (center of bat)
+    this.mouseX = centerX;
+    this.mouseY = batY + batHeight / 2;
+    
     this.bat.setPosition(centerX - batWidth / 2, batY); // Center bat
     this.ball.reset();
     this.ball.setPosition(centerX, ballY);
@@ -750,9 +782,64 @@ export class Game {
           this.ball.bounce(collision.normal);
         }
         
-        // Damage brick (use ball's damage value)
+        // Calculate damage (with critical hit check)
+        let damage = this.ball.getDamage();
+        let isCritical = false;
+        
+        if (this.gameUpgrades.hasCriticalHits()) {
+          const critChance = this.gameUpgrades.getCriticalHitChance();
+          if (Math.random() < critChance) {
+            damage *= 2; // Double damage on critical hit
+            isCritical = true;
+          }
+        }
+        
+        // Damage brick
         const wasDestroyed = brick.isDestroyed();
-        brick.takeDamage(this.ball.getDamage());
+        brick.takeDamage(damage);
+        
+        // Apply explosion damage to nearby bricks if upgrade is active
+        if (this.gameUpgrades.hasBallExplosions()) {
+          const explosionDamageMultiplier = this.gameUpgrades.getBallExplosionDamageMultiplier();
+          const explosionDamage = this.ball.getDamage() * explosionDamageMultiplier;
+          const explosionRadius = BRICK_WIDTH * 1.5; // 1.5 brick-width radius
+          
+          // Get impact point (center of the brick that was hit)
+          const impactX = brickBounds.x + brickBounds.width / 2;
+          const impactY = brickBounds.y + brickBounds.height / 2;
+          
+          // Check all other bricks for explosion damage
+          for (const otherBrick of bricks) {
+            if (otherBrick === brick || otherBrick.isDestroyed()) continue;
+            
+            const otherBounds = otherBrick.getBounds();
+            const otherCenterX = otherBounds.x + otherBounds.width / 2;
+            const otherCenterY = otherBounds.y + otherBounds.height / 2;
+            
+            // Calculate distance from impact point to brick center
+            const dx = otherCenterX - impactX;
+            const dy = otherCenterY - impactY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Apply explosion damage if within radius
+            if (distance <= explosionRadius) {
+              const wasOtherDestroyed = otherBrick.isDestroyed();
+              otherBrick.takeDamage(explosionDamage);
+              
+              // Track if explosion destroyed this brick
+              if (!wasOtherDestroyed && otherBrick.isDestroyed()) {
+                this.totalBricksDestroyed++;
+                // Update status bar brick count
+                this.statusBar.setBrickCounts(
+                  this.level.getRemainingBricks(),
+                  this.level.getTotalBricks()
+                );
+                // Create particles at brick center
+                this.particleSystem.createParticles(otherCenterX, otherCenterY, 8, otherBrick.getColor(), 120);
+              }
+            }
+          }
+        }
         
         // Track destroyed bricks and create particles
         if (!wasDestroyed && brick.isDestroyed()) {
@@ -767,13 +854,26 @@ export class Game {
           const brickBounds = brick.getBounds();
           const centerX = brickPos.x + brickBounds.width / 2;
           const centerY = brickPos.y + brickBounds.height / 2;
-          this.particleSystem.createParticles(centerX, centerY, 10, brick.getColor(), 150);
+          
+          // Extra particles for critical hits
+          const particleCount = isCritical ? 20 : 10;
+          const particleLifetime = isCritical ? 200 : 150;
+          this.particleSystem.createParticles(centerX, centerY, particleCount, brick.getColor(), particleLifetime);
           
           // Play explosion sound
           this.playSound(this.brickExplodeSound);
         } else if (!brick.isDestroyed()) {
           // Brick was hit but not destroyed - play ding sound
           this.playSound(this.brickHitSound);
+          
+          // Create small particle burst for critical hits on non-destroyed bricks
+          if (isCritical) {
+            const brickPos = brick.getPosition();
+            const brickBounds = brick.getBounds();
+            const centerX = brickPos.x + brickBounds.width / 2;
+            const centerY = brickPos.y + brickBounds.height / 2;
+            this.particleSystem.createParticles(centerX, centerY, 15, '#ffff00', 150); // Yellow particles for crit
+          }
         }
         
         // Restore ball to normal if it was grey

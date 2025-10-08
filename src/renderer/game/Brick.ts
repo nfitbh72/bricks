@@ -197,6 +197,20 @@ export class Brick {
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, h);
 
+    // Draw health text
+    ctx.shadowBlur = 0; // Remove shadow for text
+    ctx.fillStyle = '#000000';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Display health rounded to 1 decimal place if fractional, otherwise as integer
+    const healthText = this.health % 1 === 0 
+      ? this.health.toString() 
+      : this.health.toFixed(1);
+    
+    ctx.fillText(healthText, x + w / 2, y + h / 2);
+
     ctx.restore();
   }
 

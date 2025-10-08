@@ -345,6 +345,7 @@ describe('Level Class', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        fillText: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -352,6 +353,9 @@ describe('Level Class', () => {
         strokeStyle: '',
         lineWidth: 0,
         globalAlpha: 1,
+        font: '',
+        textAlign: 'center',
+        textBaseline: 'middle',
       } as unknown as CanvasRenderingContext2D;
 
       expect(() => level.render(mockCtx)).not.toThrow();
@@ -367,6 +371,7 @@ describe('Level Class', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        fillText: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -374,13 +379,17 @@ describe('Level Class', () => {
         strokeStyle: '',
         lineWidth: 0,
         globalAlpha: 1,
+        font: '',
+        textAlign: 'center',
+        textBaseline: 'middle',
       } as unknown as CanvasRenderingContext2D;
 
       level.render(mockCtx);
       
-      // Each brick calls fillRect and strokeRect
+      // Each brick calls fillRect, strokeRect, and fillText
       expect(mockCtx.fillRect).toHaveBeenCalled();
       expect(mockCtx.strokeRect).toHaveBeenCalled();
+      expect(mockCtx.fillText).toHaveBeenCalled();
     });
   });
 

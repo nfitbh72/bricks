@@ -304,6 +304,7 @@ describe('Brick', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        fillText: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -311,6 +312,9 @@ describe('Brick', () => {
         strokeStyle: '',
         lineWidth: 0,
         globalAlpha: 1,
+        font: '',
+        textAlign: 'center',
+        textBaseline: 'middle',
       } as unknown as CanvasRenderingContext2D;
 
       expect(() => brick.render(mockCtx)).not.toThrow();
@@ -326,6 +330,7 @@ describe('Brick', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        fillText: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -333,6 +338,9 @@ describe('Brick', () => {
         strokeStyle: '',
         lineWidth: 0,
         globalAlpha: 1,
+        font: '',
+        textAlign: 'center',
+        textBaseline: 'middle',
       } as unknown as CanvasRenderingContext2D;
 
       brick.render(mockCtx);
@@ -340,6 +348,7 @@ describe('Brick', () => {
       expect(mockCtx.save).toHaveBeenCalled();
       expect(mockCtx.fillRect).toHaveBeenCalledWith(0, 0, BRICK_WIDTH, BRICK_HEIGHT);
       expect(mockCtx.strokeRect).toHaveBeenCalledWith(0, 0, BRICK_WIDTH, BRICK_HEIGHT);
+      expect(mockCtx.fillText).toHaveBeenCalled();
       expect(mockCtx.restore).toHaveBeenCalled();
     });
 
@@ -380,6 +389,7 @@ describe('Brick', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        fillText: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -387,12 +397,16 @@ describe('Brick', () => {
         strokeStyle: '',
         lineWidth: 0,
         globalAlpha: 1,
+        font: '',
+        textAlign: 'center',
+        textBaseline: 'middle',
       } as unknown as CanvasRenderingContext2D;
 
       brick.render(mockCtx);
 
       expect(mockCtx.fillRect).toHaveBeenCalled();
       expect(mockCtx.strokeRect).toHaveBeenCalled();
+      expect(mockCtx.fillText).toHaveBeenCalled();
     });
   });
 

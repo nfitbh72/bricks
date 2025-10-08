@@ -128,6 +128,49 @@ export class GameUpgrades {
   }
 
   /**
+   * Check if ball explosions are unlocked
+   */
+  hasBallExplosions(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BALL_EXPLOSIONS) > 0;
+  }
+
+  /**
+   * Get ball explosion damage multiplier
+   * Base explosion damage is 10% of ball damage
+   * Each upgrade level increases this by 10%
+   */
+  getBallExplosionDamageMultiplier(): number {
+    if (!this.hasBallExplosions()) return 0;
+    
+    const explosionLevel = this.getUpgradeLevel(UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT);
+    const baseMultiplier = 0.1; // 10% base explosion damage
+    const bonusMultiplier = explosionLevel * 0.1; // +10% per level
+    
+    return baseMultiplier + bonusMultiplier;
+  }
+
+  /**
+   * Check if critical hits are unlocked
+   */
+  hasCriticalHits(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BALL_ADD_CRITICAL_HITS) > 0;
+  }
+
+  /**
+   * Get critical hit chance (0 to 1)
+   * Base chance is 10%, increases by 10% per upgrade level
+   */
+  getCriticalHitChance(): number {
+    if (!this.hasCriticalHits()) return 0;
+    
+    const bonusLevel = this.getUpgradeLevel(UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT);
+    const baseChance = 0.1; // 10% base chance
+    const bonusChance = bonusLevel * 0.1; // +10% per level
+    
+    return Math.min(baseChance + bonusChance, 1.0); // Cap at 100%
+  }
+
+  /**
    * Get all active upgrades as a readable summary
    */
   getSummary(): string[] {

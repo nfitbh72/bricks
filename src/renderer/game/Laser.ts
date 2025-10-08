@@ -8,7 +8,7 @@ export class Laser {
   private position: Vector2D;
   private readonly speed: number;
   private readonly damage: number;
-  private readonly width: number = 2;
+  private readonly width: number = 4;
   private readonly height: number = 10;
   private active: boolean = true;
 
@@ -32,9 +32,9 @@ export class Laser {
   render(ctx: CanvasRenderingContext2D): void {
     if (!this.active) return;
 
-    // Draw laser WITHOUT shadow for now (testing)
+    // Draw neon pink laser
     ctx.save();
-    ctx.fillStyle = '#00ffff';
+    ctx.fillStyle = '#ff00ff';
     ctx.fillRect(
       this.position.x - this.width / 2,
       this.position.y - this.height / 2,
