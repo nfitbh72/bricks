@@ -5,6 +5,7 @@
 import { Ball } from './Ball';
 import { Bat } from './Bat';
 import { Level } from './Level';
+import { StatusBar } from './StatusBar';
 import { GameState, LevelConfig } from './types';
 import { checkCircleRectCollision, calculateGameElementScale } from './utils';
 import { IntroScreen } from '../ui/IntroScreen';
@@ -21,6 +22,7 @@ export class Game {
   private ball: Ball;
   private bat: Bat;
   private level: Level | null = null;
+  private statusBar: StatusBar;
   private gameState: GameState = GameState.INTRO;
   private playerHealth: number = 3;
   private animationFrameId: number | null = null;
@@ -88,6 +90,9 @@ export class Game {
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
     this.ball = new Ball(centerX, ballY, ballRadius, ballSpeed);
+
+    // Initialize status bar
+    this.statusBar = new StatusBar(canvas.width, canvas.height);
 
     // Initialize UI screens
     this.introScreen = new IntroScreen(
@@ -292,6 +297,14 @@ export class Game {
     this.playerHealth = levelConfig.playerHealth;
     this.gameState = GameState.PLAYING;
     
+    // Update status bar
+    this.statusBar.setLevelTitle(levelConfig.name);
+    this.statusBar.setPlayerHealth(this.playerHealth);
+    this.statusBar.setBrickCounts(
+      this.level.getRemainingBricks(),
+      this.level.getTotalBricks()
+    );
+    
     // Reset ball and bat
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
@@ -389,16 +402,18 @@ export class Game {
       }
     }
 
-    // Check wall collisions
+    // Check wall collisions (bottom boundary is status bar top)
+    const statusBarTop = this.statusBar.getY();
     const hitBackWall = this.ball.checkWallCollisions(
       0,
       this.canvas.width,
       0,
-      this.canvas.height
+      statusBarTop
     );
 
     if (hitBackWall) {
       this.playerHealth--;
+      this.statusBar.setPlayerHealth(this.playerHealth);
       // Trigger screen shake on back wall hit
       this.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
     }
@@ -473,6 +488,11 @@ export class Game {
         // Track destroyed bricks and create particles
         if (!wasDestroyed && brick.isDestroyed()) {
           this.totalBricksDestroyed++;
+          // Update status bar brick count
+          this.statusBar.setBrickCounts(
+            this.level.getRemainingBricks(),
+            this.level.getTotalBricks()
+          );
           // Create particles at brick center
           const brickPos = brick.getPosition();
           const brickBounds = brick.getBounds();
@@ -559,29 +579,11 @@ export class Game {
 
     this.ctx.restore();
 
-    // Render UI (not affected by screen shake)
-    this.renderUI();
+    // Render status bar (not affected by screen shake)
+    this.statusBar.render(this.ctx);
 
     // Render CRT scanline overlay
     this.renderCRTOverlay();
-  }
-
-  /**
-   * Render UI elements (health, etc.)
-   */
-  private renderUI(): void {
-    this.ctx.save();
-
-    // Health display (hearts/number at bottom)
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.font = '24px Arial';
-    this.ctx.shadowBlur = 10;
-    this.ctx.shadowColor = '#ff00ff';
-    
-    const healthText = '❤️'.repeat(this.playerHealth);
-    this.ctx.fillText(healthText, 10, this.canvas.height - 10);
-
-    this.ctx.restore();
   }
 
   /**
