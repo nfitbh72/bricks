@@ -2,8 +2,8 @@
  * Level configurations for the Bricks game
  */
 
-import { LevelConfig } from '../game/types';
-import { createBricksFromPattern } from './brickLayout';
+import { LevelConfig, BrickType } from '../game/types';
+import { createBricksFromPattern, createBricksFromWord } from './brickLayout';
 
 /**
  * Create Level 1 configuration
@@ -22,7 +22,7 @@ export function createLevel1(): LevelConfig {
   
   return {
     id: 1,
-    name: 'Level 1: Simple Blocks',
+    name: 'Level 1: Effective Design',
     bricks: createBricksFromPattern(pattern),
     playerHealth: 3,
   };
@@ -33,25 +33,14 @@ export function createLevel1(): LevelConfig {
  * Mixed brick types with pattern
  */
 export function createLevel2(): LevelConfig {
-  const pattern = [
-    "HHHHHHHHH",
-    "H       H",
-    "H NNNNN H",
-    "H NNNNN H",
-    "H NNNNN H",
-    "H       H",
-    "HHHHHHHHH",
-  ];
-  
   return {
     id: 2,
-    name: 'Level 2: The Frame',
-    bricks: createBricksFromPattern(pattern),
+    name: 'Level 2: Says Hi',
+    bricks: createBricksFromWord("UR MOM", BrickType.NORMAL),
     playerHealth: 3,
   };
 }
 
-//bricks: createWordBricks('BRICKS', 0, 5, BrickType.NORMAL)
 /**
  * Get level by ID
  */
