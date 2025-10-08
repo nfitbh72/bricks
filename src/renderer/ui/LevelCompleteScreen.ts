@@ -8,6 +8,7 @@ import { Button } from './Button';
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
   private currentLevel: number = 1;
+  private backgroundImage: HTMLImageElement | null = null;
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
@@ -16,10 +17,26 @@ export class LevelCompleteScreen extends Screen {
   }
 
   /**
-   * Set current level
+   * Set current level and load its background image
    */
   setLevel(level: number): void {
     this.currentLevel = level;
+    this.loadBackgroundImage(level);
+  }
+
+  /**
+   * Load the background image for the level
+   */
+  private loadBackgroundImage(levelId: number): void {
+    const img = new Image();
+    img.src = `./assets/images/level${levelId}.jpg`;
+    img.onload = () => {
+      this.backgroundImage = img;
+    };
+    img.onerror = () => {
+      console.warn(`Failed to load background image for level ${levelId}`);
+      this.backgroundImage = null;
+    };
   }
 
   /**
@@ -56,9 +73,18 @@ export class LevelCompleteScreen extends Screen {
    * Render the level complete screen
    */
   render(): void {
-    // Clear screen
-    this.ctx.fillStyle = '#0a0a0a';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Draw background image if available
+    if (this.backgroundImage) {
+      this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+      
+      // Add dark overlay for text readability
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    } else {
+      // Fallback: solid dark background
+      this.ctx.fillStyle = '#0a0a0a';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
     this.ctx.save();
 

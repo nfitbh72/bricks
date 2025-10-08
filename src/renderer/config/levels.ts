@@ -17,7 +17,7 @@ export function createLevel1(): LevelConfig {
     "N     HH  N",
     "NNNNNNH       N",
     "N N",
-    "NNN",
+    "HHH",
   ];
   
   return {

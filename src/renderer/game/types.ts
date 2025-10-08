@@ -37,6 +37,7 @@ export enum GameState {
   PLAYING = 'PLAYING',
   PAUSED = 'PAUSED',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
+  UPGRADE = 'UPGRADE',
   GAME_OVER = 'GAME_OVER',
 }
 
@@ -70,23 +71,29 @@ export interface LevelConfig {
 }
 
 /**
- * Upgrade types available between levels
+ * Upgrade type
  */
 export enum UpgradeType {
-  BAT_WIDTH_INCREASE = 'BAT_WIDTH_INCREASE',
-  BALL_SPEED_DECREASE = 'BALL_SPEED_DECREASE',
-  EXTRA_HEALTH = 'EXTRA_HEALTH',
-  MULTI_BALL = 'MULTI_BALL',
+    BAT_WIDTH_INCREASE_10_PERCENT = 'BAT_WIDTH_INCREASE_10_PERCENT',
+    BAT_ADD_SHOOTER = 'BAT_ADD_SHOOTER',
+    BAT_SHOOTER_INCREASE_10_PERCENT = 'BAT_WIDTH_INCREASE_10_PERCENT',    
+    BALL_DAMAGE_INCREASE_INCREMENT_1 = 'BALL_DAMAGE_INCREASE_INCREMENT_1',
+    BALL_ADD_PIERCING = 'BALL_ADD_PIERCING',
+    BALL_CHANCE_PIERCING_10_PERCENT = 'BALL_CHANCE_PIERCING_10_PERCENT',
+    BAT_HEALTH_INCREASE_1 = 'BAT_HEALTH_INCREASE_1',
 }
 
 /**
  * Upgrade definition
  */
 export interface Upgrade {
-  type: UpgradeType;
   name: string;
   description: string;
-  value: number;
+  times: number;
+  previewNextUpgrades: number;
+  unlockNextUpgradesAfterTimes: number;
+  nextUpgrades: Upgrade[];
+  type: UpgradeType;
 }
 
 /**
@@ -97,3 +104,4 @@ export interface CollisionResult {
   normal?: Vector2D;
   penetration?: number;
 }
+

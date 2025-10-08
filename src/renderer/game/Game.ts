@@ -13,8 +13,10 @@ import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
 import { PauseScreen } from '../ui/PauseScreen';
+import { UpgradeTreeScreen } from '../ui/UpgradeTreeScreen';
 import { ParticleSystem } from './ParticleSystem';
 import { getLevel } from '../config/levels';
+import { getUpgrades } from '../config/upgrades';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -34,6 +36,7 @@ export class Game {
   private introScreen: IntroScreen;
   private gameOverScreen: GameOverScreen;
   private levelCompleteScreen: LevelCompleteScreen;
+  private upgradeTreeScreen: UpgradeTreeScreen;
   private transitionScreen: TransitionScreen;
   private pauseScreen: PauseScreen;
   private isTransitioning: boolean = false;
@@ -47,6 +50,10 @@ export class Game {
     intensity: 0,
     duration: 0,
   };
+
+  // Sound effects
+  private brickHitSound: HTMLAudioElement;
+  private brickExplodeSound: HTMLAudioElement;
 
   // Game stats
   private currentLevelId: number = 1;
@@ -96,10 +103,12 @@ export class Game {
     this.statusBar = new StatusBar(canvas.width, canvas.height);
 
     // Initialize UI screens
+    // @TODO: Remove handleDevUpgrades callback before production
     this.introScreen = new IntroScreen(
       canvas,
       () => this.handleStartGame(),
-      () => this.handleQuit()
+      () => this.handleQuit(),
+      () => this.handleDevUpgrades()
     );
     this.gameOverScreen = new GameOverScreen(
       canvas,
@@ -108,7 +117,12 @@ export class Game {
     );
     this.levelCompleteScreen = new LevelCompleteScreen(
       canvas,
-      () => this.handleContinue()
+      () => this.handleLevelCompleteTransition()
+    );
+    this.upgradeTreeScreen = new UpgradeTreeScreen(
+      canvas,
+      () => this.handleUpgradeComplete(),
+      getUpgrades()
     );
     this.transitionScreen = new TransitionScreen(canvas);
     this.pauseScreen = new PauseScreen(
@@ -119,6 +133,12 @@ export class Game {
 
     // Initialize particle system
     this.particleSystem = new ParticleSystem();
+
+    // Load sound effects
+    this.brickHitSound = new Audio('./assets/sounds/ding.mp3');
+    this.brickHitSound.volume = 0.3;
+    this.brickExplodeSound = new Audio('./assets/sounds/explosion-107629.mp3');
+    this.brickExplodeSound.volume = 0.4;
 
     // Load background image
     this.loadBackgroundImage();
@@ -174,6 +194,8 @@ export class Game {
         this.gameOverScreen.handleKeyPress(e.key);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleKeyPress(e.key);
+      } else if (this.gameState === GameState.UPGRADE) {
+        this.upgradeTreeScreen.handleKeyPress(e.key);
       } else if (this.gameState === GameState.PAUSED) {
         this.pauseScreen.handleKeyPress(e.key);
       }
@@ -197,6 +219,8 @@ export class Game {
         this.gameOverScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleMouseMove(this.mouseX, this.mouseY);
+      } else if (this.gameState === GameState.UPGRADE) {
+        this.upgradeTreeScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.PAUSED) {
         this.pauseScreen.handleMouseMove(this.mouseX, this.mouseY);
       } else if (this.gameState === GameState.PLAYING) {
@@ -218,6 +242,8 @@ export class Game {
         this.gameOverScreen.handleClick(x, y);
       } else if (this.gameState === GameState.LEVEL_COMPLETE) {
         this.levelCompleteScreen.handleClick(x, y);
+      } else if (this.gameState === GameState.UPGRADE) {
+        this.upgradeTreeScreen.handleClick(x, y);
       } else if (this.gameState === GameState.PAUSED) {
         this.pauseScreen.handleClick(x, y);
       }
@@ -240,6 +266,23 @@ export class Game {
   }
 
   /**
+   * Handle dev upgrades button (for testing)
+   * @TODO: Remove this entire method before production
+   */
+  private handleDevUpgrades(): void {
+    // Capture a dark background for the upgrade screen
+    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.upgradeTreeScreen.captureBackground();
+    
+    // Give 500 points for testing
+    this.upgradeTreeScreen.setAvailablePoints(500);
+    
+    // Transition to upgrade screen
+    this.gameState = GameState.UPGRADE;
+  }
+
+  /**
    * Handle restart from game over
    */
   private handleRestart(): void {
@@ -249,9 +292,24 @@ export class Game {
   }
 
   /**
-   * Handle continue from level complete
+   * Handle transition from level complete to upgrade screen
    */
-  private handleContinue(): void {
+  private handleLevelCompleteTransition(): void {
+    // Capture current game state as background
+    this.upgradeTreeScreen.captureBackground();
+    
+    // Award 50 points for completing the level
+    const currentPoints = this.upgradeTreeScreen.getAvailablePoints();
+    this.upgradeTreeScreen.setAvailablePoints(currentPoints + 50);
+    
+    // Transition to upgrade screen
+    this.gameState = GameState.UPGRADE;
+  }
+
+  /**
+   * Handle continue from upgrade screen to next level
+   */
+  private handleUpgradeComplete(): void {
     this.startTransition(() => {
       const nextLevelConfig = getLevel(this.currentLevelId + 1);
       if (nextLevelConfig) {
@@ -526,6 +584,12 @@ export class Game {
           const centerX = brickPos.x + brickBounds.width / 2;
           const centerY = brickPos.y + brickBounds.height / 2;
           this.particleSystem.createParticles(centerX, centerY, 10, brick.getColor(), 150);
+          
+          // Play explosion sound
+          this.playSound(this.brickExplodeSound);
+        } else if (!brick.isDestroyed()) {
+          // Brick was hit but not destroyed - play ding sound
+          this.playSound(this.brickHitSound);
         }
         
         // Restore ball to normal if it was grey
@@ -568,6 +632,8 @@ export class Game {
       this.gameOverScreen.render();
     } else if (this.gameState === GameState.LEVEL_COMPLETE) {
       this.levelCompleteScreen.render();
+    } else if (this.gameState === GameState.UPGRADE) {
+      this.upgradeTreeScreen.render();
     } else if (this.gameState === GameState.PAUSED) {
       // Render game in background
       this.renderGameplay();
@@ -623,14 +689,25 @@ export class Game {
   }
 
   /**
-   * Get current game state
+   * Play a sound effect
+   */
+  private playSound(audio: HTMLAudioElement): void {
+    // Reset and play sound (allows rapid playback)
+    audio.currentTime = 0;
+    audio.play().catch(err => {
+      console.warn('Failed to play sound:', err);
+    });
+  }
+
+  /**
+   * Get current game state (for testing)
    */
   getGameState(): GameState {
     return this.gameState;
   }
 
   /**
-   * Get player health
+   * Get player health (for testing)
    */
   getPlayerHealth(): number {
     return this.playerHealth;
