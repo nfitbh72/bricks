@@ -40,6 +40,7 @@ export class Game {
 
   // Visual effects
   private particleSystem: ParticleSystem;
+  private backgroundImage: HTMLImageElement | null = null;
   private screenShake: { x: number; y: number; intensity: number; duration: number } = {
     x: 0,
     y: 0,
@@ -119,8 +120,25 @@ export class Game {
     // Initialize particle system
     this.particleSystem = new ParticleSystem();
 
+    // Load background image
+    this.loadBackgroundImage();
+
     // Set up input listeners
     this.setupInputListeners();
+  }
+
+  /**
+   * Load the background image
+   */
+  private loadBackgroundImage(): void {
+    const img = new Image();
+    img.src = './assets/images/dystopian.jpg';
+    img.onload = () => {
+      this.backgroundImage = img;
+    };
+    img.onerror = () => {
+      console.warn('Failed to load background image');
+    };
   }
 
   /**
@@ -555,9 +573,18 @@ export class Game {
    * Render gameplay (used for both PLAYING and PAUSED states)
    */
   private renderGameplay(): void {
-    // Clear canvas
+    // Clear canvas with black
     this.ctx.fillStyle = '#0a0a0a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Draw background image if loaded
+    if (this.backgroundImage) {
+      this.ctx.save();
+      this.ctx.globalAlpha = 0.3; // Make it subtle/darker
+      this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.globalAlpha = 1.0;
+      this.ctx.restore();
+    }
 
     // Apply screen shake
     this.ctx.save();
