@@ -202,22 +202,25 @@ describe('Brick', () => {
       expect(typeof color2).toBe('string');
     });
 
-    it('should return green color when health > 66%', () => {
+    it('should return neon color based on health modulo 16', () => {
       const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      // Full health (100%) should be green
-      expect(brick.getColor()).toBe('#00ff00');
+      // HEALTHY has 3 health, so 3 % 16 = 3
+      expect(brick.getColor()).toBe('#ffff00'); // Index 3 is Yellow
     });
 
-    it('should return yellow color when health between 33% and 66%', () => {
+    it('should return different color when health changes', () => {
       const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      brick.takeDamage(1.5); // 50% health
-      expect(brick.getColor()).toBe('#ffff00');
+      const initialColor = brick.getColor(); // health = 3
+      brick.takeDamage(1); // health = 2
+      const newColor = brick.getColor();
+      expect(newColor).not.toBe(initialColor);
+      expect(newColor).toBe('#00ff00'); // Index 2 is Green
     });
 
-    it('should return magenta color when health between 0% and 33%', () => {
-      const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      brick.takeDamage(2.4); // 20% health
-      expect(brick.getColor()).toBe('#ff00ff');
+    it('should cycle through neon colors for different health values', () => {
+      const brick = new Brick(createBrickConfig(0, 0, BrickType.NORMAL));
+      // NORMAL has 1 health, so 1 % 16 = 1
+      expect(brick.getColor()).toBe('#00ffff'); // Index 1 is Cyan
     });
 
     it('should return gray color when destroyed', () => {

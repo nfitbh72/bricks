@@ -23,6 +23,29 @@ export class Brick {
     [BrickType.HEALTHY]: 3,
   };
 
+  /**
+   * Neon color palette (16 colors)
+   * Colors are indexed by health % 16
+   */
+  private static readonly NEON_COLORS: string[] = [
+    '#ff00ff', // Magenta
+    '#00ffff', // Cyan
+    '#00ff00', // Green
+    '#ffff00', // Yellow
+    '#ff0080', // Hot Pink
+    '#0080ff', // Sky Blue
+    '#80ff00', // Lime
+    '#ff8000', // Orange
+    '#ff0040', // Red-Pink
+    '#00ff80', // Spring Green
+    '#8000ff', // Purple
+    '#ff00c0', // Rose
+    '#00c0ff', // Light Blue
+    '#c0ff00', // Yellow-Green
+    '#ff4000', // Red-Orange
+    '#40ff00', // Bright Green
+  ];
+
   constructor(config: BrickConfig) {
     // Convert grid coordinates to pixel coordinates
     const pixelPos = gridToPixel(config.col, config.row);
@@ -120,20 +143,16 @@ export class Brick {
   }
 
   /**
-   * Get color based on current health percentage
+   * Get color based on current health using neon palette
    */
   private getColorByHealth(): string {
-    const healthPercent = this.getHealthPercentage();
-    
-    if (healthPercent > 0.66) {
-      return '#00ff00'; // Green - healthy
-    } else if (healthPercent > 0.33) {
-      return '#ffff00'; // Yellow - damaged
-    } else if (healthPercent > 0) {
-      return '#ff00ff'; // Magenta - critical
-    } else {
+    if (this.health <= 0) {
       return '#666666'; // Gray - destroyed
     }
+    
+    // Use health modulo 16 to index into neon color palette
+    const colorIndex = this.health % 16;
+    return Brick.NEON_COLORS[colorIndex];
   }
 
   /**
