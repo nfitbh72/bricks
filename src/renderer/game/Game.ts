@@ -575,8 +575,8 @@ export class Game {
     // Update weapons
     this.weaponManager.update(deltaTime);
 
-    // Update collision manager (for piercing duration)
-    this.collisionManager.update(deltaTime);
+    // Update collision manager (for piercing duration and ball visual state)
+    this.collisionManager.update(deltaTime, this.ball);
 
     // Update visual effects
     this.effectsManager.update(deltaTime);

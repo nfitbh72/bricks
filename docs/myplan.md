@@ -16,12 +16,12 @@ Just some notes about future features so that I don't forget
 - [X] Refactor Game.ts to be more modular, e.g. separate out audio manager, input, etc.
 - [] Add loads of Upgrades
     - [X] slower ball
-    - [] piercing can last for extra seconds
+    - [X] piercing can last for extra seconds
     - [] sticky bat with LR control and preview
     - [] laser bat becomes bomb bat - can only fire once a second but does a large-aoe (2.5 blocks) and medium-damage (2) explosion
 - [X] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
 - [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
-- [] move hardcoded values to constants
+- [X] move hardcoded values to constants
 - [] use a dictionary and make the game multi-lingual
 - [X] Ball speed up mechanics
 - [] Boss bricks: Large multi-segment bricks with special patterns

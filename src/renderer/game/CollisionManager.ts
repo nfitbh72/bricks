@@ -26,15 +26,18 @@ export class CollisionManager {
   private piercingTimeRemaining: number = 0;
 
   /**
-   * Update piercing timer
+   * Update piercing timer and ball visual state
    */
-  update(deltaTime: number): void {
+  update(deltaTime: number, ball: Ball): void {
     if (this.piercingTimeRemaining > 0) {
       this.piercingTimeRemaining -= deltaTime;
       if (this.piercingTimeRemaining < 0) {
         this.piercingTimeRemaining = 0;
       }
     }
+    
+    // Update ball's piercing visual state
+    ball.setPiercing(this.piercingTimeRemaining > 0);
   }
 
   /**

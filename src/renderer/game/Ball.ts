@@ -24,6 +24,7 @@ export class Ball {
   private readonly initialSpeed: number;
   private currentSpeed: number;
   private isGrey: boolean = false;
+  private isPiercing: boolean = false;
   private damage: number = BALL_BASE_DAMAGE;
   private elapsedTime: number = 0; // Track time for acceleration
   private readonly speedIncreasePerSecond: number = BALL_SPEED_INCREASE_PER_SECOND;
@@ -62,7 +63,12 @@ export class Ball {
     ctx.save();
 
     // Choose color based on state
-    const color = this.isGrey ? '#666666' : '#00ffff';
+    let color = '#00ffff'; // Default cyan
+    if (this.isGrey) {
+      color = '#666666'; // Grey when inactive
+    } else if (this.isPiercing) {
+      color = '#ff0000'; // Neon red when piercing
+    }
 
     // Draw comet tail if ball is moving
     if (this.velocity.x !== 0 || this.velocity.y !== 0) {
@@ -380,5 +386,12 @@ export class Ball {
    */
   setAccelerationMultiplier(multiplier: number): void {
     this.accelerationMultiplier = multiplier;
+  }
+
+  /**
+   * Set piercing state (for visual feedback)
+   */
+  setPiercing(piercing: boolean): void {
+    this.isPiercing = piercing;
   }
 }
