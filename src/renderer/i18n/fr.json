@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "CONTINUER",
+      "quit": "QUITTER",
+      "restart": "RECOMMENCER",
+      "resume": "REPRENDRE",
+      "options": "OPTIONS",
+      "back": "RETOUR",
+      "startGame": "DÉMARRER"
+    },
+    "screens": {
+      "levelComplete": "NIVEAU TERMINÉ!",
+      "gameOver": "GAME OVER",
+      "paused": "PAUSE",
+      "enterYourName": "ENTREZ VOTRE NOM"
+    },
+    "options": {
+      "title": "OPTIONS",
+      "music": "MUSIQUE",
+      "sfx": "EFFETS SONORES",
+      "particles": "PARTICULES",
+      "damageNumbers": "NUMÉROS DE DÉGÂTS",
+      "language": "LANGUE"
+    },
+    "leaderboard": {
+      "rank": "RANG",
+      "name": "NOM",
+      "time": "TEMPS"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Niveau",
+      "time": "Temps"
+    },
+    "levels": {
+      "level1": "Niveau 1: Design Efficace",
+      "level2": "Niveau 2: Dit Bonjour",
+      "level3": "Niveau 3: Île du Crâne"
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Largeur de Raquette",
+        "description": "Augmente la largeur de la raquette de 10%"
+      },
+      "lasers": {
+        "name": "Lasers",
+        "description": "Permet à la raquette de tirer (clic gauche)"
+      },
+      "lasersPlus": {
+        "name": "Lasers+",
+        "description": "Augmente les dégâts laser de 10%"
+      },
+      "lives": {
+        "name": "Vies",
+        "description": "Augmente le nombre de vies de 1"
+      },
+      "slowerBall": {
+        "name": "Balle Plus Lente",
+        "description": "Réduit l'accélération de la balle de 25%"
+      },
+      "ballDamage": {
+        "name": "Dégâts de Balle",
+        "description": "Augmente les dégâts de la balle de 1"
+      },
+      "piercing": {
+        "name": "Perçage",
+        "description": "Une chance sur 10 de percer une brique"
+      },
+      "piercingPlus": {
+        "name": "Perçage+",
+        "description": "Augmente la chance de perçage de 10%"
+      },
+      "piercingDuration": {
+        "name": "Durée de Perçage",
+        "description": "Augmente la durée de perçage de 1 seconde"
+      },
+      "criticalHits": {
+        "name": "Coups Critiques",
+        "description": "Une chance sur 10 d'infliger le double de dégâts"
+      },
+      "criticalHitsPlus": {
+        "name": "Coups Critiques+",
+        "description": "Augmente la chance de coup critique de 10%"
+      },
+      "explosions": {
+        "name": "Explosions",
+        "description": "Les impacts de balle causent de petites explosions"
+      },
+      "explosionsPlus": {
+        "name": "Explosions+",
+        "description": "Augmente les dégâts d'explosion de 10%"
+      }
+    }
+  }
+}

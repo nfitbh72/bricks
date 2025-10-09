@@ -5,6 +5,7 @@
 import { Screen } from './Screen';
 import { Button } from './Button';
 import { Leaderboard, LeaderboardEntry } from '../game/Leaderboard';
+import { t } from '../i18n/LanguageManager';
 
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
@@ -87,7 +88,7 @@ export class LevelCompleteScreen extends Screen {
         y: this.canvas.height / 2 + 180, // Moved down to clear leaderboard
         width: buttonWidth,
         height: buttonHeight,
-        text: 'CONTINUE',
+        text: t('ui.buttons.continue'),
         onClick: () => this.onContinue(),
       })
     );
@@ -169,7 +170,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.font = '64px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width / 2, this.canvas.height / 2 - 180);
+    this.ctx.fillText(t('ui.screens.levelComplete'), this.canvas.width / 2, this.canvas.height / 2 - 180);
 
     // Draw level number
     this.ctx.font = '36px "D Day Stencil", Arial';
@@ -177,7 +178,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.shadowColor = '#00ffff';
     this.ctx.shadowBlur = 20;
     this.ctx.fillText(
-      `Level ${this.currentLevel}`,
+      `${t('game.status.level')} ${this.currentLevel}`,
       this.canvas.width / 2,
       this.canvas.height / 2 - 120
     );
@@ -188,7 +189,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.shadowColor = '#ffff00';
     this.ctx.shadowBlur = 20;
     this.ctx.fillText(
-      `Time: ${this.formatTime(this.levelTime)}`,
+      `${t('game.status.time')}: ${this.formatTime(this.levelTime)}`,
       this.canvas.width / 2,
       this.canvas.height / 2 - 70
     );
@@ -211,7 +212,7 @@ export class LevelCompleteScreen extends Screen {
       this.ctx.shadowBlur = 15;
       this.ctx.textAlign = 'center';
       this.ctx.fillText(
-        'ENTER YOUR NAME',
+        t('ui.screens.enterYourName'),
         this.canvas.width / 2,
         this.canvas.height / 2 + 180
       );
@@ -232,9 +233,9 @@ export class LevelCompleteScreen extends Screen {
     // Draw header
     this.ctx.fillStyle = '#00ff00';
     this.ctx.shadowColor = '#00ff00';
-    this.ctx.fillText('RANK', this.canvas.width / 2 - 200, startY - 40);
-    this.ctx.fillText('NAME', this.canvas.width / 2 - 80, startY - 40);
-    this.ctx.fillText('TIME', this.canvas.width / 2 + 80, startY - 40);
+    this.ctx.fillText(t('ui.leaderboard.rank'), this.canvas.width / 2 - 200, startY - 40);
+    this.ctx.fillText(t('ui.leaderboard.name'), this.canvas.width / 2 - 80, startY - 40);
+    this.ctx.fillText(t('ui.leaderboard.time'), this.canvas.width / 2 + 80, startY - 40);
     
     // Draw entries
     this.leaderboardEntries.forEach((entry, index) => {

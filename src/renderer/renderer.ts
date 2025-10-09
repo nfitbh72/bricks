@@ -3,6 +3,7 @@
  */
 
 import { Game } from './game/Game';
+import { LanguageManager } from './i18n/LanguageManager';
 
 console.log('Bricks game renderer initialized');
 
@@ -31,8 +32,13 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.height = window.innerHeight;
   });
 
-  // Wait a bit for fonts to load, then create and start the game
-  setTimeout(() => {
+  // Wait a bit for fonts to load, then initialize language and start game
+  setTimeout(async () => {
+    console.log('Initializing language manager...');
+    const languageManager = LanguageManager.getInstance();
+    await languageManager.loadTranslations();
+    console.log('Language loaded:', languageManager.getCurrentLanguage());
+    
     console.log('Creating game...');
     try {
       const game = new Game(canvas);

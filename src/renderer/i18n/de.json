@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "WEITER",
+      "quit": "BEENDEN",
+      "restart": "NEUSTART",
+      "resume": "FORTSETZEN",
+      "options": "OPTIONEN",
+      "back": "ZURÜCK",
+      "startGame": "SPIEL STARTEN"
+    },
+    "screens": {
+      "levelComplete": "LEVEL ABGESCHLOSSEN!",
+      "gameOver": "GAME OVER",
+      "paused": "PAUSIERT",
+      "enterYourName": "GEBEN SIE IHREN NAMEN EIN"
+    },
+    "options": {
+      "title": "OPTIONEN",
+      "music": "MUSIK",
+      "sfx": "SOUNDEFFEKTE",
+      "particles": "PARTIKEL",
+      "damageNumbers": "SCHADENSZAHLEN",
+      "language": "SPRACHE"
+    },
+    "leaderboard": {
+      "rank": "RANG",
+      "name": "NAME",
+      "time": "ZEIT"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Level",
+      "time": "Zeit"
+    },
+    "levels": {
+      "level1": "Level 1: Effektives Design",
+      "level2": "Level 2: Sagt Hallo",
+      "level3": "Level 3: Schädelinsel"
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Schlägerbreite",
+        "description": "Erhöht die Schlägerbreite um 10%"
+      },
+      "lasers": {
+        "name": "Laser",
+        "description": "Ermöglicht dem Schläger zu schießen (Linksklick)"
+      },
+      "lasersPlus": {
+        "name": "Laser+",
+        "description": "Erhöht Laserschaden um 10%"
+      },
+      "lives": {
+        "name": "Leben",
+        "description": "Erhöht die Anzahl der Leben um 1"
+      },
+      "slowerBall": {
+        "name": "Langsamerer Ball",
+        "description": "Reduziert Ballbeschleunigung um 25%"
+      },
+      "ballDamage": {
+        "name": "Ballschaden",
+        "description": "Erhöht Ballschaden um 1"
+      },
+      "piercing": {
+        "name": "Durchdringung",
+        "description": "Eine Chance von 1 zu 10, einen Block zu durchdringen"
+      },
+      "piercingPlus": {
+        "name": "Durchdringung+",
+        "description": "Erhöht Durchdringungschance um 10%"
+      },
+      "piercingDuration": {
+        "name": "Durchdringungsdauer",
+        "description": "Erhöht Durchdringungsdauer um 1 Sekunde"
+      },
+      "criticalHits": {
+        "name": "Kritische Treffer",
+        "description": "Eine Chance von 1 zu 10, doppelten Schaden zu verursachen"
+      },
+      "criticalHitsPlus": {
+        "name": "Kritische Treffer+",
+        "description": "Erhöht kritische Trefferchance um 10%"
+      },
+      "explosions": {
+        "name": "Explosionen",
+        "description": "Balltreffer verursachen kleine Explosionen"
+      },
+      "explosionsPlus": {
+        "name": "Explosionen+",
+        "description": "Erhöht Explosionsschaden um 10%"
+      }
+    }
+  }
+}

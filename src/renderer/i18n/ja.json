@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "続ける",
+      "quit": "終了",
+      "restart": "再スタート",
+      "resume": "再開",
+      "options": "オプション",
+      "back": "戻る",
+      "startGame": "ゲーム開始"
+    },
+    "screens": {
+      "levelComplete": "レベルクリア！",
+      "gameOver": "ゲームオーバー",
+      "paused": "一時停止",
+      "enterYourName": "名前を入力"
+    },
+    "options": {
+      "title": "オプション",
+      "music": "音楽",
+      "sfx": "効果音",
+      "particles": "パーティクル",
+      "damageNumbers": "ダメージ数値",
+      "language": "言語"
+    },
+    "leaderboard": {
+      "rank": "順位",
+      "name": "名前",
+      "time": "時間"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "レベル",
+      "time": "時間"
+    },
+    "levels": {
+      "level1": "レベル1：効果的なデザイン",
+      "level2": "レベル2：挨拶",
+      "level3": "レベル3：スカル島"
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "バット幅",
+        "description": "バットの幅を10%増加"
+      },
+      "lasers": {
+        "name": "レーザー",
+        "description": "バットが撃てるようになる（左クリック）"
+      },
+      "lasersPlus": {
+        "name": "レーザー+",
+        "description": "レーザーダメージを10%増加"
+      },
+      "lives": {
+        "name": "ライフ",
+        "description": "ライフ数を1増加"
+      },
+      "slowerBall": {
+        "name": "ボール減速",
+        "description": "ボールの加速度を25%減少"
+      },
+      "ballDamage": {
+        "name": "ボールダメージ",
+        "description": "ボールダメージを1増加"
+      },
+      "piercing": {
+        "name": "貫通",
+        "description": "10分の1の確率でブロックを貫通"
+      },
+      "piercingPlus": {
+        "name": "貫通+",
+        "description": "貫通確率を10%増加"
+      },
+      "piercingDuration": {
+        "name": "貫通持続時間",
+        "description": "貫通持続時間を1秒増加"
+      },
+      "criticalHits": {
+        "name": "クリティカルヒット",
+        "description": "10分の1の確率で2倍ダメージ"
+      },
+      "criticalHitsPlus": {
+        "name": "クリティカルヒット+",
+        "description": "クリティカル確率を10%増加"
+      },
+      "explosions": {
+        "name": "爆発",
+        "description": "ボールヒット時に小爆発が発生"
+      },
+      "explosionsPlus": {
+        "name": "爆発+",
+        "description": "爆発ダメージを10%増加"
+      }
+    }
+  }
+}

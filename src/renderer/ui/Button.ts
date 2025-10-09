@@ -92,6 +92,13 @@ export class Button {
   }
 
   /**
+   * Update button text (for translations)
+   */
+  setText(text: string): void {
+    this.text = text;
+  }
+
+  /**
    * Get button bounds
    */
   getBounds(): { x: number; y: number; width: number; height: number } {

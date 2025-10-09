@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "CONTINUE",
+      "quit": "QUIT",
+      "restart": "RESTART",
+      "resume": "RESUME",
+      "options": "OPTIONS",
+      "back": "BACK",
+      "startGame": "START GAME"
+    },
+    "screens": {
+      "levelComplete": "LEVEL COMPLETE!",
+      "gameOver": "GAME OVER",
+      "paused": "PAUSED",
+      "enterYourName": "ENTER YOUR NAME"
+    },
+    "options": {
+      "title": "OPTIONS",
+      "music": "MUSIC",
+      "sfx": "SFX",
+      "particles": "PARTICLES",
+      "damageNumbers": "DAMAGE NUMBERS",
+      "language": "LANGUAGE"
+    },
+    "leaderboard": {
+      "rank": "RANK",
+      "name": "NAME",
+      "time": "TIME"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Level",
+      "time": "Time"
+    },
+    "levels": {
+      "level1": "Level 1: Effective Design",
+      "level2": "Level 2: Says Hi",
+      "level3": "Level 3: Skull Island"
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Bat Width",
+        "description": "Increase bat width by 10%"
+      },
+      "lasers": {
+        "name": "Lasers",
+        "description": "Allows the bat to shoot (LMB)"
+      },
+      "lasersPlus": {
+        "name": "Lasers+",
+        "description": "Increase Laser Damage by 10%"
+      },
+      "lives": {
+        "name": "Lives",
+        "description": "Increase the number of lives by 1"
+      },
+      "slowerBall": {
+        "name": "Slower Ball",
+        "description": "Reduce ball acceleration by 25%"
+      },
+      "ballDamage": {
+        "name": "Ball Damage",
+        "description": "Increase ball damage by 1"
+      },
+      "piercing": {
+        "name": "Piercing",
+        "description": "One in 10 chance to pierce through a brick"
+      },
+      "piercingPlus": {
+        "name": "Piercing+",
+        "description": "Increase the chance to pierce by 10%"
+      },
+      "piercingDuration": {
+        "name": "Piercing Duration",
+        "description": "Increase piercing duration by 1 second"
+      },
+      "criticalHits": {
+        "name": "Critical Hits",
+        "description": "One in 10 chance to deal double damage"
+      },
+      "criticalHitsPlus": {
+        "name": "Critical Hits+",
+        "description": "Increase critical hit chance by 10%"
+      },
+      "explosions": {
+        "name": "Explosions",
+        "description": "Ball hits cause small explosions"
+      },
+      "explosionsPlus": {
+        "name": "Explosions+",
+        "description": "Increase explosion damage by 10%"
+      }
+    }
+  }
+}

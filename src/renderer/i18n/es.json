@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "CONTINUAR",
+      "quit": "SALIR",
+      "restart": "REINICIAR",
+      "resume": "REANUDAR",
+      "options": "OPCIONES",
+      "back": "VOLVER",
+      "startGame": "INICIAR JUEGO"
+    },
+    "screens": {
+      "levelComplete": "¡NIVEL COMPLETADO!",
+      "gameOver": "JUEGO TERMINADO",
+      "paused": "PAUSADO",
+      "enterYourName": "INGRESA TU NOMBRE"
+    },
+    "options": {
+      "title": "OPCIONES",
+      "music": "MÚSICA",
+      "sfx": "EFECTOS",
+      "particles": "PARTÍCULAS",
+      "damageNumbers": "NÚMEROS DE DAÑO",
+      "language": "IDIOMA"
+    },
+    "leaderboard": {
+      "rank": "RANGO",
+      "name": "NOMBRE",
+      "time": "TIEMPO"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Nivel",
+      "time": "Tiempo"
+    },
+    "levels": {
+      "level1": "Nivel 1: Diseño Efectivo",
+      "level2": "Nivel 2: Dice Hola",
+      "level3": "Nivel 3: Isla Calavera"
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Ancho de Paleta",
+        "description": "Aumenta el ancho de la paleta en 10%"
+      },
+      "lasers": {
+        "name": "Láseres",
+        "description": "Permite a la paleta disparar (clic izquierdo)"
+      },
+      "lasersPlus": {
+        "name": "Láseres+",
+        "description": "Aumenta el daño del láser en 10%"
+      },
+      "lives": {
+        "name": "Vidas",
+        "description": "Aumenta el número de vidas en 1"
+      },
+      "slowerBall": {
+        "name": "Bola Más Lenta",
+        "description": "Reduce la aceleración de la bola en 25%"
+      },
+      "ballDamage": {
+        "name": "Daño de Bola",
+        "description": "Aumenta el daño de la bola en 1"
+      },
+      "piercing": {
+        "name": "Perforación",
+        "description": "Una probabilidad de 1 en 10 de perforar un bloque"
+      },
+      "piercingPlus": {
+        "name": "Perforación+",
+        "description": "Aumenta la probabilidad de perforar en 10%"
+      },
+      "piercingDuration": {
+        "name": "Duración de Perforación",
+        "description": "Aumenta la duración de perforación en 1 segundo"
+      },
+      "criticalHits": {
+        "name": "Golpes Críticos",
+        "description": "Una probabilidad de 1 en 10 de hacer daño doble"
+      },
+      "criticalHitsPlus": {
+        "name": "Golpes Críticos+",
+        "description": "Aumenta la probabilidad de golpe crítico en 10%"
+      },
+      "explosions": {
+        "name": "Explosiones",
+        "description": "Los golpes de bola causan pequeñas explosiones"
+      },
+      "explosionsPlus": {
+        "name": "Explosiones+",
+        "description": "Aumenta el daño de explosión en 10%"
+      }
+    }
+  }
+}
