@@ -98,8 +98,11 @@ export class CollisionManager {
           }
         }
         
-        // Bounce ball (unless piercing)
-        if (!pierced && collision.normal) {
+        // Indestructible bricks always cause bounce, even when piercing
+        const isIndestructible = brick.isIndestructible();
+        
+        // Bounce ball (unless piercing and brick is destructible)
+        if ((!pierced || isIndestructible) && collision.normal) {
           ball.bounce(collision.normal);
         }
         
@@ -147,10 +150,11 @@ export class CollisionManager {
           ball.restoreToNormal();
         }
         
-        // If piercing, continue to next brick; otherwise stop
+        // If not piercing, stop checking more bricks
         if (!pierced) {
           break;
         }
+        // If piercing, continue to next brick (even after hitting indestructible)
       }
     }
   }
