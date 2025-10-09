@@ -17,3 +17,5 @@ don't document what you have done (no-one is impressed with a show off), instead
 don't compliment me.
 
 try to ask questions that have options as answers rather than needing me to type a lot text for answers - it may not always be possible, but it's quicker for me to confirm with short answers (e.g. A or yes)
+
+whenever you create text that is shown to players, use the dictionary instead of hardcoding
