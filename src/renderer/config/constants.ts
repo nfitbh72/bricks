@@ -90,7 +90,7 @@ export const STATUSBAR_FONT_SIZE_HEARTS = 28;
 export const STATUSBAR_TEXT_GLOW = 10;
 export const STATUSBAR_HEARTS_GLOW = 12;
 export const STATUSBAR_HEARTS_PADDING = 15;
-export const STATUSBAR_ITEM_OFFSET = 120; // Offset from center for timer and brick count
+export const STATUSBAR_ITEM_OFFSET = 200; // Offset from center for timer and brick count
 
 // StatusBar colors
 export const STATUSBAR_COLOR_HEARTS = '#ff00ff'; // Magenta
