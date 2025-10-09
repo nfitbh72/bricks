@@ -12,16 +12,16 @@ export function getUpgrades() : Upgrade[] {
             type: UpgradeType.BAT_WIDTH_INCREASE_10_PERCENT,
             nextUpgrades: [
                 {
-                    name: 'Lasers',
-                    description: 'Allows the bat to shoot (LMB)',
+                    name: t('game.upgrades.lasers.name'),
+                    description: t('game.upgrades.lasers.description'),
                     times: 1,
                     previewNextUpgrades: 1,
                     unlockNextUpgradesAfterTimes: 1,
                     type: UpgradeType.BAT_ADD_SHOOTER,
                     nextUpgrades: [
                         {
-                            name: 'Lasers+',
-                            description: 'Increase Laser Damage by 10%',
+                            name: t('game.upgrades.lasersPlus.name'),
+                            description: t('game.upgrades.lasersPlus.description'),
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 0,
@@ -31,16 +31,16 @@ export function getUpgrades() : Upgrade[] {
                     ],
                 },
                 {
-                    name: 'Lives',
-                    description: 'Increase the number of lives by 1',
+                    name: t('game.upgrades.lives.name'),
+                    description: t('game.upgrades.lives.description'),
                     times: 3,
                     previewNextUpgrades: 1,
                     unlockNextUpgradesAfterTimes: 2,
                     type: UpgradeType.HEALTH_INCREASE_1,
                     nextUpgrades: [
                         {
-                            name: 'Slower Ball',
-                            description: 'Reduce ball acceleration by 25%',
+                            name: t('game.upgrades.slowerBall.name'),
+                            description: t('game.upgrades.slowerBall.description'),
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 0,
@@ -52,32 +52,32 @@ export function getUpgrades() : Upgrade[] {
             ],
         },
         {
-            name: 'Ball Damage',
-            description: 'Increase ball damage by 1',
+            name: t('game.upgrades.ballDamage.name'),
+            description: t('game.upgrades.ballDamage.description'),
             times: 3,
             previewNextUpgrades: 1,
             unlockNextUpgradesAfterTimes: 2,
             type: UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1,
             nextUpgrades: [
                 {
-                    name: 'Piercing',
-                    description: 'One in 10 chance to pierce through a brick',
+                    name: t('game.upgrades.piercing.name'),
+                    description: t('game.upgrades.piercing.description'),
                     times: 1,
                     previewNextUpgrades: 1,
                     unlockNextUpgradesAfterTimes: 1,
                     type: UpgradeType.BALL_ADD_PIERCING,
                     nextUpgrades: [
                         {
-                            name: "Piercing+",
-                            description: 'Increase the chance to pierce by 10%',
+                            name: t('game.upgrades.piercingPlus.name'),
+                            description: t('game.upgrades.piercingPlus.description'),
                             times: 3,
                             previewNextUpgrades: 1,
                             unlockNextUpgradesAfterTimes: 2,
                             type: UpgradeType.BALL_CHANCE_PIERCING_10_PERCENT,
                             nextUpgrades: [
                                 {
-                                    name: "Piercing Duration",
-                                    description: 'Increase piercing duration by 1 second',
+                                    name: t('game.upgrades.piercingDuration.name'),
+                                    description: t('game.upgrades.piercingDuration.description'),
                                     times: 3,
                                     previewNextUpgrades: 0,
                                     unlockNextUpgradesAfterTimes: 0,
@@ -90,16 +90,16 @@ export function getUpgrades() : Upgrade[] {
                     ],
                 },
                 {
-                    name: 'Critical Hits',
-                    description: 'One in 10 chance to deal double damage',
+                    name: t('game.upgrades.criticalHits.name'),
+                    description: t('game.upgrades.criticalHits.description'),
                     times: 1,
                     previewNextUpgrades: 0,
                     unlockNextUpgradesAfterTimes: 1,
                     type: UpgradeType.BALL_ADD_CRITICAL_HITS,
                     nextUpgrades: [
                         {
-                            name: "Critical Hits+",
-                            description: 'Increase the chance to deal double damage by 10%',
+                            name: t('game.upgrades.criticalHitsPlus.name'),
+                            description: t('game.upgrades.criticalHitsPlus.description'),
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 0,
@@ -109,16 +109,16 @@ export function getUpgrades() : Upgrade[] {
                     ],
                 },
                 {
-                    name: 'Explosions',
-                    description: 'Ball hits now explode, doing splash damage',
+                    name: t('game.upgrades.explosions.name'),
+                    description: t('game.upgrades.explosions.description'),
                     times: 1,
                     previewNextUpgrades: 0,
                     unlockNextUpgradesAfterTimes: 1,
                     type: UpgradeType.BALL_EXPLOSIONS,
                     nextUpgrades: [
                         {
-                            name: "Explosions+",
-                            description: "Explosions do 10% more damage",
+                            name: t('game.upgrades.explosionsPlus.name'),
+                            description: t('game.upgrades.explosionsPlus.description'),
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 1,
