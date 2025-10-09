@@ -62,7 +62,7 @@ export function getUpgrades() : Upgrade[] {
                     name: 'Piercing',
                     description: 'One in 10 chance to pierce through a brick',
                     times: 1,
-                    previewNextUpgrades: 0,
+                    previewNextUpgrades: 1,
                     unlockNextUpgradesAfterTimes: 1,
                     type: UpgradeType.BALL_ADD_PIERCING,
                     nextUpgrades: [
@@ -70,11 +70,22 @@ export function getUpgrades() : Upgrade[] {
                             name: "Piercing+",
                             description: 'Increase the chance to pierce by 10%',
                             times: 3,
-                            previewNextUpgrades: 0,
-                            unlockNextUpgradesAfterTimes: 0,
+                            previewNextUpgrades: 1,
+                            unlockNextUpgradesAfterTimes: 2,
                             type: UpgradeType.BALL_CHANCE_PIERCING_10_PERCENT,
-                            nextUpgrades: [],
-                        }
+                            nextUpgrades: [
+                                {
+                                    name: "Piercing Duration",
+                                    description: 'Piercing lasts for 1 second when activated',
+                                    times: 1,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    type: UpgradeType.BALL_PIERCING_DURATION,
+                                    nextUpgrades: [],
+                                },
+                            ],
+                        },
+                        
                     ],
                 },
                 {

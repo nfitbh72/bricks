@@ -119,6 +119,13 @@ export class GameUpgrades {
   }
 
   /**
+   * Check if piercing duration upgrade is unlocked
+   */
+  hasPiercingDuration(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BALL_PIERCING_DURATION) > 0;
+  }
+
+  /**
    * Get bat shooter damage multiplier
    */
   getBatShooterDamage(): number {

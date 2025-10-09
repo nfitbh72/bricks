@@ -219,6 +219,20 @@ describe('GameUpgrades', () => {
     });
   });
 
+  describe('piercing duration', () => {
+    it('should return false for hasPiercingDuration with no upgrade', () => {
+      expect(gameUpgrades.hasPiercingDuration()).toBe(false);
+    });
+
+    it('should return true for hasPiercingDuration when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_PIERCING_DURATION, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.hasPiercingDuration()).toBe(true);
+    });
+  });
+
   describe('bat shooter', () => {
     it('should return false for hasBatShooter with no upgrade', () => {
       expect(gameUpgrades.hasBatShooter()).toBe(false);

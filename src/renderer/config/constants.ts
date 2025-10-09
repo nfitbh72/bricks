@@ -107,5 +107,8 @@ export const BUTTON_BORDER_WIDTH = 3;
 export const BUTTON_FONT_SIZE = 32;
 export const BUTTON_FONT_FAMILY = '"D Day Stencil", Arial';
 
+// Piercing constants
+export const PIERCING_DURATION = 1.0; // Duration in seconds when piercing is activated
+
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1;

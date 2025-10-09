@@ -13,6 +13,7 @@ import {
   BRICK_WIDTH,
   EXPLOSION_RADIUS_MULTIPLIER,
   CRITICAL_HIT_DAMAGE_MULTIPLIER,
+  PIERCING_DURATION,
 } from '../config/constants';
 
 export interface CollisionCallbacks {
@@ -23,6 +24,19 @@ export interface CollisionCallbacks {
 
 export class CollisionManager {
   private callbacks: CollisionCallbacks = {};
+  private piercingTimeRemaining: number = 0;
+
+  /**
+   * Update piercing timer
+   */
+  update(deltaTime: number): void {
+    if (this.piercingTimeRemaining > 0) {
+      this.piercingTimeRemaining -= deltaTime;
+      if (this.piercingTimeRemaining < 0) {
+        this.piercingTimeRemaining = 0;
+      }
+    }
+  }
 
   /**
    * Set collision callbacks
@@ -66,7 +80,21 @@ export class CollisionManager {
       if (collision.collided) {
         // Check for piercing
         const piercingChance = gameUpgrades.getBallPiercingChance();
-        const pierced = piercingChance > 0 && Math.random() < piercingChance;
+        const hasDuration = gameUpgrades.hasPiercingDuration();
+        
+        // Check if piercing is active (either from chance or from duration)
+        let pierced = false;
+        if (this.piercingTimeRemaining > 0) {
+          // Piercing is active from duration
+          pierced = true;
+        } else if (piercingChance > 0 && Math.random() < piercingChance) {
+          // Piercing activated by chance
+          pierced = true;
+          // If duration upgrade is active, start the timer
+          if (hasDuration) {
+            this.piercingTimeRemaining = PIERCING_DURATION;
+          }
+        }
         
         // Bounce ball (unless piercing)
         if (!pierced && collision.normal) {
