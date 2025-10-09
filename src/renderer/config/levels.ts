@@ -33,6 +33,7 @@ export function createLevel1(): LevelConfig {
     name: 'Level 1: One',
     //bricks: createBricksFromPattern(pattern),
     bricks: createBricksFromWord("1", BrickType.NORMAL),
+    baseHealth: 1, // Normal bricks = 1 HP, Healthy bricks = 3 HP
   };
 }
 
@@ -80,7 +81,7 @@ export function createLevel3(): LevelConfig {
     id: 3,
     name: 'Level 3: Skull Island (AI Generated LOL)',
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 1, // Normal bricks = 3 HP, Healthy bricks = 9 HP
+    baseHealth: 2, // Normal bricks = 3 HP, Healthy bricks = 9 HP
   };
 }
 
