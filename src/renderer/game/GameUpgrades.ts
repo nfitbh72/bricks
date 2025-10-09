@@ -91,6 +91,14 @@ export class GameUpgrades {
   }
 
   /**
+   * Get ball acceleration multiplier (reduced by upgrade)
+   */
+  getBallAccelerationMultiplier(): number {
+    const level = this.getUpgradeLevel(UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT);
+    return 1 - (level * 0.25); // Reduce by 25% per level
+  }
+
+  /**
    * Check if ball piercing is unlocked
    */
   hasBallPiercing(): boolean {

@@ -33,10 +33,20 @@ export function getUpgrades() : Upgrade[] {
                     name: 'Lives',
                     description: 'Increase the number of lives by 1',
                     times: 3,
-                    previewNextUpgrades: 0,
-                    unlockNextUpgradesAfterTimes: 0,
+                    previewNextUpgrades: 1,
+                    unlockNextUpgradesAfterTimes: 2,
                     type: UpgradeType.HEALTH_INCREASE_1,
-                    nextUpgrades: [],
+                    nextUpgrades: [
+                        {
+                            name: 'Slower Ball',
+                            description: 'Reduce ball acceleration by 25%',
+                            times: 3,
+                            previewNextUpgrades: 0,
+                            unlockNextUpgradesAfterTimes: 0,
+                            type: UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT,
+                            nextUpgrades: [],
+                        }
+                    ],
                 }
             ],
         },

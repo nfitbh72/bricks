@@ -357,6 +357,10 @@ export class Game {
     // Apply ball upgrades
     const ballProps = this.gameUpgrades.applyBallUpgrades();
     this.ball.setDamage(ballProps.damage);
+    
+    // Apply ball acceleration multiplier
+    const accelerationMultiplier = this.gameUpgrades.getBallAccelerationMultiplier();
+    this.ball.setAccelerationMultiplier(accelerationMultiplier);
   }
 
   /**

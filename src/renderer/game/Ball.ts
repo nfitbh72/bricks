@@ -27,6 +27,7 @@ export class Ball {
   private damage: number = BALL_BASE_DAMAGE;
   private elapsedTime: number = 0; // Track time for acceleration
   private readonly speedIncreasePerSecond: number = BALL_SPEED_INCREASE_PER_SECOND;
+  private accelerationMultiplier: number = 1.0; // Can be reduced by upgrades
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -45,8 +46,8 @@ export class Ball {
     // Accumulate elapsed time for speed calculation
     this.elapsedTime += deltaTime;
     
-    // Calculate new speed based on elapsed time
-    const speedIncrease = this.elapsedTime * this.speedIncreasePerSecond;
+    // Calculate new speed based on elapsed time with acceleration multiplier
+    const speedIncrease = this.elapsedTime * this.speedIncreasePerSecond * this.accelerationMultiplier;
     this.currentSpeed = this.initialSpeed + speedIncrease;
     
     // deltaTime is in seconds, so multiply velocity by it for frame-independent movement
@@ -372,5 +373,12 @@ export class Ball {
    */
   setDamage(damage: number): void {
     this.damage = damage;
+  }
+
+  /**
+   * Set acceleration multiplier (from upgrades)
+   */
+  setAccelerationMultiplier(multiplier: number): void {
+    this.accelerationMultiplier = multiplier;
   }
 }
