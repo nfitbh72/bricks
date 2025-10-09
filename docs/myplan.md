@@ -12,7 +12,7 @@ Just some notes about future features so that I don't forget
 - [X] Refactor Game.ts to be more modular, e.g. separate out audio manager, input, etc.
 - [] Add loads of Upgrades (slower ball)
 - [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
-- [] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
+- [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
 - [X] Ball speed up mechanics
 - [] Boss bricks: Large multi-segment bricks with special patterns
 - [] Obstacles that would damage the bat (making the bat smaller?)

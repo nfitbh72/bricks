@@ -13,6 +13,7 @@ export class StatusBar {
   private playerHealth: number;
   private remainingBricks: number;
   private totalBricks: number;
+  private levelTime: number;
 
   constructor(canvasWidth: number, canvasHeight: number) {
     this.x = 0;
@@ -23,6 +24,7 @@ export class StatusBar {
     this.playerHealth = 0;
     this.remainingBricks = 0;
     this.totalBricks = 0;
+    this.levelTime = 0;
   }
 
   /**
@@ -45,6 +47,29 @@ export class StatusBar {
   setBrickCounts(remaining: number, total: number): void {
     this.remainingBricks = remaining;
     this.totalBricks = total;
+  }
+
+  /**
+   * Set level time in seconds
+   */
+  setLevelTime(time: number): void {
+    this.levelTime = time;
+  }
+
+  /**
+   * Get level time in seconds
+   */
+  getLevelTime(): number {
+    return this.levelTime;
+  }
+
+  /**
+   * Format time as MM:SS
+   */
+  private formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   /**
@@ -95,6 +120,28 @@ export class StatusBar {
     ctx.fillText(hearts, 15, centerY);
     ctx.shadowBlur = 0;
 
+    // Draw timer left of center with yellow glow
+    ctx.fillStyle = '#ffff00';
+    ctx.font = statusFont;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffff00';
+    const timeText = this.formatTime(this.levelTime);
+    ctx.fillText(timeText, this.width / 2 - 120, centerY);
+    ctx.shadowBlur = 0;
+
+    // Draw brick count left of center with cyan glow
+    ctx.fillStyle = '#00ffff';
+    ctx.font = statusFont;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00ffff';
+    const brickText = `[${this.remainingBricks}/${this.totalBricks}]`;
+    ctx.fillText(brickText, this.width / 2 + 120, centerY);
+    ctx.shadowBlur = 0;
+
     // Draw level title centered with green glow
     if (this.levelTitle) {
       ctx.fillStyle = '#00ff00';
@@ -106,16 +153,5 @@ export class StatusBar {
       ctx.fillText(this.levelTitle.toUpperCase(), this.width / 2, centerY);
       ctx.shadowBlur = 0;
     }
-
-    // Draw brick count on the right with cyan glow
-    ctx.fillStyle = '#00ffff';
-    ctx.font = statusFont;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = '#00ffff';
-    const brickText = `[${this.remainingBricks}/${this.totalBricks}]`;
-    ctx.fillText(brickText, this.width - 15, centerY);
-    ctx.shadowBlur = 0;
   }
 }

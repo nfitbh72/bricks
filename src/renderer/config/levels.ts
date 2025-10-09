@@ -26,8 +26,8 @@ export function createLevel1(): LevelConfig {
   return {
     id: 1,
     name: 'Level 1: Effective Design',
-    bricks: createBricksFromPattern(pattern),
-    //bricks: createBricksFromWord("0-0", BrickType.HEALTHY),
+    //bricks: createBricksFromPattern(pattern),
+    bricks: createBricksFromWord("---", BrickType.NORMAL),
   };
 }
 

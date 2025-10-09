@@ -46,6 +46,7 @@ export class Game {
   private gameOverDelay: number = 1000; // 1 second delay
   private gameOverTimer: number = 0;
   private isDevUpgradeMode: boolean = false;
+  private levelTime: number = 0; // Time spent on current level in seconds
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -453,6 +454,9 @@ export class Game {
     // Clear any active lasers
     this.weaponManager.clear();
     
+    // Reset level timer
+    this.levelTime = 0;
+    
     this.gameState = GameState.PLAYING;
     
     // Load background image for this level
@@ -545,6 +549,10 @@ export class Game {
       return; // Pause updates when not playing or paused
     }
 
+    // Update level timer
+    this.levelTime += deltaTime;
+    this.statusBar.setLevelTime(this.levelTime);
+
     // Handle input
     this.handleInput(deltaTime);
 
@@ -579,7 +587,7 @@ export class Game {
     // Check level completion
     if (this.level && this.level.isComplete()) {
       this.gameState = GameState.LEVEL_COMPLETE;
-      this.screenManager.levelCompleteScreen.setLevel(this.currentLevelId);
+      this.screenManager.levelCompleteScreen.setLevel(this.currentLevelId, this.levelTime);
     }
   }
 

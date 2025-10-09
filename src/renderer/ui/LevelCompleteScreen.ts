@@ -8,6 +8,7 @@ import { Button } from './Button';
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
   private currentLevel: number = 1;
+  private levelTime: number = 0;
   private backgroundImage: HTMLImageElement | null = null;
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
@@ -17,11 +18,21 @@ export class LevelCompleteScreen extends Screen {
   }
 
   /**
-   * Set current level and load its background image
+   * Set current level, time, and load its background image
    */
-  setLevel(level: number): void {
+  setLevel(level: number, time: number = 0): void {
     this.currentLevel = level;
+    this.levelTime = time;
     this.loadBackgroundImage(level);
+  }
+
+  /**
+   * Format time as MM:SS
+   */
+  private formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   /**
@@ -106,6 +117,17 @@ export class LevelCompleteScreen extends Screen {
       `Level ${this.currentLevel}`,
       this.canvas.width / 2,
       this.canvas.height / 2 - 20
+    );
+
+    // Draw completion time
+    this.ctx.font = '32px "D Day Stencil", Arial';
+    this.ctx.fillStyle = '#ffff00';
+    this.ctx.shadowColor = '#ffff00';
+    this.ctx.shadowBlur = 20;
+    this.ctx.fillText(
+      `Time: ${this.formatTime(this.levelTime)}`,
+      this.canvas.width / 2,
+      this.canvas.height / 2 + 30
     );
 
     this.ctx.restore();

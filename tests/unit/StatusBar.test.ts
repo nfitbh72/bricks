@@ -109,7 +109,8 @@ describe('StatusBar', () => {
       expect(mockCtx.fillRect).toHaveBeenCalled();
       expect(mockCtx.fillText).toHaveBeenCalledWith('TEST LEVEL', canvasWidth / 2, expect.any(Number));
       expect(mockCtx.fillText).toHaveBeenCalledWith('♥♥♥', 15, expect.any(Number));
-      expect(mockCtx.fillText).toHaveBeenCalledWith('[10/20]', canvasWidth - 15, expect.any(Number));
+      expect(mockCtx.fillText).toHaveBeenCalledWith('0:00', expect.any(Number), expect.any(Number)); // Timer
+      expect(mockCtx.fillText).toHaveBeenCalledWith('[10/20]', expect.any(Number), expect.any(Number)); // Brick count
     });
   });
 });
