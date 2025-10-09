@@ -4,6 +4,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
+import { t } from '../i18n/LanguageManager';
 
 export class IntroScreen extends Screen {
   private onStart: () => void;
@@ -37,7 +38,7 @@ export class IntroScreen extends Screen {
         y: this.canvas.height / 2 + 50,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'START',
+        text: t('ui.buttons.startGame'),
         onClick: () => this.onStart(),
       })
     );
@@ -62,7 +63,7 @@ export class IntroScreen extends Screen {
         y: this.canvas.height / 2 + 210,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'OPTIONS',
+        text: t('ui.buttons.options'),
         onClick: () => this.onOptions(),
       })
     );
@@ -74,7 +75,7 @@ export class IntroScreen extends Screen {
         y: this.canvas.height / 2 + 290,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'QUIT',
+        text: t('ui.buttons.quit'),
         onClick: () => this.onQuit(),
       })
     );
