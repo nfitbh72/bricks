@@ -280,9 +280,9 @@ export class Game {
     // Capture current game state as background
     this.screenManager.upgradeTreeScreen.captureBackground();
     
-    // Award 50 points for completing the level
+    // Award 3 points for completing the level
     const currentPoints = this.screenManager.upgradeTreeScreen.getAvailablePoints();
-    this.screenManager.upgradeTreeScreen.setAvailablePoints(currentPoints + 50);
+    this.screenManager.upgradeTreeScreen.setAvailablePoints(currentPoints + 3);
     
     // Transition to upgrade screen
     this.gameState = GameState.UPGRADE;
