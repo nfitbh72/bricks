@@ -257,6 +257,9 @@ export class Game {
     // Give 500 points for testing
     this.screenManager.upgradeTreeScreen.setAvailablePoints(500);
     
+    // Enable dev mode to show ALL button
+    this.screenManager.upgradeTreeScreen.setDevMode(true);
+    
     // Transition to upgrade screen
     this.gameState = GameState.UPGRADE;
   }
@@ -283,6 +286,9 @@ export class Game {
     // Award 3 points for completing the level
     const currentPoints = this.screenManager.upgradeTreeScreen.getAvailablePoints();
     this.screenManager.upgradeTreeScreen.setAvailablePoints(currentPoints + 3);
+    
+    // Disable dev mode for normal gameplay
+    this.screenManager.upgradeTreeScreen.setDevMode(false);
     
     // Transition to upgrade screen
     this.gameState = GameState.UPGRADE;

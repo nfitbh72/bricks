@@ -244,22 +244,41 @@ export class Ball {
    * The further from center, the steeper the angle
    */
   bounceOffBat(bat: Bat): void {
+    const batBounds = bat.getBounds();
+    const batCenterY = batBounds.y + batBounds.height / 2;
+    
+    // Determine if ball hit top or bottom of bat
+    const hitFromTop = this.position.y < batCenterY;
+    
     // Get relative hit position (-1 to 1)
     const relativeHitPos = bat.getRelativeHitPosition(this.position.x);
     
     // Calculate bounce angle based on hit position
-    // Center = -90 degrees (straight up)
-    // Edges = up to ±60 degrees from vertical
     const maxAngle = 60; // Maximum deflection angle in degrees
-    const bounceAngle = -90 + (relativeHitPos * maxAngle);
     
-    // Convert to radians and set velocity using current accelerated speed
-    const radians = (bounceAngle * Math.PI) / 180;
-    
-    this.velocity = {
-      x: Math.cos(radians) * this.currentSpeed,
-      y: Math.sin(radians) * this.currentSpeed,
-    };
+    if (hitFromTop) {
+      // Hit top of bat - bounce upward
+      // Center = -90 degrees (straight up)
+      // Edges = up to ±60 degrees from vertical
+      const bounceAngle = -90 + (relativeHitPos * maxAngle);
+      const radians = (bounceAngle * Math.PI) / 180;
+      
+      this.velocity = {
+        x: Math.cos(radians) * this.currentSpeed,
+        y: Math.sin(radians) * this.currentSpeed,
+      };
+    } else {
+      // Hit bottom of bat - bounce downward
+      // Center = 90 degrees (straight down)
+      // Edges = up to ±60 degrees from vertical
+      const bounceAngle = 90 + (relativeHitPos * maxAngle);
+      const radians = (bounceAngle * Math.PI) / 180;
+      
+      this.velocity = {
+        x: Math.cos(radians) * this.currentSpeed,
+        y: Math.sin(radians) * this.currentSpeed,
+      };
+    }
   }
 
   /**

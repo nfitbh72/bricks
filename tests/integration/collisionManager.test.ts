@@ -52,6 +52,22 @@ describe('CollisionManager Integration', () => {
 
       expect(finalVelocity.y).toBe(initialVelocity.y); // No bounce
     });
+
+    it('should bounce ball off bottom of bat', () => {
+      // Position ball to collide with bottom of bat
+      const batPos = bat.getPosition();
+      const batHeight = bat.getHeight();
+      ball.setPosition(batPos.x + 50, batPos.y + batHeight + 5);
+      ball.setVelocity(0, -100); // Moving up
+
+      const initialVelocity = ball.getVelocity();
+      expect(initialVelocity.y).toBeLessThan(0);
+
+      collisionManager.checkBallBatCollision(ball, bat);
+
+      const finalVelocity = ball.getVelocity();
+      expect(finalVelocity.y).toBeGreaterThan(0); // Should bounce down
+    });
   });
 
   describe('Ball-Brick Collisions', () => {

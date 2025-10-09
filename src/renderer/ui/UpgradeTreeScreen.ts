@@ -45,6 +45,7 @@ export class UpgradeTreeScreen extends Screen {
   private backgroundImage: ImageData | null = null;
   private lastFrameTime: number = 0;
   private upgradeSound: HTMLAudioElement;
+  private isDevMode: boolean = false;
   
   // Layout constants
   private readonly NODE_WIDTH = 180;
@@ -72,6 +73,16 @@ export class UpgradeTreeScreen extends Screen {
     this.upgradeSound = new Audio('./assets/sounds/power-up-game-sound-effect-359227.mp3');
     this.upgradeSound.volume = 0.5; // 50% volume
     
+    this.createButtons();
+  }
+
+  /**
+   * Enable dev mode (shows ALL button)
+   */
+  setDevMode(enabled: boolean): void {
+    this.isDevMode = enabled;
+    // Recreate buttons to add/remove ALL button
+    this.buttons = [];
     this.createButtons();
   }
 
@@ -291,6 +302,20 @@ export class UpgradeTreeScreen extends Screen {
         onClick: () => this.handleContinue(),
       })
     );
+
+    // ALL button (dev mode only, top-right below CONTINUE)
+    if (this.isDevMode) {
+      this.buttons.push(
+        new Button({
+          x: this.canvas.width - buttonWidth - 20,
+          y: 70, // Below CONTINUE button
+          width: buttonWidth,
+          height: buttonHeight,
+          text: 'ALL',
+          onClick: () => this.handleUnlockAll(),
+        })
+      );
+    }
   }
 
   /**
@@ -298,6 +323,38 @@ export class UpgradeTreeScreen extends Screen {
    */
   private handleContinue(): void {
     this.onContinue();
+  }
+
+  /**
+   * Handle unlock all button (dev mode)
+   */
+  private handleUnlockAll(): void {
+    // Recursively unlock all nodes to max level
+    const unlockNode = (node: UpgradeNode) => {
+      node.currentLevel = node.upgrade.times;
+      node.state = 'maxed';
+      node.animation = {
+        type: 'unlock',
+        startTime: Date.now(),
+        duration: 300,
+      };
+      
+      // Unlock children
+      node.children.forEach(child => unlockNode(child));
+    };
+
+    // Unlock all root nodes and their children
+    this.state.rootNodes.forEach(root => unlockNode(root));
+
+    // Play sound
+    try {
+      this.upgradeSound.currentTime = 0;
+      this.upgradeSound.play().catch(() => {
+        // Ignore audio play errors
+      });
+    } catch (e) {
+      // Ignore audio errors
+    }
   }
 
   /**

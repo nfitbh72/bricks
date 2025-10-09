@@ -9,11 +9,15 @@ Just some notes about future features so that I don't forget
 - [] Add many maps
 - [X] Test coverage
 - [X] Integration tests
-- [X] Add a (fake) leaderboard for each level that has quite poor players.  Keep dystopian but also old school (3 letter names)
-- [] level orientation (bat doesnt have to be bottom of screen)
+- [X] Add a (fake) leaderboard for each level that has quite poor players.
+- [] level orientation (bat doesn't have to be bottom of screen)
+- [X] the ball can hit the bottom of the bat
 - [X] visual effect to the ball - like a comet tail
 - [X] Refactor Game.ts to be more modular, e.g. separate out audio manager, input, etc.
-- [] Add loads of Upgrades (slower ball)
+- [] Add loads of Upgrades
+    - [] slower ball
+    - [] chance for piercing to last for a second, etc
+    - [] sticky bat with LR control and preview
 - [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
 - [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
 - [X] Ball speed up mechanics
@@ -22,7 +26,7 @@ Just some notes about future features so that I don't forget
 - [] Challenge Modes
     - [] Survival mode: Endless waves with increasing difficulty
     - [] Time attack: Complete level as fast as possible
-    - [] One-shot mode: Single life, no respawns
+    - [] One-shot mode: Single life, no re-spawns
     - [] Precision mode: Limited number of ball launches
     - [] Chaos mode: Random modifiers each level
 - [] Slow-mo on level complete: Dramatic final brick destruction
