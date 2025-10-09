@@ -84,7 +84,7 @@ export class LevelCompleteScreen extends Screen {
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 280, // Moved down to clear leaderboard
+        y: this.canvas.height / 2 + 180, // Moved down to clear leaderboard
         width: buttonWidth,
         height: buttonHeight,
         text: 'CONTINUE',
@@ -169,7 +169,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.font = '64px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width / 2, this.canvas.height / 2 - 80);
+    this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width / 2, this.canvas.height / 2 - 180);
 
     // Draw level number
     this.ctx.font = '36px "D Day Stencil", Arial';
@@ -179,7 +179,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.fillText(
       `Level ${this.currentLevel}`,
       this.canvas.width / 2,
-      this.canvas.height / 2 - 20
+      this.canvas.height / 2 - 120
     );
 
     // Draw completion time
@@ -190,7 +190,7 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.fillText(
       `Time: ${this.formatTime(this.levelTime)}`,
       this.canvas.width / 2,
-      this.canvas.height / 2 + 30
+      this.canvas.height / 2 - 70
     );
 
     // Draw leaderboard
@@ -213,7 +213,7 @@ export class LevelCompleteScreen extends Screen {
       this.ctx.fillText(
         'ENTER YOUR NAME',
         this.canvas.width / 2,
-        this.canvas.height / 2 + 280
+        this.canvas.height / 2 + 180
       );
     }
   }
@@ -222,7 +222,7 @@ export class LevelCompleteScreen extends Screen {
    * Render the leaderboard
    */
   private renderLeaderboard(): void {
-    const startY = this.canvas.height / 2 + 120; // Increased gap from time
+    const startY = this.canvas.height / 2 + 20; // Increased gap from time
     const lineHeight = 40;
     
     this.ctx.font = '28px "D Day Stencil", Arial';

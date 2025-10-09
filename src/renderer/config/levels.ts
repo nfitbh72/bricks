@@ -39,7 +39,7 @@ export function createLevel2(): LevelConfig {
   return {
     id: 2,
     name: 'Level 2: Says Hi',
-    bricks: createBricksFromWord("NFI", BrickType.HEALTHY),
+    bricks: createBricksFromWord("NFI", BrickType.NORMAL),
     baseHealth: 2, // Normal bricks = 2 HP, Healthy bricks = 6 HP
   };
 }
