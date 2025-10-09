@@ -8,11 +8,13 @@ import { Button } from './Button';
 export class PauseScreen extends Screen {
   private onResume: () => void;
   private onQuit: () => void;
+  private onOptions: () => void;
 
-  constructor(canvas: HTMLCanvasElement, onResume: () => void, onQuit: () => void) {
+  constructor(canvas: HTMLCanvasElement, onResume: () => void, onQuit: () => void, onOptions: () => void) {
     super(canvas);
     this.onResume = onResume;
     this.onQuit = onQuit;
+    this.onOptions = onOptions;
     this.createButtons();
   }
 
@@ -36,11 +38,23 @@ export class PauseScreen extends Screen {
       })
     );
 
-    // QUIT button
+    // OPTIONS button
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
         y: this.canvas.height / 2 + 70,
+        width: buttonWidth,
+        height: buttonHeight,
+        text: 'OPTIONS',
+        onClick: () => this.onOptions(),
+      })
+    );
+
+    // QUIT button
+    this.buttons.push(
+      new Button({
+        x: centerX - buttonWidth / 2,
+        y: this.canvas.height / 2 + 150,
         width: buttonWidth,
         height: buttonHeight,
         text: 'QUIT',

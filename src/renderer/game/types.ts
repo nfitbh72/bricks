@@ -39,6 +39,7 @@ export enum GameState {
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
   UPGRADE = 'UPGRADE',
   GAME_OVER = 'GAME_OVER',
+  OPTIONS = 'OPTIONS',
 }
 
 /**

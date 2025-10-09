@@ -15,8 +15,10 @@ import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { TransitionScreen } from '../ui/TransitionScreen';
 import { PauseScreen } from '../ui/PauseScreen';
 import { UpgradeTreeScreen } from '../ui/UpgradeTreeScreen';
+import { OptionsScreen, GameOptions } from '../ui/OptionsScreen';
 import { ParticleSystem } from './ParticleSystem';
 import { GameUpgrades } from './GameUpgrades';
+import { DamageNumber } from './DamageNumber';
 import { getLevel } from '../config/levels';
 import { getUpgrades } from '../config/upgrades';
 import { BRICK_WIDTH } from '../config/constants';
@@ -43,10 +45,13 @@ export class Game {
   private upgradeTreeScreen: UpgradeTreeScreen;
   private transitionScreen: TransitionScreen;
   private pauseScreen: PauseScreen;
+  private optionsScreen: OptionsScreen;
   private isTransitioning: boolean = false;
+  private previousState: GameState | null = null; // Store state before options
 
   // Visual effects
   private particleSystem: ParticleSystem;
+  private damageNumbers: DamageNumber[] = [];
   private backgroundImage: HTMLImageElement | null = null;
   private screenShake: { x: number; y: number; intensity: number; duration: number } = {
     x: 0,
@@ -121,7 +126,8 @@ export class Game {
       canvas,
       () => this.handleStartGame(),
       () => this.handleQuit(),
-      () => this.handleDevUpgrades()
+      () => this.handleDevUpgrades(),
+      () => this.handleOpenOptions()
     );
     this.gameOverScreen = new GameOverScreen(
       canvas,
@@ -141,8 +147,22 @@ export class Game {
     this.pauseScreen = new PauseScreen(
       canvas,
       () => this.handleResume(),
-      () => this.handleQuitFromPause()
+      () => this.handleQuitFromPause(),
+      () => this.handleOpenOptions()
     );
+    this.optionsScreen = new OptionsScreen(
+      canvas,
+      () => this.handleCloseOptions()
+    );
+    
+    // Set volume change callback for real-time updates
+    this.optionsScreen.setVolumeChangeCallback((musicVolume, sfxVolume) => {
+      if (this.backgroundMusic) {
+        this.backgroundMusic.volume = musicVolume * 0.2;
+      }
+      this.brickHitSound.volume = sfxVolume * 0.3;
+      this.brickExplodeSound.volume = sfxVolume * 0.4;
+    });
 
     // Initialize particle system
     this.particleSystem = new ParticleSystem();
@@ -160,6 +180,9 @@ export class Game {
     this.backgroundMusic.play().catch(err => {
       console.warn('Background music autoplay blocked. Will start on first user interaction:', err);
     });
+
+    // Apply saved options
+    this.applyOptions();
 
     // Load background image
     this.loadBackgroundImage();
@@ -451,6 +474,45 @@ export class Game {
   }
 
   /**
+   * Handle opening options screen
+   */
+  private handleOpenOptions(): void {
+    this.previousState = this.gameState;
+    this.gameState = GameState.OPTIONS;
+    this.optionsScreen.attach();
+  }
+
+  /**
+   * Handle closing options screen
+   */
+  private handleCloseOptions(): void {
+    this.optionsScreen.detach();
+    if (this.previousState) {
+      this.gameState = this.previousState;
+      this.previousState = null;
+    }
+    
+    // Apply volume settings
+    this.applyOptions();
+  }
+
+  /**
+   * Apply options to game
+   */
+  private applyOptions(): void {
+    const options = this.optionsScreen.getOptions();
+    
+    // Apply music volume
+    if (this.backgroundMusic) {
+      this.backgroundMusic.volume = options.musicVolume * 0.2; // Base volume 0.2
+    }
+    
+    // Apply SFX volume
+    this.brickHitSound.volume = options.sfxVolume * 0.3; // Base volume 0.3
+    this.brickExplodeSound.volume = options.sfxVolume * 0.4; // Base volume 0.4
+  }
+
+  /**
    * Start transition animation
    */
   private startTransition(onComplete: () => void): void {
@@ -533,7 +595,13 @@ export class Game {
         ) {
           // Damage brick
           const wasDestroyed = brick.isDestroyed();
-          brick.takeDamage(laser.getDamage());
+          const laserDamage = laser.getDamage();
+          brick.takeDamage(laserDamage);
+
+          // Create damage number above brick
+          const brickCenterX = brickBounds.x + brickBounds.width / 2;
+          const brickTopY = brickBounds.y - 5;
+          this.damageNumbers.push(new DamageNumber(brickCenterX, brickTopY, laserDamage, false));
 
           // Track destroyed bricks and create particles
           if (!wasDestroyed && brick.isDestroyed()) {
@@ -685,6 +753,11 @@ export class Game {
     // Update particles
     this.particleSystem.update(deltaTime);
 
+    // Update damage numbers
+    const currentTime = performance.now();
+    this.damageNumbers.forEach(damageNumber => damageNumber.update(currentTime));
+    this.damageNumbers = this.damageNumbers.filter(damageNumber => !damageNumber.isExpired());
+
     // Update screen shake
     if (this.screenShake.duration > 0) {
       this.screenShake.duration -= deltaTime;
@@ -798,6 +871,11 @@ export class Game {
         const wasDestroyed = brick.isDestroyed();
         brick.takeDamage(damage);
         
+        // Create damage number above brick
+        const brickCenterX = brickBounds.x + brickBounds.width / 2;
+        const brickTopY = brickBounds.y - 5; // Slightly above brick
+        this.damageNumbers.push(new DamageNumber(brickCenterX, brickTopY, damage, isCritical));
+        
         // Apply explosion damage to nearby bricks if upgrade is active
         if (this.gameUpgrades.hasBallExplosions()) {
           const explosionDamageMultiplier = this.gameUpgrades.getBallExplosionDamageMultiplier();
@@ -825,6 +903,10 @@ export class Game {
             if (distance <= explosionRadius) {
               const wasOtherDestroyed = otherBrick.isDestroyed();
               otherBrick.takeDamage(explosionDamage);
+              
+              // Create damage number for explosion damage
+              const otherBrickTopY = otherBounds.y - 5;
+              this.damageNumbers.push(new DamageNumber(otherCenterX, otherBrickTopY, explosionDamage, false));
               
               // Track if explosion destroyed this brick
               if (!wasOtherDestroyed && otherBrick.isDestroyed()) {
@@ -858,7 +940,8 @@ export class Game {
           // Extra particles for critical hits
           const particleCount = isCritical ? 20 : 10;
           const particleLifetime = isCritical ? 200 : 150;
-          this.particleSystem.createParticles(centerX, centerY, particleCount, brick.getColor(), particleLifetime);
+          const particleColor = isCritical ? '#ffff00' : brick.getColor(); // Yellow for crits
+          this.particleSystem.createParticles(centerX, centerY, particleCount, particleColor, particleLifetime);
           
           // Play explosion sound
           this.playSound(this.brickExplodeSound);
@@ -923,6 +1006,16 @@ export class Game {
       this.levelCompleteScreen.render();
     } else if (this.gameState === GameState.UPGRADE) {
       this.upgradeTreeScreen.render();
+    } else if (this.gameState === GameState.OPTIONS) {
+      // Render previous screen in background
+      if (this.previousState === GameState.INTRO) {
+        this.introScreen.render();
+      } else if (this.previousState === GameState.PAUSED) {
+        this.renderGameplay();
+        this.pauseScreen.render();
+      }
+      // Render options overlay
+      this.optionsScreen.render();
     } else if (this.gameState === GameState.PAUSED) {
       // Render game in background
       this.renderGameplay();
@@ -974,8 +1067,16 @@ export class Game {
     }
     this.ctx.restore();
 
-    // Render particles
-    this.particleSystem.render(this.ctx);
+    // Render particles (if enabled)
+    const options = this.optionsScreen.getOptions();
+    if (options.showParticles) {
+      this.particleSystem.render(this.ctx);
+    }
+
+    // Render damage numbers (if enabled)
+    if (options.showDamageNumbers) {
+      this.damageNumbers.forEach(damageNumber => damageNumber.render(this.ctx));
+    }
 
     this.ctx.restore();
 

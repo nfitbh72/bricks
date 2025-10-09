@@ -8,13 +8,15 @@ import { Button } from './Button';
 export class IntroScreen extends Screen {
   private onStart: () => void;
   private onQuit: () => void;
+  private onOptions: () => void;
   // @TODO: Remove dev upgrades callback before production
   private onDevUpgrades: () => void;
 
-  constructor(canvas: HTMLCanvasElement, onStart: () => void, onQuit: () => void, onDevUpgrades: () => void) {
+  constructor(canvas: HTMLCanvasElement, onStart: () => void, onQuit: () => void, onDevUpgrades: () => void, onOptions: () => void) {
     super(canvas);
     this.onStart = onStart;
     this.onQuit = onQuit;
+    this.onOptions = onOptions;
     // @TODO: Remove dev upgrades callback before production
     this.onDevUpgrades = onDevUpgrades;
     this.createButtons();
@@ -53,12 +55,23 @@ export class IntroScreen extends Screen {
       })
     );
 
-    // QUIT button
-    // @TODO: Move back to y + 130 when DEV UPGRADES button is removed
+    // OPTIONS button
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
         y: this.canvas.height / 2 + 210,
+        width: buttonWidth,
+        height: buttonHeight,
+        text: 'OPTIONS',
+        onClick: () => this.onOptions(),
+      })
+    );
+
+    // QUIT button
+    this.buttons.push(
+      new Button({
+        x: centerX - buttonWidth / 2,
+        y: this.canvas.height / 2 + 290,
         width: buttonWidth,
         height: buttonHeight,
         text: 'QUIT',
