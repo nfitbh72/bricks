@@ -30,12 +30,23 @@ export class IntroScreen extends Screen {
     const centerX = this.canvas.width / 2;
     const buttonWidth = 200;
     const buttonHeight = 60;
+    
+    // Calculate total content height:
+    // Title + subtitle + spacing + 4 buttons
+    // Title: 72px, Subtitle: 36px, spacing: 60px + 90px = 150px
+    // Buttons: 4 * 60px + 3 * 80px spacing = 240 + 240 = 480px
+    // Total: ~630px
+    const totalContentHeight = 630;
+    
+    // Position so the vertical midpoint is at 45% from top
+    const contentMidY = this.canvas.height * 0.45;
+    const baseY = contentMidY - totalContentHeight / 2;
 
     // START button
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 50,
+        y: baseY + 150,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.startGame'),
@@ -48,7 +59,7 @@ export class IntroScreen extends Screen {
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 130,
+        y: baseY + 230,
         width: buttonWidth,
         height: buttonHeight,
         text: 'DEV UPGRADES',
@@ -60,7 +71,7 @@ export class IntroScreen extends Screen {
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 210,
+        y: baseY + 310,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.options'),
@@ -72,7 +83,7 @@ export class IntroScreen extends Screen {
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 290,
+        y: baseY + 390,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.quit'),
@@ -100,6 +111,11 @@ export class IntroScreen extends Screen {
 
     this.ctx.save();
 
+    // Calculate positioning to center content vertically at 45% from top
+    const totalContentHeight = 630;
+    const contentMidY = this.canvas.height * 0.45;
+    const baseY = contentMidY - totalContentHeight / 2;
+
     // Draw title
     this.ctx.shadowBlur = 40;
     this.ctx.shadowColor = '#ff00ff';
@@ -107,14 +123,14 @@ export class IntroScreen extends Screen {
     this.ctx.font = '72px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('BRICKS', this.canvas.width / 2, this.canvas.height / 2 - 100);
+    this.ctx.fillText('BRICKS', this.canvas.width / 2, baseY);
 
     // Draw subtitle
     this.ctx.font = '36px "D Day Stencil", Arial';
     this.ctx.fillStyle = '#00ffff';
     this.ctx.shadowColor = '#00ffff';
     this.ctx.shadowBlur = 20;
-    this.ctx.fillText('with UPGRADES', this.canvas.width / 2, this.canvas.height / 2 - 40);
+    this.ctx.fillText('with UPGRADES', this.canvas.width / 2, baseY + 60);
 
     this.ctx.restore();
 
