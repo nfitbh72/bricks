@@ -154,6 +154,15 @@ export class ScreenManager {
   }
 
   /**
+   * Update current screen (for animations)
+   */
+  update(currentState: GameState, deltaTime: number): void {
+    if (currentState === GameState.LEVEL_COMPLETE) {
+      this.levelCompleteScreen.update(deltaTime);
+    }
+  }
+
+  /**
    * Render current screen
    */
   render(currentState: GameState, previousState: GameState | null, renderGameplayFn: () => void): void {

@@ -8,6 +8,9 @@ Just some notes about future features so that I don't forget
 - [X] Indestructible bricks
 - [] Add many maps
 - [X] Test coverage
+- [X] Integration tests
+- [X] Add a (fake) leaderboard for each level that has quite poor players.  Keep dystopian but also old school (3 letter names)
+- [] level orientation (bat doesnt have to be bottom of screen)
 - [X] visual effect to the ball - like a comet tail
 - [X] Refactor Game.ts to be more modular, e.g. separate out audio manager, input, etc.
 - [] Add loads of Upgrades (slower ball)

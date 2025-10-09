@@ -4,12 +4,19 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
+import { Leaderboard, LeaderboardEntry } from '../game/Leaderboard';
 
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
   private currentLevel: number = 1;
   private levelTime: number = 0;
   private backgroundImage: HTMLImageElement | null = null;
+  private leaderboardEntries: LeaderboardEntry[] = [];
+  private isOnLeaderboard: boolean = false;
+  private playerName: string = 'AAA';
+  private nameEntryIndex: number = 0; // Which character is being entered (0-2)
+  private flashTimer: number = 0;
+  private showFlash: boolean = true;
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
@@ -24,6 +31,21 @@ export class LevelCompleteScreen extends Screen {
     this.currentLevel = level;
     this.levelTime = time;
     this.loadBackgroundImage(level);
+    
+    // Generate leaderboard
+    this.leaderboardEntries = Leaderboard.generateFakeLeaderboard(level);
+    this.isOnLeaderboard = Leaderboard.isPlayerOnLeaderboard(time, this.leaderboardEntries);
+    
+    // Reset name entry
+    this.playerName = 'AAA';
+    this.nameEntryIndex = 0;
+    this.flashTimer = 0;
+    this.showFlash = true;
+    
+    // If player is on leaderboard, insert them
+    if (this.isOnLeaderboard) {
+      this.leaderboardEntries = Leaderboard.insertPlayer(time, this.playerName, this.leaderboardEntries);
+    }
   }
 
   /**
@@ -58,11 +80,11 @@ export class LevelCompleteScreen extends Screen {
     const buttonWidth = 200;
     const buttonHeight = 60;
 
-    // CONTINUE button
+    // CONTINUE button - positioned below leaderboard
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 80,
+        y: this.canvas.height / 2 + 280, // Moved down to clear leaderboard
         width: buttonWidth,
         height: buttonHeight,
         text: 'CONTINUE',
@@ -72,11 +94,52 @@ export class LevelCompleteScreen extends Screen {
   }
 
   /**
-   * Handle key press (Space/Enter triggers CONTINUE)
+   * Handle key press (Space/Enter triggers CONTINUE, letters for name entry)
    */
   handleKeyPress(key: string): void {
+    // If on leaderboard and entering name
+    if (this.isOnLeaderboard && this.nameEntryIndex < 3) {
+      // Check if it's a letter
+      if (key.length === 1 && /[A-Z]/i.test(key)) {
+        const upperKey = key.toUpperCase();
+        const nameArray = this.playerName.split('');
+        nameArray[this.nameEntryIndex] = upperKey;
+        this.playerName = nameArray.join('');
+        
+        // Move to next character
+        this.nameEntryIndex++;
+        this.flashTimer = 0;
+        this.showFlash = true;
+        
+        // Update leaderboard with new name
+        this.leaderboardEntries = Leaderboard.insertPlayer(
+          this.levelTime,
+          this.playerName,
+          Leaderboard.generateFakeLeaderboard(this.currentLevel)
+        );
+        
+        return;
+      }
+    }
+    
+    // Continue on space/enter (only if name entry is complete or not on leaderboard)
     if (key === ' ' || key === 'Enter') {
-      this.onContinue();
+      if (!this.isOnLeaderboard || this.nameEntryIndex >= 3) {
+        this.onContinue();
+      }
+    }
+  }
+  
+  /**
+   * Update flash animation
+   */
+  update(deltaTime: number): void {
+    if (this.isOnLeaderboard && this.nameEntryIndex < 3) {
+      this.flashTimer += deltaTime;
+      if (this.flashTimer >= 0.5) {
+        this.showFlash = !this.showFlash;
+        this.flashTimer = 0;
+      }
     }
   }
 
@@ -130,11 +193,86 @@ export class LevelCompleteScreen extends Screen {
       this.canvas.height / 2 + 30
     );
 
+    // Draw leaderboard
+    this.renderLeaderboard();
+
     this.ctx.restore();
 
-    // Render buttons
-    for (const button of this.buttons) {
-      button.render(this.ctx);
+    // Render buttons (only if name entry is complete or not on leaderboard)
+    if (!this.isOnLeaderboard || this.nameEntryIndex >= 3) {
+      for (const button of this.buttons) {
+        button.render(this.ctx);
+      }
+    } else {
+      // Show prompt for name entry
+      this.ctx.font = '24px "D Day Stencil", Arial';
+      this.ctx.fillStyle = '#ff00ff';
+      this.ctx.shadowColor = '#ff00ff';
+      this.ctx.shadowBlur = 15;
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(
+        'ENTER YOUR NAME',
+        this.canvas.width / 2,
+        this.canvas.height / 2 + 280
+      );
     }
+  }
+
+  /**
+   * Render the leaderboard
+   */
+  private renderLeaderboard(): void {
+    const startY = this.canvas.height / 2 + 120; // Increased gap from time
+    const lineHeight = 40;
+    
+    this.ctx.font = '28px "D Day Stencil", Arial';
+    this.ctx.textAlign = 'left';
+    this.ctx.shadowBlur = 10;
+    
+    // Draw header
+    this.ctx.fillStyle = '#00ff00';
+    this.ctx.shadowColor = '#00ff00';
+    this.ctx.fillText('RANK', this.canvas.width / 2 - 200, startY - 40);
+    this.ctx.fillText('NAME', this.canvas.width / 2 - 80, startY - 40);
+    this.ctx.fillText('TIME', this.canvas.width / 2 + 80, startY - 40);
+    
+    // Draw entries
+    this.leaderboardEntries.forEach((entry, index) => {
+      const y = startY + index * lineHeight;
+      const rank = index + 1;
+      
+      // Rank
+      this.ctx.fillStyle = '#00ffff';
+      this.ctx.shadowColor = '#00ffff';
+      this.ctx.fillText(`${rank}.`, this.canvas.width / 2 - 200, y);
+      
+      // Name (with flashing character for player entry)
+      if (entry.isPlayer) {
+        this.ctx.fillStyle = '#ff00ff';
+        this.ctx.shadowColor = '#ff00ff';
+        
+        // Draw each character separately to handle flashing
+        const nameChars = this.playerName.split('');
+        for (let i = 0; i < nameChars.length; i++) {
+          const charX = this.canvas.width / 2 - 80 + i * 20;
+          
+          // Flash the current character being entered
+          if (i === this.nameEntryIndex && !this.showFlash) {
+            // Don't draw (creates flash effect)
+          } else {
+            this.ctx.fillText(nameChars[i], charX, y);
+          }
+        }
+      } else {
+        this.ctx.fillStyle = '#666666';
+        this.ctx.shadowColor = '#666666';
+        this.ctx.fillText(entry.name, this.canvas.width / 2 - 80, y);
+      }
+      
+      // Time
+      this.ctx.fillStyle = entry.isPlayer ? '#ffff00' : '#666666';
+      this.ctx.shadowColor = entry.isPlayer ? '#ffff00' : '#666666';
+      this.ctx.fillText(Leaderboard.formatTime(entry.time), this.canvas.width / 2 + 80, y);
+    });
   }
 }

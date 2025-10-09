@@ -534,6 +534,9 @@ export class Game {
       return;
     }
 
+    // Update screen animations
+    this.screenManager.update(this.gameState, deltaTime);
+
     // Handle game over delay
     if (this.gameState === GameState.PLAYING && this.playerHealth <= 0) {
       this.gameOverTimer += deltaTime * 1000; // Convert to ms
