@@ -1,10 +1,11 @@
 import { Upgrade, UpgradeType } from "../game/types"
+import { t } from '../i18n/LanguageManager';
 
 export function getUpgrades() : Upgrade[] {
     return [
         {
-            name: 'Bat Width',
-            description: 'Increase bat width by 10%',
+            name: t('game.upgrades.batWidth.name'),
+            description: t('game.upgrades.batWidth.description'),
             times: 3,
             previewNextUpgrades: 1,
             unlockNextUpgradesAfterTimes: 2,

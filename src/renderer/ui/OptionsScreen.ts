@@ -2,6 +2,8 @@
  * OptionsScreen - Game options overlay
  */
 
+import { t } from '../i18n/LanguageManager';
+
 export interface GameOptions {
   musicVolume: number;      // 0 to 1
   sfxVolume: number;         // 0 to 1
@@ -356,23 +358,23 @@ export class OptionsScreen {
     this.ctx.font = '48px "PopulationZeroBB", "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
-    this.ctx.fillText('OPTIONS', panel.x + this.panelWidth / 2, panel.y + 20);
+    this.ctx.fillText(t('ui.options.title'), panel.x + this.panelWidth / 2, panel.y + 20);
     this.ctx.restore();
 
     // Draw music volume slider
-    this.drawSlider('Music Volume', this.getMusicSliderY(), this.options.musicVolume, this.hoveredElement === 'musicSlider');
+    this.drawSlider(t('ui.options.music'), this.getMusicSliderY(), this.options.musicVolume, this.hoveredElement === 'musicSlider');
 
     // Draw SFX volume slider
-    this.drawSlider('Sound Effects', this.getSfxSliderY(), this.options.sfxVolume, this.hoveredElement === 'sfxSlider');
+    this.drawSlider(t('ui.options.sfx'), this.getSfxSliderY(), this.options.sfxVolume, this.hoveredElement === 'sfxSlider');
 
     // Draw particles checkbox
-    this.drawCheckbox('Show Particles', this.getParticlesCheckboxY(), this.options.showParticles, this.hoveredElement === 'particlesCheckbox');
+    this.drawCheckbox(t('ui.options.particles'), this.getParticlesCheckboxY(), this.options.showParticles, this.hoveredElement === 'particlesCheckbox');
 
     // Draw damage numbers checkbox
-    this.drawCheckbox('Show Damage Numbers', this.getDamageNumbersCheckboxY(), this.options.showDamageNumbers, this.hoveredElement === 'damageNumbersCheckbox');
+    this.drawCheckbox(t('ui.options.damageNumbers'), this.getDamageNumbersCheckboxY(), this.options.showDamageNumbers, this.hoveredElement === 'damageNumbersCheckbox');
 
     // Draw close button
-    this.drawButton('CLOSE', this.getCloseButtonBounds(), this.hoveredElement === 'closeButton');
+    this.drawButton(t('ui.buttons.back'), this.getCloseButtonBounds(), this.hoveredElement === 'closeButton');
   }
 
   /**
