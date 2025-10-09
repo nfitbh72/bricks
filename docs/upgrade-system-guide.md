@@ -120,7 +120,7 @@ Add your upgrade to the tree structure:
 | `name` | string | Display name shown to player |
 | `description` | string | What the upgrade does |
 | `times` | number | Max purchase count (1 for unlocks) |
-| `previewNextUpgrades` | number | Number of child upgrades to preview |
+| `previewNextUpgrades` | number | Purchases needed to preview children |
 | `unlockNextUpgradesAfterTimes` | number | Purchases needed to unlock children |
 | `type` | UpgradeType | Enum value for this upgrade |
 | `nextUpgrades` | Upgrade[] | Array of child upgrades |

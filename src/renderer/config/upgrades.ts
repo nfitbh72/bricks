@@ -11,7 +11,7 @@ export function getUpgrades() : Upgrade[] {
             type: UpgradeType.BAT_WIDTH_INCREASE_10_PERCENT,
             nextUpgrades: [
                 {
-                    name: 'Bat Shooter',
+                    name: 'Lasers',
                     description: 'Allows the bat to shoot (LMB)',
                     times: 1,
                     previewNextUpgrades: 1,
@@ -19,8 +19,8 @@ export function getUpgrades() : Upgrade[] {
                     type: UpgradeType.BAT_ADD_SHOOTER,
                     nextUpgrades: [
                         {
-                            name: 'Bat Shooter+',
-                            description: 'Allows the bat to shoot (LMB)',
+                            name: 'Lasers+',
+                            description: 'Increase Laser Damage by 10%',
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 0,
@@ -101,17 +101,7 @@ export function getUpgrades() : Upgrade[] {
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 1,
                             type: UpgradeType.BALL_EXPLOSIONS,
-                            nextUpgrades: [
-                                {
-                                    name: "Explosions+",
-                                    description: "Explosions do 10% more damage",
-                                    times: 3,
-                                    previewNextUpgrades: 0,
-                                    unlockNextUpgradesAfterTimes: 0,
-                                    type: UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT,
-                                    nextUpgrades: [],
-                                },
-                            ]
+                            nextUpgrades: []
                         },
                     ]
                 },
