@@ -5,6 +5,8 @@ Just some notes about future features so that I don't forget
 ## Future Features
 
 - [] Add many maps
+- [] Test coverage
+- [] refactor Game.ts to be more modular, e.g. separate out audio manager, input, etc.
 - [] Add base health to each level in the config
 - [] Add loads of Upgrades (slower ball)
 - [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
