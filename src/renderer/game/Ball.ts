@@ -45,13 +45,18 @@ export class Ball {
   }
 
   /**
-   * Render the ball on the canvas
+   * Render the ball on the canvas with comet tail effect
    */
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
 
     // Choose color based on state
     const color = this.isGrey ? '#666666' : '#00ffff';
+
+    // Draw comet tail if ball is moving
+    if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+      this.renderCometTail(ctx, color);
+    }
 
     // Draw glow effect (dystopian neon style)
     ctx.shadowBlur = 20;
@@ -64,6 +69,57 @@ export class Ball {
     ctx.fill();
 
     ctx.restore();
+  }
+
+  /**
+   * Render comet tail effect behind the ball
+   * Tail length increases with speed
+   */
+  private renderCometTail(ctx: CanvasRenderingContext2D, color: string): void {
+    // Calculate tail direction (opposite to velocity)
+    const speed = magnitude(this.velocity);
+    if (speed === 0) return;
+
+    const dirX = -this.velocity.x / speed;
+    const dirY = -this.velocity.y / speed;
+
+    // Tail length scales with speed (longer at higher speeds)
+    // Base length at initial speed (300), scales up to 3x at 900 speed
+    const speedRatio = this.currentSpeed / this.initialSpeed;
+    const baseTailLength = 20;
+    const tailLength = baseTailLength * Math.min(speedRatio, 3);
+
+    // Number of tail segments
+    const segments = 8;
+
+    // Draw tail segments with decreasing opacity
+    for (let i = 0; i < segments; i++) {
+      const t = i / segments;
+      const distance = tailLength * t;
+      
+      // Position of this tail segment
+      const tailX = this.position.x + dirX * distance;
+      const tailY = this.position.y + dirY * distance;
+      
+      // Size decreases along the tail
+      const segmentRadius = this.radius * (1 - t * 0.7);
+      
+      // Opacity decreases along the tail
+      const opacity = (1 - t) * 0.6;
+      
+      ctx.globalAlpha = opacity;
+      ctx.fillStyle = color;
+      ctx.shadowBlur = 15 * (1 - t);
+      ctx.shadowColor = color;
+      
+      ctx.beginPath();
+      ctx.arc(tailX, tailY, segmentRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Reset alpha and shadow
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
   }
 
   /**
