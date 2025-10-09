@@ -11,22 +11,34 @@ export class Ball {
   private velocity: Vector2D;
   private readonly initialPosition: Vector2D;
   private readonly radius: number;
-  private readonly speed: number;
+  private readonly initialSpeed: number;
+  private currentSpeed: number;
   private isGrey: boolean = false;
   private damage: number = 1; // Base damage
+  private elapsedTime: number = 0; // Track time for acceleration
+  private readonly speedIncreasePerSecond: number = 5; // 300 per minute = 5 per second
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
     this.initialPosition = { x, y };
     this.velocity = { x: 0, y: 0 };
     this.radius = radius;
-    this.speed = speed;
+    this.initialSpeed = speed;
+    this.currentSpeed = speed;
   }
 
   /**
    * Update ball position based on velocity and deltaTime
+   * Also handles speed acceleration over time
    */
   update(deltaTime: number): void {
+    // Accumulate elapsed time for speed calculation
+    this.elapsedTime += deltaTime;
+    
+    // Calculate new speed based on elapsed time
+    const speedIncrease = this.elapsedTime * this.speedIncreasePerSecond;
+    this.currentSpeed = this.initialSpeed + speedIncrease;
+    
     // deltaTime is in seconds, so multiply velocity by it for frame-independent movement
     this.position.x += this.velocity.x * deltaTime;
     this.position.y += this.velocity.y * deltaTime;
@@ -77,23 +89,40 @@ export class Ball {
 
   /**
    * Reset ball to initial position and stop movement
+   * Also resets speed acceleration
    */
   reset(): void {
     this.position = { ...this.initialPosition };
     this.velocity = { x: 0, y: 0 };
     this.isGrey = false;
+    this.elapsedTime = 0;
+    this.currentSpeed = this.initialSpeed;
   }
 
   /**
-   * Launch the ball in a direction
+   * Launch the ball in a direction using current speed
    */
   launch(angle: number): void {
     // Convert angle to radians and calculate velocity components
     const radians = (angle * Math.PI) / 180;
     this.velocity = {
-      x: Math.cos(radians) * this.speed,
-      y: Math.sin(radians) * this.speed,
+      x: Math.cos(radians) * this.currentSpeed,
+      y: Math.sin(radians) * this.currentSpeed,
     };
+  }
+
+  /**
+   * Update velocity magnitude to match current speed (maintains direction)
+   */
+  private updateVelocityMagnitude(): void {
+    if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+      const currentMagnitude = magnitude(this.velocity);
+      if (currentMagnitude > 0) {
+        const scale = this.currentSpeed / currentMagnitude;
+        this.velocity.x *= scale;
+        this.velocity.y *= scale;
+      }
+    }
   }
 
   /**
@@ -118,10 +147,10 @@ export class Ball {
   }
 
   /**
-   * Get ball speed
+   * Get ball speed (current speed with acceleration)
    */
   getSpeed(): number {
-    return this.speed;
+    return this.currentSpeed;
   }
 
   /**
@@ -144,11 +173,14 @@ export class Ball {
 
   /**
    * Bounce off a surface with a given normal vector
+   * Maintains current speed with acceleration
    */
   bounce(normal: Vector2D): void {
     const normalizedNormal = normalize(normal);
     const reflectedVelocity = reflect(this.velocity, normalizedNormal);
     this.velocity = reflectedVelocity;
+    // Update velocity magnitude to match current accelerated speed
+    this.updateVelocityMagnitude();
   }
 
   /**
@@ -165,15 +197,12 @@ export class Ball {
     const maxAngle = 60; // Maximum deflection angle in degrees
     const bounceAngle = -90 + (relativeHitPos * maxAngle);
     
-    // Convert to radians and set velocity
+    // Convert to radians and set velocity using current accelerated speed
     const radians = (bounceAngle * Math.PI) / 180;
-    // Use ball's speed if currently stationary, otherwise use current speed
-    const currentSpeed = magnitude(this.velocity);
-    const useSpeed = currentSpeed > 0 ? currentSpeed : this.speed;
     
     this.velocity = {
-      x: Math.cos(radians) * useSpeed,
-      y: Math.sin(radians) * useSpeed,
+      x: Math.cos(radians) * this.currentSpeed,
+      y: Math.sin(radians) * this.currentSpeed,
     };
   }
 
