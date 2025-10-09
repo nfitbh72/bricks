@@ -36,8 +36,8 @@ export class CollisionManager {
       }
     }
     
-    // Update ball's piercing visual state
-    ball.setPiercing(this.piercingTimeRemaining > 0);
+    // Update ball's piercing visual state with time remaining for flash effect
+    ball.setPiercing(this.piercingTimeRemaining > 0, this.piercingTimeRemaining);
   }
 
   /**

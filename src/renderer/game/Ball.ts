@@ -14,6 +14,8 @@ import {
   BALL_TAIL_MAX_SPEED_MULTIPLIER,
   BALL_GLOW_BLUR,
   BALL_TAIL_GLOW_BLUR,
+  PIERCING_WARNING_DURATION,
+  PIERCING_FLASH_INTERVAL,
 } from '../config/constants';
 
 export class Ball {
@@ -25,6 +27,7 @@ export class Ball {
   private currentSpeed: number;
   private isGrey: boolean = false;
   private isPiercing: boolean = false;
+  private piercingTimeRemaining: number = 0;
   private damage: number = BALL_BASE_DAMAGE;
   private elapsedTime: number = 0; // Track time for acceleration
   private readonly speedIncreasePerSecond: number = BALL_SPEED_INCREASE_PER_SECOND;
@@ -67,7 +70,14 @@ export class Ball {
     if (this.isGrey) {
       color = '#666666'; // Grey when inactive
     } else if (this.isPiercing) {
-      color = '#ff0000'; // Neon red when piercing
+      // Check if we're in warning period (last 0.5 seconds)
+      if (this.piercingTimeRemaining <= PIERCING_WARNING_DURATION) {
+        // Flash between white and red every 0.1 seconds
+        const flashCycle = Math.floor(this.piercingTimeRemaining / PIERCING_FLASH_INTERVAL) % 2;
+        color = flashCycle === 0 ? '#ffffff' : '#ff0000';
+      } else {
+        color = '#ff0000'; // Neon red when piercing
+      }
     }
 
     // Draw comet tail if ball is moving
@@ -391,7 +401,8 @@ export class Ball {
   /**
    * Set piercing state (for visual feedback)
    */
-  setPiercing(piercing: boolean): void {
+  setPiercing(piercing: boolean, timeRemaining: number = 0): void {
     this.isPiercing = piercing;
+    this.piercingTimeRemaining = timeRemaining;
   }
 }

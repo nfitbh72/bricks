@@ -107,5 +107,9 @@ export const BUTTON_BORDER_WIDTH = 3;
 export const BUTTON_FONT_SIZE = 32;
 export const BUTTON_FONT_FAMILY = '"D Day Stencil", Arial';
 
+// Piercing visual constants
+export const PIERCING_WARNING_DURATION = 0.5; // Last 0.5 seconds flash warning
+export const PIERCING_FLASH_INTERVAL = 0.1; // Flash every 0.1 seconds
+
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1;
