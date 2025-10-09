@@ -2,7 +2,7 @@
 
 ## Overview
 
-Bricks is built as an Electron application using TypeScript and the Canvas API for rendering. The architecture emphasizes modularity, testability, and separation of concerns between the game engine and level configuration.
+Bricks is built as an Electron application using TypeScript and the Canvas API for rendering. The architecture emphasizes modularity, testability, and separation of concerns. The game features a comprehensive upgrade system, multi-language support, and modular subsystems for audio, input, and UI management.
 
 ## Technology Stack
 
@@ -49,29 +49,68 @@ Bricks is built as an Electron application using TypeScript and the Canvas API f
 │              Game (Main Engine)              │
 │  - Game loop (requestAnimationFrame)        │
 │  - State management                          │
-│  - Collision detection                       │
-│  - Screen management (intro/game/gameover)  │
+│  - Entity coordination                       │
 └───────┬──────────────────────────────────────┘
+        │
+        ├─── AudioManager (Subsystem)
+        │     - Background music
+        │     - Sound effects
+        │     - Volume control
+        │
+        ├─── InputManager (Subsystem)
+        │     - Keyboard/mouse handling
+        │     - Input state queries
+        │     - Event callbacks
+        │
+        ├─── ScreenManager (Subsystem)
+        │     - UI screen management
+        │     - Screen transitions
+        │     - Render delegation
+        │
+        ├─── CollisionManager (Subsystem)
+        │     - Ball-bat collisions
+        │     - Ball-brick collisions
+        │     - Wall collisions
+        │
+        ├─── GameUpgrades (System)
+        │     - Upgrade tree management
+        │     - Upgrade point tracking
+        │     - Ability unlocking
         │
         ├─── Level (Level Manager)
         │     - Load level configuration
         │     - Track completion state
-        │     - Manage upgrades
+        │     - Brick management
         │
         ├─── Ball (Entity)
         │     - Position, velocity
-        │     - Collision response
+        │     - Damage, piercing, critical hits
         │     - Rendering
         │
         ├─── Bat (Entity)
         │     - Position, dimensions
-        │     - Input handling
+        │     - Laser shooting
         │     - Rendering
         │
-        └─── Brick[] (Entity Collection)
-              - Position, health
-              - Damage handling
-              - Rendering
+        ├─── Brick[] (Entity Collection)
+        │     - Position, health, type
+        │     - Damage handling
+        │     - Rendering
+        │
+        ├─── Laser[] (Projectiles)
+        │     - Position, velocity
+        │     - Collision detection
+        │     - Rendering
+        │
+        ├─── ParticleSystem (Visual Effects)
+        │     - Particle generation
+        │     - Animation
+        │     - Rendering
+        │
+        └─── StatusBar (HUD)
+              - Level info display
+              - Health display
+              - Timer display
 ```
 
 ### Class Design
@@ -225,17 +264,23 @@ Rendered in next frame
 
 ### Collision Detection
 ```
-Game.checkCollisions()
+CollisionManager
     │
-    ├─── Ball vs Walls
-    │     └─── Bounce or lose health
-    │
-    ├─── Ball vs Bat
+    ├─── checkBallBatCollision()
     │     └─── Bounce with angle based on hit position
     │
-    └─── Ball vs Bricks
-          └─── Brick.takeDamage()
-               └─── Remove if destroyed
+    ├─── checkBallBrickCollisions()
+    │     ├─── Check piercing chance
+    │     ├─── Check critical hit chance
+    │     ├─── Apply damage
+    │     ├─── Trigger explosions
+    │     └─── Remove if destroyed
+    │
+    ├─── checkBallWallCollisions()
+    │     └─── Bounce or lose health
+    │
+    └─── checkLaserBrickCollisions()
+          └─── Damage bricks hit by lasers
 ```
 
 ## Configuration System
@@ -248,33 +293,48 @@ interface LevelConfig {
   id: number;
   name: string;
   bricks: BrickConfig[];
-  ballSpeed: number;
-  batWidth: number;
-  batHeight: number;
-  playerHealth: number;
+  baseHealth?: number; // Multiplier for brick health
 }
 
 interface BrickConfig {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  health: number;
+  col: number;  // Grid column
+  row: number;  // Grid row
+  type: BrickType; // NORMAL, HEALTHY, or INDESTRUCTIBLE
   color?: string;
 }
 ```
 
-**Level 1 Configuration** (`src/renderer/config/levels.ts`):
-- Bricks arranged to form the word "BRICKS"
-- Each brick: 1 health
-- Player: 3 health
-- Ball speed: 1
-- Bat: 100x10 pixels
+**Level System** (`src/renderer/config/levels.ts`):
+- Levels use word-based brick layouts via `createBricksFromWord()`
+- Brick health scales with `baseHealth` multiplier
+- Three brick types: NORMAL (1x), HEALTHY (3x), INDESTRUCTIBLE (∞)
+- Centralized constants in `constants.ts`
+
+### Upgrade Configuration
+Upgrades are defined in a tree structure:
+
+```typescript
+interface Upgrade {
+  name: string;
+  description: string;
+  type: UpgradeType;
+  times: number;  // How many times it can be purchased
+  nextUpgrades: Upgrade[];  // Child upgrades
+  previewNextUpgrades: number;
+  unlockNextUpgradesAfterTimes: number;
+}
+```
+
+**Upgrade Tree** (`src/renderer/config/upgrades.ts`):
+- Two main branches: Bat upgrades and Ball upgrades
+- Progressive unlocking system
+- Translatable names and descriptions via i18n
 
 This approach allows:
 - Easy level creation without touching game engine code
-- Level data can be loaded from JSON files
+- Configuration-driven upgrade system
 - Simple testing of different configurations
+- Multi-language support for all text
 
 ## State Management
 
@@ -357,13 +417,22 @@ tests/
 
 ## Extensibility
 
+### Implemented Features
+- ✅ **Upgrade System**: Comprehensive upgrade tree with 10+ upgrades
+- ✅ **Brick Types**: NORMAL, HEALTHY, and INDESTRUCTIBLE bricks
+- ✅ **Audio System**: AudioManager with music and SFX
+- ✅ **Particle System**: Visual effects for explosions and impacts
+- ✅ **Multi-language**: Support for 5 languages with auto-detection
+- ✅ **Laser Shooting**: Bat can shoot projectiles
+- ✅ **Ball Abilities**: Piercing, critical hits, explosions
+- ✅ **Options Screen**: Volume and visual settings
+
 ### Future Enhancements
-- **Power-ups**: Modular power-up system (multi-ball, larger bat, etc.)
-- **Brick Types**: Special bricks (explosive, moving, indestructible)
+- **Power-ups**: Temporary power-ups that drop from bricks
+- **More Brick Types**: Moving bricks, regenerating bricks
 - **Difficulty Levels**: Easy/Medium/Hard configurations
 - **Leaderboards**: Score tracking and persistence
-- **Sound**: Audio manager for music and SFX
-- **Particles**: Particle system for visual effects
+- **More Levels**: Additional level patterns and challenges
 
 ### Plugin Architecture (Future)
 ```typescript
@@ -405,22 +474,50 @@ npm start
 ```
 src/renderer/
 ├── game/
-│   ├── Game.ts          # Main game engine
-│   ├── Ball.ts          # Ball entity
-│   ├── Bat.ts           # Bat entity
-│   ├── Brick.ts         # Brick entity
-│   ├── Level.ts         # Level manager
-│   ├── types.ts         # Shared types and interfaces
-│   └── utils.ts         # Utility functions (collision, math)
+│   ├── Game.ts                # Main game engine
+│   ├── Ball.ts                # Ball entity
+│   ├── Bat.ts                 # Bat entity
+│   ├── Brick.ts               # Brick entity
+│   ├── Level.ts               # Level manager
+│   ├── Laser.ts               # Laser projectile
+│   ├── AudioManager.ts        # Audio subsystem
+│   ├── InputManager.ts        # Input handling subsystem
+│   ├── ScreenManager.ts       # UI screen management
+│   ├── CollisionManager.ts    # Collision detection
+│   ├── GameUpgrades.ts        # Upgrade system
+│   ├── ParticleSystem.ts      # Visual effects
+│   ├── DamageNumber.ts        # Floating damage numbers
+│   ├── StatusBar.ts           # HUD display
+│   ├── types.ts               # Shared types and interfaces
+│   └── utils.ts               # Utility functions (collision, math)
 ├── config/
-│   └── levels.ts        # Level configurations
+│   ├── levels.ts              # Level configurations
+│   ├── upgrades.ts            # Upgrade tree configuration
+│   ├── constants.ts           # Game constants
+│   └── brickLayout.ts         # Brick positioning utilities
 ├── ui/
-│   ├── IntroScreen.ts   # Intro screen UI
-│   ├── GameOverScreen.ts # Game over screen UI
-│   └── UpgradeScreen.ts # Upgrade selection UI
-├── index.html           # HTML entry point
-├── styles.css           # Global styles
-└── renderer.ts          # Renderer entry point
+│   ├── Screen.ts              # Base screen class
+│   ├── Button.ts              # Button component
+│   ├── IntroScreen.ts         # Intro screen UI
+│   ├── GameOverScreen.ts      # Game over screen UI
+│   ├── PauseScreen.ts         # Pause screen UI
+│   ├── OptionsScreen.ts       # Options/settings screen
+│   ├── LevelCompleteScreen.ts # Level completion screen
+│   ├── UpgradeTreeScreen.ts   # Upgrade tree UI
+│   └── TransitionScreen.ts    # Level transition screen
+├── i18n/
+│   ├── LanguageManager.ts     # Language management
+│   ├── en.json                # English translations
+│   ├── es.json                # Spanish translations
+│   ├── fr.json                # French translations
+│   ├── de.json                # German translations
+│   └── ja.json                # Japanese translations
+├── assets/
+│   ├── audio/                 # Sound files
+│   └── fonts/                 # Custom fonts
+├── index.html                 # HTML entry point
+├── styles.css                 # Global styles
+└── renderer.ts                # Renderer entry point
 ```
 
 ## Dependencies

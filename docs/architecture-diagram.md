@@ -1,24 +1,6 @@
 # Game Architecture Diagram
 
-## Before Refactoring
-```
-┌─────────────────────────────────────────────────────────────┐
-│                          Game.ts                            │
-│                        (1,184 lines)                        │
-├─────────────────────────────────────────────────────────────┤
-│ • Game Loop & State Management                              │
-│ • Audio (3 properties + methods)                            │
-│ • Input Handling (4 properties + event listeners)           │
-│ • UI Screens (7 screen objects + transition logic)          │
-│ • Collision Detection                                       │
-│ • Level Management                                          │
-│ • Upgrade System                                            │
-│ • Visual Effects (particles, damage numbers, screen shake)  │
-│ • Rendering                                                 │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## After Refactoring
+## Current State
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                          Game.ts                            │
