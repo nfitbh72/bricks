@@ -4,7 +4,7 @@
  */
 
 // Brick dimensions (fixed size for all bricks)
-export const BRICK_WIDTH = 40;
+export const BRICK_WIDTH = 80;
 export const BRICK_HEIGHT = 20;
 export const BRICK_SPACING = 2;
 export const BRICK_LAYOUT_TOP_MARGIN = 200;

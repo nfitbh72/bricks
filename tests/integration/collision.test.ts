@@ -7,6 +7,8 @@ import { Bat } from '../../src/renderer/game/Bat';
 import { Brick } from '../../src/renderer/game/Brick';
 import { BrickConfig, BrickType } from '../../src/renderer/game/types';
 import { checkCircleRectCollision } from '../../src/renderer/game/utils';
+import { gridToPixel } from '../../src/renderer/config/brickLayout';
+import { BRICK_WIDTH, BRICK_HEIGHT } from '../../src/renderer/config/constants';
 
 // Helper to create brick config from grid position
 function createBrickConfig(col: number, row: number, type: BrickType): BrickConfig {
@@ -79,8 +81,10 @@ describe('Collision Detection Integration', () => {
 
   describe('Ball-Brick Collisions', () => {
     it('should detect collision when ball overlaps brick', () => {
-      const ball = new Ball(100, 100, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball in center of brick
+      const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y + BRICK_HEIGHT / 2, 10, 300);
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -90,8 +94,9 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should not detect collision when ball is far from brick', () => {
-      const ball = new Ball(100, 100, 10, 300);
       const brick = new Brick(createBrickConfig(4, 9, BrickType.NORMAL));
+      // Place ball far away from brick
+      const ball = new Ball(100, 100, 10, 300);
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -101,8 +106,10 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should provide normal vector for brick collision', () => {
-      const ball = new Ball(100, 85, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball above brick (approaching from top) - within collision distance
+      const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y - 5, 10, 300);
       
       const ballBounds = ball.getBounds();
       const brickBounds = brick.getBounds();
@@ -114,8 +121,10 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should bounce ball correctly off brick top', () => {
-      const ball = new Ball(100, 85, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball above brick - within collision distance
+      const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y - 5, 10, 300);
       
       ball.setVelocity(0, 100); // Moving down
       
@@ -132,8 +141,10 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should bounce ball correctly off brick side', () => {
-      const ball = new Ball(85, 100, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball to the left of brick - within collision distance
+      const ball = new Ball(brickPos.x - 5, brickPos.y + BRICK_HEIGHT / 2, 10, 300);
       
       ball.setVelocity(100, 0); // Moving right
       
@@ -150,8 +161,10 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should damage brick on collision', () => {
-      const ball = new Ball(100, 100, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.HEALTHY));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball in center of brick
+      const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y + BRICK_HEIGHT / 2, 10, 300);
       
       expect(brick.getHealth()).toBe(3);
       
@@ -167,8 +180,10 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should destroy brick when health reaches 0', () => {
-      const ball = new Ball(100, 100, 10, 300);
       const brick = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
+      const brickPos = gridToPixel(2, 4);
+      // Place ball in center of brick
+      const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y + BRICK_HEIGHT / 2, 10, 300);
       
       expect(brick.isDestroyed()).toBe(false);
       
@@ -299,10 +314,13 @@ describe('Collision Detection Integration', () => {
     });
 
     it('should handle multiple brick collisions', () => {
-      const ball = new Ball(100, 100, 10, 300);
       const brick1 = new Brick(createBrickConfig(2, 4, BrickType.NORMAL));
       const brick2 = new Brick(createBrickConfig(3, 4, BrickType.NORMAL));
+      const brick1Pos = gridToPixel(2, 4);
+      const brick2Pos = gridToPixel(3, 4);
       
+      // Place ball in center of first brick
+      const ball = new Ball(brick1Pos.x + BRICK_WIDTH / 2, brick1Pos.y + BRICK_HEIGHT / 2, 10, 300);
       ball.setVelocity(100, 0);
       
       // Check collision with first brick
@@ -313,8 +331,8 @@ describe('Collision Detection Integration', () => {
         brick1.takeDamage(1);
       }
       
-      // Move ball
-      ball.setPosition(160, 100);
+      // Move ball to second brick
+      ball.setPosition(brick2Pos.x + BRICK_WIDTH / 2, brick2Pos.y + BRICK_HEIGHT / 2);
       
       // Check collision with second brick
       ballBounds = ball.getBounds();
