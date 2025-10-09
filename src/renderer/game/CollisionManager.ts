@@ -13,7 +13,6 @@ import {
   BRICK_WIDTH,
   EXPLOSION_RADIUS_MULTIPLIER,
   CRITICAL_HIT_DAMAGE_MULTIPLIER,
-  PIERCING_DURATION,
 } from '../config/constants';
 
 export interface CollisionCallbacks {
@@ -80,7 +79,7 @@ export class CollisionManager {
       if (collision.collided) {
         // Check for piercing
         const piercingChance = gameUpgrades.getBallPiercingChance();
-        const hasDuration = gameUpgrades.hasPiercingDuration();
+        const piercingDuration = gameUpgrades.getPiercingDuration();
         
         // Check if piercing is active (either from chance or from duration)
         let pierced = false;
@@ -91,8 +90,8 @@ export class CollisionManager {
           // Piercing activated by chance
           pierced = true;
           // If duration upgrade is active, start the timer
-          if (hasDuration) {
-            this.piercingTimeRemaining = PIERCING_DURATION;
+          if (piercingDuration > 0) {
+            this.piercingTimeRemaining = piercingDuration;
           }
         }
         

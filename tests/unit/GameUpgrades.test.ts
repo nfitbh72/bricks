@@ -231,6 +231,34 @@ describe('GameUpgrades', () => {
 
       expect(gameUpgrades.hasPiercingDuration()).toBe(true);
     });
+
+    it('should return 0 seconds with no upgrade', () => {
+      expect(gameUpgrades.getPiercingDuration()).toBe(0);
+    });
+
+    it('should return 1 second at level 1', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_PIERCING_DURATION, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getPiercingDuration()).toBe(1);
+    });
+
+    it('should return 2 seconds at level 2', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_PIERCING_DURATION, 2);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getPiercingDuration()).toBe(2);
+    });
+
+    it('should return 3 seconds at level 3', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_PIERCING_DURATION, 3);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getPiercingDuration()).toBe(3);
+    });
   });
 
   describe('bat shooter', () => {

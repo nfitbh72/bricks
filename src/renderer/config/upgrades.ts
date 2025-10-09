@@ -76,8 +76,8 @@ export function getUpgrades() : Upgrade[] {
                             nextUpgrades: [
                                 {
                                     name: "Piercing Duration",
-                                    description: 'Piercing lasts for 1 second when activated',
-                                    times: 1,
+                                    description: 'Increase piercing duration by 1 second',
+                                    times: 3,
                                     previewNextUpgrades: 0,
                                     unlockNextUpgradesAfterTimes: 0,
                                     type: UpgradeType.BALL_PIERCING_DURATION,

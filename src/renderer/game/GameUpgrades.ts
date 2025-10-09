@@ -126,6 +126,14 @@ export class GameUpgrades {
   }
 
   /**
+   * Get piercing duration in seconds
+   */
+  getPiercingDuration(): number {
+    const level = this.getUpgradeLevel(UpgradeType.BALL_PIERCING_DURATION);
+    return level; // 1 second per level (0, 1, 2, or 3 seconds)
+  }
+
+  /**
    * Get bat shooter damage multiplier
    */
   getBatShooterDamage(): number {
