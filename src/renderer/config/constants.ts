@@ -7,6 +7,7 @@
 export const BRICK_WIDTH = 40;
 export const BRICK_HEIGHT = 20;
 export const BRICK_SPACING = 2;
+export const BRICK_LAYOUT_TOP_MARGIN = 200;
 
 // Letter pattern constants
 export const LETTER_BRICK_COLS = 5; // Each letter is 5 bricks wide

@@ -3,7 +3,7 @@
  * Helper functions for positioning bricks in levels
  */
 
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING } from './constants';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING, BRICK_LAYOUT_TOP_MARGIN } from './constants';
 import { BrickConfig, BrickType } from '../game/types';
 
 /**
@@ -433,7 +433,7 @@ export function getCenteredStartPosition(
 ): { x: number; y: number } {
   return {
     x: (canvasWidth - layoutWidth) / 2,
-    y: 100, // Fixed top margin
+    y: BRICK_LAYOUT_TOP_MARGIN,
   };
 }
 
