@@ -17,10 +17,12 @@ export class Brick {
 
   /**
    * Calculate health multiplier for brick type
+   * Indestructible bricks use Infinity to represent unlimited health
    */
   private static readonly BRICK_TYPE_MULTIPLIER: Record<BrickType, number> = {
     [BrickType.NORMAL]: 1,
     [BrickType.HEALTHY]: 3,
+    [BrickType.INDESTRUCTIBLE]: Infinity,
   };
 
   /**
@@ -72,9 +74,17 @@ export class Brick {
 
   /**
    * Check if brick is destroyed (health <= 0)
+   * Indestructible bricks are never destroyed
    */
   isDestroyed(): boolean {
     return this.health <= 0;
+  }
+
+  /**
+   * Check if brick is indestructible
+   */
+  isIndestructible(): boolean {
+    return this.type === BrickType.INDESTRUCTIBLE;
   }
 
   /**
@@ -151,6 +161,11 @@ export class Brick {
       return '#666666'; // Gray - destroyed
     }
     
+    // Indestructible bricks have a special metallic gray color
+    if (this.isIndestructible()) {
+      return '#888888'; // Metallic gray
+    }
+    
     // Use health modulo 16 to index into neon color palette
     // Floor the health to handle fractional damage (e.g., from lasers)
     const colorIndex = Math.round(this.health) % 16;
@@ -168,8 +183,9 @@ export class Brick {
     ctx.save();
 
     // Calculate opacity based on health
+    // Indestructible bricks always render at full opacity
     const healthPercent = this.getHealthPercentage();
-    const opacity = 0.3 + (healthPercent * 0.7); // 0.3 to 1.0
+    const opacity = this.isIndestructible() ? 1.0 : 0.3 + (healthPercent * 0.7); // 0.3 to 1.0
 
     const x = this.position.x;
     const y = this.position.y;

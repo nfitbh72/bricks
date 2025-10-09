@@ -108,10 +108,13 @@ export class Level {
   }
 
   /**
-   * Check if level is complete (all bricks destroyed)
+   * Check if level is complete (all destructible bricks destroyed)
+   * Indestructible bricks are ignored
    */
   isComplete(): boolean {
-    return this.bricks.every((brick) => brick.isDestroyed());
+    return this.bricks
+      .filter((brick) => !brick.isIndestructible())
+      .every((brick) => brick.isDestroyed());
   }
 
   /**

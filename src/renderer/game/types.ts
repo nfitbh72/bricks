@@ -48,6 +48,7 @@ export enum GameState {
 export enum BrickType {
   NORMAL = 'NORMAL',
   HEALTHY = 'HEALTHY',
+  INDESTRUCTIBLE = 'INDESTRUCTIBLE',
 }
 
 /**

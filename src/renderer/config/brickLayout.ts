@@ -11,6 +11,7 @@ import { BrickConfig, BrickType } from '../game/types';
  * ' ' = empty space
  * 'N' = NORMAL brick (1 health)
  * 'H' = HEALTHY brick (3 health)
+ * 'I' = INDESTRUCTIBLE brick (infinite health)
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
@@ -25,6 +26,8 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
         type = BrickType.NORMAL;
       } else if (char === 'H') {
         type = BrickType.HEALTHY;
+      } else if (char === 'I') {
+        type = BrickType.INDESTRUCTIBLE;
       }
       
       if (type !== null) {
