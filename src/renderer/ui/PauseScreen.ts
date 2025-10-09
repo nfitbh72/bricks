@@ -4,6 +4,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
+import { t } from '../i18n/LanguageManager';
 
 export class PauseScreen extends Screen {
   private onResume: () => void;
@@ -33,7 +34,7 @@ export class PauseScreen extends Screen {
         y: this.canvas.height / 2 - 10,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'RESUME',
+        text: t('ui.buttons.resume'),
         onClick: () => this.onResume(),
       })
     );
@@ -45,7 +46,7 @@ export class PauseScreen extends Screen {
         y: this.canvas.height / 2 + 70,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'OPTIONS',
+        text: t('ui.buttons.options'),
         onClick: () => this.onOptions(),
       })
     );
@@ -57,7 +58,7 @@ export class PauseScreen extends Screen {
         y: this.canvas.height / 2 + 150,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'QUIT',
+        text: t('ui.buttons.quit'),
         onClick: () => this.onQuit(),
       })
     );
@@ -89,7 +90,7 @@ export class PauseScreen extends Screen {
     this.ctx.font = '72px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2 - 120);
+    this.ctx.fillText(t('ui.screens.paused'), this.canvas.width / 2, this.canvas.height / 2 - 120);
 
     this.ctx.restore();
 

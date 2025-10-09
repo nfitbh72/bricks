@@ -4,6 +4,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
+import { t } from '../i18n/LanguageManager';
 
 export class GameOverScreen extends Screen {
   private onRestart: () => void;
@@ -43,7 +44,7 @@ export class GameOverScreen extends Screen {
         y: this.canvas.height / 2 + 100,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'RESTART',
+        text: t('ui.buttons.restart'),
         onClick: () => this.onRestart(),
       })
     );
@@ -55,7 +56,7 @@ export class GameOverScreen extends Screen {
         y: this.canvas.height / 2 + 180,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'QUIT',
+        text: t('ui.buttons.quit'),
         onClick: () => this.onQuit(),
       })
     );
@@ -81,7 +82,7 @@ export class GameOverScreen extends Screen {
     this.ctx.save();
 
     // Draw title (GAME OVER or COMPLETE)
-    const title = this.isComplete ? 'COMPLETE!' : 'GAME OVER';
+    const title = this.isComplete ? t('ui.screens.levelComplete') : t('ui.screens.gameOver');
     const titleColor = this.isComplete ? '#00ff00' : '#ff0000';
     
     this.ctx.shadowBlur = 40;

@@ -5,7 +5,8 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Upgrade } from '../game/types';
+import { Upgrade, UpgradeType } from '../game/types';
+import { t } from '../i18n/LanguageManager';
 
 /**
  * Animation types for upgrade nodes
@@ -298,7 +299,7 @@ export class UpgradeTreeScreen extends Screen {
         y: 20,
         width: buttonWidth,
         height: buttonHeight,
-        text: 'CONTINUE',
+        text: t('ui.buttons.continue'),
         onClick: () => this.handleContinue(),
       })
     );
