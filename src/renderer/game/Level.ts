@@ -87,7 +87,10 @@ export class Level {
       }));
     }
     
-    return brickConfigs.map((brickConfig) => new Brick(brickConfig));
+    // Get baseHealth from config (default: 1)
+    const baseHealth = this.config.baseHealth ?? 1;
+    
+    return brickConfigs.map((brickConfig) => new Brick(brickConfig, baseHealth));
   }
 
   /**

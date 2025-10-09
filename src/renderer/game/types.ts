@@ -68,6 +68,7 @@ export interface LevelConfig {
   id: number;
   name: string;
   bricks: BrickConfig[];
+  baseHealth?: number; // Base health for normal bricks (default: 1). Healthy bricks = 3x base.
 }
 
 /**

@@ -28,6 +28,7 @@ export function createLevel1(): LevelConfig {
     name: 'Level 1: Effective Design',
     //bricks: createBricksFromPattern(pattern),
     bricks: createBricksFromWord("0-0", BrickType.HEALTHY),
+    baseHealth: 1, // Normal bricks = 1 HP, Healthy bricks = 3 HP
   };
 }
 
@@ -40,6 +41,7 @@ export function createLevel2(): LevelConfig {
     id: 2,
     name: 'Level 2: Says Hi',
     bricks: createBricksFromWord("NFI", BrickType.HEALTHY),
+    baseHealth: 2, // Normal bricks = 2 HP, Healthy bricks = 6 HP
   };
 }
 

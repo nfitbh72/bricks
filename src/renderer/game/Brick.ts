@@ -16,9 +16,9 @@ export class Brick {
   private readonly customColor: string | null;
 
   /**
-   * Map brick types to their health values
+   * Calculate health multiplier for brick type
    */
-  private static readonly BRICK_TYPE_HEALTH: Record<BrickType, number> = {
+  private static readonly BRICK_TYPE_MULTIPLIER: Record<BrickType, number> = {
     [BrickType.NORMAL]: 1,
     [BrickType.HEALTHY]: 3,
   };
@@ -46,14 +46,15 @@ export class Brick {
     '#40ff00', // Bright Green
   ];
 
-  constructor(config: BrickConfig) {
+  constructor(config: BrickConfig, baseHealth: number = 1) {
     // Convert grid coordinates to pixel coordinates
     const pixelPos = gridToPixel(config.col, config.row);
     this.position = pixelPos;
     this.type = config.type;
     
-    // Get health from brick type
-    this.maxHealth = Brick.BRICK_TYPE_HEALTH[config.type];
+    // Calculate health: baseHealth * type multiplier
+    const multiplier = Brick.BRICK_TYPE_MULTIPLIER[config.type];
+    this.maxHealth = baseHealth * multiplier;
     this.health = this.maxHealth;
     
     this.customColor = config.color || null;
