@@ -20,6 +20,8 @@ Just some notes about future features so that I don't forget
     - [] sticky bat with LR control and preview
 - [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
 - [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
+- [] move hardcoded values to constants
+- [] use a dictionary and make the game multi-lingual
 - [X] Ball speed up mechanics
 - [] Boss bricks: Large multi-segment bricks with special patterns
 - [] Obstacles that would damage the bat (making the bat smaller?)

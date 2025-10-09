@@ -9,7 +9,11 @@ import { Laser } from './Laser';
 import { Level } from './Level';
 import { GameUpgrades } from './GameUpgrades';
 import { checkCircleRectCollision } from './utils';
-import { BRICK_WIDTH } from '../config/constants';
+import {
+  BRICK_WIDTH,
+  EXPLOSION_RADIUS_MULTIPLIER,
+  CRITICAL_HIT_DAMAGE_MULTIPLIER,
+} from '../config/constants';
 
 export interface CollisionCallbacks {
   onBrickHit?: (brick: Brick, damage: number, isCritical: boolean) => void;
@@ -76,7 +80,7 @@ export class CollisionManager {
         if (gameUpgrades.hasCriticalHits()) {
           const critChance = gameUpgrades.getCriticalHitChance();
           if (Math.random() < critChance) {
-            damage *= 2; // Double damage on critical hit
+            damage *= CRITICAL_HIT_DAMAGE_MULTIPLIER;
             isCritical = true;
           }
         }
@@ -187,7 +191,7 @@ export class CollisionManager {
   ): void {
     const explosionDamageMultiplier = gameUpgrades.getBallExplosionDamageMultiplier();
     const explosionDamage = baseDamage * explosionDamageMultiplier;
-    const explosionRadius = BRICK_WIDTH * 1.5; // 1.5 brick-width radius
+    const explosionRadius = BRICK_WIDTH * EXPLOSION_RADIUS_MULTIPLIER;
     
     // Get impact point (center of the brick that was hit)
     const impactX = hitBrickBounds.x + hitBrickBounds.width / 2;

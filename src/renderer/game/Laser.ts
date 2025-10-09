@@ -3,13 +3,14 @@
  */
 
 import { Vector2D } from './types';
+import { LASER_WIDTH, LASER_HEIGHT } from '../config/constants';
 
 export class Laser {
   private position: Vector2D;
   private readonly speed: number;
   private readonly damage: number;
-  private readonly width: number = 4;
-  private readonly height: number = 10;
+  private readonly width: number = LASER_WIDTH;
+  private readonly height: number = LASER_HEIGHT;
   private active: boolean = true;
 
   constructor(x: number, y: number, speed: number, damage: number) {

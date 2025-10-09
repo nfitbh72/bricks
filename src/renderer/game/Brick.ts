@@ -2,8 +2,9 @@
  * Brick entity - represents a destructible brick in the game
  */
 
-import { BrickConfig, BrickType } from './types';
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
+import { BrickConfig } from './types';
+import { BrickType } from './types';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../config/constants';
 import { gridToPixel } from '../config/brickLayout';
 
 export class Brick {
@@ -194,7 +195,7 @@ export class Brick {
     const color = this.getColor();
 
     // Draw glow effect (dystopian neon style)
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = BRICK_GLOW_BLUR;
     ctx.shadowColor = color;
 
     // Create gradient for 3D effect (top-left to bottom-right)

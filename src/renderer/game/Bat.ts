@@ -3,6 +3,7 @@
  */
 
 import { Vector2D } from './types';
+import { BAT_GLOW_BLUR } from '../config/constants';
 
 export class Bat {
   private position: Vector2D;
@@ -37,7 +38,7 @@ export class Bat {
     ctx.save();
 
     // Draw glow effect (dystopian neon style)
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = BAT_GLOW_BLUR;
     ctx.shadowColor = '#ff00ff';
 
     // Draw bat

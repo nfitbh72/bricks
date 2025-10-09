@@ -16,6 +16,7 @@ import { ScreenManager } from './ScreenManager';
 import { EffectsManager } from './EffectsManager';
 import { CollisionManager } from './CollisionManager';
 import { WeaponManager } from './WeaponManager';
+import { PLAYER_STARTING_HEALTH } from '../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -25,7 +26,7 @@ export class Game {
   private level: Level | null = null;
   private statusBar: StatusBar;
   private gameState: GameState = GameState.INTRO;
-  private playerHealth: number = 3;
+  private playerHealth: number = PLAYER_STARTING_HEALTH;
   private animationFrameId: number | null = null;
   private lastTime: number = 0;
   private accumulator: number = 0;
@@ -452,10 +453,9 @@ export class Game {
     // Create level with canvas width for centering
     this.level = new Level(levelConfig, this.canvas.width);
     
-    // Set player health: base (1) + upgrade bonus
-    const baseHealth = 1;
+    // Set player health: base + upgrade bonus
     const upgradeBonus = this.gameUpgrades.getHealthBonus();
-    this.playerHealth = baseHealth + upgradeBonus;
+    this.playerHealth = PLAYER_STARTING_HEALTH + upgradeBonus;
     
     // Clear any active lasers
     this.weaponManager.clear();

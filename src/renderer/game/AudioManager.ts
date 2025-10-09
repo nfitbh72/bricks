@@ -2,25 +2,36 @@
  * AudioManager - Handles all game audio including music and sound effects
  */
 
+import {
+  AUDIO_MUSIC_BASE_VOLUME,
+  AUDIO_BRICK_HIT_BASE_VOLUME,
+  AUDIO_BRICK_EXPLODE_BASE_VOLUME,
+  AUDIO_DEFAULT_MUSIC_VOLUME,
+  AUDIO_DEFAULT_SFX_VOLUME,
+  AUDIO_PATH_BRICK_HIT,
+  AUDIO_PATH_BRICK_EXPLODE,
+  AUDIO_PATH_BACKGROUND_MUSIC,
+} from '../config/constants';
+
 export class AudioManager {
   private brickHitSound: HTMLAudioElement;
   private brickExplodeSound: HTMLAudioElement;
   private backgroundMusic: HTMLAudioElement;
   
-  private musicVolume: number = 1.0;
-  private sfxVolume: number = 1.0;
+  private musicVolume: number = AUDIO_DEFAULT_MUSIC_VOLUME;
+  private sfxVolume: number = AUDIO_DEFAULT_SFX_VOLUME;
 
   constructor() {
     // Load sound effects
-    this.brickHitSound = new Audio('./assets/sounds/ding.mp3');
-    this.brickHitSound.volume = 0.3;
+    this.brickHitSound = new Audio(AUDIO_PATH_BRICK_HIT);
+    this.brickHitSound.volume = AUDIO_BRICK_HIT_BASE_VOLUME;
     
-    this.brickExplodeSound = new Audio('./assets/sounds/explosion-107629.mp3');
-    this.brickExplodeSound.volume = 0.4;
+    this.brickExplodeSound = new Audio(AUDIO_PATH_BRICK_EXPLODE);
+    this.brickExplodeSound.volume = AUDIO_BRICK_EXPLODE_BASE_VOLUME;
     
     // Load and start background music
-    this.backgroundMusic = new Audio('./assets/sounds/lulu-swing-giulio-fazio-main-version-02-18-3209.mp3');
-    this.backgroundMusic.volume = 0.2;
+    this.backgroundMusic = new Audio(AUDIO_PATH_BACKGROUND_MUSIC);
+    this.backgroundMusic.volume = AUDIO_MUSIC_BASE_VOLUME;
     this.backgroundMusic.loop = true;
     this.backgroundMusic.play().catch(err => {
       console.warn('Background music autoplay blocked. Will start on first user interaction:', err);
@@ -47,7 +58,7 @@ export class AudioManager {
   setMusicVolume(volume: number): void {
     this.musicVolume = volume;
     if (this.backgroundMusic) {
-      this.backgroundMusic.volume = volume * 0.2; // Base volume 0.2
+      this.backgroundMusic.volume = volume * AUDIO_MUSIC_BASE_VOLUME;
     }
   }
 
@@ -56,8 +67,8 @@ export class AudioManager {
    */
   setSFXVolume(volume: number): void {
     this.sfxVolume = volume;
-    this.brickHitSound.volume = volume * 0.3; // Base volume 0.3
-    this.brickExplodeSound.volume = volume * 0.4; // Base volume 0.4
+    this.brickHitSound.volume = volume * AUDIO_BRICK_HIT_BASE_VOLUME;
+    this.brickExplodeSound.volume = volume * AUDIO_BRICK_EXPLODE_BASE_VOLUME;
   }
 
   /**

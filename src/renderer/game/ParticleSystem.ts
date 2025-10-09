@@ -2,6 +2,17 @@
  * Particle system for visual effects
  */
 
+import {
+  PARTICLE_MIN_SIZE,
+  PARTICLE_MAX_SIZE,
+  PARTICLE_DEFAULT_SPEED,
+  PARTICLE_SPEED_VARIATION_MIN,
+  PARTICLE_SPEED_VARIATION_MAX,
+  PARTICLE_GRAVITY,
+  PARTICLE_FADE_RATE,
+  PARTICLE_GLOW_BLUR,
+} from '../config/constants';
+
 interface Particle {
   x: number;
   y: number;
@@ -24,13 +35,13 @@ export class ParticleSystem {
     y: number,
     count: number,
     color: string,
-    speed: number = 100
+    speed: number = PARTICLE_DEFAULT_SPEED
   ): void {
     for (let i = 0; i < count; i++) {
       // Random angle
       const angle = Math.random() * Math.PI * 2;
       // Random speed variation
-      const particleSpeed = speed * (0.5 + Math.random() * 0.5);
+      const particleSpeed = speed * (PARTICLE_SPEED_VARIATION_MIN + Math.random() * PARTICLE_SPEED_VARIATION_MAX);
       
       this.particles.push({
         x,
@@ -40,7 +51,7 @@ export class ParticleSystem {
         life: 1.0,
         maxLife: 1.0,
         color,
-        size: 2 + Math.random() * 3, // 2-5 pixels
+        size: PARTICLE_MIN_SIZE + Math.random() * (PARTICLE_MAX_SIZE - PARTICLE_MIN_SIZE),
       });
     }
   }
@@ -57,10 +68,10 @@ export class ParticleSystem {
       particle.y += particle.vy * deltaTime;
       
       // Apply gravity
-      particle.vy += 200 * deltaTime;
+      particle.vy += PARTICLE_GRAVITY * deltaTime;
       
       // Fade out
-      particle.life -= deltaTime * 2; // Fade over 0.5 seconds
+      particle.life -= deltaTime * PARTICLE_FADE_RATE;
       
       // Remove dead particles
       if (particle.life <= 0) {
@@ -79,7 +90,7 @@ export class ParticleSystem {
       const alpha = particle.life / particle.maxLife;
       
       // Draw particle with glow
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = PARTICLE_GLOW_BLUR;
       ctx.shadowColor = particle.color;
       ctx.globalAlpha = alpha;
       ctx.fillStyle = particle.color;

@@ -2,13 +2,22 @@
  * DamageNumber - Displays floating damage numbers above bricks
  */
 
+import {
+  DAMAGE_NUMBER_LIFETIME,
+  DAMAGE_NUMBER_FADE_DURATION,
+  DAMAGE_NUMBER_FLOAT_SPEED,
+  DAMAGE_NUMBER_FONT_SIZE_NORMAL,
+  DAMAGE_NUMBER_FONT_SIZE_CRITICAL,
+  DAMAGE_NUMBER_GLOW_BLUR,
+} from '../config/constants';
+
 export class DamageNumber {
   private x: number;
   private y: number;
   private damage: number;
   private isCritical: boolean;
   private lifetime: number;
-  private maxLifetime: number = 1000; // 1 second
+  private maxLifetime: number = DAMAGE_NUMBER_LIFETIME;
   private startTime: number;
 
   constructor(x: number, y: number, damage: number, isCritical: boolean) {
@@ -27,7 +36,7 @@ export class DamageNumber {
     this.lifetime = currentTime - this.startTime;
     
     // Float upward
-    this.y -= 0.5; // Move up 0.5 pixels per frame
+    this.y -= DAMAGE_NUMBER_FLOAT_SPEED;
   }
 
   /**
@@ -45,11 +54,11 @@ export class DamageNumber {
 
     ctx.save();
 
-    // Calculate opacity based on lifetime (fade out in last 300ms)
-    const fadeStart = this.maxLifetime - 300;
+    // Calculate opacity based on lifetime
+    const fadeStart = this.maxLifetime - DAMAGE_NUMBER_FADE_DURATION;
     let opacity = 1.0;
     if (this.lifetime > fadeStart) {
-      opacity = 1.0 - ((this.lifetime - fadeStart) / 300);
+      opacity = 1.0 - ((this.lifetime - fadeStart) / DAMAGE_NUMBER_FADE_DURATION);
     }
 
     // Set color based on critical hit
@@ -57,14 +66,14 @@ export class DamageNumber {
     
     // Add glow effect for critical hits
     if (this.isCritical) {
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = DAMAGE_NUMBER_GLOW_BLUR;
       ctx.shadowColor = color;
     }
 
     // Set font and style
     ctx.fillStyle = color;
     ctx.globalAlpha = opacity;
-    ctx.font = this.isCritical ? 'bold 16px Arial' : '14px Arial';
+    ctx.font = this.isCritical ? `bold ${DAMAGE_NUMBER_FONT_SIZE_CRITICAL}px Arial` : `${DAMAGE_NUMBER_FONT_SIZE_NORMAL}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 

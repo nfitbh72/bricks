@@ -6,6 +6,7 @@ import { Laser } from './Laser';
 import { Bat } from './Bat';
 import { Ball } from './Ball';
 import { GameUpgrades } from './GameUpgrades';
+import { LASER_SPEED_MULTIPLIER, LASER_DAMAGE_MULTIPLIER } from '../config/constants';
 
 export class WeaponManager {
   private lasers: Laser[] = [];
@@ -27,9 +28,9 @@ export class WeaponManager {
 
     // Calculate laser properties
     const ballSpeed = ball.getSpeed();
-    const laserSpeed = ballSpeed * 3; // 3x ball speed
+    const laserSpeed = ballSpeed * LASER_SPEED_MULTIPLIER;
     const ballDamage = ball.getDamage();
-    const laserDamage = ballDamage * 0.1; // 1/10th ball damage
+    const laserDamage = ballDamage * LASER_DAMAGE_MULTIPLIER;
 
     // Create and add laser
     const laser = new Laser(centerX, centerY, laserSpeed, laserDamage);

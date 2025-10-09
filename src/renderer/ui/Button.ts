@@ -2,6 +2,16 @@
  * Button component for UI screens
  */
 
+import {
+  BUTTON_COLOR_NORMAL,
+  BUTTON_COLOR_HOVERED,
+  BUTTON_GLOW_NORMAL,
+  BUTTON_GLOW_HOVERED,
+  BUTTON_BORDER_WIDTH,
+  BUTTON_FONT_SIZE,
+  BUTTON_FONT_FAMILY,
+} from '../config/constants';
+
 export interface ButtonConfig {
   x: number;
   y: number;
@@ -62,18 +72,18 @@ export class Button {
     ctx.save();
 
     // Neon glow effect
-    const glowColor = this.isHovered ? '#00ffff' : '#ff00ff';
-    ctx.shadowBlur = this.isHovered ? 30 : 15;
+    const glowColor = this.isHovered ? BUTTON_COLOR_HOVERED : BUTTON_COLOR_NORMAL;
+    ctx.shadowBlur = this.isHovered ? BUTTON_GLOW_HOVERED : BUTTON_GLOW_NORMAL;
     ctx.shadowColor = glowColor;
 
     // Draw border
     ctx.strokeStyle = glowColor;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = BUTTON_BORDER_WIDTH;
     ctx.strokeRect(this.x, this.y, this.width, this.height);
 
     // Draw text
     ctx.fillStyle = glowColor;
-    ctx.font = '32px "D Day Stencil", Arial';
+    ctx.font = `${BUTTON_FONT_SIZE}px ${BUTTON_FONT_FAMILY}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2);

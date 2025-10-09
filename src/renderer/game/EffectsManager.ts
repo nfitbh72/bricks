@@ -4,6 +4,7 @@
 
 import { ParticleSystem } from './ParticleSystem';
 import { DamageNumber } from './DamageNumber';
+import { BACKGROUND_IMAGE_OPACITY } from '../config/constants';
 
 export class EffectsManager {
   private particleSystem: ParticleSystem;
@@ -112,7 +113,7 @@ export class EffectsManager {
   renderBackground(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     if (this.backgroundImage) {
       ctx.save();
-      ctx.globalAlpha = 0.3; // Make it subtle/darker
+      ctx.globalAlpha = BACKGROUND_IMAGE_OPACITY;
       ctx.drawImage(this.backgroundImage, 0, 0, width, height);
       ctx.globalAlpha = 1.0;
       ctx.restore();

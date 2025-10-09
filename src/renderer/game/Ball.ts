@@ -5,6 +5,16 @@
 import { Vector2D } from './types';
 import { reflect, normalize, magnitude, clamp } from './utils';
 import { Bat } from './Bat';
+import {
+  BALL_BASE_DAMAGE,
+  BALL_SPEED_INCREASE_PER_SECOND,
+  BALL_BOUNCE_MAX_ANGLE,
+  BALL_TAIL_BASE_LENGTH,
+  BALL_TAIL_SEGMENTS,
+  BALL_TAIL_MAX_SPEED_MULTIPLIER,
+  BALL_GLOW_BLUR,
+  BALL_TAIL_GLOW_BLUR,
+} from '../config/constants';
 
 export class Ball {
   private position: Vector2D;
@@ -14,9 +24,9 @@ export class Ball {
   private readonly initialSpeed: number;
   private currentSpeed: number;
   private isGrey: boolean = false;
-  private damage: number = 1; // Base damage
+  private damage: number = BALL_BASE_DAMAGE;
   private elapsedTime: number = 0; // Track time for acceleration
-  private readonly speedIncreasePerSecond: number = 5; // 300 per minute = 5 per second
+  private readonly speedIncreasePerSecond: number = BALL_SPEED_INCREASE_PER_SECOND;
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -59,7 +69,7 @@ export class Ball {
     }
 
     // Draw glow effect (dystopian neon style)
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = BALL_GLOW_BLUR;
     ctx.shadowColor = color;
 
     // Draw ball
@@ -84,13 +94,11 @@ export class Ball {
     const dirY = -this.velocity.y / speed;
 
     // Tail length scales with speed (longer at higher speeds)
-    // Base length at initial speed (300), scales up to 3x at 900 speed
     const speedRatio = this.currentSpeed / this.initialSpeed;
-    const baseTailLength = 20;
-    const tailLength = baseTailLength * Math.min(speedRatio, 3);
+    const tailLength = BALL_TAIL_BASE_LENGTH * Math.min(speedRatio, BALL_TAIL_MAX_SPEED_MULTIPLIER);
 
     // Number of tail segments
-    const segments = 8;
+    const segments = BALL_TAIL_SEGMENTS;
 
     // Draw tail segments with decreasing opacity
     for (let i = 0; i < segments; i++) {
@@ -109,7 +117,7 @@ export class Ball {
       
       ctx.globalAlpha = opacity;
       ctx.fillStyle = color;
-      ctx.shadowBlur = 15 * (1 - t);
+      ctx.shadowBlur = BALL_TAIL_GLOW_BLUR * (1 - t);
       ctx.shadowColor = color;
       
       ctx.beginPath();
@@ -254,7 +262,7 @@ export class Ball {
     const relativeHitPos = bat.getRelativeHitPosition(this.position.x);
     
     // Calculate bounce angle based on hit position
-    const maxAngle = 60; // Maximum deflection angle in degrees
+    const maxAngle = BALL_BOUNCE_MAX_ANGLE;
     
     if (hitFromTop) {
       // Hit top of bat - bounce upward

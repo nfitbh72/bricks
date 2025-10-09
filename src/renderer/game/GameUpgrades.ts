@@ -6,6 +6,7 @@
 import { Bat } from './Bat';
 import { Ball } from './Ball';
 import { UpgradeType } from './types';
+import { BALL_BASE_DAMAGE } from '../config/constants';
 
 export class GameUpgrades {
   private upgradeLevels: Map<string, number> = new Map();
@@ -73,7 +74,7 @@ export class GameUpgrades {
   applyBallUpgrades(): { speed: number; radius: number; damage: number } {
     // Ball damage upgrade
     const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1);
-    const damage = 1 + damageLevel; // Base damage 1, +1 per level
+    const damage = BALL_BASE_DAMAGE + damageLevel;
     
     return {
       speed: this.baseBallSpeed, // No speed upgrades yet
