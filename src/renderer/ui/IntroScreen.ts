@@ -13,6 +13,10 @@ export class IntroScreen extends Screen {
   // @TODO: Remove dev upgrades callback before production
   private onDevUpgrades: () => void;
 
+  // Layout constants
+  private readonly TOTAL_CONTENT_HEIGHT = 630;
+  private readonly CONTENT_VERTICAL_POSITION = 0.45; // 45% from top
+
   constructor(canvas: HTMLCanvasElement, onStart: () => void, onQuit: () => void, onDevUpgrades: () => void, onOptions: () => void) {
     super(canvas);
     this.onStart = onStart;
@@ -31,16 +35,9 @@ export class IntroScreen extends Screen {
     const buttonWidth = 200;
     const buttonHeight = 60;
     
-    // Calculate total content height:
-    // Title + subtitle + spacing + 4 buttons
-    // Title: 72px, Subtitle: 36px, spacing: 60px + 90px = 150px
-    // Buttons: 4 * 60px + 3 * 80px spacing = 240 + 240 = 480px
-    // Total: ~630px
-    const totalContentHeight = 630;
-    
-    // Position so the vertical midpoint is at 45% from top
-    const contentMidY = this.canvas.height * 0.45;
-    const baseY = contentMidY - totalContentHeight / 2;
+    // Position so the vertical midpoint is at configured position from top
+    const contentMidY = this.canvas.height * this.CONTENT_VERTICAL_POSITION;
+    const baseY = contentMidY - this.TOTAL_CONTENT_HEIGHT / 2;
 
     // START button
     this.buttons.push(
@@ -111,10 +108,9 @@ export class IntroScreen extends Screen {
 
     this.ctx.save();
 
-    // Calculate positioning to center content vertically at 45% from top
-    const totalContentHeight = 630;
-    const contentMidY = this.canvas.height * 0.45;
-    const baseY = contentMidY - totalContentHeight / 2;
+    // Calculate positioning to center content vertically
+    const contentMidY = this.canvas.height * this.CONTENT_VERTICAL_POSITION;
+    const baseY = contentMidY - this.TOTAL_CONTENT_HEIGHT / 2;
 
     // Draw title
     this.ctx.shadowBlur = 40;
