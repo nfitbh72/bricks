@@ -16,7 +16,12 @@ import { ScreenManager } from './ScreenManager';
 import { EffectsManager } from './EffectsManager';
 import { CollisionManager } from './CollisionManager';
 import { WeaponManager } from './WeaponManager';
-import { PLAYER_STARTING_HEALTH } from '../config/constants';
+import { 
+  PLAYER_STARTING_HEALTH, 
+  SLOW_MOTION_FACTOR, 
+  SLOW_MOTION_DURATION,
+  SLOW_MOTION_TRIGGER_DISTANCE 
+} from '../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -48,6 +53,10 @@ export class Game {
   private gameOverTimer: number = 0;
   private isDevUpgradeMode: boolean = false;
   private levelTime: number = 0; // Time spent on current level in seconds
+
+  // Slow-motion effect
+  private isSlowMotion: boolean = false;
+  private slowMotionTimer: number = 0;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -199,14 +208,17 @@ export class Game {
       },
       onBrickDestroyed: (brick, x, y, isCritical) => {
         this.totalBricksDestroyed++;
+        const remainingBricks = this.level!.getRemainingBricks();
         this.statusBar.setBrickCounts(
-          this.level!.getRemainingBricks(),
+          remainingBricks,
           this.level!.getTotalBricks()
         );
         
-        // Create particles
-        const particleCount = isCritical ? 20 : 10;
-        const particleLifetime = isCritical ? 200 : 150;
+        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
+        
+        // Create particles (more for final brick)
+        const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
+        const particleLifetime = remainingBricks === 0 ? 300 : (isCritical ? 200 : 150);
         const particleColor = isCritical ? '#ffff00' : brick.getColor();
         this.effectsManager.createParticles(x, y, particleCount, particleColor, particleLifetime);
         
@@ -467,6 +479,10 @@ export class Game {
     // Reset level timer
     this.levelTime = 0;
     
+    // Reset slow-motion state
+    this.isSlowMotion = false;
+    this.slowMotionTimer = 0;
+    
     this.gameState = GameState.PLAYING;
     
     // Load background image for this level
@@ -544,7 +560,23 @@ export class Game {
       return;
     }
 
-    // Update screen animations
+    // Handle slow-motion effect
+    let effectiveDeltaTime = deltaTime;
+    if (this.isSlowMotion) {
+      effectiveDeltaTime = deltaTime * SLOW_MOTION_FACTOR;
+      this.slowMotionTimer += deltaTime;
+      
+      console.log(`⏱️ Slow-mo active: ${this.slowMotionTimer.toFixed(2)}s / ${SLOW_MOTION_DURATION}s (${(effectiveDeltaTime / deltaTime * 100).toFixed(0)}% speed)`);
+      
+      // End slow-motion after duration
+      if (this.slowMotionTimer >= SLOW_MOTION_DURATION) {
+        console.log('✅ Slow-motion ended');
+        this.isSlowMotion = false;
+        this.slowMotionTimer = 0;
+      }
+    }
+
+    // Update screen animations (use real deltaTime for UI)
     this.screenManager.update(this.gameState, deltaTime);
 
     // Handle game over delay
@@ -562,24 +594,24 @@ export class Game {
       return; // Pause updates when not playing or paused
     }
 
-    // Update level timer
+    // Update level timer (use real deltaTime)
     this.levelTime += deltaTime;
     this.statusBar.setLevelTime(this.levelTime);
 
-    // Handle input
-    this.handleInput(deltaTime);
+    // Handle input (use effective deltaTime for movement)
+    this.handleInput(effectiveDeltaTime);
 
-    // Update ball
-    this.ball.update(deltaTime);
+    // Update ball (use effective deltaTime for slow-mo)
+    this.ball.update(effectiveDeltaTime);
 
-    // Update weapons
-    this.weaponManager.update(deltaTime);
+    // Update weapons (use effective deltaTime for slow-mo)
+    this.weaponManager.update(effectiveDeltaTime);
 
-    // Update collision manager (for piercing duration and ball visual state)
-    this.collisionManager.update(deltaTime, this.ball);
+    // Update collision manager (use effective deltaTime for slow-mo)
+    this.collisionManager.update(effectiveDeltaTime, this.ball);
 
-    // Update visual effects
-    this.effectsManager.update(deltaTime);
+    // Update visual effects (use effective deltaTime for slow-mo)
+    this.effectsManager.update(effectiveDeltaTime);
 
     // Check wall collisions (bottom boundary is status bar top)
     const statusBarTop = this.statusBar.getY();
@@ -595,6 +627,15 @@ export class Game {
       this.statusBar.setPlayerHealth(this.playerHealth);
       // Trigger screen shake on back wall hit
       this.effectsManager.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
+    }
+
+    // Check if we should trigger slow-motion (1 brick left, ball approaching)
+    if (this.level && this.level.getRemainingBricks() === 1 && !this.isSlowMotion) {
+      if (this.predictBallWillHitBrick()) {
+        console.log('🎬 SLOW-MOTION ACTIVATED! Ball approaching final brick!');
+        this.isSlowMotion = true;
+        this.slowMotionTimer = 0;
+      }
     }
 
     // Check collisions
@@ -647,6 +688,91 @@ export class Game {
 
     // Laser-Brick collisions
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
+  }
+
+  /**
+   * Predict if the ball will hit a brick soon (ray tracing)
+   * Returns true if ball will hit a brick within 2 brick heights distance
+   */
+  private predictBallWillHitBrick(): boolean {
+    if (!this.level) return false;
+
+    const ballPos = this.ball.getPosition();
+    const ballVel = this.ball.getVelocity();
+    const ballRadius = this.ball.getRadius();
+    
+    // Get the final brick
+    const bricks = this.level.getActiveBricks();
+    if (bricks.length !== 1) return false;
+    
+    const finalBrick = bricks[0];
+    const brickBounds = finalBrick.getBounds();
+    
+    // Calculate distance from ball to brick
+    const closestX = Math.max(brickBounds.x, Math.min(ballPos.x, brickBounds.x + brickBounds.width));
+    const closestY = Math.max(brickBounds.y, Math.min(ballPos.y, brickBounds.y + brickBounds.height));
+    
+    const distX = ballPos.x - closestX;
+    const distY = ballPos.y - closestY;
+    const distance = Math.sqrt(distX * distX + distY * distY);
+    
+    // Trigger distance: configured brick heights
+    const triggerDistance = brickBounds.height * SLOW_MOTION_TRIGGER_DISTANCE;
+    
+    if (distance > triggerDistance) {
+      return false; // Too far away
+    }
+    
+    // Ball is close - now ray trace to confirm it will hit
+    const predictionTime = 0.5; // Look ahead 0.5 seconds
+    const steps = 20; // Number of simulation steps
+    const dt = predictionTime / steps;
+    
+    let testX = ballPos.x;
+    let testY = ballPos.y;
+    let testVelX = ballVel.x;
+    let testVelY = ballVel.y;
+    
+    const statusBarTop = this.statusBar.getY();
+    
+    for (let i = 0; i < steps; i++) {
+      // Update test position
+      testX += testVelX * dt;
+      testY += testVelY * dt;
+      
+      // Check wall bounces
+      if (testX - ballRadius < 0) {
+        testX = ballRadius;
+        testVelX = Math.abs(testVelX);
+      }
+      if (testX + ballRadius > this.canvas.width) {
+        testX = this.canvas.width - ballRadius;
+        testVelX = -Math.abs(testVelX);
+      }
+      if (testY - ballRadius < 0) {
+        testY = ballRadius;
+        testVelY = Math.abs(testVelY);
+      }
+      if (testY + ballRadius > statusBarTop) {
+        // Hit back wall - won't hit brick
+        return false;
+      }
+      
+      // Check if test position intersects the brick
+      const testClosestX = Math.max(brickBounds.x, Math.min(testX, brickBounds.x + brickBounds.width));
+      const testClosestY = Math.max(brickBounds.y, Math.min(testY, brickBounds.y + brickBounds.height));
+      
+      const testDistX = testX - testClosestX;
+      const testDistY = testY - testClosestY;
+      const testDistSquared = testDistX * testDistX + testDistY * testDistY;
+      
+      if (testDistSquared < ballRadius * ballRadius) {
+        console.log(`📍 Ray trace: Ball is ${distance.toFixed(0)}px away, will hit brick in ~${(i * dt).toFixed(2)}s`);
+        return true; // Will hit brick!
+      }
+    }
+    
+    return false; // Won't hit brick in prediction window
   }
 
   /**
@@ -714,6 +840,11 @@ export class Game {
 
     // Render CRT scanline overlay
     this.renderCRTOverlay();
+
+    // Render slow-motion overlay
+    if (this.isSlowMotion) {
+      this.renderSlowMotionOverlay();
+    }
   }
 
 
@@ -785,6 +916,35 @@ export class Game {
     );
     gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+    
+    this.ctx.globalAlpha = 1;
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    this.ctx.restore();
+  }
+
+  /**
+   * Render slow-motion visual overlay
+   */
+  private renderSlowMotionOverlay(): void {
+    this.ctx.save();
+    
+    // Desaturate effect - slight blue tint
+    this.ctx.globalAlpha = 0.15;
+    this.ctx.fillStyle = '#0088ff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Add motion blur effect with radial gradient
+    const centerX = this.canvas.width / 2;
+    const centerY = this.canvas.height / 2;
+    const gradient = this.ctx.createRadialGradient(
+      centerX, centerY, 0,
+      centerX, centerY, Math.max(this.canvas.width, this.canvas.height) * 0.6
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
     
     this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = gradient;

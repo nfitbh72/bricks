@@ -31,8 +31,8 @@ export function createLevel1(): LevelConfig {
   return {
     id: 1,
     name: 'Level 1: One',
-    //bricks: createBricksFromPattern(pattern),
-    bricks: createBricksFromWord("1", BrickType.NORMAL),
+    bricks: createBricksFromPattern(pattern),
+    //bricks: createBricksFromWord("1", BrickType.NORMAL),
     baseHealth: 1, // Normal bricks = 1 HP, Healthy bricks = 3 HP
   };
 }

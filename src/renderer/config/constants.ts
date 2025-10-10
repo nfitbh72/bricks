@@ -114,3 +114,8 @@ export const PIERCING_FLASH_INTERVAL = 0.1; // Flash every 0.1 seconds
 
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1;
+
+// Slow-motion effect constants
+export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
+export const SLOW_MOTION_DURATION = 2.0; // 2 seconds
+export const SLOW_MOTION_TRIGGER_DISTANCE = 2; // Trigger at 2 brick heights from final brick
