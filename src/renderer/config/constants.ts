@@ -118,4 +118,5 @@ export const PLAYER_STARTING_HEALTH = 1;
 // Slow-motion effect constants
 export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
 export const SLOW_MOTION_DURATION = 2.0; // 2 seconds
-export const SLOW_MOTION_TRIGGER_DISTANCE = 2; // Trigger at 2 brick heights from final brick
+export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights from final brick
+export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)

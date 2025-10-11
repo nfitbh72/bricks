@@ -20,7 +20,8 @@ import {
   PLAYER_STARTING_HEALTH, 
   SLOW_MOTION_FACTOR, 
   SLOW_MOTION_DURATION,
-  SLOW_MOTION_TRIGGER_DISTANCE 
+  SLOW_MOTION_TRIGGER_DISTANCE,
+  SLOW_MOTION_ZOOM_SCALE
 } from '../config/constants';
 
 export class Game {
@@ -51,10 +52,12 @@ export class Game {
   private totalBricksDestroyed: number = 0;
   private gameOverDelay: number = 1000; // 1 second delay
   private gameOverTimer: number = 0;
+  private levelCompleteDelay: number = 1000; // 1 second delay for animations
+  private levelCompleteTimer: number = 0;
   private isDevUpgradeMode: boolean = false;
   private levelTime: number = 0; // Time spent on current level in seconds
 
-  // Slow-motion effect
+  // Slow-motion effect (time dilation only, visuals handled by EffectsManager)
   private isSlowMotion: boolean = false;
   private slowMotionTimer: number = 0;
 
@@ -482,6 +485,10 @@ export class Game {
     // Reset slow-motion state
     this.isSlowMotion = false;
     this.slowMotionTimer = 0;
+    this.effectsManager.resetSlowMotion();
+    
+    // Reset level complete timer
+    this.levelCompleteTimer = 0;
     
     this.gameState = GameState.PLAYING;
     
@@ -560,13 +567,11 @@ export class Game {
       return;
     }
 
-    // Handle slow-motion effect
+    // Handle slow-motion time dilation
     let effectiveDeltaTime = deltaTime;
     if (this.isSlowMotion) {
       effectiveDeltaTime = deltaTime * SLOW_MOTION_FACTOR;
       this.slowMotionTimer += deltaTime;
-      
-      console.log(`⏱️ Slow-mo active: ${this.slowMotionTimer.toFixed(2)}s / ${SLOW_MOTION_DURATION}s (${(effectiveDeltaTime / deltaTime * 100).toFixed(0)}% speed)`);
       
       // End slow-motion after duration
       if (this.slowMotionTimer >= SLOW_MOTION_DURATION) {
@@ -635,16 +640,42 @@ export class Game {
         console.log('🎬 SLOW-MOTION ACTIVATED! Ball approaching final brick!');
         this.isSlowMotion = true;
         this.slowMotionTimer = 0;
+        
+        // Calculate target focus point (midpoint between ball and final brick)
+        const ballPos = this.ball.getPosition();
+        const bricks = this.level.getActiveBricks();
+        if (bricks.length === 1) {
+          const brickBounds = bricks[0].getBounds();
+          const brickCenterX = brickBounds.x + brickBounds.width / 2;
+          const brickCenterY = brickBounds.y + brickBounds.height / 2;
+          
+          const targetFocusX = (ballPos.x + brickCenterX) / 2;
+          const targetFocusY = (ballPos.y + brickCenterY) / 2;
+          
+          // Trigger slow-motion visual effects in EffectsManager
+          this.effectsManager.triggerSlowMotion(
+            this.canvas.width,
+            this.canvas.height,
+            targetFocusX,
+            targetFocusY
+          );
+          
+          console.log(`Slow-motion triggered with focus at (${targetFocusX.toFixed(0)}, ${targetFocusY.toFixed(0)})`);
+        }
       }
     }
 
     // Check collisions
     this.checkCollisions();
 
-    // Check level completion
-    if (this.level && this.level.isComplete()) {
-      this.gameState = GameState.LEVEL_COMPLETE;
-      this.screenManager.levelCompleteScreen.setLevel(this.currentLevelId, this.levelTime);
+    // Check level completion with delay for animations
+    if (this.level && this.level.isComplete() && this.gameState === GameState.PLAYING) {
+      this.levelCompleteTimer += deltaTime * 1000; // Convert to ms
+      if (this.levelCompleteTimer >= this.levelCompleteDelay) {
+        this.gameState = GameState.LEVEL_COMPLETE;
+        this.screenManager.levelCompleteScreen.setLevel(this.currentLevelId, this.levelTime);
+        this.levelCompleteTimer = 0;
+      }
     }
   }
 
@@ -810,9 +841,13 @@ export class Game {
     // Draw background image if loaded
     this.effectsManager.renderBackground(this.ctx, this.canvas.width, this.canvas.height);
 
-    // Apply screen shake
+    // Apply screen shake and slow-motion zoom
     const shake = this.effectsManager.getScreenShakeOffset();
     this.ctx.save();
+    
+    // Apply slow-motion zoom transform (handled by EffectsManager)
+    this.effectsManager.applySlowMotionTransform(this.ctx);
+    
     this.ctx.translate(shake.x, shake.y);
 
     // Render level (bricks)
@@ -841,10 +876,8 @@ export class Game {
     // Render CRT scanline overlay
     this.renderCRTOverlay();
 
-    // Render slow-motion overlay
-    if (this.isSlowMotion) {
-      this.renderSlowMotionOverlay();
-    }
+    // Render slow-motion overlay (handled by EffectsManager)
+    this.effectsManager.renderSlowMotionOverlay(this.ctx, this.canvas.width, this.canvas.height);
   }
 
 
@@ -924,32 +957,4 @@ export class Game {
     this.ctx.restore();
   }
 
-  /**
-   * Render slow-motion visual overlay
-   */
-  private renderSlowMotionOverlay(): void {
-    this.ctx.save();
-    
-    // Desaturate effect - slight blue tint
-    this.ctx.globalAlpha = 0.15;
-    this.ctx.fillStyle = '#0088ff';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    // Add motion blur effect with radial gradient
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    const gradient = this.ctx.createRadialGradient(
-      centerX, centerY, 0,
-      centerX, centerY, Math.max(this.canvas.width, this.canvas.height) * 0.6
-    );
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
-    
-    this.ctx.globalAlpha = 1;
-    this.ctx.fillStyle = gradient;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    this.ctx.restore();
-  }
 }

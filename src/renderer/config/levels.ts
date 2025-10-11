@@ -25,6 +25,22 @@ export function createLevel1(): LevelConfig {
   ];
   */
  const pattern = [
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
   "N",
  ];
   
