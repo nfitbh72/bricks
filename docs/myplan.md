@@ -19,19 +19,22 @@ Just some notes about future features so that I don't forget
     - [X] piercing can last for extra seconds
     - [] sticky bat with LR control and preview
     - [] laser bat becomes bomb bat - can only fire once a second but does a large-aoe (2.5 blocks) and medium-damage (2) explosion
+    - [] dual laser upgrade
 - [X] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
 - [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
 - [X] move hardcoded values to constants
-- [] use a dictionary and make the game multi-lingual
+- [X] use a dictionary and make the game multi-lingual
 - [X] Ball speed up mechanics
 - [] Boss bricks: Large multi-segment bricks with special patterns
-- [] Obstacles that would damage the bat (making the bat smaller?)
+- [] Offensive Bricks that would damage the bat (making the bat smaller)
+    - [] Bricks that fall instead of crumbling
+    - [] Bricks that explode and send avoidable debris
 - [] Challenge Modes
     - [] Survival mode: Endless waves with increasing difficulty
     - [] Time attack: Complete level as fast as possible
     - [] One-shot mode: Single life, no re-spawns
     - [] Precision mode: Limited number of ball launches
     - [] Chaos mode: Random modifiers each level
-- [] Slow-mo on level complete: Dramatic final brick destruction
+- [X] Slow-mo on level complete: Dramatic final brick destruction
 - [] Achievement system: Track milestones (100 bricks destroyed, etc.)
 

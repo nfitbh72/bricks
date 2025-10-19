@@ -127,6 +127,12 @@ export class Game {
       this.audioManager.setSFXVolume(sfxVolume);
     });
 
+    // Set language change callback to refresh UI
+    this.screenManager.optionsScreen.setLanguageChangeCallback(() => {
+      // Force a re-render to update all translated text
+      this.render();
+    });
+
     // Initialize effects manager
     this.effectsManager = new EffectsManager();
 

@@ -2,13 +2,14 @@
  * OptionsScreen - Game options overlay
  */
 
-import { t } from '../i18n/LanguageManager';
+import { t, LanguageManager } from '../i18n/LanguageManager';
 
 export interface GameOptions {
   musicVolume: number;      // 0 to 1
   sfxVolume: number;         // 0 to 1
   showParticles: boolean;
   showDamageNumbers: boolean;
+  selectedLanguage: string;  // Language code
 }
 
 export class OptionsScreen {
@@ -20,10 +21,12 @@ export class OptionsScreen {
   private hoveredElement: string | null = null;
   private isDraggingMusicSlider: boolean = false;
   private isDraggingSfxSlider: boolean = false;
+  private isLanguageDropdownOpen: boolean = false;
+  private onLanguageChange: (() => void) | null = null;
 
   // UI Layout
   private readonly panelWidth = 500;
-  private readonly panelHeight = 400;
+  private readonly panelHeight = 550;
   private readonly sliderWidth = 300;
   private readonly sliderHeight = 20;
   private readonly cornerRadius = 15;
@@ -51,25 +54,42 @@ export class OptionsScreen {
   }
 
   /**
+   * Set callback for language changes
+   */
+  setLanguageChangeCallback(callback: () => void): void {
+    this.onLanguageChange = callback;
+  }
+
+  /**
    * Load options from localStorage
    */
   private loadOptions(): GameOptions {
+    // Default options
+    const defaults: GameOptions = {
+      musicVolume: 0.5,
+      sfxVolume: 0.7,
+      showParticles: true,
+      showDamageNumbers: true,
+      selectedLanguage: LanguageManager.getInstance().getCurrentLanguage(),
+    };
+
     const saved = localStorage.getItem('gameOptions');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Merge with defaults to ensure all fields exist
+        return {
+          ...defaults,
+          ...parsed,
+          // Ensure selectedLanguage is valid
+          selectedLanguage: parsed.selectedLanguage || defaults.selectedLanguage,
+        };
       } catch (e) {
         console.error('Failed to load options:', e);
       }
     }
 
-    // Default options
-    return {
-      musicVolume: 0.5,
-      sfxVolume: 0.7,
-      showParticles: true,
-      showDamageNumbers: true,
-    };
+    return defaults;
   }
 
   /**
@@ -215,8 +235,29 @@ export class OptionsScreen {
     } else if (element === 'damageNumbersCheckbox') {
       this.options.showDamageNumbers = !this.options.showDamageNumbers;
       this.saveOptions();
+    } else if (element === 'languageSelector') {
+      this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+    } else if (element && element.startsWith('languageItem_')) {
+      const index = parseInt(element.split('_')[1]);
+      const languages = LanguageManager.getInstance().getSupportedLanguages();
+      if (index >= 0 && index < languages.length) {
+        const selectedLang = languages[index];
+        this.options.selectedLanguage = selectedLang;
+        this.saveOptions();
+        // Update the language manager
+        LanguageManager.getInstance().setLanguage(selectedLang as any).then(() => {
+          // Notify that language has changed so UI can refresh
+          if (this.onLanguageChange) {
+            this.onLanguageChange();
+          }
+        });
+        this.isLanguageDropdownOpen = false;
+      }
     } else if (element === 'closeButton') {
       this.onClose();
+    } else {
+      // Close dropdown if clicking outside
+      this.isLanguageDropdownOpen = false;
     }
   }
 
@@ -256,6 +297,23 @@ export class OptionsScreen {
       return 'damageNumbersCheckbox';
     }
 
+    // Language selector
+    const languageSelector = this.getLanguageSelectorBounds();
+    if (this.isPointInRect(x, y, languageSelector)) {
+      return 'languageSelector';
+    }
+
+    // Language dropdown items (if open)
+    if (this.isLanguageDropdownOpen) {
+      const languages = LanguageManager.getInstance().getSupportedLanguages();
+      for (let i = 0; i < languages.length; i++) {
+        const itemBounds = this.getLanguageDropdownItemBounds(i);
+        if (this.isPointInRect(x, y, itemBounds)) {
+          return `languageItem_${i}`;
+        }
+      }
+    }
+
     return null;
   }
 
@@ -286,6 +344,10 @@ export class OptionsScreen {
     return this.getParticlesCheckboxY() + 50;
   }
 
+  private getLanguageSelectorY(): number {
+    return this.getDamageNumbersCheckboxY() + 60;
+  }
+
   /**
    * Get checkbox bounds
    */
@@ -294,6 +356,31 @@ export class OptionsScreen {
     const size = 24;
     const x = panel.x + 100;
     return { x, y, width: size, height: size };
+  }
+
+  /**
+   * Get language selector bounds
+   */
+  private getLanguageSelectorBounds() {
+    const panel = this.getPanelBounds();
+    const width = 200;
+    const height = 35;
+    const x = panel.x + (this.panelWidth - width) / 2;
+    return { x, y: this.getLanguageSelectorY(), width, height };
+  }
+
+  /**
+   * Get language dropdown item bounds
+   */
+  private getLanguageDropdownItemBounds(index: number) {
+    const selector = this.getLanguageSelectorBounds();
+    const height = 30;
+    return {
+      x: selector.x,
+      y: selector.y + selector.height + index * height,
+      width: selector.width,
+      height,
+    };
   }
 
   /**
@@ -372,6 +459,9 @@ export class OptionsScreen {
 
     // Draw damage numbers checkbox
     this.drawCheckbox(t('ui.options.damageNumbers'), this.getDamageNumbersCheckboxY(), this.options.showDamageNumbers, this.hoveredElement === 'damageNumbersCheckbox');
+
+    // Draw language selector
+    this.drawLanguageSelector();
 
     // Draw close button
     this.drawButton(t('ui.buttons.back'), this.getCloseButtonBounds(), this.hoveredElement === 'closeButton');
@@ -527,5 +617,121 @@ export class OptionsScreen {
     }
     this.ctx.fillText(text, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     this.ctx.restore();
+  }
+
+  /**
+   * Draw language selector
+   */
+  private drawLanguageSelector(): void {
+    const selector = this.getLanguageSelectorBounds();
+    const isHovered = this.hoveredElement === 'languageSelector';
+    const languageManager = LanguageManager.getInstance();
+    const currentLang = this.options.selectedLanguage || languageManager.getCurrentLanguage();
+    const currentLangName = languageManager.getLanguageName(currentLang as any);
+
+    // Draw label
+    this.ctx.save();
+    this.ctx.fillStyle = '#00ffff';
+    this.ctx.font = '18px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'bottom';
+    this.ctx.shadowBlur = 5;
+    this.ctx.shadowColor = '#00ffff';
+    this.ctx.fillText(t('ui.options.language'), selector.x + selector.width / 2, selector.y - 10);
+    this.ctx.restore();
+
+    // Draw selector box
+    this.ctx.save();
+    const selectorRadius = 5;
+    this.drawRoundedRect(selector.x, selector.y, selector.width, selector.height, selectorRadius);
+    this.ctx.fillStyle = isHovered ? '#1a1a1a' : '#0a0a0a';
+    this.ctx.fill();
+    this.ctx.strokeStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.shadowBlur = isHovered ? 15 : 10;
+    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    // Draw current language text
+    this.ctx.save();
+    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.font = '16px "PopulationZeroBB", Arial';
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.shadowBlur = 5;
+    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.fillText(currentLangName, selector.x + 15, selector.y + selector.height / 2);
+    this.ctx.restore();
+
+    // Draw dropdown arrow
+    this.ctx.save();
+    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.beginPath();
+    const arrowX = selector.x + selector.width - 20;
+    const arrowY = selector.y + selector.height / 2;
+    if (this.isLanguageDropdownOpen) {
+      // Up arrow
+      this.ctx.moveTo(arrowX - 5, arrowY + 3);
+      this.ctx.lineTo(arrowX, arrowY - 3);
+      this.ctx.lineTo(arrowX + 5, arrowY + 3);
+    } else {
+      // Down arrow
+      this.ctx.moveTo(arrowX - 5, arrowY - 3);
+      this.ctx.lineTo(arrowX, arrowY + 3);
+      this.ctx.lineTo(arrowX + 5, arrowY - 3);
+    }
+    this.ctx.fill();
+    this.ctx.restore();
+
+    // Draw dropdown if open
+    if (this.isLanguageDropdownOpen) {
+      const languages = languageManager.getSupportedLanguages();
+      for (let i = 0; i < languages.length; i++) {
+        const lang = languages[i];
+        const itemBounds = this.getLanguageDropdownItemBounds(i);
+        const itemHovered = this.hoveredElement === `languageItem_${i}`;
+        const isSelected = lang === currentLang;
+
+        // Draw item background
+        this.ctx.save();
+        this.ctx.fillStyle = itemHovered ? '#1a1a1a' : '#0a0a0a';
+        this.ctx.fillRect(itemBounds.x, itemBounds.y, itemBounds.width, itemBounds.height);
+        
+        // Draw item border
+        this.ctx.strokeStyle = itemHovered ? '#ff00ff' : '#333333';
+        this.ctx.lineWidth = 1;
+        if (itemHovered) {
+          this.ctx.shadowBlur = 10;
+          this.ctx.shadowColor = '#ff00ff';
+        }
+        this.ctx.strokeRect(itemBounds.x, itemBounds.y, itemBounds.width, itemBounds.height);
+        this.ctx.restore();
+
+        // Draw language name
+        this.ctx.save();
+        this.ctx.fillStyle = isSelected ? '#ff00ff' : (itemHovered ? '#ff00ff' : '#00ffff');
+        this.ctx.font = isSelected ? 'bold 16px "PopulationZeroBB", Arial' : '16px "PopulationZeroBB", Arial';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
+        if (itemHovered || isSelected) {
+          this.ctx.shadowBlur = 5;
+          this.ctx.shadowColor = '#ff00ff';
+        }
+        this.ctx.fillText(languageManager.getLanguageName(lang), itemBounds.x + 15, itemBounds.y + itemBounds.height / 2);
+        this.ctx.restore();
+
+        // Draw checkmark for selected language
+        if (isSelected) {
+          this.ctx.save();
+          this.ctx.fillStyle = '#ff00ff';
+          this.ctx.font = '14px Arial';
+          this.ctx.textAlign = 'right';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('✓', itemBounds.x + itemBounds.width - 15, itemBounds.y + itemBounds.height / 2);
+          this.ctx.restore();
+        }
+      }
+    }
   }
 }

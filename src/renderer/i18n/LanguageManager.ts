@@ -32,6 +32,14 @@ export class LanguageManager {
    * Detect browser language and set if supported
    */
   private detectAndSetLanguage(): void {
+    // First check if there's a saved language preference
+    const savedLang = localStorage.getItem('selectedLanguage');
+    if (savedLang && this.supportedLanguages.includes(savedLang as SupportedLanguage)) {
+      this.currentLanguage = savedLang as SupportedLanguage;
+      return;
+    }
+
+    // Otherwise, use browser language
     const browserLang = navigator.language.split('-')[0] as SupportedLanguage;
     if (this.supportedLanguages.includes(browserLang)) {
       this.currentLanguage = browserLang;
@@ -84,6 +92,8 @@ export class LanguageManager {
   async setLanguage(lang: SupportedLanguage): Promise<void> {
     if (this.supportedLanguages.includes(lang)) {
       this.currentLanguage = lang;
+      // Save to localStorage
+      localStorage.setItem('selectedLanguage', lang);
       await this.loadTranslations();
     }
   }
