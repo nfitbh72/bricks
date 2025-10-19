@@ -127,6 +127,7 @@ export class Game {
       onRestart: () => this.handleRestart(),
       onLevelCompleteTransition: () => this.handleLevelCompleteTransition(),
       onUpgradeComplete: () => this.handleUpgradeComplete(),
+      onStartLevel: (levelId: number) => this.handleStartLevel(levelId),
       onResume: () => this.handleResume(),
       onQuitFromPause: () => this.handleQuitFromPause(),
       onCloseOptions: () => this.handleCloseOptions(),
@@ -367,6 +368,29 @@ export class Game {
           this.gameState = GameState.GAME_OVER;
           this.screenManager.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
         }
+      }
+    });
+  }
+
+  /**
+   * Handle start level from dev upgrades (dev mode)
+   */
+  private handleStartLevel(levelId: number): void {
+    // Apply all purchased upgrades before transitioning
+    this.applyUpgrades();
+    
+    this.startTransition(() => {
+      // Exit dev upgrade mode
+      this.isDevUpgradeMode = false;
+      
+      // Set the level and reset stats
+      this.currentLevelId = levelId;
+      this.totalBricksDestroyed = 0;
+      
+      // Load the selected level
+      const levelConfig = getLevel(levelId);
+      if (levelConfig) {
+        this.loadLevel(levelConfig);
       }
     });
   }

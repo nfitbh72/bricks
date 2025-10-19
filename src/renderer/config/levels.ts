@@ -67,32 +67,17 @@ export function createLevel2(): LevelConfig {
  */
 export function createLevel3(): LevelConfig {
   const pattern = [
-    "",
-    "    HHHHHHHHH",
-    "   HHHIIIIIHHHH",
-    "  HHHIINNNIIHHHH",
-    "  HHIINNNNNIIHHH",
-    " HHHINNNNNNNIHHH",
-    " HHHINNNNNNNIHHH",
-    " HHHINNIIINNIHHH",
-    " HHHINNIIINNIHHH",
-    "  HHINNNNNNIHH",
-    "  HHHINNNNIHHHH",
-    "   HHHIIIIHHH",
-    "    HHHHHHHH",
-    "   HHH    HHH",
-    "  HHH      HHH",
-    "  HHH      HHH",
-    " HHHH      HHHH",
-    " NNNN      NNNN",
-    "NNNNN      NNNNN",
+    "L L L L",
+    " L L L ",
+    "L L L L",
+    " L L L "
   ];
   
   return {
     id: 3,
     name: 'Level 3: Skull Island (AI Generated LOL)',
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 2, // Normal bricks = 3 HP, Healthy bricks = 9 HP
+    baseHealth: 3, // Normal bricks = 3 HP, Healthy bricks = 9 HP
   };
 }
 

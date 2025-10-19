@@ -20,6 +20,7 @@ export interface ScreenCallbacks {
   onRestart: () => void;
   onLevelCompleteTransition: () => void;
   onUpgradeComplete: () => void;
+  onStartLevel: (levelId: number) => void;
   onResume: () => void;
   onQuitFromPause: () => void;
   onCloseOptions: () => void;
@@ -66,6 +67,7 @@ export class ScreenManager {
     this.upgradeTreeScreen = new UpgradeTreeScreen(
       canvas,
       callbacks.onUpgradeComplete,
+      callbacks.onStartLevel,
       getUpgrades()
     );
     

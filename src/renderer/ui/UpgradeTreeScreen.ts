@@ -42,6 +42,7 @@ interface UpgradeTreeState {
 
 export class UpgradeTreeScreen extends Screen {
   private onContinue: () => void;
+  private onStartLevel: (levelId: number) => void;
   private state: UpgradeTreeState;
   private backgroundImage: ImageData | null = null;
   private lastFrameTime: number = 0;
@@ -57,10 +58,12 @@ export class UpgradeTreeScreen extends Screen {
   constructor(
     canvas: HTMLCanvasElement,
     onContinue: () => void,
+    onStartLevel: (levelId: number) => void,
     upgrades: Upgrade[]
   ) {
     super(canvas);
     this.onContinue = onContinue;
+    this.onStartLevel = onStartLevel;
     
     // Initialize state
     this.state = {
@@ -291,6 +294,7 @@ export class UpgradeTreeScreen extends Screen {
   private createButtons(): void {
     const buttonWidth = 150;
     const buttonHeight = 40;
+    const buttonSpacing = 10;
     
     // CONTINUE button (top-right)
     this.buttons.push(
@@ -306,16 +310,36 @@ export class UpgradeTreeScreen extends Screen {
 
     // ALL button (dev mode only, top-right below CONTINUE)
     if (this.isDevMode) {
+      let currentY = 70; // Below CONTINUE button
+      
       this.buttons.push(
         new Button({
           x: this.canvas.width - buttonWidth - 20,
-          y: 70, // Below CONTINUE button
+          y: currentY,
           width: buttonWidth,
           height: buttonHeight,
           text: 'ALL',
           onClick: () => this.handleUnlockAll(),
         })
       );
+      
+      currentY += buttonHeight + buttonSpacing;
+      
+      // Level selection buttons
+      const levels = [1, 2, 3];
+      for (const levelId of levels) {
+        this.buttons.push(
+          new Button({
+            x: this.canvas.width - buttonWidth - 20,
+            y: currentY,
+            width: buttonWidth,
+            height: buttonHeight,
+            text: `Level ${levelId}`,
+            onClick: () => this.handleStartLevel(levelId),
+          })
+        );
+        currentY += buttonHeight + buttonSpacing;
+      }
     }
   }
 
@@ -324,6 +348,13 @@ export class UpgradeTreeScreen extends Screen {
    */
   private handleContinue(): void {
     this.onContinue();
+  }
+
+  /**
+   * Handle start level button (dev mode)
+   */
+  private handleStartLevel(levelId: number): void {
+    this.onStartLevel(levelId);
   }
 
   /**

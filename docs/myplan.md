@@ -26,10 +26,10 @@ Just some notes about future features so that I don't forget
 - [X] use a dictionary and make the game multi-lingual
 - [X] Ball speed up mechanics
 - [] Boss bricks: Large multi-segment bricks with special patterns
-- [] Offensive Bricks that would damage the bat (making the bat smaller)
-    - [] Bricks that fall instead of crumbling
-    - [] Bricks that explode and send avoidable debris in 8 different directions
-    - [] Bricks that send a laser directly at the bat upon crumbling
+- [X] Offensive Bricks that would damage the bat (making the bat smaller)
+    - [X] Bricks that fall instead of crumbling
+    - [X] Bricks that explode and send avoidable debris in 8 different directions
+    - [X] Bricks that send a laser directly at the bat upon crumbling
 - [] Challenge Modes
     - [] Survival mode: Endless waves with increasing difficulty
     - [] Time attack: Complete level as fast as possible
