@@ -144,6 +144,7 @@ describe('CollisionManager Integration', () => {
 
         expect(indestructibleBrick.getHealth()).toBe(initialHealth);
         expect(indestructibleBrick.isDestroyed()).toBe(false);
+        expect(onBrickHit).not.toHaveBeenCalled(); // No damage numbers
         expect(onBrickDestroyed).not.toHaveBeenCalled();
       }
     });
@@ -198,6 +199,29 @@ describe('CollisionManager Integration', () => {
 
       // Should trigger explosion damage to nearby bricks
       expect(onExplosionDamage).toHaveBeenCalled();
+    });
+
+    it('should not trigger explosions when hitting indestructible bricks', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      const onExplosionDamage = jest.fn();
+      collisionManager.setCallbacks({ onExplosionDamage });
+
+      const bricks = level.getActiveBricks();
+      const indestructibleBrick = bricks.find(b => b.isIndestructible());
+      expect(indestructibleBrick).toBeDefined();
+
+      if (indestructibleBrick) {
+        const bounds = indestructibleBrick.getBounds();
+        ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+
+        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+
+        // Should NOT trigger explosion damage for indestructible bricks
+        expect(onExplosionDamage).not.toHaveBeenCalled();
+      }
     });
 
     it('should handle piercing when upgrade is active', () => {

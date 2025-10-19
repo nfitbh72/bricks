@@ -113,42 +113,45 @@ export class CollisionManager {
           ball.bounce(collision.normal);
         }
         
-        // Calculate damage (with critical hit check)
-        let damage = ball.getDamage();
-        let isCritical = false;
-        
-        if (gameUpgrades.hasCriticalHits()) {
-          const critChance = gameUpgrades.getCriticalHitChance();
-          if (Math.random() < critChance) {
-            damage *= CRITICAL_HIT_DAMAGE_MULTIPLIER;
-            isCritical = true;
-          }
-        }
-        
-        // Damage brick
-        const wasDestroyed = brick.isDestroyed();
-        brick.takeDamage(damage);
-        
-        // Notify hit
-        if (this.callbacks.onBrickHit) {
-          const brickCenterX = brickBounds.x + brickBounds.width / 2;
-          const brickTopY = brickBounds.y - 5;
-          this.callbacks.onBrickHit(brick, damage, isCritical);
-        }
-        
-        // Apply explosion damage to nearby bricks if upgrade is active
-        if (gameUpgrades.hasBallExplosions()) {
-          this.applyExplosionDamage(brick, brickBounds, bricks, ball.getDamage(), gameUpgrades);
-        }
-        
-        // Track destroyed bricks and create particles
-        if (!wasDestroyed && brick.isDestroyed()) {
-          const brickPos = brick.getPosition();
-          const centerX = brickPos.x + brickBounds.width / 2;
-          const centerY = brickPos.y + brickBounds.height / 2;
+        // Skip damage, explosions, and notifications for indestructible bricks
+        if (!isIndestructible) {
+          // Calculate damage (with critical hit check)
+          let damage = ball.getDamage();
+          let isCritical = false;
           
-          if (this.callbacks.onBrickDestroyed) {
-            this.callbacks.onBrickDestroyed(brick, centerX, centerY, isCritical);
+          if (gameUpgrades.hasCriticalHits()) {
+            const critChance = gameUpgrades.getCriticalHitChance();
+            if (Math.random() < critChance) {
+              damage *= CRITICAL_HIT_DAMAGE_MULTIPLIER;
+              isCritical = true;
+            }
+          }
+          
+          // Damage brick
+          const wasDestroyed = brick.isDestroyed();
+          brick.takeDamage(damage);
+          
+          // Notify hit (show damage numbers)
+          if (this.callbacks.onBrickHit) {
+            const brickCenterX = brickBounds.x + brickBounds.width / 2;
+            const brickTopY = brickBounds.y - 5;
+            this.callbacks.onBrickHit(brick, damage, isCritical);
+          }
+          
+          // Apply explosion damage to nearby bricks if upgrade is active
+          if (gameUpgrades.hasBallExplosions()) {
+            this.applyExplosionDamage(brick, brickBounds, bricks, ball.getDamage(), gameUpgrades);
+          }
+          
+          // Track destroyed bricks and create particles
+          if (!wasDestroyed && brick.isDestroyed()) {
+            const brickPos = brick.getPosition();
+            const centerX = brickPos.x + brickBounds.width / 2;
+            const centerY = brickPos.y + brickBounds.height / 2;
+            
+            if (this.callbacks.onBrickDestroyed) {
+              this.callbacks.onBrickDestroyed(brick, centerX, centerY, isCritical);
+            }
           }
         }
         
@@ -191,29 +194,33 @@ export class CollisionManager {
           laserBounds.y < brickBounds.y + brickBounds.height &&
           laserBounds.y + laserBounds.height > brickBounds.y
         ) {
-          // Damage brick
-          const wasDestroyed = brick.isDestroyed();
-          const laserDamage = laser.getDamage();
-          brick.takeDamage(laserDamage);
+          // Deactivate laser after hitting any brick
+          laser.deactivate();
+          
+          // Skip damage and notifications for indestructible bricks
+          if (!brick.isIndestructible()) {
+            // Damage brick
+            const wasDestroyed = brick.isDestroyed();
+            const laserDamage = laser.getDamage();
+            brick.takeDamage(laserDamage);
 
-          // Notify hit
-          if (this.callbacks.onBrickHit) {
-            this.callbacks.onBrickHit(brick, laserDamage, false);
-          }
+            // Notify hit (show damage numbers)
+            if (this.callbacks.onBrickHit) {
+              this.callbacks.onBrickHit(brick, laserDamage, false);
+            }
 
-          // Track destroyed bricks
-          if (!wasDestroyed && brick.isDestroyed()) {
-            const brickPos = brick.getPosition();
-            const centerX = brickPos.x + brickBounds.width / 2;
-            const centerY = brickPos.y + brickBounds.height / 2;
-            
-            if (this.callbacks.onBrickDestroyed) {
-              this.callbacks.onBrickDestroyed(brick, centerX, centerY, false);
+            // Track destroyed bricks
+            if (!wasDestroyed && brick.isDestroyed()) {
+              const brickPos = brick.getPosition();
+              const centerX = brickPos.x + brickBounds.width / 2;
+              const centerY = brickPos.y + brickBounds.height / 2;
+              
+              if (this.callbacks.onBrickDestroyed) {
+                this.callbacks.onBrickDestroyed(brick, centerX, centerY, false);
+              }
             }
           }
-
-          // Deactivate laser after hitting brick
-          laser.deactivate();
+          
           break;
         }
       }

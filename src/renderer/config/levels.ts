@@ -24,28 +24,12 @@ export function createLevel1(): LevelConfig {
     "HHH",
   ];
   */
- const pattern = [
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "NIEFL",
-  "EEEEE",
-  "EEEEE",
-  "EEEEE"
- ];
+  const pattern = [
+    "NNNN",
+    "NFFN",
+    "NFFN",
+    "NNNN"
+  ];
   
   return {
     id: 1,
@@ -61,10 +45,18 @@ export function createLevel1(): LevelConfig {
  * Mixed brick types with pattern
  */
 export function createLevel2(): LevelConfig {
+    const pattern = [
+    "IIIIII",
+    "INNNNI",
+    "INHENI",
+    "INEHNI",
+    "INNNNI"
+  ];
+
   return {
     id: 2,
     name: 'Level 2: Two (duh!)',
-    bricks: createBricksFromWord("2", BrickType.NORMAL),
+    bricks: createBricksFromPattern(pattern),
     baseHealth: 2, // Normal bricks = 2 HP, Healthy bricks = 6 HP
   };
 }
