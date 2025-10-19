@@ -7,7 +7,8 @@ import { BAT_GLOW_BLUR } from '../config/constants';
 
 export class Bat {
   private position: Vector2D;
-  private readonly width: number;
+  private width: number; // Changed from readonly to allow shrinking
+  private readonly originalWidth: number; // Track original width for damage calculation
   private readonly height: number;
   private readonly speed: number;
   private minX: number = 0;
@@ -18,6 +19,7 @@ export class Bat {
   constructor(x: number, y: number, width: number, height: number, speed: number = 300) {
     this.position = { x, y };
     this.width = width;
+    this.originalWidth = width;
     this.height = height;
     this.speed = speed;
   }
@@ -206,5 +208,24 @@ export class Bat {
     const normalizedX = relativeX / (this.width / 2);
     // Clamp to -1 to 1 range
     return Math.max(-1, Math.min(1, normalizedX));
+  }
+
+  /**
+   * Damage the bat by reducing its width by a percentage
+   * @param damagePercent - Percentage of ORIGINAL width to remove (0-100)
+   */
+  takeDamage(damagePercent: number): void {
+    const damageAmount = this.originalWidth * (damagePercent / 100);
+    this.width = Math.max(0, this.width - damageAmount);
+    
+    // Recenter bat position to keep it centered after shrinking
+    this.constrainToBounds();
+  }
+
+  /**
+   * Check if bat is destroyed (width <= 0)
+   */
+  isDestroyed(): boolean {
+    return this.width <= 0;
   }
 }

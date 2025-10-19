@@ -4,7 +4,14 @@
 
 import { BrickConfig } from './types';
 import { BrickType } from './types';
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../config/constants';
+import { 
+  BRICK_WIDTH, 
+  BRICK_HEIGHT, 
+  BRICK_GLOW_BLUR,
+  OFFENSIVE_BRICK_COLOR_FALLING,
+  OFFENSIVE_BRICK_COLOR_EXPLODING,
+  OFFENSIVE_BRICK_COLOR_LASER
+} from '../config/constants';
 import { gridToPixel } from '../config/brickLayout';
 
 export class Brick {
@@ -24,6 +31,9 @@ export class Brick {
     [BrickType.NORMAL]: 1,
     [BrickType.HEALTHY]: 3,
     [BrickType.INDESTRUCTIBLE]: Infinity,
+    [BrickType.OFFENSIVE_FALLING]: 1,
+    [BrickType.OFFENSIVE_EXPLODING]: 1,
+    [BrickType.OFFENSIVE_LASER]: 1,
   };
 
   /**
@@ -89,6 +99,24 @@ export class Brick {
   }
 
   /**
+   * Check if brick is an offensive type
+   */
+  isOffensive(): boolean {
+    return (
+      this.type === BrickType.OFFENSIVE_FALLING ||
+      this.type === BrickType.OFFENSIVE_EXPLODING ||
+      this.type === BrickType.OFFENSIVE_LASER
+    );
+  }
+
+  /**
+   * Get brick type
+   */
+  getType(): BrickType {
+    return this.type;
+  }
+
+  /**
    * Get current health
    */
   getHealth(): number {
@@ -150,8 +178,28 @@ export class Brick {
     if (this.customColor) {
       return this.customColor;
     }
+    // Offensive bricks have distinct warning colors
+    if (this.isOffensive()) {
+      return this.getOffensiveColor();
+    }
     // Otherwise, use health-based color
     return this.getColorByHealth();
+  }
+
+  /**
+   * Get color for offensive brick types
+   */
+  private getOffensiveColor(): string {
+    switch (this.type) {
+      case BrickType.OFFENSIVE_FALLING:
+        return OFFENSIVE_BRICK_COLOR_FALLING;
+      case BrickType.OFFENSIVE_EXPLODING:
+        return OFFENSIVE_BRICK_COLOR_EXPLODING;
+      case BrickType.OFFENSIVE_LASER:
+        return OFFENSIVE_BRICK_COLOR_LASER;
+      default:
+        return '#ffffff';
+    }
   }
 
   /**

@@ -12,6 +12,9 @@ import { BrickConfig, BrickType } from '../game/types';
  * 'N' = NORMAL brick (1 health)
  * 'H' = HEALTHY brick (3 health)
  * 'I' = INDESTRUCTIBLE brick (infinite health)
+ * 'F' = OFFENSIVE_FALLING brick (falls when destroyed)
+ * 'E' = OFFENSIVE_EXPLODING brick (explodes into debris)
+ * 'L' = OFFENSIVE_LASER brick (shoots laser at bat)
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
@@ -28,6 +31,12 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
         type = BrickType.HEALTHY;
       } else if (char === 'I') {
         type = BrickType.INDESTRUCTIBLE;
+      } else if (char === 'F') {
+        type = BrickType.OFFENSIVE_FALLING;
+      } else if (char === 'E') {
+        type = BrickType.OFFENSIVE_EXPLODING;
+      } else if (char === 'L') {
+        type = BrickType.OFFENSIVE_LASER;
       }
       
       if (type !== null) {

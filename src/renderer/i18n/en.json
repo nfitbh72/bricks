@@ -39,6 +39,16 @@
       "level2": "Level 2: Says Hi",
       "level3": "Level 3: Skull Island"
     },
+    "bricks": {
+      "offensive": {
+        "falling": "Falling Brick",
+        "exploding": "Exploding Brick",
+        "laser": "Laser Brick",
+        "warningFalling": "Watch out! Brick falling!",
+        "warningExploding": "Danger! Brick exploding!",
+        "warningLaser": "Warning! Laser charging!"
+      }
+    },
     "upgrades": {
       "batWidth": {
         "name": "Bat Width",

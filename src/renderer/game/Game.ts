@@ -6,7 +6,7 @@ import { Ball } from './Ball';
 import { Bat } from './Bat';
 import { Level } from './Level';
 import { StatusBar } from './StatusBar';
-import { GameState, LevelConfig } from './types';
+import { GameState, LevelConfig, BrickType } from './types';
 import { calculateGameElementScale } from './utils';
 import { GameUpgrades } from './GameUpgrades';
 import { getLevel } from '../config/levels';
@@ -16,12 +16,18 @@ import { ScreenManager } from './ScreenManager';
 import { EffectsManager } from './EffectsManager';
 import { CollisionManager } from './CollisionManager';
 import { WeaponManager } from './WeaponManager';
+import { FallingBrick } from './FallingBrick';
+import { Debris } from './Debris';
+import { BrickLaser } from './BrickLaser';
+import { Brick } from './Brick';
 import { 
   PLAYER_STARTING_HEALTH, 
   SLOW_MOTION_FACTOR, 
   SLOW_MOTION_DURATION,
   SLOW_MOTION_TRIGGER_DISTANCE,
-  SLOW_MOTION_ZOOM_SCALE
+  SLOW_MOTION_ZOOM_SCALE,
+  EXPLODING_BRICK_DEBRIS_COUNT,
+  EXPLODING_BRICK_DEBRIS_SPEED
 } from '../config/constants';
 
 export class Game {
@@ -45,6 +51,11 @@ export class Game {
   private effectsManager: EffectsManager;
   private collisionManager: CollisionManager;
   private weaponManager: WeaponManager;
+
+  // Offensive brick entities
+  private fallingBricks: FallingBrick[] = [];
+  private debris: Debris[] = [];
+  private brickLasers: BrickLaser[] = [];
 
 
   // Game stats
@@ -225,6 +236,9 @@ export class Game {
         
         console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
         
+        // Spawn offensive entities based on brick type
+        this.spawnOffensiveEntity(brick, x, y);
+        
         // Create particles (more for final brick)
         const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
         const particleLifetime = remainingBricks === 0 ? 300 : (isCritical ? 200 : 150);
@@ -239,6 +253,15 @@ export class Game {
         
         if (brick.isDestroyed()) {
           this.effectsManager.createParticles(x, y, 8, brick.getColor(), 120);
+        }
+      },
+      onBatDamaged: (damagePercent) => {
+        // Visual feedback for bat damage
+        this.effectsManager.triggerScreenShake(2, 0.15);
+        
+        // Check if bat is destroyed
+        if (this.bat.isDestroyed()) {
+          this.playerHealth = 0;
         }
       },
     });
@@ -618,6 +641,9 @@ export class Game {
     // Update weapons (use effective deltaTime for slow-mo)
     this.weaponManager.update(effectiveDeltaTime);
 
+    // Update offensive brick entities (use effective deltaTime for slow-mo)
+    this.updateOffensiveEntities(effectiveDeltaTime);
+
     // Update collision manager (use effective deltaTime for slow-mo)
     this.collisionManager.update(effectiveDeltaTime, this.ball);
 
@@ -725,6 +751,75 @@ export class Game {
 
     // Laser-Brick collisions
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
+
+    // Offensive entity-Bat collisions
+    this.collisionManager.checkFallingBrickBatCollisions(this.fallingBricks, this.bat);
+    this.collisionManager.checkDebrisBatCollisions(this.debris, this.bat);
+    this.collisionManager.checkBrickLaserBatCollisions(this.brickLasers, this.bat);
+  }
+
+  /**
+   * Spawn offensive entity when an offensive brick is destroyed
+   */
+  private spawnOffensiveEntity(brick: Brick, x: number, y: number): void {
+    const brickType = brick.getType();
+    const color = brick.getColor();
+    const brickBounds = brick.getBounds();
+
+    switch (brickType) {
+      case BrickType.OFFENSIVE_FALLING:
+        // Create falling brick at destroyed brick position
+        this.fallingBricks.push(new FallingBrick(brickBounds.x, brickBounds.y, color));
+        break;
+
+      case BrickType.OFFENSIVE_EXPLODING:
+        // Create debris in 8 directions
+        const angleStep = (Math.PI * 2) / EXPLODING_BRICK_DEBRIS_COUNT;
+        for (let i = 0; i < EXPLODING_BRICK_DEBRIS_COUNT; i++) {
+          const angle = angleStep * i;
+          const velocityX = Math.cos(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
+          const velocityY = Math.sin(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
+          this.debris.push(new Debris(x, y, velocityX, velocityY, color));
+        }
+        break;
+
+      case BrickType.OFFENSIVE_LASER:
+        // Create laser targeting bat's current position
+        const batCenterX = this.bat.getCenterX();
+        this.brickLasers.push(new BrickLaser(x, y, batCenterX, color));
+        break;
+    }
+  }
+
+  /**
+   * Update all offensive brick entities
+   */
+  private updateOffensiveEntities(deltaTime: number): void {
+    // Update falling bricks
+    for (const fallingBrick of this.fallingBricks) {
+      fallingBrick.update(deltaTime);
+    }
+
+    // Update debris
+    for (const debrisParticle of this.debris) {
+      debrisParticle.update(deltaTime);
+    }
+
+    // Update brick lasers
+    for (const laser of this.brickLasers) {
+      laser.update(deltaTime);
+    }
+
+    // Remove inactive or off-screen entities
+    this.fallingBricks = this.fallingBricks.filter(
+      (fb) => fb.isActive() && !fb.isOffScreen(this.canvas.height)
+    );
+    this.debris = this.debris.filter(
+      (d) => d.isActive() && !d.isOffScreen(this.canvas.width, this.canvas.height)
+    );
+    this.brickLasers = this.brickLasers.filter(
+      (bl) => bl.isActive() && !bl.isOffScreen(this.canvas.height)
+    );
   }
 
   /**
@@ -870,6 +965,9 @@ export class Game {
     // Render weapons (lasers)
     this.weaponManager.render(this.ctx);
 
+    // Render offensive brick entities
+    this.renderOffensiveEntities();
+
     // Render visual effects (if enabled)
     const options = this.screenManager.optionsScreen.getOptions();
     this.effectsManager.render(this.ctx, options.showParticles, options.showDamageNumbers);
@@ -886,6 +984,26 @@ export class Game {
     this.effectsManager.renderSlowMotionOverlay(this.ctx, this.canvas.width, this.canvas.height);
   }
 
+
+  /**
+   * Render all offensive brick entities
+   */
+  private renderOffensiveEntities(): void {
+    // Render falling bricks
+    for (const fallingBrick of this.fallingBricks) {
+      fallingBrick.render(this.ctx);
+    }
+
+    // Render debris
+    for (const debrisParticle of this.debris) {
+      debrisParticle.render(this.ctx);
+    }
+
+    // Render brick lasers
+    for (const laser of this.brickLasers) {
+      laser.render(this.ctx);
+    }
+  }
 
   /**
    * Get current game state (for testing)

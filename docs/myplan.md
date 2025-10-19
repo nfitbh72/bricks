@@ -28,7 +28,8 @@ Just some notes about future features so that I don't forget
 - [] Boss bricks: Large multi-segment bricks with special patterns
 - [] Offensive Bricks that would damage the bat (making the bat smaller)
     - [] Bricks that fall instead of crumbling
-    - [] Bricks that explode and send avoidable debris
+    - [] Bricks that explode and send avoidable debris in 8 different directions
+    - [] Bricks that send a laser directly at the bat upon crumbling
 - [] Challenge Modes
     - [] Survival mode: Endless waves with increasing difficulty
     - [] Time attack: Complete level as fast as possible

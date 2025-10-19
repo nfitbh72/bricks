@@ -120,3 +120,25 @@ export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
 export const SLOW_MOTION_DURATION = 2.0; // 2 seconds
 export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights from final brick
 export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
+
+// Offensive brick constants
+export const OFFENSIVE_BRICK_COLOR_FALLING = '#ff4400'; // Red-Orange warning color
+export const OFFENSIVE_BRICK_COLOR_EXPLODING = '#ff0000'; // Red warning color
+export const OFFENSIVE_BRICK_COLOR_LASER = '#ffff00'; // Yellow warning color
+
+// Falling brick constants
+export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
+export const FALLING_BRICK_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+
+// Exploding brick constants
+export const EXPLODING_BRICK_DEBRIS_COUNT = 8; // 8 directions
+export const EXPLODING_BRICK_DEBRIS_SPEED = 300; // Pixels per second
+export const EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+export const EXPLODING_BRICK_DEBRIS_SIZE = 8; // Debris particle size
+
+// Laser brick constants
+export const LASER_BRICK_FIRE_DELAY = 0.5; // Seconds before laser fires
+export const LASER_BRICK_LASER_WIDTH = 6; // Laser beam width
+export const LASER_BRICK_LASER_SPEED = 600; // Pixels per second
+export const LASER_BRICK_LASER_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+export const LASER_BRICK_WARNING_COLOR = '#ffff00'; // Yellow warning flash

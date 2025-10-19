@@ -41,7 +41,10 @@ export function createLevel1(): LevelConfig {
   "",
   "",
   "",
-  "N",
+  "NIEFL",
+  "EEEEE",
+  "EEEEE",
+  "EEEEE"
  ];
   
   return {

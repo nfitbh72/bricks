@@ -8,17 +8,24 @@ import { Brick } from './Brick';
 import { Laser } from './Laser';
 import { Level } from './Level';
 import { GameUpgrades } from './GameUpgrades';
+import { FallingBrick } from './FallingBrick';
+import { Debris } from './Debris';
+import { BrickLaser } from './BrickLaser';
 import { checkCircleRectCollision } from './utils';
 import {
   BRICK_WIDTH,
   EXPLOSION_RADIUS_MULTIPLIER,
   CRITICAL_HIT_DAMAGE_MULTIPLIER,
+  FALLING_BRICK_DAMAGE_PERCENT,
+  EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT,
+  LASER_BRICK_LASER_DAMAGE_PERCENT,
 } from '../config/constants';
 
 export interface CollisionCallbacks {
   onBrickHit?: (brick: Brick, damage: number, isCritical: boolean) => void;
   onBrickDestroyed?: (brick: Brick, x: number, y: number, isCritical: boolean) => void;
   onExplosionDamage?: (brick: Brick, damage: number, x: number, y: number) => void;
+  onBatDamaged?: (damagePercent: number) => void;
 }
 
 export class CollisionManager {
@@ -209,6 +216,112 @@ export class CollisionManager {
           laser.deactivate();
           break;
         }
+      }
+    }
+  }
+
+  /**
+   * Check falling brick-bat collisions
+   */
+  checkFallingBrickBatCollisions(
+    fallingBricks: FallingBrick[],
+    bat: Bat
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const fallingBrick of fallingBricks) {
+      if (!fallingBrick.isActive()) continue;
+
+      const brickBounds = fallingBrick.getBounds();
+
+      // Simple AABB collision
+      if (
+        brickBounds.x < batBounds.x + batBounds.width &&
+        brickBounds.x + brickBounds.width > batBounds.x &&
+        brickBounds.y < batBounds.y + batBounds.height &&
+        brickBounds.y + brickBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(FALLING_BRICK_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(FALLING_BRICK_DAMAGE_PERCENT);
+        }
+
+        // Deactivate falling brick
+        fallingBrick.deactivate();
+      }
+    }
+  }
+
+  /**
+   * Check debris-bat collisions
+   */
+  checkDebrisBatCollisions(
+    debris: Debris[],
+    bat: Bat
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const debrisParticle of debris) {
+      if (!debrisParticle.isActive()) continue;
+
+      const debrisBounds = debrisParticle.getBounds();
+
+      // Simple AABB collision
+      if (
+        debrisBounds.x < batBounds.x + batBounds.width &&
+        debrisBounds.x + debrisBounds.width > batBounds.x &&
+        debrisBounds.y < batBounds.y + batBounds.height &&
+        debrisBounds.y + debrisBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT);
+        }
+
+        // Deactivate debris
+        debrisParticle.deactivate();
+      }
+    }
+  }
+
+  /**
+   * Check brick laser-bat collisions
+   */
+  checkBrickLaserBatCollisions(
+    brickLasers: BrickLaser[],
+    bat: Bat
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const laser of brickLasers) {
+      if (!laser.isActive() || laser.isCharging()) continue;
+
+      const laserBounds = laser.getBounds();
+      if (!laserBounds) continue; // Null when charging
+
+      // Simple AABB collision
+      if (
+        laserBounds.x < batBounds.x + batBounds.width &&
+        laserBounds.x + laserBounds.width > batBounds.x &&
+        laserBounds.y < batBounds.y + batBounds.height &&
+        laserBounds.y + laserBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(LASER_BRICK_LASER_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(LASER_BRICK_LASER_DAMAGE_PERCENT);
+        }
+
+        // Deactivate laser
+        laser.deactivate();
       }
     }
   }
