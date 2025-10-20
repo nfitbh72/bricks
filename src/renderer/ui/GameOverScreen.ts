@@ -81,8 +81,8 @@ export class GameOverScreen extends Screen {
 
     this.ctx.save();
 
-    // Draw title (GAME OVER or COMPLETE)
-    const title = this.isComplete ? t('ui.screens.levelComplete') : t('ui.screens.gameOver');
+    // Draw title (always GAME OVER, but green if complete)
+    const title = t('ui.screens.gameOver');
     const titleColor = this.isComplete ? '#00ff00' : '#ff0000';
     
     this.ctx.shadowBlur = 40;

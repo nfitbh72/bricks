@@ -620,7 +620,8 @@ export class Game {
       this.levelCompleteTimer += deltaTime * 1000; // Convert to ms
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
         this.gameState = GameState.LEVEL_COMPLETE;
-        this.screenManager.levelCompleteScreen.setLevel(this.currentLevelId, this.levelTime);
+        // Use level.getId() to ensure we show the level that was just completed
+        this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime);
         this.levelCompleteTimer = 0;
       }
     }

@@ -223,7 +223,7 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.loadLevel).toHaveBeenCalled();
     });
 
-    it('should exit dev mode and progress to next level', () => {
+    it('should exit dev mode and load current level (not increment)', () => {
       mockContext.isDevUpgradeMode = true;
       mockContext.currentLevelId = 1;
       
@@ -231,7 +231,7 @@ describe('StateTransitionHandler', () => {
       handler.handleUpgradeComplete();
       
       expect(mockContext.isDevUpgradeMode).toBe(false);
-      expect(mockContext.currentLevelId).toBe(2);
+      expect(mockContext.currentLevelId).toBe(1); // Should stay at 1 in dev mode
     });
   });
 

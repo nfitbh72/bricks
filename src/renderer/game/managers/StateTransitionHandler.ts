@@ -145,16 +145,17 @@ export class StateTransitionHandler {
     this.applyUpgrades();
     
     this.context.startTransition(() => {
-      // Exit dev mode if active
+      // Check if we're in dev mode
+      const wasDevMode = this.context.isDevUpgradeMode;
       this.context.setIsDevUpgradeMode(false);
       
-      // Load next level (we already checked it exists in handleLevelCompleteTransition)
-      const nextLevelId = this.context.currentLevelId + 1;
-      this.context.setCurrentLevelId(nextLevelId);
-      const nextLevelConfig = getLevel(nextLevelId);
+      // In dev mode, load current level. In normal mode, load next level.
+      const levelIdToLoad = wasDevMode ? this.context.currentLevelId : this.context.currentLevelId + 1;
+      this.context.setCurrentLevelId(levelIdToLoad);
+      const levelConfig = getLevel(levelIdToLoad);
       
-      if (nextLevelConfig) {
-        this.context.loadLevel(nextLevelConfig);
+      if (levelConfig) {
+        this.context.loadLevel(levelConfig);
       }
     });
   }
