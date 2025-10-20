@@ -1,543 +1,313 @@
-# Architecture
+# Architecture Guide
 
-## Overview
+> **Purpose**: Enable developers to quickly understand and extend the codebase
 
-Bricks is built as an Electron application using TypeScript and the Canvas API for rendering. The architecture emphasizes modularity, testability, and separation of concerns. The game features a comprehensive upgrade system, multi-language support, and modular subsystems for audio, input, and UI management.
+## Tech Stack
 
-## Technology Stack
+- **Electron** (Node.js + Chromium) - Desktop app framework
+- **TypeScript** - Type-safe development
+- **Canvas API** - 2D rendering
+- **Jest** - Testing (658 tests)
 
-- **Runtime**: Electron (Node.js + Chromium)
-- **Language**: TypeScript
-- **Rendering**: Canvas API (2D context)
-- **Testing**: Jest
-- **Build**: TypeScript Compiler (tsc)
+## Core Principles
 
-## Application Structure
+1. **Modular Design** - Each manager handles one concern
+2. **Centralized Config** - All constants in `config/constants.ts`
+3. **Manager Pattern** - Coordinators in `game/managers/`
+4. **Entity-Component** - Game objects in `game/entities/`
+5. **No DOM Testing** - Test logic, not rendering
 
-### Electron Architecture
+## Adding New Features
 
-```
-┌─────────────────────────────────────────┐
-│         Main Process (Node.js)          │
-│  - Window management                    │
-│  - System integration                   │
-│  - File system access                   │
-└─────────────────┬───────────────────────┘
-                  │ IPC
-┌─────────────────┴───────────────────────┐
-│      Renderer Process (Chromium)        │
-│  - Game engine                          │
-│  - Canvas rendering                     │
-│  - User input handling                  │
-└─────────────────────────────────────────┘
-```
+### 🎮 New Game Mechanic
 
-**Main Process** (`src/main/`):
-- `main.ts`: Creates and manages the BrowserWindow, handles app lifecycle
-- `preload.ts`: Secure bridge for IPC communication (context isolation)
+**Example: Add a shield power-up**
 
-**Renderer Process** (`src/renderer/`):
-- Game logic, rendering, and user interaction
-- No direct access to Node.js APIs (security)
+1. **Define constant** in `src/renderer/config/constants.ts`:
+   ```typescript
+   export const SHIELD_DURATION = 5; // seconds
+   export const SHIELD_COLOR = '#00ffff';
+   ```
 
-## Game Engine Architecture
+2. **Add to Bat entity** in `src/renderer/game/entities/Bat.ts`:
+   ```typescript
+   private shieldActive: boolean = false;
+   private shieldTimer: number = 0;
+   
+   activateShield(): void {
+     this.shieldActive = true;
+     this.shieldTimer = SHIELD_DURATION;
+   }
+   ```
 
-### Core Modules
+3. **Update in game loop** in `src/renderer/game/core/Game.ts`:
+   ```typescript
+   // In update() method
+   this.bat.updateShield(deltaTime);
+   ```
 
-```
-┌──────────────────────────────────────────────┐
-│              Game (Main Engine)              │
-│  - Game loop (requestAnimationFrame)        │
-│  - State management                          │
-│  - Entity coordination                       │
-└───────┬──────────────────────────────────────┘
-        │
-        ├─── AudioManager (Subsystem)
-        │     - Background music
-        │     - Sound effects
-        │     - Volume control
-        │
-        ├─── InputManager (Subsystem)
-        │     - Keyboard/mouse handling
-        │     - Input state queries
-        │     - Event callbacks
-        │
-        ├─── ScreenManager (Subsystem)
-        │     - UI screen management
-        │     - Screen transitions
-        │     - Render delegation
-        │
-        ├─── CollisionManager (Subsystem)
-        │     - Ball-bat collisions
-        │     - Ball-brick collisions
-        │     - Wall collisions
-        │
-        ├─── GameUpgrades (System)
-        │     - Upgrade tree management
-        │     - Upgrade point tracking
-        │     - Ability unlocking
-        │
-        ├─── Level (Level Manager)
-        │     - Load level configuration
-        │     - Track completion state
-        │     - Brick management
-        │
-        ├─── Ball (Entity)
-        │     - Position, velocity
-        │     - Damage, piercing, critical hits
-        │     - Rendering
-        │
-        ├─── Bat (Entity)
-        │     - Position, dimensions
-        │     - Laser shooting
-        │     - Rendering
-        │
-        ├─── Brick[] (Entity Collection)
-        │     - Position, health, type
-        │     - Damage handling
-        │     - Rendering
-        │
-        ├─── Laser[] (Projectiles)
-        │     - Position, velocity
-        │     - Collision detection
-        │     - Rendering
-        │
-        ├─── ParticleSystem (Visual Effects)
-        │     - Particle generation
-        │     - Animation
-        │     - Rendering
-        │
-        └─── StatusBar (HUD)
-              - Level info display
-              - Health display
-              - Timer display
-```
+4. **Add collision logic** in `src/renderer/game/managers/CollisionManager.ts`:
+   ```typescript
+   if (this.bat.hasShield()) {
+     return; // Ignore collision
+   }
+   ```
 
-### Class Design
+5. **Write tests** in `tests/unit/Bat.test.ts`:
+   ```typescript
+   it('should activate shield', () => {
+     bat.activateShield();
+     expect(bat.hasShield()).toBe(true);
+   });
+   ```
 
-#### Game Class
-**Responsibilities**:
-- Initialize canvas and context
-- Run game loop
-- Manage game state (intro, playing, paused, gameOver, levelComplete)
-- Handle collision detection
-- Coordinate entity updates and rendering
-- Manage player health
+### 📊 New Level
 
-**Key Methods**:
-```typescript
-class Game {
-  constructor(canvas: HTMLCanvasElement)
-  start(): void
-  pause(): void
-  resume(): void
-  update(deltaTime: number): void
-  render(): void
-  checkCollisions(): void
-  loadLevel(levelConfig: LevelConfig): void
-}
-```
-
-#### Ball Class
-**Responsibilities**:
-- Track position and velocity
-- Update position based on velocity
-- Bounce off walls, bat, and bricks
-- Render itself
-
-**Key Methods**:
-```typescript
-class Ball {
-  constructor(x: number, y: number, radius: number, speed: number)
-  update(deltaTime: number): void
-  render(ctx: CanvasRenderingContext2D): void
-  bounce(normal: Vector2D): void
-  reset(): void
-}
-```
-
-#### Bat Class
-**Responsibilities**:
-- Track position and dimensions
-- Handle keyboard/mouse input
-- Constrain movement to screen bounds
-- Render itself
-
-**Key Methods**:
-```typescript
-class Bat {
-  constructor(x: number, y: number, width: number, height: number)
-  update(deltaTime: number): void
-  render(ctx: CanvasRenderingContext2D): void
-  moveLeft(): void
-  moveRight(): void
-  setPosition(x: number): void
-}
-```
-
-#### Brick Class
-**Responsibilities**:
-- Track position, dimensions, and health
-- Handle damage
-- Determine if destroyed
-- Render with visual feedback based on health
-
-**Key Methods**:
-```typescript
-class Brick {
-  constructor(x: number, y: number, width: number, height: number, health: number)
-  takeDamage(amount: number): void
-  isDestroyed(): boolean
-  render(ctx: CanvasRenderingContext2D): void
-}
-```
-
-#### Level Class
-**Responsibilities**:
-- Load level configuration
-- Create brick layouts
-- Track level completion
-- Provide upgrade options
-
-**Key Methods**:
-```typescript
-class Level {
-  constructor(config: LevelConfig)
-  getBricks(): Brick[]
-  isComplete(): boolean
-  getUpgradeOptions(): Upgrade[]
-}
-```
-
-## Data Flow
-
-### Game Loop
-```
-┌─────────────────────────────────────┐
-│  requestAnimationFrame callback     │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  Calculate deltaTime                │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  Update Phase                       │
-│  - Update ball position             │
-│  - Update bat position              │
-│  - Check collisions                 │
-│  - Update game state                │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  Render Phase                       │
-│  - Clear canvas                     │
-│  - Render bricks                    │
-│  - Render bat                       │
-│  - Render ball                      │
-│  - Render UI (health, score)        │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-         (loop continues)
-```
-
-### Input Handling
-```
-User Input (keyboard/mouse)
-    │
-    ▼
-Event Listeners (renderer.ts)
-    │
-    ▼
-Bat.moveLeft() / Bat.moveRight() / Bat.setPosition()
-    │
-    ▼
-Bat position updated
-    │
-    ▼
-Rendered in next frame
-```
-
-### Collision Detection
-```
-CollisionManager
-    │
-    ├─── checkBallBatCollision()
-    │     └─── Bounce with angle based on hit position
-    │
-    ├─── checkBallBrickCollisions()
-    │     ├─── Check piercing chance
-    │     ├─── Check critical hit chance
-    │     ├─── Apply damage
-    │     ├─── Trigger explosions
-    │     └─── Remove if destroyed
-    │
-    ├─── checkBallWallCollisions()
-    │     └─── Bounce or lose health
-    │
-    └─── checkLaserBrickCollisions()
-          └─── Damage bricks hit by lasers
-```
-
-## Configuration System
-
-### Level Configuration
-Levels are defined as data objects, completely separate from the game engine:
+**File**: `src/renderer/config/levels.ts`
 
 ```typescript
-interface LevelConfig {
-  id: number;
-  name: string;
-  bricks: BrickConfig[];
-  baseHealth?: number; // Multiplier for brick health
-}
-
-interface BrickConfig {
-  col: number;  // Grid column
-  row: number;  // Grid row
-  type: BrickType; // NORMAL, HEALTHY, or INDESTRUCTIBLE
-  color?: string;
+{
+  id: 10,
+  name: 'Level 10: BOSS',
+  bricks: createBricksFromWord('BOSS', 5, 3),
+  baseHealth: 10, // Brick health multiplier
 }
 ```
 
-**Level System** (`src/renderer/config/levels.ts`):
-- Levels use word-based brick layouts via `createBricksFromWord()`
-- Brick health scales with `baseHealth` multiplier
-- Three brick types: NORMAL (1x), HEALTHY (3x), INDESTRUCTIBLE (∞)
-- Centralized constants in `constants.ts`
+**Brick layout helpers**:
+- `createBricksFromWord(word, startCol, startRow)` - Spell out words
+- `createBricksFromPattern(pattern)` - Custom 2D array patterns
 
-### Upgrade Configuration
-Upgrades are defined in a tree structure:
+### 💪 New Upgrade
+
+**File**: `src/renderer/config/upgrades.ts`
 
 ```typescript
-interface Upgrade {
-  name: string;
-  description: string;
-  type: UpgradeType;
-  times: number;  // How many times it can be purchased
-  nextUpgrades: Upgrade[];  // Child upgrades
-  previewNextUpgrades: number;
-  unlockNextUpgradesAfterTimes: number;
+{
+  name: t('game.upgrades.triple_shot.name'),
+  description: t('game.upgrades.triple_shot.description'),
+  type: UpgradeType.TRIPLE_SHOT,
+  times: 1,
+  nextUpgrades: [],
+  previewNextUpgrades: 0,
+  unlockNextUpgradesAfterTimes: 1,
 }
 ```
 
-**Upgrade Tree** (`src/renderer/config/upgrades.ts`):
-- Two main branches: Bat upgrades and Ball upgrades
-- Progressive unlocking system
-- Translatable names and descriptions via i18n
+**Then implement in**:
+1. Add `TRIPLE_SHOT` to `UpgradeType` enum in `game/core/types.ts`
+2. Handle in `game/systems/GameUpgrades.ts`
+3. Apply in `game/managers/WeaponManager.ts`
 
-This approach allows:
-- Easy level creation without touching game engine code
-- Configuration-driven upgrade system
-- Simple testing of different configurations
-- Multi-language support for all text
+### 🌍 New Translation
 
-## State Management
+**Files**: `src/renderer/i18n/*.json`
 
-### Game States
+```json
+{
+  "game": {
+    "upgrades": {
+      "triple_shot": {
+        "name": "Triple Shot",
+        "description": "Fire 3 lasers at once"
+      }
+    }
+  }
+}
+```
+
+**Usage**: `t('game.upgrades.triple_shot.name')`
+
+### 🎨 New Visual Effect
+
+**File**: `src/renderer/game/managers/EffectsManager.ts`
+
+```typescript
+// Add particle effect
+this.effectsManager.createParticles(
+  x, y,           // Position
+  20,             // Count
+  '#ff00ff',      // Color
+  300             // Lifetime (ms)
+);
+
+// Add screen shake
+this.effectsManager.triggerScreenShake(
+  5,              // Intensity (pixels)
+  0.3             // Duration (seconds)
+);
+```
+
+## Manager Responsibilities
+
+### 🎮 Game.ts (Core Orchestrator)
+- **Game loop** - 60 FPS fixed timestep
+- **State management** - INTRO → PLAYING → LEVEL_COMPLETE → UPGRADE
+- **Entity coordination** - Updates all managers and entities
+- **Entry point** for most game logic changes
+
+### 🔊 AudioManager
+- Background music playback
+- Sound effects (brick hit, explosion, etc.)
+- Volume control (music/SFX separate)
+
+### ⌨️ InputManager
+- Keyboard (WASD, arrows, space, ESC)
+- Mouse (movement, click)
+- Callbacks for game actions
+
+### 💥 CollisionManager
+- Ball-bat collision (angle-based bounce)
+- Ball-brick collision (damage, piercing, critical hits)
+- Laser-brick collision
+- Offensive entity-bat collision
+
+### 🖥️ ScreenManager
+- UI screen routing (intro, pause, game over, etc.)
+- Screen transitions
+- Delegates rendering to appropriate screen
+
+### ✨ EffectsManager
+- Particle system
+- Screen shake
+- Damage numbers
+- Slow-motion effects
+- Background images
+
+### 🎯 StateTransitionHandler
+- Handles all state changes (start game, restart, level complete, etc.)
+- Applies upgrades
+- Manages dev mode
+
+### ⚔️ OffensiveEntityManager
+- Manages enemy projectiles (falling bricks, debris, lasers)
+- Spawns based on brick type
+- Updates and renders all offensive entities
+
+### ⏱️ SlowMotionManager
+- Triggers slow-motion on final brick
+- Ray-tracing prediction
+- Time dilation calculations
+
+## Key Interfaces
+
+### BrickType Enum
+```typescript
+enum BrickType {
+  NORMAL,                    // 1x health
+  HEALTHY,                   // 3x health
+  INDESTRUCTIBLE,            // ∞ health
+  OFFENSIVE_FALLING,         // Drops when destroyed
+  OFFENSIVE_EXPLODING,       // Explodes into debris
+  OFFENSIVE_LASER,           // Shoots laser at bat
+}
+```
+
+### GameState Enum
 ```typescript
 enum GameState {
-  INTRO,       // Show start screen
-  PLAYING,     // Active gameplay
-  PAUSED,      // Game paused
-  LEVEL_COMPLETE, // Show upgrade screen
-  GAME_OVER    // Show game over screen
+  INTRO,           // Start screen
+  PLAYING,         // Active gameplay
+  PAUSED,          // Paused
+  LEVEL_COMPLETE,  // Show upgrade screen
+  UPGRADE,         // Upgrade tree
+  GAME_OVER,       // Game over screen
+  OPTIONS,         // Settings
 }
 ```
 
-### State Transitions
-```
-INTRO → (click START) → PLAYING
-PLAYING → (all bricks destroyed) → LEVEL_COMPLETE
-PLAYING → (health = 0) → GAME_OVER
-LEVEL_COMPLETE → (select upgrade) → PLAYING (next level)
-GAME_OVER → (click RESTART) → INTRO
-```
+## Testing
 
-## Rendering Strategy
+### Writing Tests
 
-### Canvas Layers (Conceptual)
-1. **Background**: Dark dystopian background
-2. **Bricks**: Rendered with neon colors, glow effects
-3. **Bat**: Neon-colored paddle
-4. **Ball**: Bright glowing ball with trail effect
-5. **UI Overlay**: Health, score, level info
+**Location**: `tests/unit/` or `tests/integration/`
 
-### Visual Style
-- **Color Palette**: Dark background (#0a0a0a) with neon accents
-  - Cyan: #00ffff
-  - Magenta: #ff00ff
-  - Yellow: #ffff00
-  - Green: #00ff00
-- **Effects**: 
-  - Glow/bloom on game objects
-  - Motion blur on ball
-  - Screen shake on impacts
-  - Particle effects on brick destruction
-
-## Testing Strategy
-
-### Unit Tests
-- **Ball**: Movement, bouncing, collision bounds
-- **Bat**: Movement, input handling, boundary constraints
-- **Brick**: Health management, destruction
-- **Level**: Configuration loading, completion detection
-
-### Integration Tests
-- **Collision Detection**: Ball-bat, ball-brick, ball-wall interactions
-- **Game State**: State transitions, win/lose conditions
-- **Level Progression**: Loading next level, applying upgrades
-
-### Test Structure
-```
-tests/
-├── unit/
-│   ├── Ball.test.ts
-│   ├── Bat.test.ts
-│   ├── Brick.test.ts
-│   └── Level.test.ts
-├── integration/
-│   ├── collision.test.ts
-│   ├── gameState.test.ts
-│   └── levelProgression.test.ts
-└── helpers/
-    └── testUtils.ts
-```
-
-## Performance Considerations
-
-1. **Collision Detection**: Use spatial partitioning if brick count > 100
-2. **Rendering**: Only render visible objects
-3. **Memory**: Object pooling for particles/effects
-4. **Frame Rate**: Target 60 FPS, use deltaTime for consistent physics
-
-## Extensibility
-
-### Implemented Features
-- ✅ **Upgrade System**: Comprehensive upgrade tree with 10+ upgrades
-- ✅ **Brick Types**: NORMAL, HEALTHY, and INDESTRUCTIBLE bricks
-- ✅ **Audio System**: AudioManager with music and SFX
-- ✅ **Particle System**: Visual effects for explosions and impacts
-- ✅ **Multi-language**: Support for 5 languages with auto-detection
-- ✅ **Laser Shooting**: Bat can shoot projectiles
-- ✅ **Ball Abilities**: Piercing, critical hits, explosions
-- ✅ **Options Screen**: Volume and visual settings
-
-### Future Enhancements
-- **Power-ups**: Temporary power-ups that drop from bricks
-- **More Brick Types**: Moving bricks, regenerating bricks
-- **Difficulty Levels**: Easy/Medium/Hard configurations
-- **Leaderboards**: Score tracking and persistence
-- **More Levels**: Additional level patterns and challenges
-
-### Plugin Architecture (Future)
 ```typescript
-interface GamePlugin {
-  onInit(game: Game): void;
-  onUpdate(deltaTime: number): void;
-  onRender(ctx: CanvasRenderingContext2D): void;
-}
+import { Ball } from '../../src/renderer/game/entities/Ball';
+
+describe('Ball', () => {
+  it('should move based on velocity', () => {
+    const ball = new Ball(100, 100, 10, 600);
+    ball.setVelocity(100, 0);
+    ball.update(0.1);
+    
+    const pos = ball.getPosition();
+    expect(pos.x).toBeGreaterThan(100);
+  });
+});
 ```
 
-## Security Considerations
+**Guidelines**:
+- ✅ Test logic and state changes
+- ❌ Avoid testing DOM/rendering (per methodology)
+- ✅ Test entities, managers, and systems
+- ✅ Use descriptive test names
 
-- **Context Isolation**: Enabled in Electron (preload script)
-- **No eval()**: Avoid dynamic code execution
-- **Input Validation**: Sanitize level configuration data
-- **CSP**: Content Security Policy for renderer process
+**Run tests**: `npm test` or `npm run test:watch`
 
-## Build & Deployment
+## Common Patterns
 
-### Development Build
-```bash
-npm run build    # Compile TypeScript
-npm run dev      # Run Electron app
+### Adding a Manager
+
+1. Create in `src/renderer/game/managers/YourManager.ts`
+2. Initialize in `Game.ts` constructor
+3. Call `update()` and `render()` in game loop
+4. Write tests in `tests/unit/YourManager.test.ts`
+
+### Accessing Game State
+
+```typescript
+// In Game.ts
+this.gameState = GameState.PLAYING;
+
+// In managers (via callbacks)
+this.screenManager.render(this.gameState, ...);
 ```
 
-### Production Build
-```bash
-npm run build
-npm start
+### Using Constants
+
+```typescript
+// Define in config/constants.ts
+export const NEW_FEATURE_SPEED = 500;
+
+// Import where needed
+import { NEW_FEATURE_SPEED } from '../../config/constants';
 ```
 
-### Future: Packaging
-- Use `electron-builder` or `electron-forge`
-- Create installers for Windows, macOS, Linux
-- Code signing for distribution
+## Quick Reference
 
-## File Organization
+### File Locations (see README.md for full structure)
+- **Game loop**: `src/renderer/game/core/Game.ts`
+- **Constants**: `src/renderer/config/constants.ts`
+- **Levels**: `src/renderer/config/levels.ts`
+- **Upgrades**: `src/renderer/config/upgrades.ts`
+- **Translations**: `src/renderer/i18n/*.json`
+- **Managers**: `src/renderer/game/managers/`
+- **Entities**: `src/renderer/game/entities/`
+- **Tests**: `tests/unit/` and `tests/integration/`
 
-```
-src/renderer/
-├── game/
-│   ├── Game.ts                # Main game engine
-│   ├── Ball.ts                # Ball entity
-│   ├── Bat.ts                 # Bat entity
-│   ├── Brick.ts               # Brick entity
-│   ├── Level.ts               # Level manager
-│   ├── Laser.ts               # Laser projectile
-│   ├── AudioManager.ts        # Audio subsystem
-│   ├── InputManager.ts        # Input handling subsystem
-│   ├── ScreenManager.ts       # UI screen management
-│   ├── CollisionManager.ts    # Collision detection
-│   ├── GameUpgrades.ts        # Upgrade system
-│   ├── ParticleSystem.ts      # Visual effects
-│   ├── DamageNumber.ts        # Floating damage numbers
-│   ├── StatusBar.ts           # HUD display
-│   ├── types.ts               # Shared types and interfaces
-│   └── utils.ts               # Utility functions (collision, math)
-├── config/
-│   ├── levels.ts              # Level configurations
-│   ├── upgrades.ts            # Upgrade tree configuration
-│   ├── constants.ts           # Game constants
-│   └── brickLayout.ts         # Brick positioning utilities
-├── ui/
-│   ├── Screen.ts              # Base screen class
-│   ├── Button.ts              # Button component
-│   ├── IntroScreen.ts         # Intro screen UI
-│   ├── GameOverScreen.ts      # Game over screen UI
-│   ├── PauseScreen.ts         # Pause screen UI
-│   ├── OptionsScreen.ts       # Options/settings screen
-│   ├── LevelCompleteScreen.ts # Level completion screen
-│   ├── UpgradeTreeScreen.ts   # Upgrade tree UI
-│   └── TransitionScreen.ts    # Level transition screen
-├── i18n/
-│   ├── LanguageManager.ts     # Language management
-│   ├── en.json                # English translations
-│   ├── es.json                # Spanish translations
-│   ├── fr.json                # French translations
-│   ├── de.json                # German translations
-│   └── ja.json                # Japanese translations
-├── assets/
-│   ├── audio/                 # Sound files
-│   └── fonts/                 # Custom fonts
-├── index.html                 # HTML entry point
-├── styles.css                 # Global styles
-└── renderer.ts                # Renderer entry point
+### Performance Tips
+- Target 60 FPS with fixed timestep
+- Use `deltaTime` for frame-independent physics
+- Centralize constants for easy tuning
+- Object pooling for particles (already implemented)
+
+### Debugging
+```typescript
+// Add console logs in Game.ts update loop
+console.log('Ball pos:', this.ball.getPosition());
+
+// Check collision manager state
+console.log('Collisions:', this.collisionManager);
+
+// Verify manager initialization
+console.log('Managers initialized:', {
+  audio: !!this.audioManager,
+  input: !!this.inputManager,
+  // ...
+});
 ```
 
-## Dependencies
+---
 
-### Production
-- `electron`: Desktop app framework
-
-### Development
-- `typescript`: Type-safe JavaScript
-- `@types/node`: Node.js type definitions
-- `jest`: Testing framework
-- `@types/jest`: Jest type definitions
-- `ts-jest`: TypeScript preprocessor for Jest
-
-## Summary
-
-This architecture provides:
-- ✅ **Modularity**: Clear separation of concerns
-- ✅ **Testability**: Pure functions and dependency injection
-- ✅ **Maintainability**: Configuration-driven design
-- ✅ **Extensibility**: Easy to add new features
-- ✅ **Performance**: Efficient game loop and rendering
-- ✅ **Security**: Electron best practices
+**See README.md for complete folder structure and build instructions.**

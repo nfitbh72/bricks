@@ -2,7 +2,7 @@
  * Renderer process - initializes and starts the game
  */
 
-import { Game } from './game/Game';
+import { Game } from './game/core/Game';
 import { LanguageManager } from './i18n/LanguageManager';
 
 console.log('Bricks game renderer initialized');

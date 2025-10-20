@@ -1,148 +1,121 @@
 # Bricks Game
 
-A dystopian-styled brick-breaking game built with Electron, TypeScript, and Canvas API. Clear all the bricks to win each level while managing your health and upgrading your abilities.
-
-## 🎮 Game Overview
-
-**Objective**: Destroy all bricks in each level by bouncing a ball off your bat (paddle).
-
-**Features**:
-- 🎨 Dystopian aesthetic with bright neon colors
-- 🖥️ Fullscreen immersive gameplay
-- 🎯 Multiple levels with increasing difficulty
-- 💪 Comprehensive upgrade tree system
-- 🌍 Multi-language support (English, Spanish, French, German, Japanese)
-- ⌨️ Keyboard and mouse controls
-- ❤️ Health system with game over mechanics
-- 🔫 Laser shooting upgrade
-- 💥 Ball upgrades: piercing, critical hits, explosions
-- 🎵 Audio system with music and sound effects
-- ⚙️ Options screen with volume and visual settings
+Dystopian brick-breaking game built with Electron + TypeScript + Canvas.
 
 ## 🚀 Quick Start
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Run in development mode**:
-   ```bash
-   npm run dev
-   ```
-
-3. **Build for production**:
-   ```bash
-   npm run build
-   npm start
-   ```
-
-## 🎯 How to Play
-
-- **Move Bat**: Use arrow keys (←/→) or mouse to control the paddle
-- **Shoot Lasers**: Left mouse button (after unlocking the Lasers upgrade)
-- **Pause**: Press ESC during gameplay
-- **Start Game**: Click the START button on the intro screen
-- **Objective**: Destroy all bricks without losing all your health
-- **Health**: You lose health when the ball hits the back wall
-- **Win**: Clear all bricks to complete the level and choose upgrades
-- **Upgrades**: Spend upgrade points to unlock new abilities in the upgrade tree
-
-## 📁 Project Structure
-
-```
-bricks/
-├── src/
-│   ├── main/              # Electron main process
-│   │   ├── main.ts        # Main entry point
-│   │   └── preload.ts     # Preload script for secure IPC
-│   └── renderer/          # Renderer process (game UI)
-│       ├── game/          # Game engine and entities
-│       │   ├── Game.ts    # Main game engine
-│       │   ├── Ball.ts    # Ball entity
-│       │   ├── Bat.ts     # Bat/paddle entity
-│       │   ├── Brick.ts   # Brick entity
-│       │   ├── Level.ts   # Level manager
-│       │   ├── Laser.ts   # Laser projectile
-│       │   ├── AudioManager.ts      # Audio subsystem
-│       │   ├── InputManager.ts      # Input handling
-│       │   ├── ScreenManager.ts     # UI screen management
-│       │   ├── CollisionManager.ts  # Collision detection
-│       │   ├── GameUpgrades.ts      # Upgrade system
-│       │   ├── ParticleSystem.ts    # Visual effects
-│       │   ├── StatusBar.ts         # HUD display
-│       │   └── types.ts   # Shared types
-│       ├── config/        # Game configuration
-│       │   ├── levels.ts       # Level definitions
-│       │   ├── upgrades.ts     # Upgrade tree configuration
-│       │   ├── constants.ts    # Game constants
-│       │   └── brickLayout.ts  # Brick positioning utilities
-│       ├── ui/            # UI screens
-│       │   ├── IntroScreen.ts
-│       │   ├── GameOverScreen.ts
-│       │   ├── PauseScreen.ts
-│       │   ├── OptionsScreen.ts
-│       │   ├── LevelCompleteScreen.ts
-│       │   ├── UpgradeTreeScreen.ts
-│       │   └── TransitionScreen.ts
-│       ├── i18n/          # Internationalization
-│       │   ├── LanguageManager.ts
-│       │   ├── en.json    # English translations
-│       │   ├── es.json    # Spanish translations
-│       │   ├── fr.json    # French translations
-│       │   ├── de.json    # German translations
-│       │   └── ja.json    # Japanese translations
-│       ├── assets/        # Game assets (audio, fonts)
-│       ├── index.html     # Main HTML file
-│       ├── styles.css     # Styles
-│       └── renderer.ts    # Renderer entry point
-├── tests/                 # Test files
-├── dist/                  # Compiled JavaScript (generated)
-├── docs/                  # Documentation
-│   ├── architecture.md    # Technical architecture
-│   └── planning.md        # Development roadmap
-├── package.json
-└── tsconfig.json
+```bash
+npm install          # Install dependencies
+npm run dev          # Run in development mode
+npm test             # Run test suite
 ```
 
-## 🛠️ Development
+## 📦 Build & Distribution
 
-- **Build once**: `npm run build`
-- **Watch mode**: `npm run watch` (auto-rebuild on changes)
-- **Run app**: `npm run dev`
-- **Run tests**: `npm test`
-- **Run tests (watch)**: `npm run test:watch`
+```bash
+npm run build        # Compile TypeScript → dist/
+npm start            # Run compiled app
+npm run watch        # Auto-rebuild on changes
+```
 
-## 📚 Documentation
+**Output**: Compiled JavaScript in `dist/` directory
 
-- [Architecture](./docs/architecture.md) - Technical design and module structure
-- [Planning](./docs/planning.md) - Development roadmap and iteration plan
+## 📁 Code Locations
 
-## 🎨 Game Design
+### Core Game Engine
+```
+src/renderer/game/
+├── core/
+│   ├── Game.ts              # 🎮 Main game loop & orchestration
+│   ├── types.ts             # Type definitions
+│   └── utils.ts             # Utility functions
+│
+├── entities/                # Game objects
+│   ├── Ball.ts              # Player ball
+│   ├── Bat.ts               # Player paddle
+│   ├── Brick.ts             # Brick entity
+│   ├── Level.ts             # Level container
+│   └── offensive/           # Enemy projectiles
+│       ├── BrickLaser.ts
+│       ├── Debris.ts
+│       └── FallingBrick.ts
+│
+├── managers/                # Subsystem coordinators
+│   ├── AudioManager.ts      # 🔊 Sound/music
+│   ├── CollisionManager.ts  # 💥 Collision detection
+│   ├── EffectsManager.ts    # ✨ Visual effects
+│   ├── InputManager.ts      # ⌨️ Input handling
+│   ├── OffensiveEntityManager.ts
+│   ├── ScreenManager.ts     # 🖥️ UI coordination
+│   ├── SlowMotionManager.ts
+│   ├── StateTransitionHandler.ts
+│   └── WeaponManager.ts
+│
+├── systems/                 # Game systems
+│   ├── GameUpgrades.ts      # 💪 Upgrade logic
+│   └── Leaderboard.ts
+│
+├── weapons/
+│   └── Laser.ts             # Player laser
+│
+└── ui/                      # HUD elements
+    ├── DamageNumber.ts
+    ├── ParticleSystem.ts
+    └── StatusBar.ts
+```
 
-**Visual Style**: Dystopian with bright neon colors (cyan, magenta, yellow, green)
+### Configuration & Content
+```
+src/renderer/config/
+├── constants.ts             # 🎯 Game balance values
+├── levels.ts                # 📊 Level definitions
+├── upgrades.ts              # 🌳 Upgrade tree config
+└── brickLayout.ts           # Brick positioning
 
-**Upgrade System**:
-- **Bat Width**: Increase paddle size
-- **Lasers**: Shoot projectiles to destroy bricks
-- **Lives**: Increase maximum health
-- **Slower Ball**: Reduce ball acceleration
-- **Ball Damage**: Increase damage per hit
-- **Piercing**: Ball passes through bricks
-- **Critical Hits**: Chance for double damage
-- **Explosions**: Ball hits cause splash damage
+src/renderer/ui/             # 🖼️ UI Screens
+├── IntroScreen.ts
+├── GameOverScreen.ts
+├── PauseScreen.ts
+├── OptionsScreen.ts
+├── LevelCompleteScreen.ts
+├── UpgradeTreeScreen.ts
+└── TransitionScreen.ts
 
-**Level Configuration**:
-- Levels use word-based brick layouts
-- Brick health scales with level progression
-- Dynamic difficulty adjustment
+src/renderer/i18n/           # 🌍 Translations
+├── LanguageManager.ts
+└── *.json                   # Language files (en, es, fr, de, ja)
+```
 
-## 🧪 Testing
+### Entry Points
+- `src/main/main.ts` - Electron main process
+- `src/renderer/renderer.ts` - Game initialization
+- `src/renderer/index.html` - HTML entry
 
-The project uses Jest for testing with a focus on:
-- Unit tests for game entities (Ball, Bat, Brick)
-- Integration tests for collision detection
-- Game state management tests
+## 🔑 Key Reminders
+
+### Adding New Features
+- **Game logic** → `src/renderer/game/core/Game.ts`
+- **Constants** → `src/renderer/config/constants.ts`
+- **New levels** → `src/renderer/config/levels.ts`
+- **Upgrades** → `src/renderer/config/upgrades.ts`
+- **Translations** → `src/renderer/i18n/*.json`
+
+### Testing
+```bash
+npm test                    # Run all tests
+npm run test:watch          # Watch mode
+```
+- Tests in `tests/unit/` and `tests/integration/`
+- 658 tests covering entities, managers, and systems
+- Avoid testing DOM/jsdom (per methodology)
+
+### Architecture
+- **Modular design** - Each manager handles one concern
+- **Manager pattern** - Coordinators in `game/managers/`
+- **Entity-component** - Game objects in `game/entities/`
+- **Centralized config** - All constants in `config/`
+
+See `docs/architecture.md` for detailed design.
 
 ## 📝 License
 
