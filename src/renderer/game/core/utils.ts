@@ -2,7 +2,7 @@
  * Utility functions for game physics and collision detection
  */
 
-import { Vector2D, Rectangle, Circle, CollisionResult } from './types';
+import { Vector2D, Rectangle, Circle, CollisionResult } from '../core/types';
 
 /**
  * Check collision between two rectangles (AABB collision)

@@ -2,8 +2,8 @@
  * Unit tests for Brick class
  */
 
-import { Brick } from '../../src/renderer/game/Brick';
-import { BrickConfig, BrickType } from '../../src/renderer/game/types';
+import { Brick } from '../../src/renderer/game/entities/Brick';
+import { BrickConfig, BrickType } from '../../src/renderer/game/core/types';
 import { BRICK_WIDTH, BRICK_HEIGHT } from '../../src/renderer/config/constants';
 
 // Helper to create brick config from grid position

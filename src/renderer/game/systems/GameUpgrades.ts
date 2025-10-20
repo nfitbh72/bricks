@@ -3,10 +3,10 @@
  * Handles all upgrade logic separately from the main Game class
  */
 
-import { Bat } from './Bat';
-import { Ball } from './Ball';
-import { UpgradeType } from './types';
-import { BALL_BASE_DAMAGE } from '../config/constants';
+import { Bat } from '../entities/Bat';
+import { Ball } from '../entities/Ball';
+import { UpgradeType } from '../core/types';
+import { BALL_BASE_DAMAGE } from '../../config/constants';
 
 export class GameUpgrades {
   private upgradeLevels: Map<string, number> = new Map();

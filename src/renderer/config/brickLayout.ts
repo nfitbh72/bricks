@@ -4,7 +4,7 @@
  */
 
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING, BRICK_LAYOUT_TOP_MARGIN } from './constants';
-import { BrickConfig, BrickType } from '../game/types';
+import { BrickConfig, BrickType } from '../game/core/types';
 
 /**
  * Create bricks from a visual pattern

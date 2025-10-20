@@ -2,15 +2,15 @@
  * SlowMotionManager - manages slow-motion effects and prediction logic
  */
 
-import { Ball } from './Ball';
-import { Level } from './Level';
-import { StatusBar } from './StatusBar';
-import { EffectsManager } from './EffectsManager';
+import { Ball } from '../entities/Ball';
+import { Level } from '../entities/Level';
+import { StatusBar } from '../ui/StatusBar';
+import { EffectsManager } from '../managers/EffectsManager';
 import { 
   SLOW_MOTION_FACTOR, 
   SLOW_MOTION_DURATION,
   SLOW_MOTION_TRIGGER_DISTANCE
-} from '../config/constants';
+} from '../../config/constants';
 
 export class SlowMotionManager {
   private isSlowMotion: boolean = false;

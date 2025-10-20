@@ -4,7 +4,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Leaderboard, LeaderboardEntry } from '../game/Leaderboard';
+import { Leaderboard, LeaderboardEntry } from '../game/systems/Leaderboard';
 import { t } from '../i18n/LanguageManager';
 
 export class LevelCompleteScreen extends Screen {

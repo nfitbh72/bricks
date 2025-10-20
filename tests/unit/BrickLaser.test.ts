@@ -2,7 +2,7 @@
  * Tests for BrickLaser entity
  */
 
-import { BrickLaser } from '../../src/renderer/game/BrickLaser';
+import { BrickLaser } from '../../src/renderer/game/entities/offensive/BrickLaser';
 import { LASER_BRICK_FIRE_DELAY, LASER_BRICK_LASER_SPEED } from '../../src/renderer/config/constants';
 
 describe('BrickLaser', () => {

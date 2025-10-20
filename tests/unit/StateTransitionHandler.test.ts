@@ -2,11 +2,11 @@
  * Tests for StateTransitionHandler class
  */
 
-import { StateTransitionHandler, StateTransitionContext } from '../../src/renderer/game/StateTransitionHandler';
-import { GameState } from '../../src/renderer/game/types';
-import { Ball } from '../../src/renderer/game/Ball';
-import { Bat } from '../../src/renderer/game/Bat';
-import { GameUpgrades } from '../../src/renderer/game/GameUpgrades';
+import { StateTransitionHandler, StateTransitionContext } from '../../src/renderer/game/managers/StateTransitionHandler';
+import { GameState } from '../../src/renderer/game/core/types';
+import { Ball } from '../../src/renderer/game/entities/Ball';
+import { Bat } from '../../src/renderer/game/entities/Bat';
+import { GameUpgrades } from '../../src/renderer/game/systems/GameUpgrades';
 
 // Mock dependencies
 const createMockContext = (): StateTransitionContext => {

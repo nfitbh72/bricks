@@ -2,8 +2,8 @@
  * Laser projectile - shot from bat when shooter upgrade is unlocked
  */
 
-import { Vector2D } from './types';
-import { LASER_WIDTH, LASER_HEIGHT } from '../config/constants';
+import { Vector2D } from '../core/types';
+import { LASER_WIDTH, LASER_HEIGHT } from '../../config/constants';
 
 export class Laser {
   private position: Vector2D;

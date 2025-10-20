@@ -2,7 +2,7 @@
  * Unit tests for Bat class
  */
 
-import { Bat } from '../../src/renderer/game/Bat';
+import { Bat } from '../../src/renderer/game/entities/Bat';
 
 describe('Bat', () => {
   describe('constructor', () => {

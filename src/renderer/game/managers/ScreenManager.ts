@@ -2,15 +2,15 @@
  * ScreenManager - Manages UI screens and transitions
  */
 
-import { IntroScreen } from '../ui/IntroScreen';
-import { GameOverScreen } from '../ui/GameOverScreen';
-import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
-import { TransitionScreen } from '../ui/TransitionScreen';
-import { PauseScreen } from '../ui/PauseScreen';
-import { UpgradeTreeScreen } from '../ui/UpgradeTreeScreen';
-import { OptionsScreen } from '../ui/OptionsScreen';
-import { GameState } from './types';
-import { getUpgrades } from '../config/upgrades';
+import { IntroScreen } from '../../ui/IntroScreen';
+import { GameOverScreen } from '../../ui/GameOverScreen';
+import { LevelCompleteScreen } from '../../ui/LevelCompleteScreen';
+import { TransitionScreen } from '../../ui/TransitionScreen';
+import { PauseScreen } from '../../ui/PauseScreen';
+import { UpgradeTreeScreen } from '../../ui/UpgradeTreeScreen';
+import { OptionsScreen } from '../../ui/OptionsScreen';
+import { GameState } from '../core/types';
+import { getUpgrades } from '../../config/upgrades';
 
 export interface ScreenCallbacks {
   onStartGame: () => void;

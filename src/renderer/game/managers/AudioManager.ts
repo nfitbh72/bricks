@@ -15,7 +15,7 @@ import {
   AUDIO_PATH_BRICK_EXPLODE,
   AUDIO_PATH_BAT_DAMAGE,
   AUDIO_PATH_BACKGROUND_MUSIC,
-} from '../config/constants';
+} from '../../config/constants';
 
 export class AudioManager {
   private brickHitSound: HTMLAudioElement;

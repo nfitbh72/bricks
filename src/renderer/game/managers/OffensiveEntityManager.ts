@@ -3,15 +3,15 @@
  * (falling bricks, debris, brick lasers)
  */
 
-import { FallingBrick } from './FallingBrick';
-import { Debris } from './Debris';
-import { BrickLaser } from './BrickLaser';
-import { Brick } from './Brick';
-import { BrickType } from './types';
+import { FallingBrick } from '../entities/offensive/FallingBrick';
+import { Debris } from '../entities/offensive/Debris';
+import { BrickLaser } from '../entities/offensive/BrickLaser';
+import { Brick } from '../entities/Brick';
+import { BrickType } from '../core/types';
 import { 
   EXPLODING_BRICK_DEBRIS_COUNT,
   EXPLODING_BRICK_DEBRIS_SPEED
-} from '../config/constants';
+} from '../../config/constants';
 
 export class OffensiveEntityManager {
   private fallingBricks: FallingBrick[] = [];

@@ -2,11 +2,11 @@
  * WeaponManager - Manages all weapon systems (lasers, projectiles, etc.)
  */
 
-import { Laser } from './Laser';
-import { Bat } from './Bat';
-import { Ball } from './Ball';
-import { GameUpgrades } from './GameUpgrades';
-import { LASER_SPEED_MULTIPLIER, LASER_DAMAGE_MULTIPLIER } from '../config/constants';
+import { Laser } from '../weapons/Laser';
+import { Bat } from '../entities/Bat';
+import { Ball } from '../entities/Ball';
+import { GameUpgrades } from '../systems/GameUpgrades';
+import { LASER_SPEED_MULTIPLIER, LASER_DAMAGE_MULTIPLIER } from '../../config/constants';
 
 export class WeaponManager {
   private lasers: Laser[] = [];

@@ -2,11 +2,11 @@
  * WeaponManager unit tests
  */
 
-import { WeaponManager } from '../../src/renderer/game/WeaponManager';
-import { Bat } from '../../src/renderer/game/Bat';
-import { Ball } from '../../src/renderer/game/Ball';
-import { GameUpgrades } from '../../src/renderer/game/GameUpgrades';
-import { UpgradeType } from '../../src/renderer/game/types';
+import { WeaponManager } from '../../src/renderer/game/managers/WeaponManager';
+import { Bat } from '../../src/renderer/game/entities/Bat';
+import { Ball } from '../../src/renderer/game/entities/Ball';
+import { GameUpgrades } from '../../src/renderer/game/systems/GameUpgrades';
+import { UpgradeType } from '../../src/renderer/game/core/types';
 
 // Mock canvas context
 const createMockContext = () => ({

@@ -2,8 +2,8 @@
  * Bat entity - represents the player-controlled paddle
  */
 
-import { Vector2D } from './types';
-import { BAT_GLOW_BLUR } from '../config/constants';
+import { Vector2D } from '../core/types';
+import { BAT_GLOW_BLUR } from '../../config/constants';
 
 export class Bat {
   private position: Vector2D;

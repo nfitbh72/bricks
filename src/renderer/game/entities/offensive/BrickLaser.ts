@@ -8,7 +8,7 @@ import {
   LASER_BRICK_LASER_SPEED,
   LASER_BRICK_FIRE_DELAY,
   LASER_BRICK_WARNING_COLOR
-} from '../config/constants';
+} from '../../../config/constants';
 
 export class BrickLaser {
   private position: { x: number; y: number };

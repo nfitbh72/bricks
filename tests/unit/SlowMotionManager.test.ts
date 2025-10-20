@@ -2,12 +2,12 @@
  * Tests for SlowMotionManager class
  */
 
-import { SlowMotionManager } from '../../src/renderer/game/SlowMotionManager';
-import { Ball } from '../../src/renderer/game/Ball';
-import { Level } from '../../src/renderer/game/Level';
-import { StatusBar } from '../../src/renderer/game/StatusBar';
-import { EffectsManager } from '../../src/renderer/game/EffectsManager';
-import { BrickType } from '../../src/renderer/game/types';
+import { SlowMotionManager } from '../../src/renderer/game/managers/SlowMotionManager';
+import { Ball } from '../../src/renderer/game/entities/Ball';
+import { Level } from '../../src/renderer/game/entities/Level';
+import { StatusBar } from '../../src/renderer/game/ui/StatusBar';
+import { EffectsManager } from '../../src/renderer/game/managers/EffectsManager';
+import { BrickType } from '../../src/renderer/game/core/types';
 import { SLOW_MOTION_FACTOR } from '../../src/renderer/config/constants';
 
 describe('SlowMotionManager', () => {

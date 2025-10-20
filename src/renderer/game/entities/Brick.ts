@@ -2,8 +2,8 @@
  * Brick entity - represents a destructible brick in the game
  */
 
-import { BrickConfig } from './types';
-import { BrickType } from './types';
+import { BrickConfig } from '../core/types';
+import { BrickType } from '../core/types';
 import { 
   BRICK_WIDTH, 
   BRICK_HEIGHT, 
@@ -11,8 +11,8 @@ import {
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER
-} from '../config/constants';
-import { gridToPixel } from '../config/brickLayout';
+} from '../../config/constants';
+import { gridToPixel } from '../../config/brickLayout';
 
 export class Brick {
   private position: { x: number; y: number };

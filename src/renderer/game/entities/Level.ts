@@ -2,10 +2,10 @@
  * Level class - manages level state and bricks
  */
 
-import { LevelConfig, BrickConfig, BrickType } from './types';
-import { Brick } from './Brick';
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../config/constants';
-import { createBricksFromPattern, createBricksFromWord } from '../config/brickLayout';
+import { LevelConfig, BrickConfig, BrickType } from '../core/types';
+import { Brick } from '../entities/Brick';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../config/constants';
+import { createBricksFromPattern, createBricksFromWord } from '../../config/brickLayout';
 
 export class Level {
   private readonly config: LevelConfig;

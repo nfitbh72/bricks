@@ -2,7 +2,7 @@
  * Tests for Debris entity
  */
 
-import { Debris } from '../../src/renderer/game/Debris';
+import { Debris } from '../../src/renderer/game/entities/offensive/Debris';
 import { EXPLODING_BRICK_DEBRIS_SIZE } from '../../src/renderer/config/constants';
 
 describe('Debris', () => {

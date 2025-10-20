@@ -1,4 +1,4 @@
-import { Upgrade, UpgradeType } from "../game/types"
+import { Upgrade, UpgradeType } from "../game/core/types"
 import { t } from '../i18n/LanguageManager';
 
 export function getUpgrades() : Upgrade[] {

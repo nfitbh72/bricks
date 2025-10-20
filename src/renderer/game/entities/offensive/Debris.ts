@@ -3,7 +3,7 @@
  * Travels in a fixed direction at constant speed
  */
 
-import { EXPLODING_BRICK_DEBRIS_SIZE, PARTICLE_GLOW_BLUR } from '../config/constants';
+import { EXPLODING_BRICK_DEBRIS_SIZE, PARTICLE_GLOW_BLUR } from '../../../config/constants';
 
 export class Debris {
   private position: { x: number; y: number };

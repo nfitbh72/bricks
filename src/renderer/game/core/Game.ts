@@ -2,27 +2,27 @@
  * Game class - main game engine with loop and state management
  */
 
-import { Ball } from './Ball';
-import { Bat } from './Bat';
-import { Level } from './Level';
-import { StatusBar } from './StatusBar';
-import { GameState, LevelConfig, BrickType } from './types';
-import { calculateGameElementScale } from './utils';
-import { GameUpgrades } from './GameUpgrades';
-import { getLevel } from '../config/levels';
-import { AudioManager } from './AudioManager';
-import { InputManager } from './InputManager';
-import { ScreenManager } from './ScreenManager';
-import { EffectsManager } from './EffectsManager';
-import { CollisionManager } from './CollisionManager';
-import { WeaponManager } from './WeaponManager';
-import { OffensiveEntityManager } from './OffensiveEntityManager';
-import { SlowMotionManager } from './SlowMotionManager';
-import { StateTransitionHandler, StateTransitionContext } from './StateTransitionHandler';
-import { Brick } from './Brick';
+import { Ball } from '../entities/Ball';
+import { Bat } from '../entities/Bat';
+import { Level } from '../entities/Level';
+import { StatusBar } from '../ui/StatusBar';
+import { GameState, LevelConfig, BrickType } from '../core/types';
+import { calculateGameElementScale } from '../core/utils';
+import { GameUpgrades } from '../systems/GameUpgrades';
+import { getLevel } from '../../config/levels';
+import { AudioManager } from '../managers/AudioManager';
+import { InputManager } from '../managers/InputManager';
+import { ScreenManager } from '../managers/ScreenManager';
+import { EffectsManager } from '../managers/EffectsManager';
+import { CollisionManager } from '../managers/CollisionManager';
+import { WeaponManager } from '../managers/WeaponManager';
+import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
+import { SlowMotionManager } from '../managers/SlowMotionManager';
+import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
+import { Brick } from '../entities/Brick';
 import { 
   PLAYER_STARTING_HEALTH
-} from '../config/constants';
+} from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;

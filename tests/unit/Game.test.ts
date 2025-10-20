@@ -4,8 +4,8 @@
  * TODO: Set up jsdom or create integration tests
  */
 
-import { Game } from '../../src/renderer/game/Game';
-import { GameState } from '../../src/renderer/game/types';
+import { Game } from '../../src/renderer/game/core/Game';
+import { GameState } from '../../src/renderer/game/core/types';
 
 describe.skip('Game - Upgrade Integration', () => {
   let canvas: HTMLCanvasElement;

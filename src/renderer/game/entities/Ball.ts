@@ -2,9 +2,9 @@
  * Ball entity - represents the game ball that bounces around
  */
 
-import { Vector2D } from './types';
-import { reflect, normalize, magnitude, clamp } from './utils';
-import { Bat } from './Bat';
+import { Vector2D } from '../core/types';
+import { reflect, normalize, magnitude, clamp } from '../core/utils';
+import { Bat } from '../entities/Bat';
 import {
   BALL_BASE_DAMAGE,
   BALL_SPEED_INCREASE_PER_SECOND,
@@ -16,7 +16,7 @@ import {
   BALL_TAIL_GLOW_BLUR,
   PIERCING_WARNING_DURATION,
   PIERCING_FLASH_INTERVAL,
-} from '../config/constants';
+} from '../../config/constants';
 
 export class Ball {
   private position: Vector2D;

@@ -2,8 +2,8 @@
  * Tests for Brick offensive types
  */
 
-import { Brick } from '../../src/renderer/game/Brick';
-import { BrickType } from '../../src/renderer/game/types';
+import { Brick } from '../../src/renderer/game/entities/Brick';
+import { BrickType } from '../../src/renderer/game/core/types';
 import {
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,

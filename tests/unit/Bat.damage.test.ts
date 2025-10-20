@@ -2,7 +2,7 @@
  * Tests for Bat damage mechanics
  */
 
-import { Bat } from '../../src/renderer/game/Bat';
+import { Bat } from '../../src/renderer/game/entities/Bat';
 
 describe('Bat - Damage Mechanics', () => {
   let bat: Bat;

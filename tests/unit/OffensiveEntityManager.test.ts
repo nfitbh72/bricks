@@ -2,9 +2,9 @@
  * Tests for OffensiveEntityManager class
  */
 
-import { OffensiveEntityManager } from '../../src/renderer/game/OffensiveEntityManager';
-import { Brick } from '../../src/renderer/game/Brick';
-import { BrickType } from '../../src/renderer/game/types';
+import { OffensiveEntityManager } from '../../src/renderer/game/managers/OffensiveEntityManager';
+import { Brick } from '../../src/renderer/game/entities/Brick';
+import { BrickType } from '../../src/renderer/game/core/types';
 
 describe('OffensiveEntityManager', () => {
   let manager: OffensiveEntityManager;

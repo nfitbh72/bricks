@@ -2,7 +2,7 @@
  * Tests for ParticleSystem class
  */
 
-import { ParticleSystem } from '../../src/renderer/game/ParticleSystem';
+import { ParticleSystem } from '../../src/renderer/game/ui/ParticleSystem';
 
 describe('ParticleSystem', () => {
   let particleSystem: ParticleSystem;

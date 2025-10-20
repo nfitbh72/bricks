@@ -2,8 +2,8 @@
  * Tests for GameUpgrades class
  */
 
-import { GameUpgrades } from '../../src/renderer/game/GameUpgrades';
-import { UpgradeType } from '../../src/renderer/game/types';
+import { GameUpgrades } from '../../src/renderer/game/systems/GameUpgrades';
+import { UpgradeType } from '../../src/renderer/game/core/types';
 
 describe('GameUpgrades', () => {
   let gameUpgrades: GameUpgrades;

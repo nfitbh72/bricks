@@ -19,7 +19,7 @@ import {
   STATUSBAR_COLOR_TIMER,
   STATUSBAR_COLOR_BRICKS,
   STATUSBAR_COLOR_TITLE,
-} from '../config/constants';
+} from '../../config/constants';
 
 export class StatusBar {
   private readonly x: number;

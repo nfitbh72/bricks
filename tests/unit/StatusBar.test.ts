@@ -2,7 +2,7 @@
  * Unit tests for StatusBar class
  */
 
-import { StatusBar } from '../../src/renderer/game/StatusBar';
+import { StatusBar } from '../../src/renderer/game/ui/StatusBar';
 import { BRICK_HEIGHT } from '../../src/renderer/config/constants';
 
 describe('StatusBar', () => {

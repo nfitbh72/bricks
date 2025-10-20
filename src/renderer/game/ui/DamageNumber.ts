@@ -9,7 +9,7 @@ import {
   DAMAGE_NUMBER_FONT_SIZE_NORMAL,
   DAMAGE_NUMBER_FONT_SIZE_CRITICAL,
   DAMAGE_NUMBER_GLOW_BLUR,
-} from '../config/constants';
+} from '../../config/constants';
 
 export class DamageNumber {
   private x: number;

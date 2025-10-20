@@ -2,11 +2,11 @@
  * Integration tests for collision detection
  */
 
-import { Ball } from '../../src/renderer/game/Ball';
-import { Bat } from '../../src/renderer/game/Bat';
-import { Brick } from '../../src/renderer/game/Brick';
-import { BrickConfig, BrickType } from '../../src/renderer/game/types';
-import { checkCircleRectCollision } from '../../src/renderer/game/utils';
+import { Ball } from '../../src/renderer/game/entities/Ball';
+import { Bat } from '../../src/renderer/game/entities/Bat';
+import { Brick } from '../../src/renderer/game/entities/Brick';
+import { BrickConfig, BrickType } from '../../src/renderer/game/core/types';
+import { checkCircleRectCollision } from '../../src/renderer/game/core/utils';
 import { gridToPixel } from '../../src/renderer/config/brickLayout';
 import { BRICK_WIDTH, BRICK_HEIGHT, BALL_RADIUS } from '../../src/renderer/config/constants';
 

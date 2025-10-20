@@ -3,7 +3,7 @@
  * Accelerates downward due to gravity and damages the bat on contact
  */
 
-import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../config/constants';
+import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../../../config/constants';
 
 export class FallingBrick {
   private position: { x: number; y: number };

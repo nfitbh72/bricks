@@ -5,7 +5,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Upgrade, UpgradeType } from '../game/types';
+import { Upgrade, UpgradeType } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 
 /**

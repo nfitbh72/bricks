@@ -2,16 +2,16 @@
  * CollisionManager - Handles all collision detection and resolution
  */
 
-import { Ball } from './Ball';
-import { Bat } from './Bat';
-import { Brick } from './Brick';
-import { Laser } from './Laser';
-import { Level } from './Level';
-import { GameUpgrades } from './GameUpgrades';
-import { FallingBrick } from './FallingBrick';
-import { Debris } from './Debris';
-import { BrickLaser } from './BrickLaser';
-import { checkCircleRectCollision } from './utils';
+import { Ball } from '../entities/Ball';
+import { Bat } from '../entities/Bat';
+import { Brick } from '../entities/Brick';
+import { Laser } from '../weapons/Laser';
+import { Level } from '../entities/Level';
+import { GameUpgrades } from '../systems/GameUpgrades';
+import { FallingBrick } from '../entities/offensive/FallingBrick';
+import { Debris } from '../entities/offensive/Debris';
+import { BrickLaser } from '../entities/offensive/BrickLaser';
+import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
   EXPLOSION_RADIUS_MULTIPLIER,
@@ -19,7 +19,7 @@ import {
   FALLING_BRICK_DAMAGE_PERCENT,
   EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT,
   LASER_BRICK_LASER_DAMAGE_PERCENT,
-} from '../config/constants';
+} from '../../config/constants';
 
 export interface CollisionCallbacks {
   onBrickHit?: (brick: Brick, damage: number, isCritical: boolean) => void;

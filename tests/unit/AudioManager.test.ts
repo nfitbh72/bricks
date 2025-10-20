@@ -2,7 +2,7 @@
  * AudioManager unit tests
  */
 
-import { AudioManager } from '../../src/renderer/game/AudioManager';
+import { AudioManager } from '../../src/renderer/game/managers/AudioManager';
 
 // Mock HTMLAudioElement
 class MockAudio {

@@ -2,7 +2,7 @@
  * Level configurations for the Bricks game
  */
 
-import { LevelConfig, BrickType } from '../game/types';
+import { LevelConfig, BrickType } from '../game/core/types';
 import { createBricksFromPattern, createBricksFromWord } from './brickLayout';
 
 /**

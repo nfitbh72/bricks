@@ -2,13 +2,13 @@
  * StateTransitionHandler - manages all game state transitions and handlers
  */
 
-import { GameState, LevelConfig } from './types';
-import { Bat } from './Bat';
-import { Ball } from './Ball';
-import { GameUpgrades } from './GameUpgrades';
-import { ScreenManager } from './ScreenManager';
-import { AudioManager } from './AudioManager';
-import { getLevel } from '../config/levels';
+import { GameState, LevelConfig } from '../core/types';
+import { Bat } from '../entities/Bat';
+import { Ball } from '../entities/Ball';
+import { GameUpgrades } from '../systems/GameUpgrades';
+import { ScreenManager } from '../managers/ScreenManager';
+import { AudioManager } from '../managers/AudioManager';
+import { getLevel } from '../../config/levels';
 
 export interface StateTransitionContext {
   canvas: HTMLCanvasElement;

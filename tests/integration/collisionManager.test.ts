@@ -3,13 +3,13 @@
  * Tests the orchestration of collision detection and callbacks
  */
 
-import { CollisionManager } from '../../src/renderer/game/CollisionManager';
-import { Ball } from '../../src/renderer/game/Ball';
-import { Bat } from '../../src/renderer/game/Bat';
-import { Level } from '../../src/renderer/game/Level';
-import { Laser } from '../../src/renderer/game/Laser';
-import { GameUpgrades } from '../../src/renderer/game/GameUpgrades';
-import { LevelConfig, BrickType, UpgradeType } from '../../src/renderer/game/types';
+import { CollisionManager } from '../../src/renderer/game/managers/CollisionManager';
+import { Ball } from '../../src/renderer/game/entities/Ball';
+import { Bat } from '../../src/renderer/game/entities/Bat';
+import { Level } from '../../src/renderer/game/entities/Level';
+import { Laser } from '../../src/renderer/game/weapons/Laser';
+import { GameUpgrades } from '../../src/renderer/game/systems/GameUpgrades';
+import { LevelConfig, BrickType, UpgradeType } from '../../src/renderer/game/core/types';
 
 describe('CollisionManager Integration', () => {
   let collisionManager: CollisionManager;

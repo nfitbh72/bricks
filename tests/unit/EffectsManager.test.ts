@@ -2,7 +2,7 @@
  * EffectsManager unit tests
  */
 
-import { EffectsManager } from '../../src/renderer/game/EffectsManager';
+import { EffectsManager } from '../../src/renderer/game/managers/EffectsManager';
 
 // Mock canvas context
 const createMockContext = () => ({

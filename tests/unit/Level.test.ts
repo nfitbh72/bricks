@@ -2,13 +2,13 @@
  * Unit tests for Level class and level configuration
  */
 
-import { Level } from '../../src/renderer/game/Level';
+import { Level } from '../../src/renderer/game/entities/Level';
 import {
   getLevel,
   createLevel1,
 } from '../../src/renderer/config/levels';
 import { createBricksFromPattern, createBricksFromWord } from '../../src/renderer/config/brickLayout';
-import { BrickType, LevelConfig } from '../../src/renderer/game/types';
+import { BrickType, LevelConfig } from '../../src/renderer/game/core/types';
 import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
 describe('Level Configuration Helpers', () => {

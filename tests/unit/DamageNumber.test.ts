@@ -2,7 +2,7 @@
  * Tests for DamageNumber class
  */
 
-import { DamageNumber } from '../../src/renderer/game/DamageNumber';
+import { DamageNumber } from '../../src/renderer/game/ui/DamageNumber';
 
 describe('DamageNumber', () => {
   let mockCtx: CanvasRenderingContext2D;

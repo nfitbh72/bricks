@@ -2,13 +2,13 @@
  * EffectsManager - Manages visual effects including particles, damage numbers, screen shake, and backgrounds
  */
 
-import { ParticleSystem } from './ParticleSystem';
-import { DamageNumber } from './DamageNumber';
+import { ParticleSystem } from '../ui/ParticleSystem';
+import { DamageNumber } from '../ui/DamageNumber';
 import { 
   BACKGROUND_IMAGE_OPACITY,
   SLOW_MOTION_ZOOM_SCALE,
   SLOW_MOTION_DURATION
-} from '../config/constants';
+} from '../../config/constants';
 
 export class EffectsManager {
   private particleSystem: ParticleSystem;

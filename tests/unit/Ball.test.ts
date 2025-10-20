@@ -2,7 +2,7 @@
  * Unit tests for Ball class
  */
 
-import { Ball } from '../../src/renderer/game/Ball';
+import { Ball } from '../../src/renderer/game/entities/Ball';
 
 describe('Ball', () => {
   describe('constructor', () => {

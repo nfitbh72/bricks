@@ -2,7 +2,7 @@
  * Tests for Laser class
  */
 
-import { Laser } from '../../src/renderer/game/Laser';
+import { Laser } from '../../src/renderer/game/weapons/Laser';
 
 describe('Laser', () => {
   let mockCtx: CanvasRenderingContext2D;

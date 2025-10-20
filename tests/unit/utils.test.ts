@@ -13,8 +13,8 @@ import {
   lerp,
   magnitude,
   scale,
-} from '../../src/renderer/game/utils';
-import { Vector2D, Rectangle, Circle } from '../../src/renderer/game/types';
+} from '../../src/renderer/game/core/utils';
+import { Vector2D, Rectangle, Circle } from '../../src/renderer/game/core/types';
 
 describe('checkRectCollision', () => {
   it('should detect collision between overlapping rectangles', () => {

@@ -11,7 +11,7 @@ import {
   PARTICLE_GRAVITY,
   PARTICLE_FADE_RATE,
   PARTICLE_GLOW_BLUR,
-} from '../config/constants';
+} from '../../config/constants';
 
 interface Particle {
   x: number;

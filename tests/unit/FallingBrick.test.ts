@@ -2,7 +2,7 @@
  * Tests for FallingBrick entity
  */
 
-import { FallingBrick } from '../../src/renderer/game/FallingBrick';
+import { FallingBrick } from '../../src/renderer/game/entities/offensive/FallingBrick';
 import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT } from '../../src/renderer/config/constants';
 
 describe('FallingBrick', () => {
