@@ -263,6 +263,9 @@ export class Game {
         // Check if bat is destroyed
         if (this.bat.isDestroyed()) {
           this.playerHealth = 0;
+        } else {
+          // Play bat damage sound when damaged but not destroyed
+          this.audioManager.playBatDamage();
         }
       },
     });

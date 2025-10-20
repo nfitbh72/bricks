@@ -73,6 +73,7 @@ export const AUDIO_MUSIC_BASE_VOLUME = 0.2;
 export const AUDIO_BRICK_HIT_BASE_VOLUME = 0.3;
 export const AUDIO_BRICK_DAMAGE_BASE_VOLUME = 0.35;
 export const AUDIO_BRICK_EXPLODE_BASE_VOLUME = 0.4;
+export const AUDIO_BAT_DAMAGE_BASE_VOLUME = 0.35;
 export const AUDIO_DEFAULT_MUSIC_VOLUME = 1.0;
 export const AUDIO_DEFAULT_SFX_VOLUME = 1.0;
 
@@ -80,6 +81,7 @@ export const AUDIO_DEFAULT_SFX_VOLUME = 1.0;
 export const AUDIO_PATH_BRICK_HIT = './assets/sounds/ding.mp3';
 export const AUDIO_PATH_BRICK_DAMAGE = './assets/sounds/thud-impact-sound-sfx-379990.mp3';
 export const AUDIO_PATH_BRICK_EXPLODE = './assets/sounds/explosion-107629.mp3';
+export const AUDIO_PATH_BAT_DAMAGE = './assets/sounds/buzzer-4-183895.mp3';
 export const AUDIO_PATH_BACKGROUND_MUSIC = './assets/sounds/lulu-swing-giulio-fazio-main-version-02-18-3209.mp3';
 
 // StatusBar constants
