@@ -121,17 +121,16 @@ npm run test:watch          # Watch mode
 
 1. **Handlers that use `setters` directly** (setGameState, setCurrentLevelId, etc.):
    - ❌ DO NOT call `syncFromTransitionContext()`
-   - Examples: `handleDevUpgrades`, `handleLevelCompleteTransition`, `handlePause`
+   - Examples: `handleDevUpgrades`, `handleLevelCompleteTransition`, `handlePause`, `handleResume`
 
-2. **Handlers that use `startTransition` with sync callbacks**:
-   - ✅ DO call `syncFromTransitionContext()`
-   - Examples: `handleStartGame`, `handleRestart`
-
-3. **Handlers that use `startTransition` with async callbacks**:
+2. **Handlers that use `startTransition` callbacks**:
    - ❌ DO NOT call `syncFromTransitionContext()`
-   - Examples: `handleUpgradeComplete`, `handleStartLevel`
+   - Examples: `handleStartGame`, `handleRestart`, `handleUpgradeComplete`, `handleStartLevel`, `handleQuitFromPause`
+   - All `startTransition` callbacks are async and use setters
 
-**Why?** The context object passes primitive values by value, not reference. Calling sync after using setters will overwrite your changes with stale values.
+**Why?** The context object passes primitive values by value, not reference. Calling sync after using setters (or before async callbacks complete) will overwrite your changes with stale values.
+
+**Simple rule:** Never call `syncFromTransitionContext()` - all handlers now use setters!
 
 See `docs/architecture.md` for detailed design.
 

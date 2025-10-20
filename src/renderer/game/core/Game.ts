@@ -301,7 +301,7 @@ export class Game {
   private handleStartGame(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleStartGame();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses async transition callback with setters
   }
 
   /**
@@ -333,7 +333,7 @@ export class Game {
   private handleRestart(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleRestart();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses async transition callback
   }
 
   /**
@@ -397,7 +397,7 @@ export class Game {
   private handleQuitFromPause(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleQuitFromPause();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses async transition callback
   }
 
   /**

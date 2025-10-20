@@ -99,7 +99,7 @@ export class StateTransitionHandler {
       // Reset upgrades when restarting
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
-      this.context.gameState = GameState.INTRO;
+      this.context.setGameState(GameState.INTRO);
     });
   }
 
