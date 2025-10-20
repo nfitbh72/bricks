@@ -7,6 +7,15 @@ import { LanguageManager } from '../../src/renderer/i18n/LanguageManager';
 // Mock fetch
 global.fetch = jest.fn();
 
+// Mock localStorage
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+global.localStorage = localStorageMock as any;
+
 describe('LanguageManager', () => {
   let languageManager: LanguageManager;
 

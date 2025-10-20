@@ -16,18 +16,12 @@ import { ScreenManager } from './ScreenManager';
 import { EffectsManager } from './EffectsManager';
 import { CollisionManager } from './CollisionManager';
 import { WeaponManager } from './WeaponManager';
-import { FallingBrick } from './FallingBrick';
-import { Debris } from './Debris';
-import { BrickLaser } from './BrickLaser';
+import { OffensiveEntityManager } from './OffensiveEntityManager';
+import { SlowMotionManager } from './SlowMotionManager';
+import { StateTransitionHandler, StateTransitionContext } from './StateTransitionHandler';
 import { Brick } from './Brick';
 import { 
-  PLAYER_STARTING_HEALTH, 
-  SLOW_MOTION_FACTOR, 
-  SLOW_MOTION_DURATION,
-  SLOW_MOTION_TRIGGER_DISTANCE,
-  SLOW_MOTION_ZOOM_SCALE,
-  EXPLODING_BRICK_DEBRIS_COUNT,
-  EXPLODING_BRICK_DEBRIS_SPEED
+  PLAYER_STARTING_HEALTH
 } from '../config/constants';
 
 export class Game {
@@ -51,11 +45,9 @@ export class Game {
   private effectsManager: EffectsManager;
   private collisionManager: CollisionManager;
   private weaponManager: WeaponManager;
-
-  // Offensive brick entities
-  private fallingBricks: FallingBrick[] = [];
-  private debris: Debris[] = [];
-  private brickLasers: BrickLaser[] = [];
+  private offensiveEntityManager: OffensiveEntityManager;
+  private slowMotionManager: SlowMotionManager;
+  private stateTransitionHandler: StateTransitionHandler;
 
 
   // Game stats
@@ -67,10 +59,6 @@ export class Game {
   private levelCompleteTimer: number = 0;
   private isDevUpgradeMode: boolean = false;
   private levelTime: number = 0; // Time spent on current level in seconds
-
-  // Slow-motion effect (time dilation only, visuals handled by EffectsManager)
-  private isSlowMotion: boolean = false;
-  private slowMotionTimer: number = 0;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -159,6 +147,15 @@ export class Game {
     // Initialize weapon manager
     this.weaponManager = new WeaponManager();
 
+    // Initialize offensive entity manager
+    this.offensiveEntityManager = new OffensiveEntityManager();
+
+    // Initialize slow-motion manager
+    this.slowMotionManager = new SlowMotionManager();
+
+    // Initialize state transition handler
+    this.stateTransitionHandler = new StateTransitionHandler(this.getTransitionContext());
+
     // Apply saved options
     this.applyOptions();
 
@@ -238,7 +235,8 @@ export class Game {
         console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
         
         // Spawn offensive entities based on brick type
-        this.spawnOffensiveEntity(brick, x, y);
+        const batCenterX = this.bat.getCenterX();
+        this.offensiveEntityManager.spawnOffensiveEntity(brick, x, y, batCenterX);
         
         // Create particles (more for final brick)
         const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
@@ -272,22 +270,47 @@ export class Game {
   }
 
   /**
+   * Get transition context for StateTransitionHandler
+   */
+  private getTransitionContext(): StateTransitionContext {
+    return {
+      canvas: this.canvas,
+      ctx: this.ctx,
+      bat: this.bat,
+      ball: this.ball,
+      gameUpgrades: this.gameUpgrades,
+      screenManager: this.screenManager,
+      audioManager: this.audioManager,
+      gameState: this.gameState,
+      currentLevelId: this.currentLevelId,
+      totalBricksDestroyed: this.totalBricksDestroyed,
+      isDevUpgradeMode: this.isDevUpgradeMode,
+      loadLevel: (config) => this.loadLevel(config),
+      startTransition: (onComplete) => this.startTransition(onComplete),
+      applyOptions: () => this.applyOptions(),
+    };
+  }
+
+  /**
    * Handle start game from intro
    */
   private handleStartGame(): void {
-    this.startTransition(() => {
-      // Reset upgrades for new game
-      this.gameUpgrades.reset();
-      this.screenManager.upgradeTreeScreen.reset();
-      
-      const levelConfig = getLevel(1);
-      if (!levelConfig) {
-        throw new Error('Level 1 not found');
-      }
-      this.currentLevelId = 1;
-      this.totalBricksDestroyed = 0;
-      this.loadLevel(levelConfig);
-    });
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleStartGame();
+    this.syncFromTransitionContext();
+  }
+
+  /**
+   * Sync state back from transition context after handler modifies it
+   */
+  private syncFromTransitionContext(): void {
+    const context = this.stateTransitionHandler['context'];
+    this.bat = context.bat;
+    this.ball = context.ball;
+    this.gameState = context.gameState;
+    this.currentLevelId = context.currentLevelId;
+    this.totalBricksDestroyed = context.totalBricksDestroyed;
+    this.isDevUpgradeMode = context.isDevUpgradeMode;
   }
 
   /**
@@ -295,208 +318,98 @@ export class Game {
    * @TODO: Remove this entire method before production
    */
   private handleDevUpgrades(): void {
-    // Mark that we're in dev upgrade mode
-    this.isDevUpgradeMode = true;
-    
-    // Capture a dark background for the upgrade screen
-    this.ctx.fillStyle = '#0a0a0a';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.screenManager.upgradeTreeScreen.captureBackground();
-    
-    // Give 500 points for testing
-    this.screenManager.upgradeTreeScreen.setAvailablePoints(500);
-    
-    // Enable dev mode to show ALL button
-    this.screenManager.upgradeTreeScreen.setDevMode(true);
-    
-    // Transition to upgrade screen
-    this.gameState = GameState.UPGRADE;
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleDevUpgrades();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle restart from game over
    */
   private handleRestart(): void {
-    this.startTransition(() => {
-      // Reset upgrades when restarting
-      this.gameUpgrades.reset();
-      this.screenManager.upgradeTreeScreen.reset();
-      this.gameState = GameState.INTRO;
-    });
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleRestart();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle transition from level complete to upgrade screen
    */
   private handleLevelCompleteTransition(): void {
-    // Capture current game state as background
-    this.screenManager.upgradeTreeScreen.captureBackground();
-    
-    // Award 3 points for completing the level
-    const currentPoints = this.screenManager.upgradeTreeScreen.getAvailablePoints();
-    this.screenManager.upgradeTreeScreen.setAvailablePoints(currentPoints + 3);
-    
-    // Disable dev mode for normal gameplay
-    this.screenManager.upgradeTreeScreen.setDevMode(false);
-    
-    // Transition to upgrade screen
-    this.gameState = GameState.UPGRADE;
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleLevelCompleteTransition();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle continue from upgrade screen to next level
    */
   private handleUpgradeComplete(): void {
-    // Apply all purchased upgrades before transitioning
-    this.applyUpgrades();
-    
-    this.startTransition(() => {
-      // If coming from DEV UPGRADES, always start at level 1
-      if (this.isDevUpgradeMode) {
-        this.isDevUpgradeMode = false;
-        this.currentLevelId = 1;
-        this.totalBricksDestroyed = 0;
-        const levelConfig = getLevel(1);
-        if (levelConfig) {
-          this.loadLevel(levelConfig);
-        }
-      } else {
-        // Normal flow: go to next level
-        const nextLevelConfig = getLevel(this.currentLevelId + 1);
-        if (nextLevelConfig) {
-          this.currentLevelId++;
-          this.loadLevel(nextLevelConfig);
-        } else {
-          // No more levels - show game over with "COMPLETE" message
-          this.gameState = GameState.GAME_OVER;
-          this.screenManager.gameOverScreen.setStats(this.currentLevelId, this.totalBricksDestroyed, true);
-        }
-      }
-    });
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleUpgradeComplete();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle start level from dev upgrades (dev mode)
    */
   private handleStartLevel(levelId: number): void {
-    // Apply all purchased upgrades before transitioning
-    this.applyUpgrades();
-    
-    this.startTransition(() => {
-      // Exit dev upgrade mode
-      this.isDevUpgradeMode = false;
-      
-      // Set the level and reset stats
-      this.currentLevelId = levelId;
-      this.totalBricksDestroyed = 0;
-      
-      // Load the selected level
-      const levelConfig = getLevel(levelId);
-      if (levelConfig) {
-        this.loadLevel(levelConfig);
-      }
-    });
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleStartLevel(levelId);
+    this.syncFromTransitionContext();
   }
 
-  /**
-   * Apply all purchased upgrades from the upgrade tree
-   */
-  private applyUpgrades(): void {
-    // Get upgrade levels from the upgrade tree screen
-    const upgrades = this.screenManager.upgradeTreeScreen.getUpgradeLevels();
-    
-    // Update upgrade manager
-    this.gameUpgrades.setUpgradeLevels(upgrades);
-    
-    // Apply bat upgrades
-    const batDimensions = this.gameUpgrades.applyBatUpgrades();
-    
-    const batPos = this.bat.getPosition();
-    const batSpeed = this.bat.getSpeed();
-    
-    // Recreate bat with new dimensions (centered at same position)
-    const centerX = batPos.x + this.bat.getWidth() / 2;
-    this.bat = new Bat(
-      centerX - batDimensions.width / 2,
-      batPos.y,
-      batDimensions.width,
-      batDimensions.height,
-      batSpeed
-    );
-    this.bat.setBounds(0, this.canvas.width, 0, this.canvas.height);
-    
-    // Apply ball upgrades
-    const ballProps = this.gameUpgrades.applyBallUpgrades();
-    this.ball.setDamage(ballProps.damage);
-    
-    // Apply ball acceleration multiplier
-    const accelerationMultiplier = this.gameUpgrades.getBallAccelerationMultiplier();
-    this.ball.setAccelerationMultiplier(accelerationMultiplier);
-  }
 
   /**
    * Handle quit
    */
   private handleQuit(): void {
-    if (window.electron) {
-      window.electron.quit();
-    }
+    this.stateTransitionHandler.handleQuit();
   }
 
   /**
    * Handle pause
    */
   private handlePause(): void {
-    if (this.gameState === GameState.PLAYING) {
-      this.gameState = GameState.PAUSED;
-      this.canvas.style.cursor = 'default'; // Show cursor on pause
-    }
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handlePause();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle resume from pause
    */
   private handleResume(): void {
-    if (this.gameState === GameState.PAUSED) {
-      this.gameState = GameState.PLAYING;
-      this.canvas.style.cursor = 'none'; // Hide cursor when resuming
-    }
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleResume();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle quit from pause menu
    */
   private handleQuitFromPause(): void {
-    this.startTransition(() => {
-      // Reset upgrades when quitting to menu
-      this.gameUpgrades.reset();
-      this.screenManager.upgradeTreeScreen.reset();
-      this.gameState = GameState.INTRO;
-    });
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleQuitFromPause();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle opening options screen
    */
   private handleOpenOptions(): void {
-    this.screenManager.setPreviousState(this.gameState);
-    this.gameState = GameState.OPTIONS;
-    this.screenManager.optionsScreen.attach();
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleOpenOptions();
+    this.syncFromTransitionContext();
   }
 
   /**
    * Handle closing options screen
    */
   private handleCloseOptions(): void {
-    this.screenManager.optionsScreen.detach();
-    const previousState = this.screenManager.getPreviousState();
-    if (previousState) {
-      this.gameState = previousState;
-      this.screenManager.setPreviousState(null);
-    }
-    
-    // Apply volume settings
-    this.applyOptions();
+    this.stateTransitionHandler.updateContext(this.getTransitionContext());
+    this.stateTransitionHandler.handleCloseOptions();
+    this.syncFromTransitionContext();
   }
 
   /**
@@ -532,15 +445,15 @@ export class Game {
     const upgradeBonus = this.gameUpgrades.getHealthBonus();
     this.playerHealth = PLAYER_STARTING_HEALTH + upgradeBonus;
     
-    // Clear any active lasers
+    // Clear any active lasers and offensive entities
     this.weaponManager.clear();
+    this.offensiveEntityManager.clear();
     
     // Reset level timer
     this.levelTime = 0;
     
     // Reset slow-motion state
-    this.isSlowMotion = false;
-    this.slowMotionTimer = 0;
+    this.slowMotionManager.reset();
     this.effectsManager.resetSlowMotion();
     
     // Reset level complete timer
@@ -624,18 +537,8 @@ export class Game {
     }
 
     // Handle slow-motion time dilation
-    let effectiveDeltaTime = deltaTime;
-    if (this.isSlowMotion) {
-      effectiveDeltaTime = deltaTime * SLOW_MOTION_FACTOR;
-      this.slowMotionTimer += deltaTime;
-      
-      // End slow-motion after duration
-      if (this.slowMotionTimer >= SLOW_MOTION_DURATION) {
-        console.log('✅ Slow-motion ended');
-        this.isSlowMotion = false;
-        this.slowMotionTimer = 0;
-      }
-    }
+    this.slowMotionManager.update(deltaTime);
+    const effectiveDeltaTime = this.slowMotionManager.getEffectiveDeltaTime(deltaTime);
 
     // Update screen animations (use real deltaTime for UI)
     this.screenManager.update(this.gameState, deltaTime);
@@ -669,7 +572,7 @@ export class Game {
     this.weaponManager.update(effectiveDeltaTime);
 
     // Update offensive brick entities (use effective deltaTime for slow-mo)
-    this.updateOffensiveEntities(effectiveDeltaTime);
+    this.offensiveEntityManager.update(effectiveDeltaTime, this.canvas.width, this.canvas.height);
 
     // Update collision manager (use effective deltaTime for slow-mo)
     this.collisionManager.update(effectiveDeltaTime, this.ball);
@@ -694,35 +597,14 @@ export class Game {
     }
 
     // Check if we should trigger slow-motion (1 brick left, ball approaching)
-    if (this.level && this.level.getRemainingBricks() === 1 && !this.isSlowMotion) {
-      if (this.predictBallWillHitBrick()) {
-        console.log('🎬 SLOW-MOTION ACTIVATED! Ball approaching final brick!');
-        this.isSlowMotion = true;
-        this.slowMotionTimer = 0;
-        
-        // Calculate target focus point (midpoint between ball and final brick)
-        const ballPos = this.ball.getPosition();
-        const bricks = this.level.getActiveBricks();
-        if (bricks.length === 1) {
-          const brickBounds = bricks[0].getBounds();
-          const brickCenterX = brickBounds.x + brickBounds.width / 2;
-          const brickCenterY = brickBounds.y + brickBounds.height / 2;
-          
-          const targetFocusX = (ballPos.x + brickCenterX) / 2;
-          const targetFocusY = (ballPos.y + brickCenterY) / 2;
-          
-          // Trigger slow-motion visual effects in EffectsManager
-          this.effectsManager.triggerSlowMotion(
-            this.canvas.width,
-            this.canvas.height,
-            targetFocusX,
-            targetFocusY
-          );
-          
-          console.log(`Slow-motion triggered with focus at (${targetFocusX.toFixed(0)}, ${targetFocusY.toFixed(0)})`);
-        }
-      }
-    }
+    this.slowMotionManager.checkAndTrigger(
+      this.level,
+      this.ball,
+      this.statusBar,
+      this.effectsManager,
+      this.canvas.width,
+      this.canvas.height
+    );
 
     // Check collisions
     this.checkCollisions();
@@ -780,158 +662,9 @@ export class Game {
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
 
     // Offensive entity-Bat collisions
-    this.collisionManager.checkFallingBrickBatCollisions(this.fallingBricks, this.bat);
-    this.collisionManager.checkDebrisBatCollisions(this.debris, this.bat);
-    this.collisionManager.checkBrickLaserBatCollisions(this.brickLasers, this.bat);
-  }
-
-  /**
-   * Spawn offensive entity when an offensive brick is destroyed
-   */
-  private spawnOffensiveEntity(brick: Brick, x: number, y: number): void {
-    const brickType = brick.getType();
-    const color = brick.getColor();
-    const brickBounds = brick.getBounds();
-
-    switch (brickType) {
-      case BrickType.OFFENSIVE_FALLING:
-        // Create falling brick at destroyed brick position
-        this.fallingBricks.push(new FallingBrick(brickBounds.x, brickBounds.y, color));
-        break;
-
-      case BrickType.OFFENSIVE_EXPLODING:
-        // Create debris in 8 directions
-        const angleStep = (Math.PI * 2) / EXPLODING_BRICK_DEBRIS_COUNT;
-        for (let i = 0; i < EXPLODING_BRICK_DEBRIS_COUNT; i++) {
-          const angle = angleStep * i;
-          const velocityX = Math.cos(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
-          const velocityY = Math.sin(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
-          this.debris.push(new Debris(x, y, velocityX, velocityY, color));
-        }
-        break;
-
-      case BrickType.OFFENSIVE_LASER:
-        // Create laser targeting bat's current position
-        const batCenterX = this.bat.getCenterX();
-        this.brickLasers.push(new BrickLaser(x, y, batCenterX, color));
-        break;
-    }
-  }
-
-  /**
-   * Update all offensive brick entities
-   */
-  private updateOffensiveEntities(deltaTime: number): void {
-    // Update falling bricks
-    for (const fallingBrick of this.fallingBricks) {
-      fallingBrick.update(deltaTime);
-    }
-
-    // Update debris
-    for (const debrisParticle of this.debris) {
-      debrisParticle.update(deltaTime);
-    }
-
-    // Update brick lasers
-    for (const laser of this.brickLasers) {
-      laser.update(deltaTime);
-    }
-
-    // Remove inactive or off-screen entities
-    this.fallingBricks = this.fallingBricks.filter(
-      (fb) => fb.isActive() && !fb.isOffScreen(this.canvas.height)
-    );
-    this.debris = this.debris.filter(
-      (d) => d.isActive() && !d.isOffScreen(this.canvas.width, this.canvas.height)
-    );
-    this.brickLasers = this.brickLasers.filter(
-      (bl) => bl.isActive() && !bl.isOffScreen(this.canvas.height)
-    );
-  }
-
-  /**
-   * Predict if the ball will hit a brick soon (ray tracing)
-   * Returns true if ball will hit a brick within 2 brick heights distance
-   */
-  private predictBallWillHitBrick(): boolean {
-    if (!this.level) return false;
-
-    const ballPos = this.ball.getPosition();
-    const ballVel = this.ball.getVelocity();
-    const ballRadius = this.ball.getRadius();
-    
-    // Get the final brick
-    const bricks = this.level.getActiveBricks();
-    if (bricks.length !== 1) return false;
-    
-    const finalBrick = bricks[0];
-    const brickBounds = finalBrick.getBounds();
-    
-    // Calculate distance from ball to brick
-    const closestX = Math.max(brickBounds.x, Math.min(ballPos.x, brickBounds.x + brickBounds.width));
-    const closestY = Math.max(brickBounds.y, Math.min(ballPos.y, brickBounds.y + brickBounds.height));
-    
-    const distX = ballPos.x - closestX;
-    const distY = ballPos.y - closestY;
-    const distance = Math.sqrt(distX * distX + distY * distY);
-    
-    // Trigger distance: configured brick heights
-    const triggerDistance = brickBounds.height * SLOW_MOTION_TRIGGER_DISTANCE;
-    
-    if (distance > triggerDistance) {
-      return false; // Too far away
-    }
-    
-    // Ball is close - now ray trace to confirm it will hit
-    const predictionTime = 0.5; // Look ahead 0.5 seconds
-    const steps = 20; // Number of simulation steps
-    const dt = predictionTime / steps;
-    
-    let testX = ballPos.x;
-    let testY = ballPos.y;
-    let testVelX = ballVel.x;
-    let testVelY = ballVel.y;
-    
-    const statusBarTop = this.statusBar.getY();
-    
-    for (let i = 0; i < steps; i++) {
-      // Update test position
-      testX += testVelX * dt;
-      testY += testVelY * dt;
-      
-      // Check wall bounces
-      if (testX - ballRadius < 0) {
-        testX = ballRadius;
-        testVelX = Math.abs(testVelX);
-      }
-      if (testX + ballRadius > this.canvas.width) {
-        testX = this.canvas.width - ballRadius;
-        testVelX = -Math.abs(testVelX);
-      }
-      if (testY - ballRadius < 0) {
-        testY = ballRadius;
-        testVelY = Math.abs(testVelY);
-      }
-      if (testY + ballRadius > statusBarTop) {
-        // Hit back wall - won't hit brick
-        return false;
-      }
-      
-      // Check if test position intersects the brick
-      const testClosestX = Math.max(brickBounds.x, Math.min(testX, brickBounds.x + brickBounds.width));
-      const testClosestY = Math.max(brickBounds.y, Math.min(testY, brickBounds.y + brickBounds.height));
-      
-      const testDistX = testX - testClosestX;
-      const testDistY = testY - testClosestY;
-      const testDistSquared = testDistX * testDistX + testDistY * testDistY;
-      
-      if (testDistSquared < ballRadius * ballRadius) {
-        console.log(`📍 Ray trace: Ball is ${distance.toFixed(0)}px away, will hit brick in ~${(i * dt).toFixed(2)}s`);
-        return true; // Will hit brick!
-      }
-    }
-    
-    return false; // Won't hit brick in prediction window
+    this.collisionManager.checkFallingBrickBatCollisions(this.offensiveEntityManager.getFallingBricks(), this.bat);
+    this.collisionManager.checkDebrisBatCollisions(this.offensiveEntityManager.getDebris(), this.bat);
+    this.collisionManager.checkBrickLaserBatCollisions(this.offensiveEntityManager.getBrickLasers(), this.bat);
   }
 
   /**
@@ -993,7 +726,7 @@ export class Game {
     this.weaponManager.render(this.ctx);
 
     // Render offensive brick entities
-    this.renderOffensiveEntities();
+    this.offensiveEntityManager.render(this.ctx);
 
     // Render visual effects (if enabled)
     const options = this.screenManager.optionsScreen.getOptions();
@@ -1011,26 +744,6 @@ export class Game {
     this.effectsManager.renderSlowMotionOverlay(this.ctx, this.canvas.width, this.canvas.height);
   }
 
-
-  /**
-   * Render all offensive brick entities
-   */
-  private renderOffensiveEntities(): void {
-    // Render falling bricks
-    for (const fallingBrick of this.fallingBricks) {
-      fallingBrick.render(this.ctx);
-    }
-
-    // Render debris
-    for (const debrisParticle of this.debris) {
-      debrisParticle.render(this.ctx);
-    }
-
-    // Render brick lasers
-    for (const laser of this.brickLasers) {
-      laser.render(this.ctx);
-    }
-  }
 
   /**
    * Get current game state (for testing)

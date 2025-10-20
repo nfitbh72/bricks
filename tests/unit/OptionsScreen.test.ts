@@ -93,6 +93,7 @@ describe('OptionsScreen', () => {
         sfxVolume: 0.8,
         showParticles: false,
         showDamageNumbers: false,
+        selectedLanguage: 'en',
       };
       localStorage.setItem('gameOptions', JSON.stringify(savedOptions));
 
