@@ -5,16 +5,19 @@
 import {
   AUDIO_MUSIC_BASE_VOLUME,
   AUDIO_BRICK_HIT_BASE_VOLUME,
+  AUDIO_BRICK_DAMAGE_BASE_VOLUME,
   AUDIO_BRICK_EXPLODE_BASE_VOLUME,
   AUDIO_DEFAULT_MUSIC_VOLUME,
   AUDIO_DEFAULT_SFX_VOLUME,
   AUDIO_PATH_BRICK_HIT,
+  AUDIO_PATH_BRICK_DAMAGE,
   AUDIO_PATH_BRICK_EXPLODE,
   AUDIO_PATH_BACKGROUND_MUSIC,
 } from '../config/constants';
 
 export class AudioManager {
   private brickHitSound: HTMLAudioElement;
+  private brickDamageSound: HTMLAudioElement;
   private brickExplodeSound: HTMLAudioElement;
   private backgroundMusic: HTMLAudioElement;
   
@@ -25,6 +28,9 @@ export class AudioManager {
     // Load sound effects
     this.brickHitSound = new Audio(AUDIO_PATH_BRICK_HIT);
     this.brickHitSound.volume = AUDIO_BRICK_HIT_BASE_VOLUME;
+    
+    this.brickDamageSound = new Audio(AUDIO_PATH_BRICK_DAMAGE);
+    this.brickDamageSound.volume = AUDIO_BRICK_DAMAGE_BASE_VOLUME;
     
     this.brickExplodeSound = new Audio(AUDIO_PATH_BRICK_EXPLODE);
     this.brickExplodeSound.volume = AUDIO_BRICK_EXPLODE_BASE_VOLUME;
@@ -43,6 +49,13 @@ export class AudioManager {
    */
   playBrickHit(): void {
     this.playSound(this.brickHitSound);
+  }
+
+  /**
+   * Play brick damage sound (hit but not destroyed)
+   */
+  playBrickDamage(): void {
+    this.playSound(this.brickDamageSound);
   }
 
   /**
@@ -68,6 +81,7 @@ export class AudioManager {
   setSFXVolume(volume: number): void {
     this.sfxVolume = volume;
     this.brickHitSound.volume = volume * AUDIO_BRICK_HIT_BASE_VOLUME;
+    this.brickDamageSound.volume = volume * AUDIO_BRICK_DAMAGE_BASE_VOLUME;
     this.brickExplodeSound.volume = volume * AUDIO_BRICK_EXPLODE_BASE_VOLUME;
   }
 
@@ -102,6 +116,7 @@ export class AudioManager {
   stopAll(): void {
     this.backgroundMusic.pause();
     this.brickHitSound.pause();
+    this.brickDamageSound.pause();
     this.brickExplodeSound.pause();
   }
 

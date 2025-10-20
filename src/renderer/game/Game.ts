@@ -224,7 +224,7 @@ export class Game {
         this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
         
         if (!brick.isDestroyed()) {
-          this.audioManager.playBrickHit();
+          this.audioManager.playBrickDamage();
         }
       },
       onBrickDestroyed: (brick, x, y, isCritical) => {
