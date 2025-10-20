@@ -288,6 +288,10 @@ export class Game {
       loadLevel: (config) => this.loadLevel(config),
       startTransition: (onComplete) => this.startTransition(onComplete),
       applyOptions: () => this.applyOptions(),
+      setCurrentLevelId: (id: number) => { this.currentLevelId = id; },
+      setTotalBricksDestroyed: (count: number) => { this.totalBricksDestroyed = count; },
+      setIsDevUpgradeMode: (value: boolean) => { this.isDevUpgradeMode = value; },
+      setGameState: (state: GameState) => { this.gameState = state; },
     };
   }
 
@@ -320,7 +324,7 @@ export class Game {
   private handleDevUpgrades(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleDevUpgrades();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**
@@ -338,7 +342,7 @@ export class Game {
   private handleLevelCompleteTransition(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleLevelCompleteTransition();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**
@@ -347,7 +351,8 @@ export class Game {
   private handleUpgradeComplete(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleUpgradeComplete();
-    this.syncFromTransitionContext();
+    // Note: syncFromTransitionContext() is NOT called here because
+    // the transition callback will modify state asynchronously
   }
 
   /**
@@ -356,7 +361,8 @@ export class Game {
   private handleStartLevel(levelId: number): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleStartLevel(levelId);
-    this.syncFromTransitionContext();
+    // Note: syncFromTransitionContext() is NOT called here because
+    // the transition callback will modify state asynchronously
   }
 
 
@@ -373,7 +379,7 @@ export class Game {
   private handlePause(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handlePause();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**
@@ -382,7 +388,7 @@ export class Game {
   private handleResume(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleResume();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**
@@ -400,7 +406,7 @@ export class Game {
   private handleOpenOptions(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleOpenOptions();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**
@@ -409,7 +415,7 @@ export class Game {
   private handleCloseOptions(): void {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleCloseOptions();
-    this.syncFromTransitionContext();
+    // Note: No sync needed - handler uses setters directly
   }
 
   /**

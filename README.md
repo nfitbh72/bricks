@@ -115,6 +115,24 @@ npm run test:watch          # Watch mode
 - **Entity-component** - Game objects in `game/entities/`
 - **Centralized config** - All constants in `config/`
 
+### ⚠️ StateTransitionHandler Critical Rules
+
+**When modifying `StateTransitionHandler.ts` or `Game.ts` handlers:**
+
+1. **Handlers that use `setters` directly** (setGameState, setCurrentLevelId, etc.):
+   - ❌ DO NOT call `syncFromTransitionContext()`
+   - Examples: `handleDevUpgrades`, `handleLevelCompleteTransition`, `handlePause`
+
+2. **Handlers that use `startTransition` with sync callbacks**:
+   - ✅ DO call `syncFromTransitionContext()`
+   - Examples: `handleStartGame`, `handleRestart`
+
+3. **Handlers that use `startTransition` with async callbacks**:
+   - ❌ DO NOT call `syncFromTransitionContext()`
+   - Examples: `handleUpgradeComplete`, `handleStartLevel`
+
+**Why?** The context object passes primitive values by value, not reference. Calling sync after using setters will overwrite your changes with stale values.
+
 See `docs/architecture.md` for detailed design.
 
 ## 📝 License

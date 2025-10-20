@@ -25,6 +25,10 @@ export interface StateTransitionContext {
   loadLevel: (config: LevelConfig) => void;
   startTransition: (onComplete: () => void) => void;
   applyOptions: () => void;
+  setCurrentLevelId: (id: number) => void;
+  setTotalBricksDestroyed: (count: number) => void;
+  setIsDevUpgradeMode: (value: boolean) => void;
+  setGameState: (state: GameState) => void;
 }
 
 export class StateTransitionHandler {
@@ -54,8 +58,8 @@ export class StateTransitionHandler {
       if (!levelConfig) {
         throw new Error('Level 1 not found');
       }
-      this.context.currentLevelId = 1;
-      this.context.totalBricksDestroyed = 0;
+      this.context.setCurrentLevelId(1);
+      this.context.setTotalBricksDestroyed(0);
       this.context.loadLevel(levelConfig);
     });
   }
@@ -66,7 +70,11 @@ export class StateTransitionHandler {
    */
   handleDevUpgrades(): void {
     // Mark that we're in dev upgrade mode
-    this.context.isDevUpgradeMode = true;
+    this.context.setIsDevUpgradeMode(true);
+    
+    // Start at level 1, just like normal mode
+    this.context.setCurrentLevelId(1);
+    this.context.setTotalBricksDestroyed(0);
     
     // Capture a dark background for the upgrade screen
     this.context.ctx.fillStyle = '#0a0a0a';
@@ -80,7 +88,7 @@ export class StateTransitionHandler {
     this.context.screenManager.upgradeTreeScreen.setDevMode(true);
     
     // Transition to upgrade screen
-    this.context.gameState = GameState.UPGRADE;
+    this.context.setGameState(GameState.UPGRADE);
   }
 
   /**
@@ -99,6 +107,22 @@ export class StateTransitionHandler {
    * Handle transition from level complete to upgrade screen
    */
   handleLevelCompleteTransition(): void {
+    // Check if there are more levels
+    const nextLevelId = this.context.currentLevelId + 1;
+    const nextLevelConfig = getLevel(nextLevelId);
+    
+    if (!nextLevelConfig) {
+      // No more levels - show game over with "COMPLETE" message
+      this.context.setGameState(GameState.GAME_OVER);
+      this.context.screenManager.gameOverScreen.setStats(
+        this.context.currentLevelId, // Show last completed level
+        this.context.totalBricksDestroyed,
+        true
+      );
+      return;
+    }
+    
+    // More levels exist - show upgrade screen
     // Capture current game state as background
     this.context.screenManager.upgradeTreeScreen.captureBackground();
     
@@ -110,7 +134,7 @@ export class StateTransitionHandler {
     this.context.screenManager.upgradeTreeScreen.setDevMode(false);
     
     // Transition to upgrade screen
-    this.context.gameState = GameState.UPGRADE;
+    this.context.setGameState(GameState.UPGRADE);
   }
 
   /**
@@ -121,30 +145,16 @@ export class StateTransitionHandler {
     this.applyUpgrades();
     
     this.context.startTransition(() => {
-      // If coming from DEV UPGRADES, always start at level 1
-      if (this.context.isDevUpgradeMode) {
-        this.context.isDevUpgradeMode = false;
-        this.context.currentLevelId = 1;
-        this.context.totalBricksDestroyed = 0;
-        const levelConfig = getLevel(1);
-        if (levelConfig) {
-          this.context.loadLevel(levelConfig);
-        }
-      } else {
-        // Normal flow: go to next level
-        const nextLevelConfig = getLevel(this.context.currentLevelId + 1);
-        if (nextLevelConfig) {
-          this.context.currentLevelId++;
-          this.context.loadLevel(nextLevelConfig);
-        } else {
-          // No more levels - show game over with "COMPLETE" message
-          this.context.gameState = GameState.GAME_OVER;
-          this.context.screenManager.gameOverScreen.setStats(
-            this.context.currentLevelId,
-            this.context.totalBricksDestroyed,
-            true
-          );
-        }
+      // Exit dev mode if active
+      this.context.setIsDevUpgradeMode(false);
+      
+      // Load next level (we already checked it exists in handleLevelCompleteTransition)
+      const nextLevelId = this.context.currentLevelId + 1;
+      this.context.setCurrentLevelId(nextLevelId);
+      const nextLevelConfig = getLevel(nextLevelId);
+      
+      if (nextLevelConfig) {
+        this.context.loadLevel(nextLevelConfig);
       }
     });
   }
@@ -158,11 +168,11 @@ export class StateTransitionHandler {
     
     this.context.startTransition(() => {
       // Exit dev upgrade mode
-      this.context.isDevUpgradeMode = false;
+      this.context.setIsDevUpgradeMode(false);
       
       // Set the level and reset stats
-      this.context.currentLevelId = levelId;
-      this.context.totalBricksDestroyed = 0;
+      this.context.setCurrentLevelId(levelId);
+      this.context.setTotalBricksDestroyed(0);
       
       // Load the selected level
       const levelConfig = getLevel(levelId);
@@ -186,7 +196,7 @@ export class StateTransitionHandler {
    */
   handlePause(): void {
     if (this.context.gameState === GameState.PLAYING) {
-      this.context.gameState = GameState.PAUSED;
+      this.context.setGameState(GameState.PAUSED);
       this.context.canvas.style.cursor = 'default'; // Show cursor on pause
     }
   }
@@ -196,7 +206,7 @@ export class StateTransitionHandler {
    */
   handleResume(): void {
     if (this.context.gameState === GameState.PAUSED) {
-      this.context.gameState = GameState.PLAYING;
+      this.context.setGameState(GameState.PLAYING);
       this.context.canvas.style.cursor = 'none'; // Hide cursor when resuming
     }
   }
@@ -209,7 +219,7 @@ export class StateTransitionHandler {
       // Reset upgrades when quitting to menu
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
-      this.context.gameState = GameState.INTRO;
+      this.context.setGameState(GameState.INTRO);
     });
   }
 
@@ -218,7 +228,7 @@ export class StateTransitionHandler {
    */
   handleOpenOptions(): void {
     this.context.screenManager.setPreviousState(this.context.gameState);
-    this.context.gameState = GameState.OPTIONS;
+    this.context.setGameState(GameState.OPTIONS);
     this.context.screenManager.optionsScreen.attach();
   }
 
@@ -229,7 +239,7 @@ export class StateTransitionHandler {
     this.context.screenManager.optionsScreen.detach();
     const previousState = this.context.screenManager.getPreviousState();
     if (previousState) {
-      this.context.gameState = previousState;
+      this.context.setGameState(previousState);
       this.context.screenManager.setPreviousState(null);
     }
     

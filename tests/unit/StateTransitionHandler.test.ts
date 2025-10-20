@@ -52,7 +52,7 @@ const createMockContext = (): StateTransitionContext => {
   // Initialize GameUpgrades with base values to set up the Map properly
   gameUpgrades.setBaseValues(150, 15, 600, 10);
 
-  return {
+  const mockContext = {
     canvas: mockCanvas,
     ctx: mockCtx,
     bat,
@@ -67,7 +67,13 @@ const createMockContext = (): StateTransitionContext => {
     loadLevel: jest.fn(),
     startTransition: jest.fn((callback) => callback()),
     applyOptions: jest.fn(),
+    setCurrentLevelId: jest.fn((id: number) => { mockContext.currentLevelId = id; }),
+    setTotalBricksDestroyed: jest.fn((count: number) => { mockContext.totalBricksDestroyed = count; }),
+    setIsDevUpgradeMode: jest.fn((value: boolean) => { mockContext.isDevUpgradeMode = value; }),
+    setGameState: jest.fn((state: GameState) => { mockContext.gameState = state; }),
   };
+  
+  return mockContext;
 };
 
 describe('StateTransitionHandler', () => {
@@ -184,10 +190,25 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.screenManager.upgradeTreeScreen.setDevMode).toHaveBeenCalledWith(false);
     });
 
-    it('should transition to UPGRADE state', () => {
+    it('should transition to UPGRADE state when more levels exist', () => {
+      mockContext.currentLevelId = 1; // Level 2 exists
+      handler.updateContext(mockContext);
       handler.handleLevelCompleteTransition();
       
       expect(mockContext.gameState).toBe(GameState.UPGRADE);
+    });
+
+    it('should transition to GAME_OVER when no more levels exist', () => {
+      mockContext.currentLevelId = 3; // Level 4 doesn't exist
+      handler.updateContext(mockContext);
+      handler.handleLevelCompleteTransition();
+      
+      expect(mockContext.gameState).toBe(GameState.GAME_OVER);
+      expect(mockContext.screenManager.gameOverScreen.setStats).toHaveBeenCalledWith(
+        3, // Last completed level
+        mockContext.totalBricksDestroyed,
+        true // Game complete
+      );
     });
   });
 
@@ -202,15 +223,15 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.loadLevel).toHaveBeenCalled();
     });
 
-    it('should exit dev mode and start level 1 when in dev mode', () => {
+    it('should exit dev mode and progress to next level', () => {
       mockContext.isDevUpgradeMode = true;
-      mockContext.currentLevelId = 5;
+      mockContext.currentLevelId = 1;
       
       handler.updateContext(mockContext);
       handler.handleUpgradeComplete();
       
       expect(mockContext.isDevUpgradeMode).toBe(false);
-      expect(mockContext.currentLevelId).toBe(1);
+      expect(mockContext.currentLevelId).toBe(2);
     });
   });
 
