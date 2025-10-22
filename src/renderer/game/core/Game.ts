@@ -591,6 +591,9 @@ export class Game {
       this.ball.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
     }
 
+    // Update bat turret visibility based on laser upgrade
+    this.bat.setShowTurret(this.gameUpgrades.hasBatShooter());
+
     // Update ball (use effective deltaTime for slow-mo)
     this.ball.update(effectiveDeltaTime);
 

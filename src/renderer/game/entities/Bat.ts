@@ -15,6 +15,7 @@ export class Bat {
   private maxX: number = 0;
   private minY: number | null = null;
   private maxY: number | null = null;
+  private showTurret: boolean = false; // Show turret when lasers are active
 
   constructor(x: number, y: number, width: number, height: number, speed: number = 300) {
     this.position = { x, y };
@@ -47,7 +48,55 @@ export class Bat {
     ctx.fillStyle = '#ff00ff';
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 
+    // Draw turret if lasers are active
+    if (this.showTurret) {
+      this.renderTurret(ctx);
+    }
+
     ctx.restore();
+  }
+
+  /**
+   * Render turret on top of bat
+   */
+  private renderTurret(ctx: CanvasRenderingContext2D): void {
+    const centerX = this.position.x + this.width / 2;
+    const turretY = this.position.y;
+    const turretWidth = this.height * 1.5; // Turret width proportional to bat height
+    const turretHeight = this.height * 2; // Turret height
+    const barrelWidth = this.height * 0.4;
+    const barrelHeight = this.height * 1.5;
+
+    // Draw turret base (trapezoid)
+    ctx.fillStyle = '#ff00ff';
+    ctx.beginPath();
+    ctx.moveTo(centerX - turretWidth / 2, turretY);
+    ctx.lineTo(centerX - turretWidth / 3, turretY - turretHeight);
+    ctx.lineTo(centerX + turretWidth / 3, turretY - turretHeight);
+    ctx.lineTo(centerX + turretWidth / 2, turretY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw barrel (rectangle on top)
+    ctx.fillStyle = '#ff00ff';
+    ctx.fillRect(
+      centerX - barrelWidth / 2,
+      turretY - turretHeight - barrelHeight,
+      barrelWidth,
+      barrelHeight
+    );
+
+    // Draw barrel tip (small rectangle)
+    const tipWidth = barrelWidth * 0.6;
+    const tipHeight = this.height * 0.5;
+    ctx.fillStyle = '#00ffff'; // Cyan tip for contrast
+    ctx.shadowColor = '#00ffff';
+    ctx.fillRect(
+      centerX - tipWidth / 2,
+      turretY - turretHeight - barrelHeight - tipHeight,
+      tipWidth,
+      tipHeight
+    );
   }
 
   /**
@@ -227,5 +276,12 @@ export class Bat {
    */
   isDestroyed(): boolean {
     return this.width <= 0;
+  }
+
+  /**
+   * Set whether to show turret (when lasers are active)
+   */
+  setShowTurret(show: boolean): void {
+    this.showTurret = show;
   }
 }
