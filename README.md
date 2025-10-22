@@ -38,7 +38,9 @@ src/renderer/game/
 │   └── offensive/           # Enemy projectiles
 │       ├── BrickLaser.ts
 │       ├── Debris.ts
-│       └── FallingBrick.ts
+│       ├── FallingBrick.ts
+│       ├── HomingMissile.ts
+│       └── SplittingFragment.ts
 │
 ├── managers/                # Subsystem coordinators
 │   ├── AudioManager.ts      # 🔊 Sound/music
@@ -106,7 +108,7 @@ npm test                    # Run all tests
 npm run test:watch          # Watch mode
 ```
 - Tests in `tests/unit/` and `tests/integration/`
-- 658 tests covering entities, managers, and systems
+- 659 tests covering entities, managers, and systems
 - Avoid testing DOM/jsdom (per methodology)
 
 ### Architecture
