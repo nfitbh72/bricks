@@ -10,6 +10,7 @@ Just some notes about future features so that I don't forget
 - [X] Test coverage
 - [X] Integration tests
 - [X] Add a (fake) leaderboard for each level that has quite poor players.
+- [] sticky bat to start
 - [] level orientation (bat doesn't have to be bottom of screen)
 - [X] the ball can hit the bottom of the bat
 - [X] visual effect to the ball - like a comet tail

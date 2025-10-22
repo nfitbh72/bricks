@@ -16,6 +16,11 @@ import {
   BALL_TAIL_GLOW_BLUR,
   PIERCING_WARNING_DURATION,
   PIERCING_FLASH_INTERVAL,
+  STICKY_BALL_LAUNCH_ANGLE,
+  STICKY_BALL_INDICATOR_LENGTH,
+  STICKY_BALL_INDICATOR_WIDTH,
+  STICKY_BALL_INDICATOR_COLOR,
+  STICKY_BALL_INDICATOR_GLOW,
 } from '../../config/constants';
 
 export class Ball {
@@ -32,6 +37,9 @@ export class Ball {
   private elapsedTime: number = 0; // Track time for acceleration
   private readonly speedIncreasePerSecond: number = BALL_SPEED_INCREASE_PER_SECOND;
   private accelerationMultiplier: number = 1.0; // Can be reduced by upgrades
+  private isSticky: boolean = false; // Ball sticks to bat at level start
+  private stickyOffsetX: number = 0; // Offset from bat center when sticky
+  private stickyOffsetY: number = 0; // Offset above bat when sticky
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -45,8 +53,14 @@ export class Ball {
   /**
    * Update ball position based on velocity and deltaTime
    * Also handles speed acceleration over time
+   * When sticky, position is updated by updateStickyPosition() instead
    */
   update(deltaTime: number): void {
+    // Don't update position if ball is sticky (bat controls position)
+    if (this.isSticky) {
+      return;
+    }
+    
     // Accumulate elapsed time for speed calculation
     this.elapsedTime += deltaTime;
     
@@ -61,6 +75,7 @@ export class Ball {
 
   /**
    * Render the ball on the canvas with comet tail effect
+   * Also renders launch indicator when sticky
    */
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
@@ -78,6 +93,11 @@ export class Ball {
       } else {
         color = '#ff0000'; // Neon red when piercing
       }
+    }
+
+    // Draw launch indicator if ball is sticky
+    if (this.isSticky) {
+      this.renderLaunchIndicator(ctx);
     }
 
     // Draw comet tail if ball is moving
@@ -404,5 +424,84 @@ export class Ball {
   setPiercing(piercing: boolean, timeRemaining: number = 0): void {
     this.isPiercing = piercing;
     this.piercingTimeRemaining = timeRemaining;
+  }
+
+  /**
+   * Set sticky state (ball sticks to bat)
+   */
+  setSticky(sticky: boolean, offsetX: number = 0, offsetY: number = -30): void {
+    this.isSticky = sticky;
+    this.stickyOffsetX = offsetX;
+    this.stickyOffsetY = offsetY;
+    if (sticky) {
+      // Reset velocity when becoming sticky
+      this.velocity = { x: 0, y: 0 };
+    }
+  }
+
+  /**
+   * Check if ball is sticky
+   */
+  getIsSticky(): boolean {
+    return this.isSticky;
+  }
+
+  /**
+   * Update ball position when sticky to follow bat
+   */
+  updateStickyPosition(batCenterX: number, batY: number): void {
+    if (this.isSticky) {
+      this.position.x = batCenterX + this.stickyOffsetX;
+      this.position.y = batY + this.stickyOffsetY;
+    }
+  }
+
+  /**
+   * Launch ball from sticky state
+   */
+  launchFromSticky(): void {
+    if (this.isSticky) {
+      this.isSticky = false;
+      this.launch(STICKY_BALL_LAUNCH_ANGLE);
+    }
+  }
+
+  /**
+   * Render launch direction indicator when ball is sticky
+   */
+  private renderLaunchIndicator(ctx: CanvasRenderingContext2D): void {
+    const angle = STICKY_BALL_LAUNCH_ANGLE;
+    const radians = (angle * Math.PI) / 180;
+    const endX = this.position.x + Math.cos(radians) * STICKY_BALL_INDICATOR_LENGTH;
+    const endY = this.position.y + Math.sin(radians) * STICKY_BALL_INDICATOR_LENGTH;
+
+    // Draw indicator line with glow
+    ctx.shadowBlur = STICKY_BALL_INDICATOR_GLOW;
+    ctx.shadowColor = STICKY_BALL_INDICATOR_COLOR;
+    ctx.strokeStyle = STICKY_BALL_INDICATOR_COLOR;
+    ctx.lineWidth = STICKY_BALL_INDICATOR_WIDTH;
+    ctx.lineCap = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(this.position.x, this.position.y);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    // Draw arrowhead
+    const arrowSize = 8;
+    const arrowAngle = 25 * Math.PI / 180;
+    
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(
+      endX - arrowSize * Math.cos(radians - arrowAngle),
+      endY - arrowSize * Math.sin(radians - arrowAngle)
+    );
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(
+      endX - arrowSize * Math.cos(radians + arrowAngle),
+      endY - arrowSize * Math.sin(radians + arrowAngle)
+    );
+    ctx.stroke();
   }
 }

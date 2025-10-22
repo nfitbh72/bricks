@@ -32,7 +32,8 @@
   "game": {
     "status": {
       "level": "Level",
-      "time": "Time"
+      "time": "Time",
+      "launchBall": "Click or press SPACE to launch"
     },
     "levels": {
       "level1": "Level 1: Effective Design",

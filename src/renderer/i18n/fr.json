@@ -32,7 +32,8 @@
   "game": {
     "status": {
       "level": "Niveau",
-      "time": "Temps"
+      "time": "Temps",
+      "launchBall": "Cliquez ou appuyez sur ESPACE pour lancer"
     },
     "levels": {
       "level1": "Niveau 1: Design Efficace",

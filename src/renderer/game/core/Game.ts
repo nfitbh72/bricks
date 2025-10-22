@@ -185,7 +185,12 @@ export class Game {
       },
       onSpace: () => {
         if (this.gameState === GameState.PLAYING) {
-          this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+          // Launch ball if sticky, otherwise shoot laser
+          if (this.ball.getIsSticky()) {
+            this.ball.launchFromSticky();
+          } else {
+            this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+          }
         }
       },
       onKeyPress: (key: string) => {
@@ -203,7 +208,12 @@ export class Game {
         this.screenManager.handleClick(x, y, this.gameState);
         
         if (this.gameState === GameState.PLAYING) {
-          this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+          // Launch ball if sticky, otherwise shoot laser
+          if (this.ball.getIsSticky()) {
+            this.ball.launchFromSticky();
+          } else {
+            this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+          }
         }
       },
     });
@@ -491,6 +501,10 @@ export class Game {
     this.bat.setPosition(centerX - batWidth / 2, batY); // Center bat
     this.ball.reset();
     this.ball.setPosition(centerX, ballY);
+    
+    // Make ball sticky at level start - position on top of bat
+    const ballRadius = this.ball.getRadius();
+    this.ball.setSticky(true, 0, -ballRadius);
   }
 
   /**
@@ -570,6 +584,11 @@ export class Game {
 
     // Handle input (use effective deltaTime for movement)
     this.handleInput(effectiveDeltaTime);
+
+    // Update sticky ball position to follow bat
+    if (this.ball.getIsSticky()) {
+      this.ball.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
+    }
 
     // Update ball (use effective deltaTime for slow-mo)
     this.ball.update(effectiveDeltaTime);

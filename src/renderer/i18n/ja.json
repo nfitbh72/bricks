@@ -32,7 +32,8 @@
   "game": {
     "status": {
       "level": "レベル",
-      "time": "時間"
+      "time": "時間",
+      "launchBall": "クリックまたはスペースキーで発射"
     },
     "levels": {
       "level1": "レベル1：効果的なデザイン",

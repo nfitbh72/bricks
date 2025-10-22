@@ -32,7 +32,8 @@
   "game": {
     "status": {
       "level": "Nivel",
-      "time": "Tiempo"
+      "time": "Tiempo",
+      "launchBall": "Haz clic o presiona ESPACIO para lanzar"
     },
     "levels": {
       "level1": "Nivel 1: Diseño Efectivo",

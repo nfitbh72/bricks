@@ -119,6 +119,13 @@ export const PIERCING_FLASH_INTERVAL = 0.1; // Flash every 0.1 seconds
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1;
 
+// Sticky ball constants
+export const STICKY_BALL_LAUNCH_ANGLE = -60; // 30 degrees right of vertical (negative = upward)
+export const STICKY_BALL_INDICATOR_LENGTH = 50; // Length of launch direction indicator
+export const STICKY_BALL_INDICATOR_WIDTH = 3; // Width of indicator line
+export const STICKY_BALL_INDICATOR_COLOR = '#00ff00'; // Green indicator
+export const STICKY_BALL_INDICATOR_GLOW = 15; // Glow effect for indicator
+
 // Slow-motion effect constants
 export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
 export const SLOW_MOTION_DURATION = 2.0; // 2 seconds

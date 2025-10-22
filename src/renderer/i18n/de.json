@@ -32,7 +32,8 @@
   "game": {
     "status": {
       "level": "Level",
-      "time": "Zeit"
+      "time": "Zeit",
+      "launchBall": "Klicken oder LEERTASTE drücken zum Starten"
     },
     "levels": {
       "level1": "Level 1: Effektives Design",
