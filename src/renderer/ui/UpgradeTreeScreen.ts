@@ -48,6 +48,8 @@ export class UpgradeTreeScreen extends Screen {
   private lastFrameTime: number = 0;
   private upgradeSound: HTMLAudioElement;
   private isDevMode: boolean = false;
+  private showWelcomeDialog: boolean = false;
+  private hasVisitedBefore: boolean = false;
   
   // Layout constants
   private readonly NODE_WIDTH = 180;
@@ -95,6 +97,12 @@ export class UpgradeTreeScreen extends Screen {
    */
   setAvailablePoints(points: number): void {
     this.state.availablePoints = points;
+    
+    // Show welcome dialog on first visit
+    if (!this.hasVisitedBefore) {
+      this.showWelcomeDialog = true;
+      this.hasVisitedBefore = true;
+    }
   }
 
   /**
@@ -404,6 +412,12 @@ export class UpgradeTreeScreen extends Screen {
    * Handle mouse click
    */
   handleClick(x: number, y: number): void {
+    // If welcome dialog is showing, close it on any click
+    if (this.showWelcomeDialog) {
+      this.showWelcomeDialog = false;
+      return;
+    }
+    
     // Check button clicks
     super.handleClick(x, y);
     
@@ -590,6 +604,11 @@ export class UpgradeTreeScreen extends Screen {
     for (const button of this.buttons) {
       button.render(this.ctx);
     }
+    
+    // Render welcome dialog on top of everything
+    if (this.showWelcomeDialog) {
+      this.renderWelcomeDialog();
+    }
   }
 
   /**
@@ -630,7 +649,7 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.lineTo(this.canvas.width, this.HEADER_HEIGHT);
     this.ctx.stroke();
     
-    // Title
+    // Title (left side)
     this.ctx.shadowBlur = 20;
     this.ctx.shadowColor = '#00ffff';
     this.ctx.fillStyle = '#00ffff';
@@ -639,12 +658,12 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText('UPGRADE NEXUS', 20, this.HEADER_HEIGHT / 2);
     
-    // Points counter
+    // Points counter (center)
     this.ctx.font = '24px "D Day Stencil", Arial';
-    this.ctx.textAlign = 'right';
+    this.ctx.textAlign = 'center';
     this.ctx.fillText(
-      `POINTS AVAILABLE: ${this.state.availablePoints}`,
-      this.canvas.width - 180,
+      `You have ${this.state.availablePoints} point${this.state.availablePoints !== 1 ? 's' : ''} to spend!`,
+      this.canvas.width / 2,
       this.HEADER_HEIGHT / 2
     );
     
@@ -915,6 +934,77 @@ export class UpgradeTreeScreen extends Screen {
       }
     }
     
-    this.ctx.fillText(line, x, currentY);
+    // Draw remaining text
+    if (line) {
+      this.ctx.fillText(line, x, currentY);
+    }
+  }
+
+  /**
+   * Render welcome dialog
+   */
+  private renderWelcomeDialog(): void {
+    const centerX = this.canvas.width / 2;
+    const centerY = this.canvas.height / 2;
+    const dialogWidth = 600;
+    const dialogHeight = 300;
+    const dialogX = centerX - dialogWidth / 2;
+    const dialogY = centerY - dialogHeight / 2;
+    
+    // Semi-transparent overlay
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Dialog background
+    this.ctx.fillStyle = 'rgba(0, 20, 20, 0.95)';
+    this.ctx.fillRect(dialogX, dialogY, dialogWidth, dialogHeight);
+    
+    // Dialog border
+    this.ctx.strokeStyle = '#00ffff';
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeRect(dialogX, dialogY, dialogWidth, dialogHeight);
+    
+    // Glow effect
+    this.ctx.shadowBlur = 20;
+    this.ctx.shadowColor = '#00ffff';
+    this.ctx.strokeRect(dialogX, dialogY, dialogWidth, dialogHeight);
+    this.ctx.shadowBlur = 0;
+    
+    // Welcome text
+    this.ctx.fillStyle = '#00ffff';
+    this.ctx.font = '28px "D Day Stencil", Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'top';
+    
+    const message = `Welcome to the upgrade screen!\nSpend points here after each level is complete!\nYou have ${this.state.availablePoints} point${this.state.availablePoints !== 1 ? 's' : ''} to spend!`;
+    const lines = message.split('\n');
+    let yOffset = dialogY + 60;
+    
+    for (const line of lines) {
+      this.ctx.fillText(line, centerX, yOffset);
+      yOffset += 40;
+    }
+    
+    // OK button
+    const buttonWidth = 120;
+    const buttonHeight = 50;
+    const buttonX = centerX - buttonWidth / 2;
+    const buttonY = dialogY + dialogHeight - 80;
+    
+    // Button background
+    this.ctx.fillStyle = 'rgba(0, 255, 255, 0.2)';
+    this.ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+    
+    // Button border
+    this.ctx.strokeStyle = '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+    
+    // Button text
+    this.ctx.fillStyle = '#00ffff';
+    this.ctx.font = '24px "D Day Stencil", Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText('OK', centerX, buttonY + buttonHeight / 2);
   }
 }
