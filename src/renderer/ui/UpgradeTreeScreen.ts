@@ -785,19 +785,19 @@ export class UpgradeTreeScreen extends Screen {
     // Determine colors and opacity based on state
     let borderColor = '#00ffff'; // Cyan for active
     let glowColor = 'rgba(0, 255, 255, 0.5)';
-    let bgColor = 'rgba(0, 20, 20, 0.9)';
+    let bgColor = 'rgba(0, 5, 5, 0.9)'; // Very dark
     let textColor = '#ffffff';
     let opacity = 1.0;
     
     if (isMaxed) {
       borderColor = '#ff00ff'; // Magenta for maxed
       glowColor = 'rgba(255, 0, 255, 0.5)';
-      bgColor = 'rgba(20, 0, 20, 0.9)';
+      bgColor = 'rgba(5, 0, 5, 0.9)'; // Very dark
     } else if (isPreview) {
       // Preview state: greyed out, no glow
       borderColor = '#555555';
       glowColor = 'rgba(0, 0, 0, 0)';
-      bgColor = 'rgba(20, 20, 20, 0.8)';
+      bgColor = 'rgba(5, 5, 5, 0.8)'; // Very dark
       textColor = '#666666';
       opacity = 0.6;
     }
@@ -839,14 +839,14 @@ export class UpgradeTreeScreen extends Screen {
     
     // Title
     this.ctx.fillStyle = textColor;
-    this.ctx.font = '16px "Population Zero BB", Arial';
+    this.ctx.font = '18px "Population Zero BB", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(node.upgrade.name.toUpperCase(), x, y - halfHeight + 6);
     
     // Progress indicator
     const progressText = `[${node.currentLevel}/${node.upgrade.times}]`;
-    this.ctx.font = '13px "Population Zero BB", Arial';
+    this.ctx.font = '15px "Population Zero BB", Arial';
     this.ctx.fillStyle = isPreview ? '#555555' : '#aaaaaa';
     this.ctx.fillText(progressText, x, y - halfHeight + 25);
     
@@ -864,13 +864,13 @@ export class UpgradeTreeScreen extends Screen {
       // Maxed indicator
       if (isMaxed) {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = '12px "Population Zero BB", Arial';
+        this.ctx.font = '14px "Population Zero BB", Arial';
         this.ctx.fillText('✓ MAXED', x, y - halfHeight + 40);
       }
       
       // Description (word wrap)
       this.ctx.fillStyle = textColor;
-      this.ctx.font = '12px "Population Zero BB", Arial';
+      this.ctx.font = '14px "Population Zero BB", Arial';
       this.renderWrappedText(
         node.upgrade.description,
         x,
@@ -882,11 +882,11 @@ export class UpgradeTreeScreen extends Screen {
       // Cost indicator (bottom)
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
-        this.ctx.font = 'bold 12px "Population Zero BB", Arial';
+        this.ctx.font = 'bold 14px "Population Zero BB", Arial';
         this.ctx.fillText('COST: 1 POINT', x, y + halfHeight - 14);
       } else {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = 'bold 12px "Population Zero BB", Arial';
+        this.ctx.font = 'bold 14px "Population Zero BB", Arial';
         this.ctx.fillText('FULLY UPGRADED', x, y + halfHeight - 14);
       }
     }

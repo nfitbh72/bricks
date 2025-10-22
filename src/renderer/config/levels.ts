@@ -72,7 +72,7 @@ export function createLevel3(): LevelConfig {
     "I M M M I",
     "IL L L LI",
     "I S S S I",
-    "I       I",
+    "IHHHHHHHI",
     "I       I",
     "I       I",
     "I       I",
