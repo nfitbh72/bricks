@@ -355,6 +355,9 @@ export class CollisionManager {
     for (const otherBrick of allBricks) {
       if (otherBrick === hitBrick || otherBrick.isDestroyed()) continue;
       
+      // Skip indestructible bricks - explosions don't damage them
+      if (otherBrick.isIndestructible()) continue;
+      
       const otherBounds = otherBrick.getBounds();
       const otherCenterX = otherBounds.x + otherBounds.width / 2;
       const otherCenterY = otherBounds.y + otherBounds.height / 2;

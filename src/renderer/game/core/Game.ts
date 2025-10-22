@@ -23,6 +23,7 @@ import { Brick } from '../entities/Brick';
 import { 
   PLAYER_STARTING_HEALTH
 } from '../../config/constants';
+import { LanguageManager } from '../../i18n/LanguageManager';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -760,6 +761,11 @@ export class Game {
 
     this.ctx.restore();
 
+    // Render launch instruction if ball is sticky
+    if (this.ball.getIsSticky()) {
+      this.renderLaunchInstruction();
+    }
+
     // Render status bar (not affected by screen shake)
     this.statusBar.render(this.ctx);
 
@@ -813,6 +819,30 @@ export class Game {
     this.gameState = state;
   }
 
+
+  /**
+   * Render launch instruction text when ball is sticky
+   */
+  private renderLaunchInstruction(): void {
+    const langManager = LanguageManager.getInstance();
+    const instructionText = langManager.t('game.status.launchBall');
+    
+    this.ctx.save();
+    
+    // Position text in upper third of screen
+    const textY = this.canvas.height * 0.3;
+    
+    // Draw text with glow effect
+    this.ctx.font = '32px "D Day Stencil", Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillStyle = '#00ff00'; // Green
+    this.ctx.shadowBlur = 20;
+    this.ctx.shadowColor = '#00ff00';
+    this.ctx.fillText(instructionText, this.canvas.width / 2, textY);
+    
+    this.ctx.restore();
+  }
 
   /**
    * Render CRT scanline overlay effect
