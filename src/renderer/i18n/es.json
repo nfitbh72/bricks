@@ -57,6 +57,16 @@
         "name": "Vidas",
         "description": "Aumenta el número de vidas en 1"
       },
+      "offensive": {
+        "falling": "Ladrillo Cayendo",
+        "exploding": "Ladrillo Explosivo",
+        "laser": "Ladrillo Láser",
+        "homing": "Ladrillo Misil Guiado",
+        "warningFalling": "¡Cuidado! ¡Ladrillo cayendo!",
+        "warningExploding": "¡Peligro! ¡Ladrillo explotando!",
+        "warningLaser": "¡Advertencia! ¡Láser cargando!",
+        "warningHoming": "¡Entrante! ¡Misil rastreando!"
+      },
       "slowerBall": {
         "name": "Bola Más Lenta",
         "description": "Reduce la aceleración de la bola en 25%"

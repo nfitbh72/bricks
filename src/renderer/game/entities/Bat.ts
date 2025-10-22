@@ -3,7 +3,15 @@
  */
 
 import { Vector2D } from '../core/types';
-import { BAT_GLOW_BLUR } from '../../config/constants';
+import {
+  BAT_GLOW_BLUR,
+  BAT_TURRET_WIDTH_MULTIPLIER,
+  BAT_TURRET_HEIGHT_MULTIPLIER,
+  BAT_TURRET_BARREL_WIDTH_MULTIPLIER,
+  BAT_TURRET_BARREL_HEIGHT_MULTIPLIER,
+  BAT_TURRET_TIP_WIDTH_MULTIPLIER,
+  BAT_TURRET_TIP_HEIGHT_MULTIPLIER,
+} from '../../config/constants';
 
 export class Bat {
   private position: Vector2D;
@@ -62,10 +70,10 @@ export class Bat {
   private renderTurret(ctx: CanvasRenderingContext2D): void {
     const centerX = this.position.x + this.width / 2;
     const turretY = this.position.y;
-    const turretWidth = this.height * 1.5; // Turret width proportional to bat height
-    const turretHeight = this.height * 2; // Turret height
-    const barrelWidth = this.height * 0.4;
-    const barrelHeight = this.height * 1.5;
+    const turretWidth = this.height * BAT_TURRET_WIDTH_MULTIPLIER;
+    const turretHeight = this.height * BAT_TURRET_HEIGHT_MULTIPLIER;
+    const barrelWidth = this.height * BAT_TURRET_BARREL_WIDTH_MULTIPLIER;
+    const barrelHeight = this.height * BAT_TURRET_BARREL_HEIGHT_MULTIPLIER;
 
     // Draw turret base (trapezoid)
     ctx.fillStyle = '#ff00ff';
@@ -87,8 +95,8 @@ export class Bat {
     );
 
     // Draw barrel tip (small rectangle)
-    const tipWidth = barrelWidth * 0.6;
-    const tipHeight = this.height * 0.5;
+    const tipWidth = barrelWidth * BAT_TURRET_TIP_WIDTH_MULTIPLIER;
+    const tipHeight = this.height * BAT_TURRET_TIP_HEIGHT_MULTIPLIER;
     ctx.fillStyle = '#00ffff'; // Cyan tip for contrast
     ctx.shadowColor = '#00ffff';
     ctx.fillRect(

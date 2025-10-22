@@ -4,7 +4,7 @@
  */
 
 // Brick dimensions (fixed size for all bricks)
-export const BRICK_WIDTH = 80;
+export const BRICK_WIDTH = 104; // 30% wider than original 80
 export const BRICK_HEIGHT = 20;
 export const BRICK_SPACING = 2;
 export const BRICK_LAYOUT_TOP_MARGIN = 200;
@@ -27,9 +27,17 @@ export const BALL_TAIL_SEGMENTS = 8;
 export const BALL_TAIL_MAX_SPEED_MULTIPLIER = 3; // Tail length scales up to 3x at high speeds
 
 // Bat constants
-export const BAT_WIDTH = 150;
+export const BAT_WIDTH = 195; // 30% wider than original 150
 export const BAT_HEIGHT = 10;
 export const BAT_SPEED = 300;
+
+// Bat turret constants (relative to bat height)
+export const BAT_TURRET_WIDTH_MULTIPLIER = 1.05;
+export const BAT_TURRET_HEIGHT_MULTIPLIER = 1.4;
+export const BAT_TURRET_BARREL_WIDTH_MULTIPLIER = 0.28;
+export const BAT_TURRET_BARREL_HEIGHT_MULTIPLIER = 1.05;
+export const BAT_TURRET_TIP_WIDTH_MULTIPLIER = 0.6; // Multiplier of barrel width
+export const BAT_TURRET_TIP_HEIGHT_MULTIPLIER = 0.35;
 
 // Laser constants
 export const LASER_WIDTH = 4;
@@ -136,6 +144,7 @@ export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
 export const OFFENSIVE_BRICK_COLOR_FALLING = '#ff4400'; // Red-Orange warning color
 export const OFFENSIVE_BRICK_COLOR_EXPLODING = '#ff0000'; // Red warning color
 export const OFFENSIVE_BRICK_COLOR_LASER = '#ffff00'; // Yellow warning color
+export const OFFENSIVE_BRICK_COLOR_HOMING = '#ff00ff'; // Magenta warning color
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
@@ -153,3 +162,14 @@ export const LASER_BRICK_LASER_WIDTH = 6; // Laser beam width
 export const LASER_BRICK_LASER_SPEED = 600; // Pixels per second
 export const LASER_BRICK_LASER_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const LASER_BRICK_WARNING_COLOR = '#ffff00'; // Yellow warning flash
+
+// Homing missile constants
+export const HOMING_MISSILE_INITIAL_SPEED = 250; // Pixels per second
+export const HOMING_MISSILE_MAX_SPEED = 400; // Maximum speed after acceleration
+export const HOMING_MISSILE_ACCELERATION = 100; // Pixels per second squared
+export const HOMING_MISSILE_TURN_RATE = 3.0; // Radians per second
+export const HOMING_MISSILE_SIZE = 18; // Missile size (width/height) - 50% larger than 12
+export const HOMING_MISSILE_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+export const HOMING_MISSILE_PULSE_SPEED = 3.0; // Glow pulse frequency
+export const HOMING_MISSILE_COLOR = '#ff00ff'; // Bright purple/magenta
+export const HOMING_MISSILE_MAX_LIFETIME = 7.0; // Maximum lifetime in seconds

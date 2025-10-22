@@ -15,6 +15,7 @@ import { BrickConfig, BrickType } from '../game/core/types';
  * 'F' = OFFENSIVE_FALLING brick (falls when destroyed)
  * 'E' = OFFENSIVE_EXPLODING brick (explodes into debris)
  * 'L' = OFFENSIVE_LASER brick (shoots laser at bat)
+ * 'M' = OFFENSIVE_HOMING brick (spawns homing missile)
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
@@ -37,6 +38,8 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
         type = BrickType.OFFENSIVE_EXPLODING;
       } else if (char === 'L') {
         type = BrickType.OFFENSIVE_LASER;
+      } else if (char === 'M') {
+        type = BrickType.OFFENSIVE_HOMING;
       }
       
       if (type !== null) {

@@ -23,6 +23,16 @@
       "damageNumbers": "ダメージ数値",
       "language": "言語"
     },
+    "offensive": {
+      "falling": "落下ブロック",
+      "exploding": "爆発ブロック",
+      "laser": "レーザーブロック",
+      "homing": "誘導ミサイルブロック",
+      "warningFalling": "注意！ブロックが落ちてくる！",
+      "warningExploding": "危険！ブロックが爆発する！",
+      "warningLaser": "警告！レーザー充電中！",
+      "warningHoming": "接近！ミサイル追尾中！"
+    },
     "leaderboard": {
       "rank": "順位",
       "name": "名前",

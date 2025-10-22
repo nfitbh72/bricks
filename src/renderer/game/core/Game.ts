@@ -601,7 +601,13 @@ export class Game {
     this.weaponManager.update(effectiveDeltaTime);
 
     // Update offensive brick entities (use effective deltaTime for slow-mo)
-    this.offensiveEntityManager.update(effectiveDeltaTime, this.canvas.width, this.canvas.height);
+    this.offensiveEntityManager.update(
+      effectiveDeltaTime,
+      this.canvas.width,
+      this.canvas.height,
+      this.bat.getCenterX(),
+      this.bat.getCenterY()
+    );
 
     // Update collision manager (use effective deltaTime for slow-mo)
     this.collisionManager.update(effectiveDeltaTime, this.ball);
@@ -695,6 +701,7 @@ export class Game {
     this.collisionManager.checkFallingBrickBatCollisions(this.offensiveEntityManager.getFallingBricks(), this.bat);
     this.collisionManager.checkDebrisBatCollisions(this.offensiveEntityManager.getDebris(), this.bat);
     this.collisionManager.checkBrickLaserBatCollisions(this.offensiveEntityManager.getBrickLasers(), this.bat);
+    this.collisionManager.checkHomingMissileBatCollisions(this.offensiveEntityManager.getHomingMissiles(), this.bat);
   }
 
   /**

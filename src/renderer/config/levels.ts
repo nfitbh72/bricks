@@ -25,9 +25,9 @@ export function createLevel1(): LevelConfig {
   ];
   */
   const pattern = [
-    //"NNNN",
-    //"NFFN",
-    //"NFFN",
+    "NNNN",
+    "NFFN",
+    "NFFN",
     "NNNN"
   ];
   
@@ -46,10 +46,10 @@ export function createLevel1(): LevelConfig {
  */
 export function createLevel2(): LevelConfig {
     const pattern = [
-    //"IIIIII",
-    //"INNNNI",
-    //"INHENI",
-    //"INEHNI",
+    "IIIIII",
+    "INNNNI",
+    "INHENI",
+    "INEHNI",
     "INNNNI"
   ];
 
@@ -67,10 +67,15 @@ export function createLevel2(): LevelConfig {
  */
 export function createLevel3(): LevelConfig {
   const pattern = [
-    "L L L L",
-    " L L L ",
-    "L L L L",
-    " L L L "
+    "IIIIIIIII",
+    "IL L L LI",
+    "I M M M I",
+    "IL L L LI",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I"
   ];
   
   return {

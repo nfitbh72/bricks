@@ -53,6 +53,16 @@
         "name": "Laser+",
         "description": "Erhöht Laserschaden um 10%"
       },
+      "offensive": {
+        "falling": "Fallender Ziegel",
+        "exploding": "Explodierender Ziegel",
+        "laser": "Laser-Ziegel",
+        "homing": "Lenkraketen-Ziegel",
+        "warningFalling": "Achtung! Ziegel fällt!",
+        "warningExploding": "Gefahr! Ziegel explodiert!",
+        "warningLaser": "Warnung! Laser lädt!",
+        "warningHoming": "Anflug! Rakete verfolgt!"
+      },
       "lives": {
         "name": "Leben",
         "description": "Erhöht die Anzahl der Leben um 1"

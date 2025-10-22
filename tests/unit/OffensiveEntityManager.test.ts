@@ -77,7 +77,7 @@ describe('OffensiveEntityManager', () => {
       
       const initialPos = manager.getFallingBricks()[0].getPosition();
       
-      manager.update(0.1, 1920, 1080);
+      manager.update(0.1, 1920, 1080, 960, 540);
       
       const newPos = manager.getFallingBricks()[0].getPosition();
       expect(newPos.y).toBeGreaterThan(initialPos.y); // Should fall down
@@ -89,7 +89,7 @@ describe('OffensiveEntityManager', () => {
       
       const initialPositions = manager.getDebris().map(d => d.getPosition());
       
-      manager.update(0.1, 1920, 1080);
+      manager.update(0.1, 1920, 1080, 960, 540);
       
       const newPositions = manager.getDebris().map(d => d.getPosition());
       
@@ -110,7 +110,7 @@ describe('OffensiveEntityManager', () => {
       
       const initialPos = manager.getBrickLasers()[0].getPosition();
       
-      manager.update(0.1, 1920, 1080);
+      manager.update(0.1, 1920, 1080, 960, 540);
       
       const newPos = manager.getBrickLasers()[0].getPosition();
       // Laser should move down after fire delay
@@ -123,7 +123,7 @@ describe('OffensiveEntityManager', () => {
       
       // Update many times to move brick off screen
       for (let i = 0; i < 100; i++) {
-        manager.update(0.1, 1920, 1080);
+        manager.update(0.1, 1920, 1080, 960, 540);
       }
       
       // Should be removed when off screen
@@ -138,7 +138,7 @@ describe('OffensiveEntityManager', () => {
       
       // Update many times to move debris off screen
       for (let i = 0; i < 100; i++) {
-        manager.update(0.1, 1920, 1080);
+        manager.update(0.1, 1920, 1080, 960, 540);
       }
       
       // Some or all debris should be removed when off screen

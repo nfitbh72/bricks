@@ -6,6 +6,7 @@
 import { FallingBrick } from '../entities/offensive/FallingBrick';
 import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
+import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { Brick } from '../entities/Brick';
 import { BrickType } from '../core/types';
 import { 
@@ -17,6 +18,7 @@ export class OffensiveEntityManager {
   private fallingBricks: FallingBrick[] = [];
   private debris: Debris[] = [];
   private brickLasers: BrickLaser[] = [];
+  private homingMissiles: HomingMissile[] = [];
 
   /**
    * Spawn offensive entity when an offensive brick is destroyed
@@ -47,13 +49,18 @@ export class OffensiveEntityManager {
         // Create laser targeting bat's current position
         this.brickLasers.push(new BrickLaser(x, y, batCenterX, color));
         break;
+
+      case BrickType.OFFENSIVE_HOMING:
+        // Create homing missile at destroyed brick position
+        this.homingMissiles.push(new HomingMissile(x, y, color));
+        break;
     }
   }
 
   /**
    * Update all offensive entities
    */
-  update(deltaTime: number, canvasWidth: number, canvasHeight: number): void {
+  update(deltaTime: number, canvasWidth: number, canvasHeight: number, batCenterX: number, batCenterY: number): void {
     // Update falling bricks
     for (const fallingBrick of this.fallingBricks) {
       fallingBrick.update(deltaTime);
@@ -69,6 +76,11 @@ export class OffensiveEntityManager {
       laser.update(deltaTime);
     }
 
+    // Update homing missiles (need bat position for tracking)
+    for (const missile of this.homingMissiles) {
+      missile.update(deltaTime, batCenterX, batCenterY);
+    }
+
     // Remove inactive or off-screen entities
     this.fallingBricks = this.fallingBricks.filter(
       (fb) => fb.isActive() && !fb.isOffScreen(canvasHeight)
@@ -78,6 +90,9 @@ export class OffensiveEntityManager {
     );
     this.brickLasers = this.brickLasers.filter(
       (bl) => bl.isActive() && !bl.isOffScreen(canvasHeight)
+    );
+    this.homingMissiles = this.homingMissiles.filter(
+      (hm) => hm.isActive() && !hm.isOffScreen(canvasWidth, canvasHeight)
     );
   }
 
@@ -98,6 +113,11 @@ export class OffensiveEntityManager {
     // Render brick lasers
     for (const laser of this.brickLasers) {
       laser.render(ctx);
+    }
+
+    // Render homing missiles
+    for (const missile of this.homingMissiles) {
+      missile.render(ctx);
     }
   }
 
@@ -123,11 +143,19 @@ export class OffensiveEntityManager {
   }
 
   /**
+   * Get all homing missiles (for collision detection)
+   */
+  getHomingMissiles(): HomingMissile[] {
+    return this.homingMissiles;
+  }
+
+  /**
    * Clear all offensive entities
    */
   clear(): void {
     this.fallingBricks = [];
     this.debris = [];
     this.brickLasers = [];
+    this.homingMissiles = [];
   }
 }

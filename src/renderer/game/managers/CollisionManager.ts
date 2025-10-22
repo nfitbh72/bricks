@@ -11,6 +11,7 @@ import { GameUpgrades } from '../systems/GameUpgrades';
 import { FallingBrick } from '../entities/offensive/FallingBrick';
 import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
+import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -19,6 +20,7 @@ import {
   FALLING_BRICK_DAMAGE_PERCENT,
   EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT,
   LASER_BRICK_LASER_DAMAGE_PERCENT,
+  HOMING_MISSILE_DAMAGE_PERCENT,
 } from '../../config/constants';
 
 export interface CollisionCallbacks {
@@ -329,6 +331,41 @@ export class CollisionManager {
 
         // Deactivate laser
         laser.deactivate();
+      }
+    }
+  }
+
+  /**
+   * Check homing missile-bat collisions
+   */
+  checkHomingMissileBatCollisions(
+    homingMissiles: HomingMissile[],
+    bat: Bat
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const missile of homingMissiles) {
+      if (!missile.isActive()) continue;
+
+      const missileBounds = missile.getBounds();
+
+      // Simple AABB collision
+      if (
+        missileBounds.x < batBounds.x + batBounds.width &&
+        missileBounds.x + missileBounds.width > batBounds.x &&
+        missileBounds.y < batBounds.y + batBounds.height &&
+        missileBounds.y + missileBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(HOMING_MISSILE_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(HOMING_MISSILE_DAMAGE_PERCENT);
+        }
+
+        // Deactivate missile
+        missile.deactivate();
       }
     }
   }

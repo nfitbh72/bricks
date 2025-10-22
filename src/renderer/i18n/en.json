@@ -45,9 +45,11 @@
         "falling": "Falling Brick",
         "exploding": "Exploding Brick",
         "laser": "Laser Brick",
+        "homing": "Homing Missile Brick",
         "warningFalling": "Watch out! Brick falling!",
         "warningExploding": "Danger! Brick exploding!",
-        "warningLaser": "Warning! Laser charging!"
+        "warningLaser": "Warning! Laser charging!",
+        "warningHoming": "Incoming! Missile tracking!"
       }
     },
     "upgrades": {

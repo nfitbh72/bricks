@@ -65,6 +65,16 @@
         "name": "Dégâts de Balle",
         "description": "Augmente les dégâts de la balle de 1"
       },
+      "offensive": {
+        "falling": "Brique Tombante",
+        "exploding": "Brique Explosive",
+        "laser": "Brique Laser",
+        "homing": "Brique Missile Guidé",
+        "warningFalling": "Attention! Brique qui tombe!",
+        "warningExploding": "Danger! Brique qui explose!",
+        "warningLaser": "Alerte! Laser en charge!",
+        "warningHoming": "Arrivée! Missile en poursuite!"
+      },
       "piercing": {
         "name": "Perçage",
         "description": "Une chance sur 10 de percer une brique"
