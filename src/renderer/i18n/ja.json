@@ -28,10 +28,12 @@
       "exploding": "爆発ブロック",
       "laser": "レーザーブロック",
       "homing": "誘導ミサイルブロック",
+      "splitting": "分裂ブロック",
       "warningFalling": "注意！ブロックが落ちてくる！",
       "warningExploding": "危険！ブロックが爆発する！",
       "warningLaser": "警告！レーザー充電中！",
-      "warningHoming": "接近！ミサイル追尾中！"
+      "warningHoming": "接近！ミサイル追尾中！",
+      "warningSplitting": "注意！破片が飛んでくる！"
     },
     "leaderboard": {
       "rank": "順位",

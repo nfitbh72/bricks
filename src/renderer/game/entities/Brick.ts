@@ -35,6 +35,7 @@ export class Brick {
     [BrickType.OFFENSIVE_EXPLODING]: 1,
     [BrickType.OFFENSIVE_LASER]: 1,
     [BrickType.OFFENSIVE_HOMING]: 1,
+    [BrickType.OFFENSIVE_SPLITTING]: 1,
   };
 
   /**

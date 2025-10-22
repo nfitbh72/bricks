@@ -7,11 +7,13 @@ import { FallingBrick } from '../entities/offensive/FallingBrick';
 import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
+import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { Brick } from '../entities/Brick';
 import { BrickType } from '../core/types';
 import { 
   EXPLODING_BRICK_DEBRIS_COUNT,
-  EXPLODING_BRICK_DEBRIS_SPEED
+  EXPLODING_BRICK_DEBRIS_SPEED,
+  SPLITTING_FRAGMENT_SPEED
 } from '../../config/constants';
 
 export class OffensiveEntityManager {
@@ -19,6 +21,7 @@ export class OffensiveEntityManager {
   private debris: Debris[] = [];
   private brickLasers: BrickLaser[] = [];
   private homingMissiles: HomingMissile[] = [];
+  private splittingFragments: SplittingFragment[] = [];
 
   /**
    * Spawn offensive entity when an offensive brick is destroyed
@@ -54,6 +57,16 @@ export class OffensiveEntityManager {
         // Create homing missile at destroyed brick position
         this.homingMissiles.push(new HomingMissile(x, y, color));
         break;
+
+      case BrickType.OFFENSIVE_SPLITTING:
+        // Create 4 diagonal fragments
+        const angles = [Math.PI / 4, 3 * Math.PI / 4, 5 * Math.PI / 4, 7 * Math.PI / 4]; // 45°, 135°, 225°, 315°
+        for (const angle of angles) {
+          const velocityX = Math.cos(angle) * SPLITTING_FRAGMENT_SPEED;
+          const velocityY = Math.sin(angle) * SPLITTING_FRAGMENT_SPEED;
+          this.splittingFragments.push(new SplittingFragment(x, y, velocityX, velocityY, color));
+        }
+        break;
     }
   }
 
@@ -81,6 +94,11 @@ export class OffensiveEntityManager {
       missile.update(deltaTime, batCenterX, batCenterY);
     }
 
+    // Update splitting fragments
+    for (const fragment of this.splittingFragments) {
+      fragment.update(deltaTime);
+    }
+
     // Remove inactive or off-screen entities
     this.fallingBricks = this.fallingBricks.filter(
       (fb) => fb.isActive() && !fb.isOffScreen(canvasHeight)
@@ -93,6 +111,9 @@ export class OffensiveEntityManager {
     );
     this.homingMissiles = this.homingMissiles.filter(
       (hm) => hm.isActive() && !hm.isOffScreen(canvasWidth, canvasHeight)
+    );
+    this.splittingFragments = this.splittingFragments.filter(
+      (sf) => sf.isActive() && !sf.isOffScreen(canvasWidth, canvasHeight)
     );
   }
 
@@ -118,6 +139,11 @@ export class OffensiveEntityManager {
     // Render homing missiles
     for (const missile of this.homingMissiles) {
       missile.render(ctx);
+    }
+
+    // Render splitting fragments
+    for (const fragment of this.splittingFragments) {
+      fragment.render(ctx);
     }
   }
 
@@ -150,6 +176,13 @@ export class OffensiveEntityManager {
   }
 
   /**
+   * Get all splitting fragments (for collision detection)
+   */
+  getSplittingFragments(): SplittingFragment[] {
+    return this.splittingFragments;
+  }
+
+  /**
    * Clear all offensive entities
    */
   clear(): void {
@@ -157,5 +190,6 @@ export class OffensiveEntityManager {
     this.debris = [];
     this.brickLasers = [];
     this.homingMissiles = [];
+    this.splittingFragments = [];
   }
 }

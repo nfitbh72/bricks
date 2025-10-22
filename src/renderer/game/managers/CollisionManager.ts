@@ -12,6 +12,7 @@ import { FallingBrick } from '../entities/offensive/FallingBrick';
 import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
+import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -21,6 +22,7 @@ import {
   EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT,
   LASER_BRICK_LASER_DAMAGE_PERCENT,
   HOMING_MISSILE_DAMAGE_PERCENT,
+  SPLITTING_FRAGMENT_DAMAGE_PERCENT,
 } from '../../config/constants';
 
 export interface CollisionCallbacks {
@@ -366,6 +368,41 @@ export class CollisionManager {
 
         // Deactivate missile
         missile.deactivate();
+      }
+    }
+  }
+
+  /**
+   * Check splitting fragment-bat collisions
+   */
+  checkSplittingFragmentBatCollisions(
+    splittingFragments: SplittingFragment[],
+    bat: Bat
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const fragment of splittingFragments) {
+      if (!fragment.isActive()) continue;
+
+      const fragmentBounds = fragment.getBounds();
+
+      // Simple AABB collision
+      if (
+        fragmentBounds.x < batBounds.x + batBounds.width &&
+        fragmentBounds.x + fragmentBounds.width > batBounds.x &&
+        fragmentBounds.y < batBounds.y + batBounds.height &&
+        fragmentBounds.y + fragmentBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(SPLITTING_FRAGMENT_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(SPLITTING_FRAGMENT_DAMAGE_PERCENT);
+        }
+
+        // Deactivate fragment
+        fragment.deactivate();
       }
     }
   }

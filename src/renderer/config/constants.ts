@@ -145,6 +145,7 @@ export const OFFENSIVE_BRICK_COLOR_FALLING = '#ff4400'; // Red-Orange warning co
 export const OFFENSIVE_BRICK_COLOR_EXPLODING = '#ff0000'; // Red warning color
 export const OFFENSIVE_BRICK_COLOR_LASER = '#ffff00'; // Yellow warning color
 export const OFFENSIVE_BRICK_COLOR_HOMING = '#ff00ff'; // Magenta warning color
+export const OFFENSIVE_BRICK_COLOR_SPLITTING = '#ff6600'; // Orange warning color
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
@@ -173,3 +174,13 @@ export const HOMING_MISSILE_DAMAGE_PERCENT = 10; // Percentage of bat width to r
 export const HOMING_MISSILE_PULSE_SPEED = 3.0; // Glow pulse frequency
 export const HOMING_MISSILE_COLOR = '#ff00ff'; // Bright purple/magenta
 export const HOMING_MISSILE_MAX_LIFETIME = 7.0; // Maximum lifetime in seconds
+
+// Splitting brick constants
+export const SPLITTING_FRAGMENT_COUNT = 4; // 4 diagonal directions
+export const SPLITTING_FRAGMENT_SPEED = 350; // Pixels per second
+export const SPLITTING_FRAGMENT_SIZE = 16; // Fragment size (larger than debris)
+export const SPLITTING_FRAGMENT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+export const SPLITTING_FRAGMENT_FALL_DISTANCE = 100; // Distance before falling vertically
+export const SPLITTING_FRAGMENT_SHAKE_DURATION = 0.5; // Shake duration in seconds
+export const SPLITTING_FRAGMENT_SHAKE_INTENSITY = 3; // Shake intensity in pixels
+export const SPLITTING_FRAGMENT_GRAVITY = 500; // Gravity when falling (25% faster than 400)

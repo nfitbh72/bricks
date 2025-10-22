@@ -58,10 +58,12 @@
         "exploding": "Explodierender Ziegel",
         "laser": "Laser-Ziegel",
         "homing": "Lenkraketen-Ziegel",
+        "splitting": "Spaltender Ziegel",
         "warningFalling": "Achtung! Ziegel fällt!",
         "warningExploding": "Gefahr! Ziegel explodiert!",
         "warningLaser": "Warnung! Laser lädt!",
-        "warningHoming": "Anflug! Rakete verfolgt!"
+        "warningHoming": "Anflug! Rakete verfolgt!",
+        "warningSplitting": "Vorsicht! Fragmente kommen!"
       },
       "lives": {
         "name": "Leben",
