@@ -495,7 +495,10 @@ export class Game {
       this.level.getTotalBricks()
     );
     
-    // Reset ball and bat position (preserve bat size from upgrades)
+    // Reset bat width (remove damage from previous level, preserve upgrade size)
+    this.bat.resetWidth();
+    
+    // Reset ball and bat position
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat

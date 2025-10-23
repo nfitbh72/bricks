@@ -319,6 +319,14 @@ export class Bat {
   }
 
   /**
+   * Reset bat width to original width (for level start)
+   */
+  resetWidth(): void {
+    this.width = this.originalWidth;
+    this.constrainToBounds();
+  }
+
+  /**
    * Set whether to show turret (when lasers are active)
    */
   setShowTurret(show: boolean): void {
