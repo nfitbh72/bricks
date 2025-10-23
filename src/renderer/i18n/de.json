@@ -38,9 +38,28 @@
     "levels": {
       "level1": "Level 1: Effektives Design",
       "level2": "Level 2: Sagt Hallo",
-      "level3": "Level 3: Schädelinsel"
+      "level3": "Level 3: Schädelinsel",
+      "level1Name": "Level 1: Eins",
+      "level2Name": "Level 2: Trümmer in alle Richtungen",
+      "level3Name": "Level 3: Vorsicht vor Lasern und zerbrechenden fallenden Ziegeln!",
+      "level4Name": "Level 4: Wir nennen es Homer"
     },
     "upgrades": {
+      "title": "UPGRADE-ZENTRUM",
+      "pointsAvailable": "Sie haben {count} Punkt zum Ausgeben!",
+      "pointsAvailablePlural": "Sie haben {count} Punkte zum Ausgeben!",
+      "locked": "GESPERRT",
+      "preview": "???",
+      "maxed": "✓ MAXIMAL",
+      "cost": "KOSTEN: 1 PUNKT",
+      "fullyUpgraded": "VOLL AUFGEWERTET",
+      "welcome": {
+        "title": "Willkommen im Upgrade-Bildschirm!",
+        "message": "Geben Sie hier nach jedem Level Punkte aus!",
+        "points": "Sie haben {count} Punkt zum Ausgeben!",
+        "pointsPlural": "Sie haben {count} Punkte zum Ausgeben!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Schlägerbreite",
         "description": "Erhöht die Schlägerbreite um 10%"

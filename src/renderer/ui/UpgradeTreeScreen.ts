@@ -7,6 +7,7 @@ import { Screen } from './Screen';
 import { Button } from './Button';
 import { Upgrade, UpgradeType } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
+import { getUpgrades } from '../config/upgrades';
 
 /**
  * Animation types for upgrade nodes
@@ -131,6 +132,66 @@ export class UpgradeTreeScreen extends Screen {
     
     // Reset points
     this.state.availablePoints = 0;
+  }
+
+  /**
+   * Refresh translations when language changes (required by Screen base class)
+   */
+  refreshTranslations(): void {
+    this.refreshUpgrades(getUpgrades());
+  }
+
+  /**
+   * Refresh upgrade translations (called when language changes)
+   */
+  refreshUpgrades(upgrades: Upgrade[]): void {
+    // Save current upgrade levels
+    const currentLevels = this.getUpgradeLevels();
+    
+    // Rebuild tree with new translations
+    this.state.rootNodes = this.buildUpgradeTree(upgrades);
+    
+    // Restore upgrade levels and states
+    const restoreLevels = (node: UpgradeNode) => {
+      const savedLevel = currentLevels.get(node.upgrade.type);
+      if (savedLevel !== undefined) {
+        node.currentLevel = savedLevel;
+        
+        // Update state based on level
+        if (node.currentLevel >= node.upgrade.times) {
+          node.state = 'maxed';
+        } else if (node.currentLevel > 0) {
+          node.state = 'unlocked';
+        }
+        
+        // Check if children should be unlocked/previewed
+        if (node.currentLevel >= node.upgrade.unlockNextUpgradesAfterTimes) {
+          for (const child of node.children) {
+            if (child.state === 'locked') {
+              child.state = 'unlocked';
+            }
+          }
+        } else if (node.currentLevel >= node.upgrade.previewNextUpgrades) {
+          for (const child of node.children) {
+            if (child.state === 'locked') {
+              child.state = 'preview';
+            }
+          }
+        }
+      }
+      
+      // Recursively restore children
+      for (const child of node.children) {
+        restoreLevels(child);
+      }
+    };
+    
+    for (const rootNode of this.state.rootNodes) {
+      restoreLevels(rootNode);
+    }
+    
+    // Recalculate layout
+    this.calculateLayout();
   }
 
   /**
@@ -660,13 +721,14 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.font = '32px "D Day Stencil", Arial';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('UPGRADE NEXUS', 20, this.HEADER_HEIGHT / 2);
+    this.ctx.fillText(t('game.upgrades.title'), 20, this.HEADER_HEIGHT / 2);
     
     // Points counter (center)
     this.ctx.font = '24px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
+    const pointsKey = this.state.availablePoints === 1 ? 'game.upgrades.pointsAvailable' : 'game.upgrades.pointsAvailablePlural';
     this.ctx.fillText(
-      `You have ${this.state.availablePoints} point${this.state.availablePoints !== 1 ? 's' : ''} to spend!`,
+      t(pointsKey).replace('{count}', this.state.availablePoints.toString()),
       this.canvas.width / 2,
       this.HEADER_HEIGHT / 2
     );
@@ -877,10 +939,10 @@ export class UpgradeTreeScreen extends Screen {
       // Preview state: show ??? and LOCKED
       this.ctx.fillStyle = textColor;
       this.ctx.font = '22px "Population Zero BB", Arial';
-      this.ctx.fillText('???', x, y - halfHeight + 55);
+      this.ctx.fillText(t('game.upgrades.preview'), x, y - halfHeight + 55);
       
       this.ctx.font = '13px "Population Zero BB", Arial';
-      this.ctx.fillText('LOCKED', x, y + halfHeight - 14);
+      this.ctx.fillText(t('game.upgrades.locked'), x, y + halfHeight - 14);
     } else {
       // Unlocked or maxed: show full details
       
@@ -888,7 +950,7 @@ export class UpgradeTreeScreen extends Screen {
       if (isMaxed) {
         this.ctx.fillStyle = '#ff00ff';
         this.ctx.font = '14px "Population Zero BB", Arial';
-        this.ctx.fillText('✓ MAXED', x, y - halfHeight + 40);
+        this.ctx.fillText(t('game.upgrades.maxed'), x, y - halfHeight + 40);
       }
       
       // Description (word wrap)
@@ -906,11 +968,11 @@ export class UpgradeTreeScreen extends Screen {
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
         this.ctx.font = 'bold 14px "Population Zero BB", Arial';
-        this.ctx.fillText('COST: 1 POINT', x, y + halfHeight - 14);
+        this.ctx.fillText(t('game.upgrades.cost'), x, y + halfHeight - 14);
       } else {
         this.ctx.fillStyle = '#ff00ff';
         this.ctx.font = 'bold 14px "Population Zero BB", Arial';
-        this.ctx.fillText('FULLY UPGRADED', x, y + halfHeight - 14);
+        this.ctx.fillText(t('game.upgrades.fullyUpgraded'), x, y + halfHeight - 14);
       }
     }
     
@@ -980,8 +1042,13 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     
-    const message = `Welcome to the upgrade screen!\nSpend points here after each level is complete!\nYou have ${this.state.availablePoints} point${this.state.availablePoints !== 1 ? 's' : ''} to spend!`;
-    const lines = message.split('\n');
+    // Build message with translations
+    const title = t('game.upgrades.welcome.title');
+    const message = t('game.upgrades.welcome.message');
+    const pointsKey = this.state.availablePoints === 1 ? 'game.upgrades.welcome.points' : 'game.upgrades.welcome.pointsPlural';
+    const pointsText = t(pointsKey).replace('{count}', this.state.availablePoints.toString());
+    
+    const lines = [title, message, pointsText];
     let yOffset = dialogY + 60;
     
     for (const line of lines) {
@@ -1009,6 +1076,6 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.font = '24px "D Day Stencil", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText('OK', centerX, buttonY + buttonHeight / 2);
+    this.ctx.fillText(t('game.upgrades.welcome.ok'), centerX, buttonY + buttonHeight / 2);
   }
 }

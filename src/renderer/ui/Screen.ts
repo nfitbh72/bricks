@@ -50,6 +50,11 @@ export abstract class Screen {
   abstract render(): void;
 
   /**
+   * Refresh translations (called when language changes)
+   */
+  abstract refreshTranslations(): void;
+
+  /**
    * Get buttons (for testing)
    */
   getButtons(): Button[] {

@@ -38,7 +38,11 @@
     "levels": {
       "level1": "Antas 1: Epektibong Disenyo",
       "level2": "Antas 2: Pagbati",
-      "level3": "Antas 3: Isla ng Bungo"
+      "level3": "Antas 3: Isla ng Bungo",
+      "level1Name": "Antas 1: Isa",
+      "level2Name": "Antas 2: Mga guho sa lahat ng direksyon",
+      "level3Name": "Antas 3: Mag-ingat sa mga laser at mga nahuhulog na laryo na nadudurog!",
+      "level4Name": "Antas 4: Tinatawag namin itong Homer"
     },
     "bricks": {
       "offensive": {
@@ -55,6 +59,21 @@
       }
     },
     "upgrades": {
+      "title": "UPGRADE CENTER",
+      "pointsAvailable": "Mayroon kang {count} punto na magagastos!",
+      "pointsAvailablePlural": "Mayroon kang {count} puntos na magagastos!",
+      "locked": "NAKAKANDADO",
+      "preview": "???",
+      "maxed": "✓ PINAKAMATAAS",
+      "cost": "HALAGA: 1 PUNTO",
+      "fullyUpgraded": "LUBOS NA NA-UPGRADE",
+      "welcome": {
+        "title": "Maligayang pagdating sa upgrade screen!",
+        "message": "Gumastos ng puntos dito pagkatapos ng bawat level!",
+        "points": "Mayroon kang {count} punto na magagastos!",
+        "pointsPlural": "Mayroon kang {count} puntos na magagastos!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Lapad ng Palo",
         "description": "Dagdagan ang lapad ng palo ng 10%"

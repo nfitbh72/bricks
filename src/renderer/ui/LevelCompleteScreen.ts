@@ -118,21 +118,29 @@ export class LevelCompleteScreen extends Screen {
           this.playerName,
           Leaderboard.generateFakeLeaderboard(this.currentLevel)
         );
-        
-        return;
       }
     }
     
-    // Continue on space/enter (only if name entry is complete or not on leaderboard)
+    // Continue on space or enter (only if not entering name)
     if (key === ' ' || key === 'Enter') {
       if (!this.isOnLeaderboard || this.nameEntryIndex >= 3) {
         this.onContinue();
       }
     }
   }
-  
+
   /**
-   * Update flash animation
+   * Refresh translations when language changes
+   */
+  refreshTranslations(): void {
+    // Update button text
+    if (this.buttons.length >= 1) {
+      this.buttons[0].setText(t('ui.buttons.continue'));
+    }
+  }
+
+  /**
+   * Update animations
    */
   update(deltaTime: number): void {
     if (this.isOnLeaderboard && this.nameEntryIndex < 3) {

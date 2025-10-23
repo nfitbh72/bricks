@@ -10,6 +10,7 @@ import { GameState, LevelConfig, BrickType } from '../core/types';
 import { calculateGameElementScale } from '../core/utils';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { getLevel } from '../../config/levels';
+import { getUpgrades } from '../../config/upgrades';
 import { AudioManager } from '../managers/AudioManager';
 import { InputManager } from '../managers/InputManager';
 import { ScreenManager } from '../managers/ScreenManager';
@@ -130,6 +131,12 @@ export class Game {
 
     // Set language change callback to refresh UI
     this.screenManager.optionsScreen.setLanguageChangeCallback(() => {
+      // Refresh all screen translations
+      this.screenManager.introScreen.refreshTranslations();
+      this.screenManager.pauseScreen.refreshTranslations();
+      this.screenManager.gameOverScreen.refreshTranslations();
+      this.screenManager.levelCompleteScreen.refreshTranslations();
+      this.screenManager.upgradeTreeScreen.refreshTranslations();
       // Force a re-render to update all translated text
       this.render();
     });

@@ -4,6 +4,7 @@
 
 import { LevelConfig, BrickType } from '../game/core/types';
 import { createBricksFromPattern, createBricksFromWord } from './brickLayout';
+import { t } from '../i18n/LanguageManager';
 
 /**
  * Create Level 1 configuration
@@ -33,7 +34,7 @@ export function createLevel1(): LevelConfig {
   
   return {
     id: 1,
-    name: 'Level 1: One',
+    name: t('game.levels.level1Name'),
     bricks: createBricksFromPattern(pattern),
     //bricks: createBricksFromWord("1", BrickType.NORMAL),
     baseHealth: 1, // Normal bricks = 1 HP, Healthy bricks = 3 HP
@@ -55,7 +56,7 @@ export function createLevel2(): LevelConfig {
 
   return {
     id: 2,
-    name: 'Level 2: Debris in all directions',
+    name: t('game.levels.level2Name'),
     bricks: createBricksFromPattern(pattern),
     baseHealth: 2, // Normal bricks = 2 HP, Healthy bricks = 6 HP
   };
@@ -87,7 +88,7 @@ export function createLevel3(): LevelConfig {
   
   return {
     id: 3,
-    name: 'Level 3: Beware of lasers and shattering falling bricks!',
+    name: t('game.levels.level3Name'),
     bricks: createBricksFromPattern(pattern),
     baseHealth: 3, // Normal bricks = 3 HP, Healthy bricks = 9 HP
   };
@@ -115,7 +116,7 @@ export function createLevel4(): LevelConfig {
   
   return {
     id: 4,
-    name: 'Level 4: We call it Homer',
+    name: t('game.levels.level4Name'),
     bricks: createBricksFromPattern(pattern),
     baseHealth: 4, // Normal bricks = 4 HP, Healthy bricks = 12 HP
   };

@@ -38,7 +38,11 @@
     "levels": {
       "level1": "第1关：有效设计",
       "level2": "第2关：打招呼",
-      "level3": "第3关：骷髅岛"
+      "level3": "第3关：骷髅岛",
+      "level1Name": "第1关：一",
+      "level2Name": "第2关：碎片四处飞散",
+      "level3Name": "第3关：小心激光和破碎的坠落砖块！",
+      "level4Name": "第4关：我们称之为荷马"
     },
     "bricks": {
       "offensive": {
@@ -55,6 +59,21 @@
       }
     },
     "upgrades": {
+      "title": "升级中心",
+      "pointsAvailable": "你有 {count} 个点数可以花费！",
+      "pointsAvailablePlural": "你有 {count} 个点数可以花费！",
+      "locked": "锁定",
+      "preview": "???",
+      "maxed": "✓ 已满级",
+      "cost": "花费：1点",
+      "fullyUpgraded": "已完全升级",
+      "welcome": {
+        "title": "欢迎来到升级界面！",
+        "message": "每关完成后在这里花费点数！",
+        "points": "你有 {count} 个点数可以花费！",
+        "pointsPlural": "你有 {count} 个点数可以花费！",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "球拍宽度",
         "description": "增加球拍宽度10%"

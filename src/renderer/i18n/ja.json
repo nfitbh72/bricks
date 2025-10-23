@@ -50,9 +50,28 @@
     "levels": {
       "level1": "レベル1：効果的なデザイン",
       "level2": "レベル2：挨拶",
-      "level3": "レベル3：スカル島"
+      "level3": "レベル3：スカル島",
+      "level1Name": "レベル1：ワン",
+      "level2Name": "レベル2：あらゆる方向への破片",
+      "level3Name": "レベル3：レーザーと砕け散る落下ブロックに注意！",
+      "level4Name": "レベル4：ホーマーと呼んでいます"
     },
     "upgrades": {
+      "title": "アップグレードセンター",
+      "pointsAvailable": "{count}ポイント使えます！",
+      "pointsAvailablePlural": "{count}ポイント使えます！",
+      "locked": "ロック中",
+      "preview": "???",
+      "maxed": "✓ 最大",
+      "cost": "コスト: 1ポイント",
+      "fullyUpgraded": "完全アップグレード済み",
+      "welcome": {
+        "title": "アップグレード画面へようこそ！",
+        "message": "各レベルクリア後にここでポイントを使いましょう！",
+        "points": "{count}ポイント使えます！",
+        "pointsPlural": "{count}ポイント使えます！",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "バット幅",
         "description": "バットの幅を10%増加"

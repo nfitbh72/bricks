@@ -65,11 +65,23 @@ export class PauseScreen extends Screen {
   }
 
   /**
-   * Handle key press (ESC/Space/Enter triggers RESUME)
+   * Handle key press
    */
   handleKeyPress(key: string): void {
-    if (key === 'Escape' || key === ' ' || key === 'Enter') {
+    if (key === 'Escape') {
       this.onResume();
+    }
+  }
+
+  /**
+   * Refresh translations when language changes
+   */
+  refreshTranslations(): void {
+    // Update button texts
+    if (this.buttons.length >= 3) {
+      this.buttons[0].setText(t('ui.buttons.resume'));
+      this.buttons[1].setText(t('ui.buttons.options'));
+      this.buttons[2].setText(t('ui.buttons.quit'));
     }
   }
 

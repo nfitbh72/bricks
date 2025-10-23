@@ -38,9 +38,28 @@
     "levels": {
       "level1": "Niveau 1: Design Efficace",
       "level2": "Niveau 2: Dit Bonjour",
-      "level3": "Niveau 3: Île du Crâne"
+      "level3": "Niveau 3: Île du Crâne",
+      "level1Name": "Niveau 1: Un",
+      "level2Name": "Niveau 2: Débris dans toutes les directions",
+      "level3Name": "Niveau 3: Attention aux lasers et aux briques qui tombent et se brisent!",
+      "level4Name": "Niveau 4: On l'appelle Homer"
     },
     "upgrades": {
+      "title": "NEXUS D'AMÉLIORATION",
+      "pointsAvailable": "Vous avez {count} point à dépenser!",
+      "pointsAvailablePlural": "Vous avez {count} points à dépenser!",
+      "locked": "VERROUILLÉ",
+      "preview": "???",
+      "maxed": "✓ MAXIMUM",
+      "cost": "COÛT: 1 POINT",
+      "fullyUpgraded": "ENTIÈREMENT AMÉLIORÉ",
+      "welcome": {
+        "title": "Bienvenue sur l'écran d'amélioration!",
+        "message": "Dépensez des points ici après chaque niveau terminé!",
+        "points": "Vous avez {count} point à dépenser!",
+        "pointsPlural": "Vous avez {count} points à dépenser!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Largeur de Raquette",
         "description": "Augmente la largeur de la raquette de 10%"

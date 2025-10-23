@@ -99,6 +99,18 @@ export class IntroScreen extends Screen {
   }
 
   /**
+   * Refresh translations when language changes
+   */
+  refreshTranslations(): void {
+    // Update button texts (button 1 is DEV UPGRADES, not translated)
+    if (this.buttons.length >= 4) {
+      this.buttons[0].setText(t('ui.buttons.startGame'));
+      this.buttons[2].setText(t('ui.buttons.options'));
+      this.buttons[3].setText(t('ui.buttons.quit'));
+    }
+  }
+
+  /**
    * Render the intro screen
    */
   render(): void {

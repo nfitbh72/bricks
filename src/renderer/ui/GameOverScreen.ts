@@ -72,6 +72,17 @@ export class GameOverScreen extends Screen {
   }
 
   /**
+   * Refresh translations when language changes
+   */
+  refreshTranslations(): void {
+    // Update button texts
+    if (this.buttons.length >= 2) {
+      this.buttons[0].setText(t('ui.buttons.restart'));
+      this.buttons[1].setText(t('ui.buttons.quit'));
+    }
+  }
+
+  /**
    * Render the game over screen
    */
   render(): void {

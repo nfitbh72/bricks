@@ -38,9 +38,28 @@
     "levels": {
       "level1": "Nivel 1: Diseño Efectivo",
       "level2": "Nivel 2: Dice Hola",
-      "level3": "Nivel 3: Isla Calavera"
+      "level3": "Nivel 3: Isla Calavera",
+      "level1Name": "Nivel 1: Uno",
+      "level2Name": "Nivel 2: Escombros en todas direcciones",
+      "level3Name": "Nivel 3: ¡Cuidado con los láseres y los ladrillos que caen y se rompen!",
+      "level4Name": "Nivel 4: Lo llamamos Homer"
     },
     "upgrades": {
+      "title": "NEXO DE MEJORAS",
+      "pointsAvailable": "¡Tienes {count} punto para gastar!",
+      "pointsAvailablePlural": "¡Tienes {count} puntos para gastar!",
+      "locked": "BLOQUEADO",
+      "preview": "???",
+      "maxed": "✓ MÁXIMO",
+      "cost": "COSTO: 1 PUNTO",
+      "fullyUpgraded": "TOTALMENTE MEJORADO",
+      "welcome": {
+        "title": "¡Bienvenido a la pantalla de mejoras!",
+        "message": "¡Gasta puntos aquí después de completar cada nivel!",
+        "points": "¡Tienes {count} punto para gastar!",
+        "pointsPlural": "¡Tienes {count} puntos para gastar!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Ancho de Paleta",
         "description": "Aumenta el ancho de la paleta en 10%"

@@ -38,7 +38,11 @@
     "levels": {
       "level1": "Level 1: Desain Efektif",
       "level2": "Level 2: Menyapa",
-      "level3": "Level 3: Pulau Tengkorak"
+      "level3": "Level 3: Pulau Tengkorak",
+      "level1Name": "Level 1: Satu",
+      "level2Name": "Level 2: Puing ke segala arah",
+      "level3Name": "Level 3: Hati-hati dengan laser dan bata jatuh yang pecah!",
+      "level4Name": "Level 4: Kami menyebutnya Homer"
     },
     "bricks": {
       "offensive": {
@@ -55,6 +59,21 @@
       }
     },
     "upgrades": {
+      "title": "PUSAT UPGRADE",
+      "pointsAvailable": "Anda memiliki {count} poin untuk dibelanjakan!",
+      "pointsAvailablePlural": "Anda memiliki {count} poin untuk dibelanjakan!",
+      "locked": "TERKUNCI",
+      "preview": "???",
+      "maxed": "✓ MAKSIMAL",
+      "cost": "BIAYA: 1 POIN",
+      "fullyUpgraded": "SEPENUHNYA DITINGKATKAN",
+      "welcome": {
+        "title": "Selamat datang di layar upgrade!",
+        "message": "Belanjakan poin di sini setelah setiap level selesai!",
+        "points": "Anda memiliki {count} poin untuk dibelanjakan!",
+        "pointsPlural": "Anda memiliki {count} poin untuk dibelanjakan!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Lebar Pemukul",
         "description": "Tingkatkan lebar pemukul 10%"

@@ -38,7 +38,11 @@
     "levels": {
       "level1": "Màn 1: Thiết Kế Hiệu Quả",
       "level2": "Màn 2: Chào Hỏi",
-      "level3": "Màn 3: Đảo Đầu Lâu"
+      "level3": "Màn 3: Đảo Đầu Lâu",
+      "level1Name": "Màn 1: Một",
+      "level2Name": "Màn 2: Mảnh vỡ bay khắp nơi",
+      "level3Name": "Màn 3: Cẩn thận với laser và gạch rơi vỡ vụn!",
+      "level4Name": "Màn 4: Chúng tôi gọi nó là Homer"
     },
     "bricks": {
       "offensive": {
@@ -55,6 +59,21 @@
       }
     },
     "upgrades": {
+      "title": "TRUNG TÂM NÂNG CẤP",
+      "pointsAvailable": "Bạn có {count} điểm để chi tiêu!",
+      "pointsAvailablePlural": "Bạn có {count} điểm để chi tiêu!",
+      "locked": "KHÓA",
+      "preview": "???",
+      "maxed": "✓ TỐI ĐA",
+      "cost": "GIÁ: 1 ĐIỂM",
+      "fullyUpgraded": "ĐÃ NÂNG CẤP HOÀN TOÀN",
+      "welcome": {
+        "title": "Chào mừng đến màn hình nâng cấp!",
+        "message": "Chi tiêu điểm ở đây sau mỗi màn chơi!",
+        "points": "Bạn có {count} điểm để chi tiêu!",
+        "pointsPlural": "Bạn có {count} điểm để chi tiêu!",
+        "ok": "OK"
+      },
       "batWidth": {
         "name": "Độ Rộng Vợt",
         "description": "Tăng độ rộng vợt 10%"
