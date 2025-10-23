@@ -10,31 +10,42 @@
 # Install dependencies
 npm install
 
-# Build the project
+# Build the project (includes linting)
 npm run build
 
 # Run in development mode
 npm run dev
 
-# Run tests
+# Run linter
+npm run lint
+
+# Run linter with auto-fix
+npm run lint:fix
+
+# Run tests (includes linting)
 npm test
 ```
 
 ### Build Process
 
-The build process consists of three steps:
+The build process consists of four steps:
 
-1. **Main process compilation** (`npm run build:main`)
+1. **Linting** (`npm run lint`)
+   - Runs ESLint on all TypeScript files
+   - Catches code quality issues and potential bugs
+   - Enforces consistent code style
+
+2. **Main process compilation** (`npm run build:main`)
    - Compiles TypeScript files for the Electron main process
    - Output: `dist/main/`
 
-2. **Renderer process bundling** (`npm run build:renderer`)
+3. **Renderer process bundling** (`npm run build:renderer`)
    - Bundles TypeScript and SCSS files using webpack
    - Compiles SCSS to CSS and injects styles
    - Bundles font assets
    - Output: `dist/renderer/renderer.js` and assets
 
-3. **Asset copying** (`npm run copy-assets`)
+4. **Asset copying** (`npm run copy-assets`)
    - Copies HTML, fonts, images, sounds, and i18n files
    - Output: `dist/renderer/assets/` and `dist/renderer/i18n/`
 
