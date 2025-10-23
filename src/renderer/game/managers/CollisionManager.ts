@@ -121,6 +121,9 @@ export class CollisionManager {
         
         // Skip damage, explosions, and notifications for indestructible bricks
         if (!isIndestructible) {
+          // Track if brick was already destroyed before this hit
+          const wasDestroyed = brick.isDestroyed();
+          
           // Calculate damage (with critical hit check)
           let damage = ball.getDamage();
           let isCritical = false;
