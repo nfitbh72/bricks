@@ -1,0 +1,116 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "TIẾP TỤC",
+      "quit": "THOÁT",
+      "restart": "CHƠI LẠI",
+      "resume": "TIẾP TỤC",
+      "options": "TÙY CHỌN",
+      "back": "QUAY LẠI",
+      "startGame": "BẮT ĐẦU"
+    },
+    "screens": {
+      "levelComplete": "HOÀN THÀNH!",
+      "gameOver": "KẾT THÚC",
+      "paused": "TẠM DỪNG",
+      "enterYourName": "NHẬP TÊN CỦA BẠN"
+    },
+    "options": {
+      "title": "TÙY CHỌN",
+      "music": "NHẠC",
+      "sfx": "HIỆU ỨNG ÂM THANH",
+      "particles": "HIỆU ỨNG HẠT",
+      "damageNumbers": "SỐ SÁT THƯƠNG",
+      "language": "NGÔN NGỮ"
+    },
+    "leaderboard": {
+      "rank": "HẠNG",
+      "name": "TÊN",
+      "time": "THỜI GIAN"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Màn",
+      "time": "Thời gian",
+      "launchBall": "Nhấp hoặc nhấn SPACE để phóng"
+    },
+    "levels": {
+      "level1": "Màn 1: Thiết Kế Hiệu Quả",
+      "level2": "Màn 2: Chào Hỏi",
+      "level3": "Màn 3: Đảo Đầu Lâu"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "Gạch Rơi",
+        "exploding": "Gạch Nổ",
+        "laser": "Gạch Laser",
+        "homing": "Gạch Tên Lửa Dẫn Đường",
+        "splitting": "Gạch Phân Tách",
+        "warningFalling": "Cẩn thận! Gạch đang rơi!",
+        "warningExploding": "Nguy hiểm! Gạch sắp nổ!",
+        "warningLaser": "Cảnh báo! Laser đang nạp!",
+        "warningHoming": "Đến rồi! Tên lửa đang theo dõi!",
+        "warningSplitting": "Coi chừng! Mảnh vỡ đang bay tới!"
+      }
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Độ Rộng Vợt",
+        "description": "Tăng độ rộng vợt 10%"
+      },
+      "lasers": {
+        "name": "Laser",
+        "description": "Cho phép vợt bắn (Chuột trái)"
+      },
+      "lasersPlus": {
+        "name": "Laser+",
+        "description": "Tăng sát thương laser 10%"
+      },
+      "additionalShooter": {
+        "name": "Thêm Laser",
+        "description": "Thêm một pháo laser cho vợt"
+      },
+      "lives": {
+        "name": "Mạng",
+        "description": "Tăng số mạng 1"
+      },
+      "slowerBall": {
+        "name": "Bóng Chậm Hơn",
+        "description": "Giảm gia tốc bóng 25%"
+      },
+      "ballDamage": {
+        "name": "Sát Thương Bóng",
+        "description": "Tăng sát thương bóng 1"
+      },
+      "piercing": {
+        "name": "Xuyên Thủng",
+        "description": "1/10 cơ hội xuyên qua gạch"
+      },
+      "piercingPlus": {
+        "name": "Xuyên Thủng+",
+        "description": "Tăng cơ hội xuyên thủng 10%"
+      },
+      "piercingDuration": {
+        "name": "Thời Gian Xuyên",
+        "description": "Tăng thời gian xuyên 1 giây"
+      },
+      "criticalHits": {
+        "name": "Đòn Chí Mạng",
+        "description": "1/10 cơ hội gây sát thương gấp đôi"
+      },
+      "criticalHitsPlus": {
+        "name": "Đòn Chí Mạng+",
+        "description": "Tăng cơ hội chí mạng 10%"
+      },
+      "explosions": {
+        "name": "Nổ",
+        "description": "Bóng va chạm gây nổ nhỏ"
+      },
+      "explosionsPlus": {
+        "name": "Nổ+",
+        "description": "Tăng sát thương nổ 10%"
+      }
+    }
+  }
+}

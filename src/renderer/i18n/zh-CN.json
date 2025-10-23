@@ -1,0 +1,116 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "继续",
+      "quit": "退出",
+      "restart": "重新开始",
+      "resume": "恢复",
+      "options": "选项",
+      "back": "返回",
+      "startGame": "开始游戏"
+    },
+    "screens": {
+      "levelComplete": "关卡完成！",
+      "gameOver": "游戏结束",
+      "paused": "暂停",
+      "enterYourName": "输入你的名字"
+    },
+    "options": {
+      "title": "选项",
+      "music": "音乐",
+      "sfx": "音效",
+      "particles": "粒子效果",
+      "damageNumbers": "伤害数字",
+      "language": "语言"
+    },
+    "leaderboard": {
+      "rank": "排名",
+      "name": "名字",
+      "time": "时间"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "关卡",
+      "time": "时间",
+      "launchBall": "点击或按空格键发射"
+    },
+    "levels": {
+      "level1": "第1关：有效设计",
+      "level2": "第2关：打招呼",
+      "level3": "第3关：骷髅岛"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "坠落砖块",
+        "exploding": "爆炸砖块",
+        "laser": "激光砖块",
+        "homing": "追踪导弹砖块",
+        "splitting": "分裂砖块",
+        "warningFalling": "小心！砖块坠落！",
+        "warningExploding": "危险！砖块爆炸！",
+        "warningLaser": "警告！激光充能中！",
+        "warningHoming": "来袭！导弹追踪中！",
+        "warningSplitting": "注意！碎片来袭！"
+      }
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "球拍宽度",
+        "description": "增加球拍宽度10%"
+      },
+      "lasers": {
+        "name": "激光",
+        "description": "允许球拍射击（左键）"
+      },
+      "lasersPlus": {
+        "name": "激光+",
+        "description": "增加激光伤害10%"
+      },
+      "additionalShooter": {
+        "name": "更多激光",
+        "description": "为球拍添加一个激光炮塔"
+      },
+      "lives": {
+        "name": "生命",
+        "description": "增加生命数量1"
+      },
+      "slowerBall": {
+        "name": "减速球",
+        "description": "减少球加速度25%"
+      },
+      "ballDamage": {
+        "name": "球伤害",
+        "description": "增加球伤害1"
+      },
+      "piercing": {
+        "name": "穿透",
+        "description": "十分之一的几率穿透砖块"
+      },
+      "piercingPlus": {
+        "name": "穿透+",
+        "description": "增加穿透几率10%"
+      },
+      "piercingDuration": {
+        "name": "穿透持续时间",
+        "description": "增加穿透持续时间1秒"
+      },
+      "criticalHits": {
+        "name": "暴击",
+        "description": "十分之一的几率造成双倍伤害"
+      },
+      "criticalHitsPlus": {
+        "name": "暴击+",
+        "description": "增加暴击几率10%"
+      },
+      "explosions": {
+        "name": "爆炸",
+        "description": "球击中时造成小范围爆炸"
+      },
+      "explosionsPlus": {
+        "name": "爆炸+",
+        "description": "增加爆炸伤害10%"
+      }
+    }
+  }
+}

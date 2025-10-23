@@ -1,0 +1,116 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "LANJUT",
+      "quit": "KELUAR",
+      "restart": "MULAI ULANG",
+      "resume": "LANJUTKAN",
+      "options": "OPSI",
+      "back": "KEMBALI",
+      "startGame": "MULAI PERMAINAN"
+    },
+    "screens": {
+      "levelComplete": "LEVEL SELESAI!",
+      "gameOver": "PERMAINAN BERAKHIR",
+      "paused": "DIJEDA",
+      "enterYourName": "MASUKKAN NAMA ANDA"
+    },
+    "options": {
+      "title": "OPSI",
+      "music": "MUSIK",
+      "sfx": "EFEK SUARA",
+      "particles": "PARTIKEL",
+      "damageNumbers": "ANGKA KERUSAKAN",
+      "language": "BAHASA"
+    },
+    "leaderboard": {
+      "rank": "PERINGKAT",
+      "name": "NAMA",
+      "time": "WAKTU"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Level",
+      "time": "Waktu",
+      "launchBall": "Klik atau tekan SPASI untuk meluncurkan"
+    },
+    "levels": {
+      "level1": "Level 1: Desain Efektif",
+      "level2": "Level 2: Menyapa",
+      "level3": "Level 3: Pulau Tengkorak"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "Bata Jatuh",
+        "exploding": "Bata Meledak",
+        "laser": "Bata Laser",
+        "homing": "Bata Rudal Pelacak",
+        "splitting": "Bata Pecah",
+        "warningFalling": "Awas! Bata jatuh!",
+        "warningExploding": "Bahaya! Bata meledak!",
+        "warningLaser": "Peringatan! Laser mengisi daya!",
+        "warningHoming": "Datang! Rudal melacak!",
+        "warningSplitting": "Hati-hati! Pecahan datang!"
+      }
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Lebar Pemukul",
+        "description": "Tingkatkan lebar pemukul 10%"
+      },
+      "lasers": {
+        "name": "Laser",
+        "description": "Izinkan pemukul menembak (Klik kiri)"
+      },
+      "lasersPlus": {
+        "name": "Laser+",
+        "description": "Tingkatkan kerusakan laser 10%"
+      },
+      "additionalShooter": {
+        "name": "Laser Tambahan",
+        "description": "Tambahkan meriam laser ke pemukul"
+      },
+      "lives": {
+        "name": "Nyawa",
+        "description": "Tingkatkan jumlah nyawa 1"
+      },
+      "slowerBall": {
+        "name": "Bola Lebih Lambat",
+        "description": "Kurangi akselerasi bola 25%"
+      },
+      "ballDamage": {
+        "name": "Kerusakan Bola",
+        "description": "Tingkatkan kerusakan bola 1"
+      },
+      "piercing": {
+        "name": "Tembus",
+        "description": "1 dari 10 peluang menembus bata"
+      },
+      "piercingPlus": {
+        "name": "Tembus+",
+        "description": "Tingkatkan peluang tembus 10%"
+      },
+      "piercingDuration": {
+        "name": "Durasi Tembus",
+        "description": "Tingkatkan durasi tembus 1 detik"
+      },
+      "criticalHits": {
+        "name": "Pukulan Kritis",
+        "description": "1 dari 10 peluang kerusakan ganda"
+      },
+      "criticalHitsPlus": {
+        "name": "Pukulan Kritis+",
+        "description": "Tingkatkan peluang kritis 10%"
+      },
+      "explosions": {
+        "name": "Ledakan",
+        "description": "Benturan bola menyebabkan ledakan kecil"
+      },
+      "explosionsPlus": {
+        "name": "Ledakan+",
+        "description": "Tingkatkan kerusakan ledakan 10%"
+      }
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "MAGPATULOY",
+      "quit": "UMALIS",
+      "restart": "MAGSIMULA MULI",
+      "resume": "IPAGPATULOY",
+      "options": "MGA OPSYON",
+      "back": "BUMALIK",
+      "startGame": "MAGSIMULA"
+    },
+    "screens": {
+      "levelComplete": "NATAPOS ANG LEVEL!",
+      "gameOver": "TAPOS NA ANG LARO",
+      "paused": "NAKAHINTO",
+      "enterYourName": "ILAGAY ANG IYONG PANGALAN"
+    },
+    "options": {
+      "title": "MGA OPSYON",
+      "music": "MUSIKA",
+      "sfx": "MGA TUNOG",
+      "particles": "MGA PARTICLE",
+      "damageNumbers": "MGA NUMERO NG PINSALA",
+      "language": "WIKA"
+    },
+    "leaderboard": {
+      "rank": "RANGGO",
+      "name": "PANGALAN",
+      "time": "ORAS"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "Antas",
+      "time": "Oras",
+      "launchBall": "I-click o pindutin ang SPACE para ilunsad"
+    },
+    "levels": {
+      "level1": "Antas 1: Epektibong Disenyo",
+      "level2": "Antas 2: Pagbati",
+      "level3": "Antas 3: Isla ng Bungo"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "Nahuhulog na Laryo",
+        "exploding": "Sumasabog na Laryo",
+        "laser": "Laser na Laryo",
+        "homing": "Sumusubaybay na Misil na Laryo",
+        "splitting": "Naghahati-hating Laryo",
+        "warningFalling": "Mag-ingat! Nahuhulog ang laryo!",
+        "warningExploding": "Panganib! Sumasabog ang laryo!",
+        "warningLaser": "Babala! Nag-ccharge ang laser!",
+        "warningHoming": "Papalapit! Sumusubaybay ang misil!",
+        "warningSplitting": "Mag-ingat! Papalapit ang mga piraso!"
+      }
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "Lapad ng Palo",
+        "description": "Dagdagan ang lapad ng palo ng 10%"
+      },
+      "lasers": {
+        "name": "Mga Laser",
+        "description": "Payagan ang palo na bumaril (Kaliwang click)"
+      },
+      "lasersPlus": {
+        "name": "Mga Laser+",
+        "description": "Dagdagan ang pinsala ng laser ng 10%"
+      },
+      "additionalShooter": {
+        "name": "Karagdagang Laser",
+        "description": "Magdagdag ng laser cannon sa palo"
+      },
+      "lives": {
+        "name": "Mga Buhay",
+        "description": "Dagdagan ang bilang ng buhay ng 1"
+      },
+      "slowerBall": {
+        "name": "Mas Mabagal na Bola",
+        "description": "Bawasan ang acceleration ng bola ng 25%"
+      },
+      "ballDamage": {
+        "name": "Pinsala ng Bola",
+        "description": "Dagdagan ang pinsala ng bola ng 1"
+      },
+      "piercing": {
+        "name": "Tumagos",
+        "description": "1 sa 10 pagkakataon na tumagos sa laryo"
+      },
+      "piercingPlus": {
+        "name": "Tumagos+",
+        "description": "Dagdagan ang pagkakataon na tumagos ng 10%"
+      },
+      "piercingDuration": {
+        "name": "Tagal ng Pagtagos",
+        "description": "Dagdagan ang tagal ng pagtagos ng 1 segundo"
+      },
+      "criticalHits": {
+        "name": "Mga Critical Hit",
+        "description": "1 sa 10 pagkakataon na gumawa ng dobleng pinsala"
+      },
+      "criticalHitsPlus": {
+        "name": "Mga Critical Hit+",
+        "description": "Dagdagan ang pagkakataon ng critical hit ng 10%"
+      },
+      "explosions": {
+        "name": "Mga Pagsabog",
+        "description": "Ang pagtama ng bola ay gumagawa ng maliliit na pagsabog"
+      },
+      "explosionsPlus": {
+        "name": "Mga Pagsabog+",
+        "description": "Dagdagan ang pinsala ng pagsabog ng 10%"
+      }
+    }
+  }
+}

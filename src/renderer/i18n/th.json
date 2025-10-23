@@ -1,0 +1,116 @@
+{
+  "ui": {
+    "buttons": {
+      "continue": "ดำเนินการต่อ",
+      "quit": "ออก",
+      "restart": "เริ่มใหม่",
+      "resume": "ดำเนินการต่อ",
+      "options": "ตัวเลือก",
+      "back": "กลับ",
+      "startGame": "เริ่มเกม"
+    },
+    "screens": {
+      "levelComplete": "ผ่านด่าน!",
+      "gameOver": "เกมจบ",
+      "paused": "หยุดชั่วคราว",
+      "enterYourName": "ใส่ชื่อของคุณ"
+    },
+    "options": {
+      "title": "ตัวเลือก",
+      "music": "เพลง",
+      "sfx": "เสียงเอฟเฟกต์",
+      "particles": "อนุภาค",
+      "damageNumbers": "ตัวเลขความเสียหาย",
+      "language": "ภาษา"
+    },
+    "leaderboard": {
+      "rank": "อันดับ",
+      "name": "ชื่อ",
+      "time": "เวลา"
+    }
+  },
+  "game": {
+    "status": {
+      "level": "ด่าน",
+      "time": "เวลา",
+      "launchBall": "คลิกหรือกดสเปซเพื่อปล่อยบอล"
+    },
+    "levels": {
+      "level1": "ด่าน 1: การออกแบบที่มีประสิทธิภาพ",
+      "level2": "ด่าน 2: ทักทาย",
+      "level3": "ด่าน 3: เกาะกะโหลก"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "อิฐตกลงมา",
+        "exploding": "อิฐระเบิด",
+        "laser": "อิฐเลเซอร์",
+        "homing": "อิฐขีปนาวุธติดตาม",
+        "splitting": "อิฐแตกเป็นชิ้น",
+        "warningFalling": "ระวัง! อิฐกำลังตก!",
+        "warningExploding": "อันตราย! อิฐกำลังระเบิด!",
+        "warningLaser": "คำเตือน! เลเซอร์กำลังชาร์จ!",
+        "warningHoming": "มาแล้ว! ขีปนาวุธกำลังติดตาม!",
+        "warningSplitting": "ระวัง! เศษชิ้นส่วนกำลังมา!"
+      }
+    },
+    "upgrades": {
+      "batWidth": {
+        "name": "ความกว้างไม้",
+        "description": "เพิ่มความกว้างไม้ 10%"
+      },
+      "lasers": {
+        "name": "เลเซอร์",
+        "description": "ให้ไม้ยิงได้ (คลิกซ้าย)"
+      },
+      "lasersPlus": {
+        "name": "เลเซอร์+",
+        "description": "เพิ่มความเสียหายเลเซอร์ 10%"
+      },
+      "additionalShooter": {
+        "name": "เลเซอร์เพิ่มเติม",
+        "description": "เพิ่มปืนเลเซอร์ให้กับไม้"
+      },
+      "lives": {
+        "name": "ชีวิต",
+        "description": "เพิ่มจำนวนชีวิต 1"
+      },
+      "slowerBall": {
+        "name": "บอลช้าลง",
+        "description": "ลดความเร่งของบอล 25%"
+      },
+      "ballDamage": {
+        "name": "ความเสียหายบอล",
+        "description": "เพิ่มความเสียหายบอล 1"
+      },
+      "piercing": {
+        "name": "ทะลุทะลวง",
+        "description": "โอกาส 1 ใน 10 ที่จะทะลุอิฐ"
+      },
+      "piercingPlus": {
+        "name": "ทะลุทะลวง+",
+        "description": "เพิ่มโอกาสทะลุ 10%"
+      },
+      "piercingDuration": {
+        "name": "ระยะเวลาทะลุ",
+        "description": "เพิ่มระยะเวลาทะลุ 1 วินาที"
+      },
+      "criticalHits": {
+        "name": "คริติคอล",
+        "description": "โอกาส 1 ใน 10 ที่จะสร้างความเสียหายสองเท่า"
+      },
+      "criticalHitsPlus": {
+        "name": "คริติคอล+",
+        "description": "เพิ่มโอกาสคริติคอล 10%"
+      },
+      "explosions": {
+        "name": "ระเบิด",
+        "description": "การชนของบอลทำให้เกิดระเบิดเล็ก"
+      },
+      "explosionsPlus": {
+        "name": "ระเบิด+",
+        "description": "เพิ่มความเสียหายระเบิด 10%"
+      }
+    }
+  }
+}

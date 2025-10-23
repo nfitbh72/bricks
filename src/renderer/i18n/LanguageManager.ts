@@ -6,13 +6,13 @@ type TranslationData = {
   [key: string]: any;
 };
 
-type SupportedLanguage = 'en' | 'es' | 'fr' | 'de' | 'ja';
+type SupportedLanguage = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'zh-CN' | 'th' | 'vi' | 'id' | 'tl';
 
 export class LanguageManager {
   private static instance: LanguageManager;
   private currentLanguage: SupportedLanguage = 'en';
   private translations: TranslationData = {};
-  private readonly supportedLanguages: SupportedLanguage[] = ['en', 'es', 'fr', 'de', 'ja'];
+  private readonly supportedLanguages: SupportedLanguage[] = ['en', 'es', 'fr', 'de', 'ja', 'zh-CN', 'th', 'vi', 'id', 'tl'];
 
   private constructor() {
     this.detectAndSetLanguage();
@@ -122,6 +122,11 @@ export class LanguageManager {
       fr: 'Français',
       de: 'Deutsch',
       ja: '日本語',
+      'zh-CN': '简体中文',
+      th: 'ไทย',
+      vi: 'Tiếng Việt',
+      id: 'Bahasa Indonesia',
+      tl: 'Tagalog',
     };
     return names[lang] || lang;
   }
