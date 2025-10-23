@@ -65,6 +65,10 @@
         "name": "レーザー+",
         "description": "レーザーダメージを10%増加"
       },
+      "additionalShooter": {
+        "name": "追加レーザー",
+        "description": "バットにレーザーを追加"
+      },
       "lives": {
         "name": "ライフ",
         "description": "ライフ数を1増加"

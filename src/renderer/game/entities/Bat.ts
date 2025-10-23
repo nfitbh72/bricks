@@ -24,6 +24,7 @@ export class Bat {
   private minY: number | null = null;
   private maxY: number | null = null;
   private showTurret: boolean = false; // Show turret when lasers are active
+  private turretCount: number = 1; // Number of turrets to render
 
   constructor(x: number, y: number, width: number, height: number, speed: number = 300) {
     this.position = { x, y };
@@ -56,19 +57,29 @@ export class Bat {
     ctx.fillStyle = '#ff00ff';
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 
-    // Draw turret if lasers are active
+    // Draw turrets if lasers are active
     if (this.showTurret) {
-      this.renderTurret(ctx);
+      this.renderTurrets(ctx);
     }
 
     ctx.restore();
   }
 
   /**
-   * Render turret on top of bat
+   * Render multiple turrets equally spaced along the bat
    */
-  private renderTurret(ctx: CanvasRenderingContext2D): void {
-    const centerX = this.position.x + this.width / 2;
+  private renderTurrets(ctx: CanvasRenderingContext2D): void {
+    const turretPositions = this.getTurretPositions();
+    
+    for (const turretX of turretPositions) {
+      this.renderSingleTurret(ctx, turretX);
+    }
+  }
+
+  /**
+   * Render a single turret at the specified X position
+   */
+  private renderSingleTurret(ctx: CanvasRenderingContext2D, centerX: number): void {
     const turretY = this.position.y;
     const turretWidth = this.height * BAT_TURRET_WIDTH_MULTIPLIER;
     const turretHeight = this.height * BAT_TURRET_HEIGHT_MULTIPLIER;
@@ -105,6 +116,25 @@ export class Bat {
       tipWidth,
       tipHeight
     );
+  }
+
+  /**
+   * Calculate X positions for all turrets, equally spaced along the bat
+   */
+  getTurretPositions(): number[] {
+    if (this.turretCount === 1) {
+      // Single turret at center
+      return [this.position.x + this.width / 2];
+    }
+
+    const positions: number[] = [];
+    const spacing = this.width / (this.turretCount + 1);
+
+    for (let i = 1; i <= this.turretCount; i++) {
+      positions.push(this.position.x + spacing * i);
+    }
+
+    return positions;
   }
 
   /**
@@ -291,5 +321,19 @@ export class Bat {
    */
   setShowTurret(show: boolean): void {
     this.showTurret = show;
+  }
+
+  /**
+   * Set the number of turrets to render
+   */
+  setTurretCount(count: number): void {
+    this.turretCount = Math.max(1, count); // Minimum 1 turret
+  }
+
+  /**
+   * Get the number of turrets
+   */
+  getTurretCount(): number {
+    return this.turretCount;
   }
 }

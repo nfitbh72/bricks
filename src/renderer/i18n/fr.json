@@ -53,6 +53,10 @@
         "name": "Lasers+",
         "description": "Augmente les dégâts laser de 10%"
       },
+      "additionalShooter": {
+        "name": "Plus de Lasers",
+        "description": "Ajoute un laser à la raquette"
+      },
       "lives": {
         "name": "Vies",
         "description": "Augmente le nombre de vies de 1"

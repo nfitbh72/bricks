@@ -15,10 +15,10 @@ This guide explains how to add new upgrades to the game's upgrade system.
 
 The upgrade system consists of three main components:
 
-1. **Upgrade Types** (`src/renderer/game/types.ts`) - Enum defining all upgrade types
+1. **Upgrade Types** (`src/renderer/game/core/types.ts`) - Enum defining all upgrade types
 2. **Upgrade Tree** (`src/renderer/config/upgrades.ts`) - Tree structure defining available upgrades
-3. **Upgrade Logic** (`src/renderer/game/GameUpgrades.ts`) - Implementation of upgrade effects
-4. **Game Integration** (`src/renderer/game/Game.ts`) - Where upgrades are applied
+3. **Upgrade Logic** (`src/renderer/game/systems/GameUpgrades.ts`) - Implementation of upgrade effects
+4. **Game Integration** (`src/renderer/game/managers/StateTransitionHandler.ts`) - Where upgrades are applied
 
 ### Upgrade Flow
 
@@ -74,7 +74,7 @@ Follow these steps to add a new upgrade to the game:
 
 ### Step 1: Add Upgrade Type to Enum
 
-**File:** `src/renderer/game/types.ts`
+**File:** `src/renderer/game/core/types.ts`
 
 Add your upgrade type to the `UpgradeType` enum:
 
@@ -97,21 +97,27 @@ export enum UpgradeType {
 
 **File:** `src/renderer/config/upgrades.ts`
 
-Add your upgrade to the tree structure:
+Add your upgrade to the tree structure inside the `getUpgrades()` function:
 
 ```typescript
-{
-    name: 'Your Upgrade Name',
-    description: 'What the upgrade does',
-    times: 3,  // How many times it can be purchased
-    previewNextUpgrades: 1,  // How many child upgrades to show before unlock
-    unlockNextUpgradesAfterTimes: 2,  // Purchase count before children unlock
-    type: UpgradeType.YOUR_NEW_UPGRADE,
-    nextUpgrades: [
-        // Child upgrades (if any)
-    ],
+export function getUpgrades(): Upgrade[] {
+    return [
+        {
+            name: t('game.upgrades.yourUpgrade.name'),
+            description: t('game.upgrades.yourUpgrade.description'),
+            times: 3,  // How many times it can be purchased
+            previewNextUpgrades: 1,  // How many child upgrades to show before unlock
+            unlockNextUpgradesAfterTimes: 2,  // Purchase count before children unlock
+            type: UpgradeType.YOUR_NEW_UPGRADE,
+            nextUpgrades: [
+                // Child upgrades (if any)
+            ],
+        }
+    ];
 }
 ```
+
+**Note:** The upgrade tree uses the i18n translation system (`t()` function) for names and descriptions.
 
 **Upgrade Properties:**
 
@@ -133,7 +139,7 @@ Add your upgrade to the tree structure:
 
 ### Step 3: Implement Upgrade Logic
 
-**File:** `src/renderer/game/GameUpgrades.ts`
+**File:** `src/renderer/game/systems/GameUpgrades.ts`
 
 Add methods to handle your upgrade's logic:
 
@@ -194,26 +200,26 @@ getYourChance(): number {
 
 ### Step 4: Integrate with Game
 
-**File:** `src/renderer/game/Game.ts`
+**File:** `src/renderer/game/managers/StateTransitionHandler.ts`
 
-Apply your upgrade in the appropriate location:
+Apply your upgrade in the `applyUpgrades()` method:
 
-#### In `handleUpgradeComplete()` (for entity properties):
+#### In `applyUpgrades()` (for entity properties):
 
 ```typescript
-private handleUpgradeComplete(): void {
-    const upgrades = this.upgradeTreeScreen.getUpgradeLevels();
-    this.gameUpgrades.setUpgradeLevels(upgrades);
+private applyUpgrades(): void {
+    const upgrades = this.context.screenManager.upgradeTreeScreen.getUpgradeLevels();
+    this.context.gameUpgrades.setUpgradeLevels(upgrades);
     
     // Apply your upgrade
-    if (this.gameUpgrades.hasYourFeature()) {
-        const value = this.gameUpgrades.getYourStatValue();
-        this.yourEntity.setProperty(value);
+    if (this.context.gameUpgrades.hasYourFeature()) {
+        const value = this.context.gameUpgrades.getYourStatValue();
+        this.context.yourEntity.setProperty(value);
     }
 }
 ```
 
-#### In game loop (for runtime checks):
+#### In game loop (for runtime checks in Game.ts):
 
 ```typescript
 // In collision detection or update logic
@@ -300,13 +306,13 @@ applyBallUpgrades(): { speed: number; radius: number; damage: number } {
 }
 ```
 
-#### Step 4: Apply in Game.ts
+#### Step 4: Apply in StateTransitionHandler.ts
 ```typescript
-private handleUpgradeComplete(): void {
+private applyUpgrades(): void {
     // ... existing code ...
     
-    const ballProps = this.gameUpgrades.applyBallUpgrades();
-    this.ball.setDamage(ballProps.damage);
+    const ballProps = this.context.gameUpgrades.applyBallUpgrades();
+    this.context.ball.setDamage(ballProps.damage);
     // Ball speed would need a setter method added to Ball class
 }
 ```
@@ -368,7 +374,7 @@ getMultiBallCount(): number {
 
 #### Step 4: Apply in Game.ts
 ```typescript
-// In ball-brick collision handling
+// In ball-brick collision handling in Game.ts
 if (collision.collided) {
     brick.takeDamage(this.ball.getDamage());
     
@@ -389,9 +395,8 @@ if (collision.collided) {
 #### Step 1: Add to types.ts
 ```typescript
 export enum UpgradeType {
-    BALL_ADD_CRITICAL_HIT = 'BALL_ADD_CRITICAL_HIT',
-    BALL_CRITICAL_CHANCE_10_PERCENT = 'BALL_CRITICAL_CHANCE_10_PERCENT',
-    BALL_CRITICAL_DAMAGE_INCREASE_50_PERCENT = 'BALL_CRITICAL_DAMAGE_INCREASE_50_PERCENT',
+    BALL_ADD_CRITICAL_HITS = 'BALL_ADD_CRITICAL_HITS',
+    BALL_CHANCE_CRITICAL_HITS_10_PERCENT = 'BALL_CHANCE_CRITICAL_HITS_10_PERCENT',
 }
 ```
 
@@ -401,9 +406,9 @@ export enum UpgradeType {
     name: 'Critical Hit',
     description: '10% chance to deal double damage',
     times: 1,
-    previewNextUpgrades: 2,
+    previewNextUpgrades: 0,
     unlockNextUpgradesAfterTimes: 1,
-    type: UpgradeType.BALL_ADD_CRITICAL_HIT,
+    type: UpgradeType.BALL_ADD_CRITICAL_HITS,
     nextUpgrades: [
         {
             name: 'Critical Chance+',
@@ -411,16 +416,7 @@ export enum UpgradeType {
             times: 3,
             previewNextUpgrades: 0,
             unlockNextUpgradesAfterTimes: 0,
-            type: UpgradeType.BALL_CRITICAL_CHANCE_10_PERCENT,
-            nextUpgrades: [],
-        },
-        {
-            name: 'Critical Damage+',
-            description: 'Increase crit damage by 50%',
-            times: 3,
-            previewNextUpgrades: 0,
-            unlockNextUpgradesAfterTimes: 0,
-            type: UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_50_PERCENT,
+            type: UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT,
             nextUpgrades: [],
         }
     ],
@@ -432,31 +428,21 @@ export enum UpgradeType {
 /**
  * Check if critical hits are unlocked
  */
-hasCriticalHit(): boolean {
-    return this.getUpgradeLevel(UpgradeType.BALL_ADD_CRITICAL_HIT) > 0;
+hasCriticalHits(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BALL_ADD_CRITICAL_HITS) > 0;
 }
 
 /**
  * Get critical hit chance (0 to 1)
  */
-getCriticalChance(): number {
-    if (!this.hasCriticalHit()) return 0;
+getCriticalHitChance(): number {
+    if (!this.hasCriticalHits()) return 0;
     
-    const bonusLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_CHANCE_10_PERCENT);
+    const bonusLevel = this.getUpgradeLevel(UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT);
     const baseChance = 0.1;  // 10% base
     const bonusChance = bonusLevel * 0.1;  // +10% per level
     
     return Math.min(baseChance + bonusChance, 1.0);
-}
-
-/**
- * Get critical damage multiplier
- */
-getCriticalDamageMultiplier(): number {
-    if (!this.hasCriticalHit()) return 1.0;
-    
-    const bonusLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_50_PERCENT);
-    return 2.0 + (bonusLevel * 0.5);  // Base 2x, +0.5x per level
 }
 ```
 
@@ -467,11 +453,10 @@ if (collision.collided) {
     let damage = this.ball.getDamage();
     
     // Check for critical hit
-    if (this.gameUpgrades.hasCriticalHit()) {
-        const critChance = this.gameUpgrades.getCriticalChance();
+    if (this.gameUpgrades.hasCriticalHits()) {
+        const critChance = this.gameUpgrades.getCriticalHitChance();
         if (Math.random() < critChance) {
-            const critMultiplier = this.gameUpgrades.getCriticalDamageMultiplier();
-            damage *= critMultiplier;
+            damage *= 2; // Critical hits deal double damage
             // Show critical hit visual effect
             this.showCriticalHitEffect();
         }
@@ -634,10 +619,11 @@ return Math.min(value, 1.0);  // Cap at 100%
 
 | File | Purpose |
 |------|---------|
-| `src/renderer/game/types.ts` | Type definitions and enums |
+| `src/renderer/game/core/types.ts` | Type definitions and enums |
 | `src/renderer/config/upgrades.ts` | Upgrade tree structure |
-| `src/renderer/game/GameUpgrades.ts` | Upgrade logic implementation |
-| `src/renderer/game/Game.ts` | Game integration |
+| `src/renderer/game/systems/GameUpgrades.ts` | Upgrade logic implementation |
+| `src/renderer/game/managers/StateTransitionHandler.ts` | Upgrade application |
+| `src/renderer/game/core/Game.ts` | Runtime upgrade checks |
 | `tests/unit/GameUpgrades.test.ts` | Unit tests |
 
 ### Related Documentation

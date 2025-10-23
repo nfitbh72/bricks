@@ -287,6 +287,62 @@ describe('GameUpgrades', () => {
     });
   });
 
+  describe('additional shooter turrets', () => {
+    it('should return 0 additional turrets with no upgrade', () => {
+      expect(gameUpgrades.getAdditionalShooterCount()).toBe(0);
+    });
+
+    it('should return 1 additional turret at level 1', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADDITIONAL_SHOOTER, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getAdditionalShooterCount()).toBe(1);
+    });
+
+    it('should return 2 additional turrets at level 2', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADDITIONAL_SHOOTER, 2);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getAdditionalShooterCount()).toBe(2);
+    });
+
+    it('should return 0 total turrets when shooter not unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADDITIONAL_SHOOTER, 2);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getTotalShooterCount()).toBe(0);
+    });
+
+    it('should return 1 total turret with base shooter only', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADD_SHOOTER, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getTotalShooterCount()).toBe(1);
+    });
+
+    it('should return 2 total turrets with shooter + 1 additional', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADD_SHOOTER, 1);
+      upgrades.set(UpgradeType.BAT_ADDITIONAL_SHOOTER, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getTotalShooterCount()).toBe(2);
+    });
+
+    it('should return 3 total turrets with shooter + 2 additional', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADD_SHOOTER, 1);
+      upgrades.set(UpgradeType.BAT_ADDITIONAL_SHOOTER, 2);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getTotalShooterCount()).toBe(3);
+    });
+  });
+
   describe('reset', () => {
     it('should clear all upgrades', () => {
       const upgrades = new Map<string, number>();

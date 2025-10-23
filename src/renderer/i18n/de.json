@@ -53,6 +53,10 @@
         "name": "Laser+",
         "description": "Erhöht Laserschaden um 10%"
       },
+      "additionalShooter": {
+        "name": "Mehr Laser",
+        "description": "Fügt dem Schläger einen Laser hinzu"
+      },
       "offensive": {
         "falling": "Fallender Ziegel",
         "exploding": "Explodierender Ziegel",

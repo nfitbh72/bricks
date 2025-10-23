@@ -144,6 +144,23 @@ export class GameUpgrades {
   }
 
   /**
+   * Get number of additional shooter turrets
+   * Base shooter has 1 turret, each upgrade adds 1 more
+   */
+  getAdditionalShooterCount(): number {
+    const level = this.getUpgradeLevel(UpgradeType.BAT_ADDITIONAL_SHOOTER);
+    return level; // +1 turret per level (0, 1, or 2 additional turrets)
+  }
+
+  /**
+   * Get total number of shooter turrets (base + additional)
+   */
+  getTotalShooterCount(): number {
+    if (!this.hasBatShooter()) return 0;
+    return 1 + this.getAdditionalShooterCount(); // Base 1 + additional
+  }
+
+  /**
    * Get health bonus from upgrades
    */
   getHealthBonus(): number {

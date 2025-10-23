@@ -53,6 +53,10 @@
         "name": "Láseres+",
         "description": "Aumenta el daño del láser en 10%"
       },
+      "additionalShooter": {
+        "name": "Más Láseres",
+        "description": "Añade un láser a la paleta"
+      },
       "lives": {
         "name": "Vidas",
         "description": "Aumenta el número de vidas en 1"

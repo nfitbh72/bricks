@@ -67,6 +67,10 @@
         "name": "Lasers+",
         "description": "Increase Laser Damage by 10%"
       },
+      "additionalShooter": {
+        "name": "More Lasers",
+        "description": "Adds a laser to the bat"
+      },
       "lives": {
         "name": "Lives",
         "description": "Increase the number of lives by 1"

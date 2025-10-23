@@ -23,9 +23,19 @@ export function getUpgrades() : Upgrade[] {
                             name: t('game.upgrades.lasersPlus.name'),
                             description: t('game.upgrades.lasersPlus.description'),
                             times: 3,
-                            previewNextUpgrades: 0,
-                            unlockNextUpgradesAfterTimes: 0,
-                            nextUpgrades: [],
+                            previewNextUpgrades: 1,
+                            unlockNextUpgradesAfterTimes: 2,
+                            nextUpgrades: [
+                                {
+                                    name: t('game.upgrades.additionalShooter.name'),
+                                    description: t('game.upgrades.additionalShooter.description'),
+                                    times: 2,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    nextUpgrades: [],
+                                    type: UpgradeType.BAT_ADDITIONAL_SHOOTER,
+                                }
+                            ],
                             type: UpgradeType.BAT_SHOOTER_INCREASE_10_PERCENT,
                         }
                     ],
@@ -122,7 +132,7 @@ export function getUpgrades() : Upgrade[] {
                             times: 3,
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 1,
-                            type: UpgradeType.BALL_EXPLOSIONS,
+                            type: UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT,
                             nextUpgrades: []
                         },
                     ]

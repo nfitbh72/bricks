@@ -275,6 +275,13 @@ export class StateTransitionHandler {
     );
     this.context.bat.setBounds(0, this.context.canvas.width, 0, this.context.canvas.height);
     
+    // Apply shooter upgrades
+    if (this.context.gameUpgrades.hasBatShooter()) {
+      this.context.bat.setShowTurret(true);
+      const turretCount = this.context.gameUpgrades.getTotalShooterCount();
+      this.context.bat.setTurretCount(turretCount);
+    }
+    
     // Apply ball upgrades
     const ballProps = this.context.gameUpgrades.applyBallUpgrades();
     this.context.ball.setDamage(ballProps.damage);

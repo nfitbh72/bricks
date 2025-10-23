@@ -12,7 +12,7 @@ export class WeaponManager {
   private lasers: Laser[] = [];
 
   /**
-   * Shoot a laser from the bat (if shooter upgrade is unlocked)
+   * Shoot lasers from all bat turrets (if shooter upgrade is unlocked)
    */
   shootLaser(bat: Bat, ball: Ball, gameUpgrades: GameUpgrades): void {
     // Check if shooter upgrade is unlocked
@@ -20,10 +20,9 @@ export class WeaponManager {
       return;
     }
 
-    // Get bat center position
+    // Get turret positions from bat
+    const turretPositions = bat.getTurretPositions();
     const batPos = bat.getPosition();
-    const batWidth = bat.getWidth();
-    const centerX = batPos.x + batWidth / 2;
     const centerY = batPos.y;
 
     // Calculate laser properties
@@ -32,9 +31,11 @@ export class WeaponManager {
     const ballDamage = ball.getDamage();
     const laserDamage = ballDamage * LASER_DAMAGE_MULTIPLIER;
 
-    // Create and add laser
-    const laser = new Laser(centerX, centerY, laserSpeed, laserDamage);
-    this.lasers.push(laser);
+    // Create a laser from each turret position
+    for (const turretX of turretPositions) {
+      const laser = new Laser(turretX, centerY, laserSpeed, laserDamage);
+      this.lasers.push(laser);
+    }
   }
 
   /**
