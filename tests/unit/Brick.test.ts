@@ -305,6 +305,13 @@ describe('Brick', () => {
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
         fillText: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        arcTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -331,6 +338,13 @@ describe('Brick', () => {
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
         fillText: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        arcTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -346,8 +360,10 @@ describe('Brick', () => {
       brick.render(mockCtx);
 
       expect(mockCtx.save).toHaveBeenCalled();
-      expect(mockCtx.fillRect).toHaveBeenCalledWith(0, 0, BRICK_WIDTH, BRICK_HEIGHT);
-      expect(mockCtx.strokeRect).toHaveBeenCalledWith(0, 0, BRICK_WIDTH, BRICK_HEIGHT);
+      expect(mockCtx.beginPath).toHaveBeenCalled();
+      expect(mockCtx.arcTo).toHaveBeenCalled();
+      expect(mockCtx.fill).toHaveBeenCalled();
+      expect(mockCtx.stroke).toHaveBeenCalled();
       expect(mockCtx.fillText).toHaveBeenCalled();
       expect(mockCtx.restore).toHaveBeenCalled();
     });
@@ -363,6 +379,9 @@ describe('Brick', () => {
         restore: jest.fn(),
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
+        beginPath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -374,8 +393,9 @@ describe('Brick', () => {
 
       brick.render(mockCtx);
 
-      expect(mockCtx.fillRect).not.toHaveBeenCalled();
-      expect(mockCtx.strokeRect).not.toHaveBeenCalled();
+      expect(mockCtx.beginPath).not.toHaveBeenCalled();
+      expect(mockCtx.fill).not.toHaveBeenCalled();
+      expect(mockCtx.stroke).not.toHaveBeenCalled();
     });
 
     it('should render brick with partial health', () => {
@@ -390,6 +410,13 @@ describe('Brick', () => {
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
         fillText: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        arcTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -404,8 +431,9 @@ describe('Brick', () => {
 
       brick.render(mockCtx);
 
-      expect(mockCtx.fillRect).toHaveBeenCalled();
-      expect(mockCtx.strokeRect).toHaveBeenCalled();
+      expect(mockCtx.beginPath).toHaveBeenCalled();
+      expect(mockCtx.fill).toHaveBeenCalled();
+      expect(mockCtx.stroke).toHaveBeenCalled();
       expect(mockCtx.fillText).toHaveBeenCalled();
     });
   });

@@ -346,6 +346,13 @@ describe('Level Class', () => {
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
         fillText: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        arcTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -372,6 +379,13 @@ describe('Level Class', () => {
         fillRect: jest.fn(),
         strokeRect: jest.fn(),
         fillText: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        arcTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
+        stroke: jest.fn(),
         createLinearGradient: jest.fn(() => mockGradient),
         shadowBlur: 0,
         shadowColor: '',
@@ -386,9 +400,10 @@ describe('Level Class', () => {
 
       level.render(mockCtx);
       
-      // Each brick calls fillRect, strokeRect, and fillText
-      expect(mockCtx.fillRect).toHaveBeenCalled();
-      expect(mockCtx.strokeRect).toHaveBeenCalled();
+      // Each brick calls path methods and fillText
+      expect(mockCtx.beginPath).toHaveBeenCalled();
+      expect(mockCtx.fill).toHaveBeenCalled();
+      expect(mockCtx.stroke).toHaveBeenCalled();
       expect(mockCtx.fillText).toHaveBeenCalled();
     });
   });

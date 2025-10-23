@@ -275,16 +275,30 @@ export class Brick {
     gradient.addColorStop(0.5, color);
     gradient.addColorStop(1, this.darkenColor(color, 30));
 
-    // Draw brick with gradient
+    // Draw brick with gradient and rounded corners
+    const cornerRadius = 3; // Small radius for subtle rounding
     ctx.fillStyle = gradient;
     ctx.globalAlpha = opacity;
-    ctx.fillRect(x, y, w, h);
+    
+    // Draw rounded rectangle
+    ctx.beginPath();
+    ctx.moveTo(x + cornerRadius, y);
+    ctx.lineTo(x + w - cornerRadius, y);
+    ctx.arcTo(x + w, y, x + w, y + cornerRadius, cornerRadius);
+    ctx.lineTo(x + w, y + h - cornerRadius);
+    ctx.arcTo(x + w, y + h, x + w - cornerRadius, y + h, cornerRadius);
+    ctx.lineTo(x + cornerRadius, y + h);
+    ctx.arcTo(x, y + h, x, y + h - cornerRadius, cornerRadius);
+    ctx.lineTo(x, y + cornerRadius);
+    ctx.arcTo(x, y, x + cornerRadius, y, cornerRadius);
+    ctx.closePath();
+    ctx.fill();
 
     // Draw border for definition
     ctx.globalAlpha = 1;
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h);
+    ctx.stroke();
 
     // Draw health text (skip for indestructible bricks)
     if (!this.isIndestructible()) {
