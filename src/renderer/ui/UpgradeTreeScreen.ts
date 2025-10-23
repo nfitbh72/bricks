@@ -316,9 +316,15 @@ export class UpgradeTreeScreen extends Screen {
       })
     );
 
-    // ALL button (dev mode only, top-right below CONTINUE)
+    // ALL button (dev mode only, bottom-right)
     if (this.isDevMode) {
-      let currentY = 70; // Below CONTINUE button
+      // Level selection buttons
+      const levels = [1, 2, 3];
+      const totalButtons = 1 + levels.length; // ALL + level buttons
+      const totalHeight = totalButtons * buttonHeight + (totalButtons - 1) * buttonSpacing;
+      
+      // Start from bottom and work upwards
+      let currentY = this.canvas.height - 20 - totalHeight;
       
       this.buttons.push(
         new Button({
@@ -333,8 +339,6 @@ export class UpgradeTreeScreen extends Screen {
       
       currentY += buttonHeight + buttonSpacing;
       
-      // Level selection buttons
-      const levels = [1, 2, 3];
       for (const levelId of levels) {
         this.buttons.push(
           new Button({

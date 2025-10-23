@@ -460,11 +460,11 @@ export class OptionsScreen {
     // Draw damage numbers checkbox
     this.drawCheckbox(t('ui.options.damageNumbers'), this.getDamageNumbersCheckboxY(), this.options.showDamageNumbers, this.hoveredElement === 'damageNumbersCheckbox');
 
-    // Draw language selector
-    this.drawLanguageSelector();
-
     // Draw close button
     this.drawButton(t('ui.buttons.back'), this.getCloseButtonBounds(), this.hoveredElement === 'closeButton');
+
+    // Draw language selector (after button so dropdown appears on top)
+    this.drawLanguageSelector();
   }
 
   /**
