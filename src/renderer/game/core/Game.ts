@@ -21,6 +21,7 @@ import { WeaponManager } from '../managers/WeaponManager';
 import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
+import { RenderManager } from '../managers/RenderManager';
 import { 
   PLAYER_STARTING_HEALTH
 } from '../../config/constants';
@@ -50,6 +51,7 @@ export class Game {
   private offensiveEntityManager: OffensiveEntityManager;
   private slowMotionManager: SlowMotionManager;
   private stateTransitionHandler: StateTransitionHandler;
+  private renderManager: RenderManager;
 
 
   // Game stats
@@ -163,6 +165,9 @@ export class Game {
 
     // Initialize state transition handler
     this.stateTransitionHandler = new StateTransitionHandler(this.getTransitionContext());
+
+    // Initialize render manager
+    this.renderManager = new RenderManager(canvas, this.ctx);
 
     // Apply saved options
     this.applyOptions();
@@ -733,17 +738,11 @@ export class Game {
       return; // Still transitioning
     }
 
-    // Update cursor visibility based on game state
-    if (this.gameState === GameState.PLAYING) {
-      this.canvas.style.cursor = 'none'; // Hide cursor during gameplay
-    } else {
-      this.canvas.style.cursor = 'default'; // Show cursor on menus
-    }
-
-    // Render using screen manager
-    this.screenManager.render(
+    // Render using render manager
+    this.renderManager.render(
       this.gameState,
       this.screenManager.getPreviousState(),
+      this.screenManager,
       () => this.renderGameplay()
     );
   }
@@ -752,58 +751,18 @@ export class Game {
    * Render gameplay (used for both PLAYING and PAUSED states)
    */
   private renderGameplay(): void {
-    // Clear canvas with black
-    this.ctx.fillStyle = '#0a0a0a';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Draw background image if loaded
-    this.effectsManager.renderBackground(this.ctx, this.canvas.width, this.canvas.height);
-
-    // Apply screen shake and slow-motion zoom
-    const shake = this.effectsManager.getScreenShakeOffset();
-    this.ctx.save();
-    
-    // Apply slow-motion zoom transform (handled by EffectsManager)
-    this.effectsManager.applySlowMotionTransform(this.ctx);
-    
-    this.ctx.translate(shake.x, shake.y);
-
-    // Render level (bricks)
-    if (this.level) {
-      this.level.render(this.ctx);
-    }
-
-    // Render bat
-    this.bat.render(this.ctx);
-
-    // Render ball
-    this.ball.render(this.ctx);
-
-    // Render weapons (lasers)
-    this.weaponManager.render(this.ctx);
-
-    // Render offensive brick entities
-    this.offensiveEntityManager.render(this.ctx);
-
-    // Render visual effects (if enabled)
     const options = this.screenManager.optionsScreen.getOptions();
-    this.effectsManager.render(this.ctx, options.showParticles, options.showDamageNumbers);
-
-    this.ctx.restore();
-
-    // Render launch instruction if ball is sticky
-    if (this.ball.getIsSticky()) {
-      this.renderLaunchInstruction();
-    }
-
-    // Render status bar (not affected by screen shake)
-    this.statusBar.render(this.ctx);
-
-    // Render CRT scanline overlay
-    this.renderCRTOverlay();
-
-    // Render slow-motion overlay (handled by EffectsManager)
-    this.effectsManager.renderSlowMotionOverlay(this.ctx, this.canvas.width, this.canvas.height);
+    this.renderManager.renderGameplay(
+      this.level,
+      this.bat,
+      this.ball,
+      this.statusBar,
+      this.effectsManager,
+      this.weaponManager,
+      this.offensiveEntityManager,
+      options.showParticles,
+      options.showDamageNumbers
+    );
   }
 
 
@@ -848,63 +807,4 @@ export class Game {
   setGameState(state: GameState): void {
     this.gameState = state;
   }
-
-
-  /**
-   * Render launch instruction text when ball is sticky
-   */
-  private renderLaunchInstruction(): void {
-    const langManager = LanguageManager.getInstance();
-    const instructionText = langManager.t('game.status.launchBall');
-    
-    this.ctx.save();
-    
-    // Position text in upper third of screen
-    const textY = this.canvas.height * 0.3;
-    
-    // Draw text with glow effect
-    this.ctx.font = '32px "D Day Stencil", Arial';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillStyle = '#00ff00'; // Green
-    this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = '#00ff00';
-    this.ctx.fillText(instructionText, this.canvas.width / 2, textY);
-    
-    this.ctx.restore();
-  }
-
-  /**
-   * Render CRT scanline overlay effect
-   */
-  private renderCRTOverlay(): void {
-    this.ctx.save();
-    
-    // Draw scanlines
-    this.ctx.globalAlpha = 0.1;
-    this.ctx.fillStyle = '#000000';
-    
-    for (let y = 0; y < this.canvas.height; y += 2) {
-      this.ctx.fillRect(0, y, this.canvas.width, 1);
-    }
-    
-    // Add slight vignette effect
-    const gradient = this.ctx.createRadialGradient(
-      this.canvas.width / 2,
-      this.canvas.height / 2,
-      0,
-      this.canvas.width / 2,
-      this.canvas.height / 2,
-      Math.max(this.canvas.width, this.canvas.height) / 2
-    );
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-    
-    this.ctx.globalAlpha = 1;
-    this.ctx.fillStyle = gradient;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    this.ctx.restore();
-  }
-
 }
