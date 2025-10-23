@@ -12,15 +12,19 @@ export class FallingBrick {
   private readonly height: number = BRICK_HEIGHT;
   private readonly color: string;
   private active: boolean = true;
+  private rotation: number = 0; // Rotation angle in radians
+  private rotationSpeed: number; // Radians per second
 
   constructor(x: number, y: number, color: string) {
     this.position = { x, y };
     this.velocity = { x: 0, y: 0 }; // Starts stationary, gravity will accelerate it
     this.color = color;
+    // Random rotation speed between -3 and 3 radians per second
+    this.rotationSpeed = (Math.random() - 0.5) * 6;
   }
 
   /**
-   * Update falling brick position with gravity
+   * Update falling brick position with gravity and rotation
    */
   update(deltaTime: number): void {
     if (!this.active) return;
@@ -31,39 +35,80 @@ export class FallingBrick {
     // Update position
     this.position.x += this.velocity.x * deltaTime;
     this.position.y += this.velocity.y * deltaTime;
+
+    // Update rotation
+    this.rotation += this.rotationSpeed * deltaTime;
   }
 
   /**
-   * Render the falling brick
+   * Render the falling brick with rotation and rounded corners
    */
   render(ctx: CanvasRenderingContext2D): void {
     if (!this.active) return;
 
     ctx.save();
 
-    const x = this.position.x;
-    const y = this.position.y;
     const w = this.width;
     const h = this.height;
+    const centerX = this.position.x + w / 2;
+    const centerY = this.position.y + h / 2;
+
+    // Translate to center and rotate
+    ctx.translate(centerX, centerY);
+    ctx.rotate(this.rotation);
+    ctx.translate(-w / 2, -h / 2);
 
     // Draw glow effect
     ctx.shadowBlur = BRICK_GLOW_BLUR;
     ctx.shadowColor = this.color;
 
     // Create gradient for 3D effect
-    const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+    const gradient = ctx.createLinearGradient(0, 0, w, h);
     gradient.addColorStop(0, this.lightenColor(this.color, 30));
     gradient.addColorStop(0.5, this.color);
     gradient.addColorStop(1, this.darkenColor(this.color, 30));
 
-    // Draw brick with gradient
+    // Draw brick with gradient and rounded corners
+    const cornerRadius = 3;
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, w, h);
+    
+    ctx.beginPath();
+    ctx.moveTo(cornerRadius, 0);
+    ctx.lineTo(w - cornerRadius, 0);
+    ctx.arcTo(w, 0, w, cornerRadius, cornerRadius);
+    ctx.lineTo(w, h - cornerRadius);
+    ctx.arcTo(w, h, w - cornerRadius, h, cornerRadius);
+    ctx.lineTo(cornerRadius, h);
+    ctx.arcTo(0, h, 0, h - cornerRadius, cornerRadius);
+    ctx.lineTo(0, cornerRadius);
+    ctx.arcTo(0, 0, cornerRadius, 0, cornerRadius);
+    ctx.closePath();
+    ctx.fill();
 
-    // Draw border
+    // Draw outer border
     ctx.strokeStyle = this.color;
     ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h);
+    ctx.stroke();
+
+    // Draw inner glow for depth
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = this.lightenColor(this.color, 50);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.6;
+    
+    const innerPadding = 2;
+    ctx.beginPath();
+    ctx.moveTo(cornerRadius + innerPadding, innerPadding);
+    ctx.lineTo(w - cornerRadius - innerPadding, innerPadding);
+    ctx.arcTo(w - innerPadding, innerPadding, w - innerPadding, cornerRadius + innerPadding, cornerRadius);
+    ctx.lineTo(w - innerPadding, h - cornerRadius - innerPadding);
+    ctx.arcTo(w - innerPadding, h - innerPadding, w - cornerRadius - innerPadding, h - innerPadding, cornerRadius);
+    ctx.lineTo(cornerRadius + innerPadding, h - innerPadding);
+    ctx.arcTo(innerPadding, h - innerPadding, innerPadding, h - cornerRadius - innerPadding, cornerRadius);
+    ctx.lineTo(innerPadding, cornerRadius + innerPadding);
+    ctx.arcTo(innerPadding, innerPadding, cornerRadius + innerPadding, innerPadding, cornerRadius);
+    ctx.closePath();
+    ctx.stroke();
 
     ctx.restore();
   }
