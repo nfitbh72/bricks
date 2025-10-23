@@ -3,13 +3,12 @@
  */
 
 import { Vector2D } from '../core/types';
-import { reflect, normalize, magnitude, clamp } from '../core/utils';
+import { reflect, normalize, magnitude } from '../core/utils';
 import { Bat } from '../entities/Bat';
 import {
   BALL_BASE_DAMAGE,
   BALL_SPEED_INCREASE_PER_SECOND,
   BALL_BOUNCE_MAX_ANGLE,
-  BALL_RADIUS,
   BALL_GLOW_BLUR,
   BALL_TAIL_BASE_LENGTH,
   BALL_TAIL_SEGMENTS,

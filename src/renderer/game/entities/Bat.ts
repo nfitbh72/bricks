@@ -39,7 +39,7 @@ export class Bat {
   /**
    * Update bat position based on input (called from game loop)
    */
-  update(deltaTime: number): void {
+  update(_deltaTime: number): void {
     // Movement is handled by moveLeft/moveRight/setX methods
     // This method is here for consistency with other entities
     // and for future enhancements (e.g., smooth acceleration)

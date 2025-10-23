@@ -134,13 +134,10 @@ export class CollisionManager {
           }
           
           // Damage brick
-          const wasDestroyed = brick.isDestroyed();
           brick.takeDamage(damage);
           
           // Notify hit (show damage numbers)
           if (this.callbacks.onBrickHit) {
-            const brickCenterX = brickBounds.x + brickBounds.width / 2;
-            const brickTopY = brickBounds.y - 5;
             this.callbacks.onBrickHit(brick, damage, isCritical);
           }
           

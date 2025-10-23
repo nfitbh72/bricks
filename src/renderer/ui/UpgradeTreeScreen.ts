@@ -5,10 +5,10 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Upgrade, UpgradeType } from '../game/core/types';
+import { Upgrade } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
-import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, GLOW_LARGE } from '../config/constants';
+import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, GLOW_LARGE } from '../config/constants';
 
 /**
  * Animation types for upgrade nodes
@@ -296,15 +296,15 @@ export class UpgradeTreeScreen extends Screen {
    * @param node - The node to position
    * @param x - X position
    * @param y - Y position
-   * @param depth - Current depth in tree (0 = root)
+   * @param _depth - Current depth in tree (0 = root)
    */
-  private positionNodeWithChildren(node: UpgradeNode, x: number, y: number, depth: number): void {
+  private positionNodeWithChildren(node: UpgradeNode, x: number, y: number, _depth: number): void {
     node.position = { x, y };
     
     if (node.children.length === 0) return;
     
     // Define angles for child positioning based on number of children
-    const angles = this.getChildAngles(node.children.length, depth);
+    const angles = this.getChildAngles(node.children.length, 0);
     
     node.children.forEach((child, index) => {
       const angle = angles[index];
@@ -314,7 +314,7 @@ export class UpgradeTreeScreen extends Screen {
       const childX = x + Math.cos(angle) * distance;
       const childY = y + Math.sin(angle) * distance;
       
-      this.positionNodeWithChildren(child, childX, childY, depth + 1);
+      this.positionNodeWithChildren(child, childX, childY, 0);
     });
   }
 
@@ -322,7 +322,7 @@ export class UpgradeTreeScreen extends Screen {
    * Get angles for positioning children based on count and depth
    * Returns angles in radians
    */
-  private getChildAngles(childCount: number, depth: number): number[] {
+  private getChildAngles(childCount: number, _depth: number): number[] {
     const angles: number[] = [];
     
     if (childCount === 1) {
@@ -458,7 +458,7 @@ export class UpgradeTreeScreen extends Screen {
       this.upgradeSound.play().catch(() => {
         // Ignore audio play errors
       });
-    } catch (e) {
+    } catch (_e) {
       // Ignore audio errors
     }
   }

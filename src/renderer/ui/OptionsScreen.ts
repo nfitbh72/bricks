@@ -3,7 +3,7 @@
  */
 
 import { t, LanguageManager } from '../i18n/LanguageManager';
-import { FONT_SECONDARY_LARGE, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, FONT_TITLE_XSMALL, FONT_MONO_MINI, GLOW_XLARGE, GLOW_NORMAL, GLOW_MEDIUM, GLOW_SMALL, COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN, COLOR_DARK_GRAY, COLOR_BORDER_GRAY, COLOR_LIGHT_GRAY } from '../config/constants';
+import { FONT_SECONDARY_LARGE, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, FONT_TITLE_XSMALL, FONT_MONO_MINI, GLOW_XLARGE, GLOW_NORMAL, GLOW_MEDIUM, GLOW_SMALL, COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN, COLOR_DARK_GRAY, COLOR_BORDER_GRAY } from '../config/constants';
 
 export interface GameOptions {
   musicVolume: number;      // 0 to 1
@@ -32,9 +32,13 @@ export class OptionsScreen {
   private readonly sliderHeight = 20;
   private readonly cornerRadius = 15;
 
-  constructor(canvas: HTMLCanvasElement, onClose: () => void) {
+  constructor(canvas: HTMLCanvasElement, options: GameOptions, onClose: () => void) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Could not get 2D context from canvas');
+    }
+    this.ctx = context;
     this.onClose = onClose;
 
     // Load options from localStorage or use defaults

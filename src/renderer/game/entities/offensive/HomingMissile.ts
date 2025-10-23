@@ -9,7 +9,6 @@ import {
   HOMING_MISSILE_ACCELERATION,
   HOMING_MISSILE_TURN_RATE,
   HOMING_MISSILE_SIZE,
-  HOMING_MISSILE_DAMAGE_PERCENT,
   HOMING_MISSILE_PULSE_SPEED,
   HOMING_MISSILE_COLOR,
   HOMING_MISSILE_MAX_LIFETIME,
@@ -28,7 +27,7 @@ export class HomingMissile {
   private pulseTimer: number = 0;
   private lifetime: number = 0; // Track lifetime for despawn
 
-  constructor(x: number, y: number, color: string) {
+  constructor(x: number, y: number, _color: string) {
     this.position = { x, y };
     // Start with downward velocity
     this.velocity = { x: 0, y: this.speed };

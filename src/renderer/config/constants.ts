@@ -4,7 +4,6 @@
  */
 
 // Import and re-export font styles from fontStyles module
-import * as FontStyles from './fontStyles';
 export * from './fontStyles';
 
 // Import and re-export color styles from colorStyles module

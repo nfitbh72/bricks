@@ -4,6 +4,7 @@
 
 import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
+import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
 import { GameState, LevelConfig, BrickType } from '../core/types';
@@ -20,7 +21,6 @@ import { WeaponManager } from '../managers/WeaponManager';
 import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
-import { Brick } from '../entities/Brick';
 import { 
   PLAYER_STARTING_HEALTH
 } from '../../config/constants';
@@ -272,7 +272,7 @@ export class Game {
           this.effectsManager.createParticles(x, y, 8, brick.getColor(), 120);
         }
       },
-      onBatDamaged: (damagePercent) => {
+      onBatDamaged: (_damagePercent: number) => {
         // Visual feedback for bat damage
         this.effectsManager.triggerScreenShake(2, 0.15);
         
