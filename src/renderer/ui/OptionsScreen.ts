@@ -3,6 +3,7 @@
  */
 
 import { t, LanguageManager } from '../i18n/LanguageManager';
+import type { SupportedLanguage } from '../i18n/LanguageManager';
 import { FONT_SECONDARY_LARGE, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, FONT_TITLE_XSMALL, FONT_MONO_MINI, GLOW_XLARGE, GLOW_NORMAL, GLOW_MEDIUM, GLOW_SMALL, COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN, COLOR_DARK_GRAY, COLOR_BORDER_GRAY } from '../config/constants';
 
 export interface GameOptions {
@@ -32,7 +33,7 @@ export class OptionsScreen {
   private readonly sliderHeight = 20;
   private readonly cornerRadius = 15;
 
-  constructor(canvas: HTMLCanvasElement, options: GameOptions, onClose: () => void) {
+  constructor(canvas: HTMLCanvasElement, onClose: () => void) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context) {
@@ -250,7 +251,7 @@ export class OptionsScreen {
         this.options.selectedLanguage = selectedLang;
         this.saveOptions();
         // Update the language manager
-        LanguageManager.getInstance().setLanguage(selectedLang as any).then(() => {
+        LanguageManager.getInstance().setLanguage(selectedLang).then(() => {
           // Notify that language has changed so UI can refresh
           if (this.onLanguageChange) {
             this.onLanguageChange();
@@ -270,8 +271,6 @@ export class OptionsScreen {
    * Get element at position
    */
   private getElementAtPosition(x: number, y: number): string | null {
-    const panel = this.getPanelBounds();
-
     // Close button
     const closeButton = this.getCloseButtonBounds();
     if (this.isPointInRect(x, y, closeButton)) {
@@ -632,7 +631,7 @@ export class OptionsScreen {
     const isHovered = this.hoveredElement === 'languageSelector';
     const languageManager = LanguageManager.getInstance();
     const currentLang = this.options.selectedLanguage || languageManager.getCurrentLanguage();
-    const currentLangName = languageManager.getLanguageName(currentLang as any);
+    const currentLangName = languageManager.getLanguageName(currentLang as SupportedLanguage);
 
     // Draw label
     this.ctx.save();

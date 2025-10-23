@@ -82,13 +82,6 @@ export class ScreenManager {
     
     this.optionsScreen = new OptionsScreen(
       canvas,
-      {
-        musicVolume: 1.0,
-        sfxVolume: 1.0,
-        showParticles: true,
-        showDamageNumbers: true,
-        selectedLanguage: 'en'
-      },
       callbacks.onCloseOptions
     );
   }

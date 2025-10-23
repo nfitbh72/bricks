@@ -3,10 +3,10 @@
  */
 
 type TranslationData = {
-  [key: string]: any;
+  [key: string]: string | TranslationData;
 };
 
-type SupportedLanguage = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'zh-CN' | 'th' | 'vi' | 'id' | 'tl';
+export type SupportedLanguage = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'zh-CN' | 'th' | 'vi' | 'id' | 'tl';
 
 export class LanguageManager {
   private static instance: LanguageManager;
@@ -72,7 +72,7 @@ export class LanguageManager {
    */
   t(key: string): string {
     const keys = key.split('.');
-    let value: any = this.translations;
+    let value: string | TranslationData = this.translations;
 
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
