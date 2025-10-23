@@ -4,14 +4,11 @@
 
 import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
-import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
-import { GameState, LevelConfig, BrickType } from '../core/types';
+import { GameState, LevelConfig } from '../core/types';
 import { calculateGameElementScale } from '../core/utils';
 import { GameUpgrades } from '../systems/GameUpgrades';
-import { getLevel } from '../../config/levels';
-import { getUpgrades } from '../../config/upgrades';
 import { AudioManager } from '../managers/AudioManager';
 import { InputManager } from '../managers/InputManager';
 import { ScreenManager } from '../managers/ScreenManager';
@@ -22,10 +19,7 @@ import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
-import { 
-  PLAYER_STARTING_HEALTH
-} from '../../config/constants';
-import { LanguageManager } from '../../i18n/LanguageManager';
+import { PLAYER_STARTING_HEALTH } from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;

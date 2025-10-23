@@ -12,6 +12,7 @@ import { OffensiveEntityManager } from './OffensiveEntityManager';
 import { ScreenManager } from './ScreenManager';
 import { GameState } from '../core/types';
 import { LanguageManager } from '../../i18n/LanguageManager';
+import { FONT_TITLE_NORMAL, GLOW_LARGE, COLOR_GREEN } from '../../config/constants';
 
 export class RenderManager {
   private canvas: HTMLCanvasElement;
@@ -126,12 +127,12 @@ export class RenderManager {
     const textY = this.canvas.height * 0.3;
     
     // Draw text with glow effect
-    this.ctx.font = '32px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_NORMAL;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillStyle = '#00ff00'; // Green
-    this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = '#00ff00';
+    this.ctx.fillStyle = COLOR_GREEN;
+    this.ctx.shadowBlur = GLOW_LARGE;
+    this.ctx.shadowColor = COLOR_GREEN;
     this.ctx.fillText(instructionText, this.canvas.width / 2, textY);
     
     this.ctx.restore();
