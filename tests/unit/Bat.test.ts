@@ -465,6 +465,11 @@ describe('Bat', () => {
         save: jest.fn(),
         restore: jest.fn(),
         fillRect: jest.fn(),
+        beginPath: jest.fn(),
+        arc: jest.fn(),
+        lineTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
         shadowBlur: 0,
         shadowColor: '',
         fillStyle: '',
@@ -479,6 +484,11 @@ describe('Bat', () => {
         save: jest.fn(),
         restore: jest.fn(),
         fillRect: jest.fn(),
+        beginPath: jest.fn(),
+        arc: jest.fn(),
+        lineTo: jest.fn(),
+        closePath: jest.fn(),
+        fill: jest.fn(),
         shadowBlur: 0,
         shadowColor: '',
         fillStyle: '',
@@ -487,7 +497,9 @@ describe('Bat', () => {
       bat.render(mockCtx);
 
       expect(mockCtx.save).toHaveBeenCalled();
-      expect(mockCtx.fillRect).toHaveBeenCalledWith(100, 200, 100, 10);
+      expect(mockCtx.beginPath).toHaveBeenCalled();
+      expect(mockCtx.arc).toHaveBeenCalled();
+      expect(mockCtx.fill).toHaveBeenCalled();
       expect(mockCtx.restore).toHaveBeenCalled();
     });
   });

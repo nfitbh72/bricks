@@ -46,7 +46,7 @@ export class Bat {
   }
 
   /**
-   * Render the bat on the canvas
+   * Render the bat on the canvas with rounded ends
    */
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
@@ -55,9 +55,21 @@ export class Bat {
     ctx.shadowBlur = BAT_GLOW_BLUR;
     ctx.shadowColor = COLOR_MAGENTA;
 
-    // Draw bat
+    // Draw bat with rounded ends
     ctx.fillStyle = COLOR_MAGENTA;
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    const radius = this.height / 2; // Half-circle ends
+    
+    ctx.beginPath();
+    // Left rounded end
+    ctx.arc(this.position.x + radius, this.position.y + radius, radius, Math.PI / 2, Math.PI * 1.5);
+    // Top edge
+    ctx.lineTo(this.position.x + this.width - radius, this.position.y);
+    // Right rounded end
+    ctx.arc(this.position.x + this.width - radius, this.position.y + radius, radius, Math.PI * 1.5, Math.PI / 2);
+    // Bottom edge
+    ctx.lineTo(this.position.x + radius, this.position.y + this.height);
+    ctx.closePath();
+    ctx.fill();
 
     // Draw turrets if lasers are active
     if (this.showTurret) {

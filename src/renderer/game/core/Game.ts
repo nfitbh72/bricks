@@ -74,10 +74,10 @@ export class Game {
     const scaleFactor = calculateGameElementScale(canvas.width, canvas.height);
     
     // Initialize ball and bat with scaled dimensions
-    // Base sizes (at 4K): bat = 150x15, ball radius = 10, ball speed = 600
+    // Base sizes (at 4K): bat = 150x20, ball radius = 10, ball speed = 600
     const baseRadius = 10;
     const baseBatWidth = 150;
-    const baseBatHeight = 15;
+    const baseBatHeight = 20;
     const baseBallSpeed = 600;
     
     const ballRadius = baseRadius * scaleFactor;
