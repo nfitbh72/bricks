@@ -8,17 +8,16 @@ import {
   STATUSBAR_BORDER_COLOR,
   STATUSBAR_BORDER_WIDTH,
   STATUSBAR_BORDER_GLOW,
-  STATUSBAR_FONT_FAMILY,
-  STATUSBAR_FONT_SIZE_NORMAL,
-  STATUSBAR_FONT_SIZE_HEARTS,
-  STATUSBAR_TEXT_GLOW,
-  STATUSBAR_HEARTS_GLOW,
   STATUSBAR_HEARTS_PADDING,
   STATUSBAR_ITEM_OFFSET,
   STATUSBAR_COLOR_HEARTS,
   STATUSBAR_COLOR_TIMER,
   STATUSBAR_COLOR_BRICKS,
   STATUSBAR_COLOR_TITLE,
+  FONT_TITLE_XSMALL,
+  FONT_TITLE_SMALL,
+  GLOW_MEDIUM,
+  GLOW_SMALL,
 } from '../../config/constants';
 
 export class StatusBar {
@@ -123,15 +122,15 @@ export class StatusBar {
     ctx.shadowBlur = 0;
 
     const centerY = this.y + this.height / 2;
-    const statusFont = `${STATUSBAR_FONT_SIZE_NORMAL}px ${STATUSBAR_FONT_FAMILY}`;
-    const heartFont = `${STATUSBAR_FONT_SIZE_HEARTS}px ${STATUSBAR_FONT_FAMILY}`;
+    const statusFont = FONT_TITLE_XSMALL;
+    const heartFont = FONT_TITLE_SMALL;
 
     // Draw hearts on the left with magenta glow
     ctx.fillStyle = STATUSBAR_COLOR_HEARTS;
     ctx.font = heartFont;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.shadowBlur = STATUSBAR_HEARTS_GLOW;
+    ctx.shadowBlur = GLOW_SMALL;
     ctx.shadowColor = STATUSBAR_COLOR_HEARTS;
     const hearts = '♥'.repeat(Math.max(0, this.playerHealth));
     ctx.fillText(hearts, STATUSBAR_HEARTS_PADDING, centerY);
@@ -142,7 +141,7 @@ export class StatusBar {
     ctx.font = statusFont;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    ctx.shadowBlur = STATUSBAR_TEXT_GLOW;
+ctx.shadowBlur = GLOW_MEDIUM;
     ctx.shadowColor = STATUSBAR_COLOR_TIMER;
     const timeText = this.formatTime(this.levelTime);
     ctx.fillText(timeText, this.width / 2 - STATUSBAR_ITEM_OFFSET, centerY);
@@ -153,7 +152,7 @@ export class StatusBar {
     ctx.font = statusFont;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.shadowBlur = STATUSBAR_TEXT_GLOW;
+ctx.shadowBlur = GLOW_MEDIUM;
     ctx.shadowColor = STATUSBAR_COLOR_BRICKS;
     const brickText = `[${this.remainingBricks}/${this.totalBricks}]`;
     ctx.fillText(brickText, this.width / 2 + STATUSBAR_ITEM_OFFSET, centerY);
@@ -165,7 +164,7 @@ export class StatusBar {
       ctx.font = statusFont;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowBlur = STATUSBAR_TEXT_GLOW;
+  ctx.shadowBlur = GLOW_MEDIUM;
       ctx.shadowColor = STATUSBAR_COLOR_TITLE;
       ctx.fillText(this.levelTitle.toUpperCase(), this.width / 2, centerY);
       ctx.shadowBlur = 0;

@@ -1,0 +1,32 @@
+/**
+ * SCSS Mixins
+ * Reusable style patterns
+ */
+
+@use 'variables' as *;
+
+// Text glow effect
+@mixin text-glow($color, $blur: $glow-normal) {
+  text-shadow: 0 0 $blur $color;
+}
+
+// Common font styles (for documentation purposes)
+// Note: Canvas rendering uses TypeScript constants, not CSS classes
+@mixin font-title-huge {
+  font-family: $font-primary;
+  font-size: $font-size-huge;
+}
+
+@mixin font-title-large {
+  font-family: $font-primary;
+  font-size: $font-size-xlarge;
+}
+
+@mixin font-title-medium {
+  font-family: $font-primary;
+  font-size: $font-size-large;
+}
+
+@mixin font-secondary {
+  font-family: $font-secondary;
+}

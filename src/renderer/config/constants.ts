@@ -3,6 +3,25 @@
  * Centralized configuration for consistent gameplay
  */
 
+// Import and re-export font styles from fontStyles module
+import * as FontStyles from './fontStyles';
+export * from './fontStyles';
+
+// Import and re-export color styles from colorStyles module
+import * as ColorStyles from './colorStyles';
+export * from './colorStyles';
+
+// Destructure color constants for use in this file
+const {
+  COLOR_BLACK,
+  COLOR_GREEN,
+  COLOR_MAGENTA,
+  COLOR_YELLOW,
+  COLOR_CYAN,
+  COLOR_ORANGE,
+  COLOR_RED,
+} = ColorStyles;
+
 // Brick dimensions (fixed size for all bricks)
 export const BRICK_WIDTH = 104; // 30% wider than original 80
 export const BRICK_HEIGHT = 20;
@@ -65,8 +84,7 @@ export const PARTICLE_GLOW_BLUR = 10;
 export const DAMAGE_NUMBER_LIFETIME = 1000; // 1 second in milliseconds
 export const DAMAGE_NUMBER_FADE_DURATION = 300; // Last 300ms fade out
 export const DAMAGE_NUMBER_FLOAT_SPEED = 0.5; // Pixels per frame
-export const DAMAGE_NUMBER_FONT_SIZE_NORMAL = 14;
-export const DAMAGE_NUMBER_FONT_SIZE_CRITICAL = 16;
+// Font size constants moved to fontStyles.ts and re-exported above
 export const DAMAGE_NUMBER_GLOW_BLUR = 10;
 
 // Visual effect constants (glow/shadow)
@@ -93,32 +111,27 @@ export const AUDIO_PATH_BAT_DAMAGE = './assets/sounds/buzzer-4-183895.mp3';
 export const AUDIO_PATH_BACKGROUND_MUSIC = './assets/sounds/lulu-swing-giulio-fazio-main-version-02-18-3209.mp3';
 
 // StatusBar constants
-export const STATUSBAR_BACKGROUND_COLOR = '#0a0a0a';
-export const STATUSBAR_BORDER_COLOR = '#00ff00';
+export const STATUSBAR_BACKGROUND_COLOR = COLOR_BLACK;
+export const STATUSBAR_BORDER_COLOR = COLOR_GREEN;
 export const STATUSBAR_BORDER_WIDTH = 1;
 export const STATUSBAR_BORDER_GLOW = 5;
-export const STATUSBAR_FONT_FAMILY = '"D Day Stencil", Arial';
-export const STATUSBAR_FONT_SIZE_NORMAL = 24;
-export const STATUSBAR_FONT_SIZE_HEARTS = 28;
-export const STATUSBAR_TEXT_GLOW = 10;
-export const STATUSBAR_HEARTS_GLOW = 12;
+// Font constants moved to fontStyles.ts and re-exported above
 export const STATUSBAR_HEARTS_PADDING = 15;
 export const STATUSBAR_ITEM_OFFSET = 200; // Offset from center for timer and brick count
 
 // StatusBar colors
-export const STATUSBAR_COLOR_HEARTS = '#ff00ff'; // Magenta
-export const STATUSBAR_COLOR_TIMER = '#ffff00'; // Yellow
-export const STATUSBAR_COLOR_BRICKS = '#00ffff'; // Cyan
-export const STATUSBAR_COLOR_TITLE = '#00ff00'; // Green
+export const STATUSBAR_COLOR_HEARTS = COLOR_MAGENTA; // Magenta
+export const STATUSBAR_COLOR_TIMER = COLOR_YELLOW; // Yellow
+export const STATUSBAR_COLOR_BRICKS = COLOR_CYAN; // Cyan
+export const STATUSBAR_COLOR_TITLE = COLOR_GREEN; // Green
 
 // Button constants
-export const BUTTON_COLOR_NORMAL = '#ff00ff'; // Magenta
-export const BUTTON_COLOR_HOVERED = '#00ffff'; // Cyan
+export const BUTTON_COLOR_NORMAL = COLOR_MAGENTA; // Magenta
+export const BUTTON_COLOR_HOVERED = COLOR_CYAN; // Cyan
 export const BUTTON_GLOW_NORMAL = 15;
 export const BUTTON_GLOW_HOVERED = 30;
 export const BUTTON_BORDER_WIDTH = 3;
-export const BUTTON_FONT_SIZE = 32;
-export const BUTTON_FONT_FAMILY = '"D Day Stencil", Arial';
+// Font constants moved to fontStyles.ts and re-exported above
 
 // Piercing visual constants
 export const PIERCING_WARNING_DURATION = 0.5; // Last 0.5 seconds flash warning
@@ -131,7 +144,7 @@ export const PLAYER_STARTING_HEALTH = 1;
 export const STICKY_BALL_LAUNCH_ANGLE = -60; // 30 degrees right of vertical (negative = upward)
 export const STICKY_BALL_INDICATOR_LENGTH = 50; // Length of launch direction indicator
 export const STICKY_BALL_INDICATOR_WIDTH = 3; // Width of indicator line
-export const STICKY_BALL_INDICATOR_COLOR = '#00ff00'; // Green indicator
+export const STICKY_BALL_INDICATOR_COLOR = COLOR_GREEN; // Green indicator
 export const STICKY_BALL_INDICATOR_GLOW = 15; // Glow effect for indicator
 
 // Slow-motion effect constants
@@ -141,11 +154,11 @@ export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights fro
 export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
 
 // Offensive brick constants
-export const OFFENSIVE_BRICK_COLOR_FALLING = '#ff4400'; // Red-Orange warning color
-export const OFFENSIVE_BRICK_COLOR_EXPLODING = '#ff0000'; // Red warning color
-export const OFFENSIVE_BRICK_COLOR_LASER = '#ffff00'; // Yellow warning color
-export const OFFENSIVE_BRICK_COLOR_HOMING = '#ff00ff'; // Magenta warning color
-export const OFFENSIVE_BRICK_COLOR_SPLITTING = '#ff6600'; // Orange warning color
+export const OFFENSIVE_BRICK_COLOR_FALLING = COLOR_ORANGE; // Red-Orange warning color
+export const OFFENSIVE_BRICK_COLOR_EXPLODING = COLOR_RED; // Red warning color
+export const OFFENSIVE_BRICK_COLOR_LASER = COLOR_YELLOW; // Yellow warning color
+export const OFFENSIVE_BRICK_COLOR_HOMING = COLOR_MAGENTA; // Magenta warning color
+export const OFFENSIVE_BRICK_COLOR_SPLITTING = COLOR_ORANGE; // Orange warning color
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
@@ -162,7 +175,7 @@ export const LASER_BRICK_FIRE_DELAY = 0.5; // Seconds before laser fires
 export const LASER_BRICK_LASER_WIDTH = 6; // Laser beam width
 export const LASER_BRICK_LASER_SPEED = 600; // Pixels per second
 export const LASER_BRICK_LASER_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
-export const LASER_BRICK_WARNING_COLOR = '#ffff00'; // Yellow warning flash
+export const LASER_BRICK_WARNING_COLOR = COLOR_YELLOW; // Yellow warning flash
 
 // Homing missile constants
 export const HOMING_MISSILE_INITIAL_SPEED = 250; // Pixels per second
@@ -172,7 +185,7 @@ export const HOMING_MISSILE_TURN_RATE = 3.0; // Radians per second
 export const HOMING_MISSILE_SIZE = 18; // Missile size (width/height) - 50% larger than 12
 export const HOMING_MISSILE_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const HOMING_MISSILE_PULSE_SPEED = 3.0; // Glow pulse frequency
-export const HOMING_MISSILE_COLOR = '#ff00ff'; // Bright purple/magenta
+export const HOMING_MISSILE_COLOR = COLOR_MAGENTA; // Bright purple/magenta
 export const HOMING_MISSILE_MAX_LIFETIME = 7.0; // Maximum lifetime in seconds
 
 // Splitting brick constants

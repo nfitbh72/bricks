@@ -1,0 +1,61 @@
+/**
+ * SCSS Variables
+ * Centralized design tokens for colors, fonts, and sizes
+ */
+
+// Font Families
+$font-primary: 'D Day Stencil', Arial, sans-serif;
+$font-secondary: 'Population Zero BB', 'D Day Stencil', Arial, sans-serif;
+$font-monospace: 'Courier New', monospace;
+
+// Font Sizes
+$font-size-huge: 72px;
+$font-size-xlarge: 64px;
+$font-size-large: 48px;
+$font-size-medium: 36px;
+$font-size-normal: 32px;
+$font-size-small: 28px;
+$font-size-xsmall: 24px;
+$font-size-tiny: 20px;
+$font-size-micro: 18px;
+$font-size-mini: 16px;
+$font-size-brick: 12px;
+
+// Colors - Neon/Dystopian Palette
+$color-magenta: #ff00ff;
+$color-cyan: #00ffff;
+$color-green: #00ff00;
+$color-yellow: #ffff00;
+$color-red: #ff0000;
+$color-orange: #ff4400;
+$color-black: #0a0a0a;
+$color-white: #ffffff;
+
+// UI Colors
+$color-dark-gray: #1a1a1a;
+$color-border-gray: #333333;
+$color-text-gray: #666666;
+$color-light-gray: #aaaaaa;
+$color-preview-gray: #555555;
+
+// Additional game colors
+$color-metallic-gray: #888888;
+$color-hot-pink: #ff0080;
+$color-sky-blue: #0080ff;
+$color-lime: #80ff00;
+$color-red-pink: #ff0040;
+$color-spring-green: #00ff80;
+$color-purple: #8000ff;
+$color-rose: #ff00c0;
+$color-light-blue: #00c0ff;
+$color-yellow-green: #c0ff00;
+$color-red-orange: #ff4000;
+$color-bright-green: #40ff00;
+
+// Glow/Shadow Blur Values
+$glow-small: 5px;
+$glow-medium: 10px;
+$glow-normal: 15px;
+$glow-large: 20px;
+$glow-xlarge: 30px;
+$glow-huge: 40px;

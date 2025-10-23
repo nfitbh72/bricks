@@ -2,6 +2,8 @@
  * Transition screen with spinning brick and fade effect
  */
 
+import { COLOR_BLACK, COLOR_MAGENTA } from '../config/constants';
+
 export class TransitionScreen {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -65,7 +67,7 @@ export class TransitionScreen {
    */
   render(): void {
     // Clear screen
-    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillStyle = COLOR_BLACK;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.save();
@@ -87,14 +89,14 @@ export class TransitionScreen {
 
     // Neon glow effect
     this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = '#ff00ff';
+    this.ctx.shadowColor = COLOR_MAGENTA;
 
     // Draw brick
-    this.ctx.fillStyle = '#ff00ff';
+    this.ctx.fillStyle = COLOR_MAGENTA;
     this.ctx.fillRect(-brickWidth / 2, -brickHeight / 2, brickWidth, brickHeight);
 
     // Draw border
-    this.ctx.strokeStyle = '#ff00ff';
+    this.ctx.strokeStyle = COLOR_MAGENTA;
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(-brickWidth / 2, -brickHeight / 2, brickWidth, brickHeight);
 

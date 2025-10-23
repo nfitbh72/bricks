@@ -10,12 +10,49 @@
 # Install dependencies
 npm install
 
+# Build the project
+npm run build
+
 # Run in development mode
 npm run dev
 
 # Run tests
 npm test
 ```
+
+### Build Process
+
+The build process consists of three steps:
+
+1. **Main process compilation** (`npm run build:main`)
+   - Compiles TypeScript files for the Electron main process
+   - Output: `dist/main/`
+
+2. **Renderer process bundling** (`npm run build:renderer`)
+   - Bundles TypeScript and SCSS files using webpack
+   - Compiles SCSS to CSS and injects styles
+   - Bundles font assets
+   - Output: `dist/renderer/renderer.js` and assets
+
+3. **Asset copying** (`npm run copy-assets`)
+   - Copies HTML, fonts, images, sounds, and i18n files
+   - Output: `dist/renderer/assets/` and `dist/renderer/i18n/`
+
+### Styling System
+
+The project uses **typed SCSS modules** for maintainable, type-safe styling:
+
+- **SCSS files**: Located in `src/renderer/styles/`
+  - `_variables.scss` - Colors, fonts, sizes
+  - `_fonts.scss` - Font-face declarations
+  - `_mixins.scss` - Reusable style patterns
+  - `base.scss` - Base HTML/body styles
+  - `index.scss` - Main entry point
+
+- **Font constants**: TypeScript constants in `src/renderer/config/fontStyles.ts`
+  - Type-safe font strings for canvas rendering
+  - Synchronized with SCSS variables
+  - Provides autocomplete and refactoring support
 
 ## Building Distributables
 

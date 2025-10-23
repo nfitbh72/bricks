@@ -11,6 +11,8 @@ import {
   BAT_TURRET_BARREL_HEIGHT_MULTIPLIER,
   BAT_TURRET_TIP_WIDTH_MULTIPLIER,
   BAT_TURRET_TIP_HEIGHT_MULTIPLIER,
+  COLOR_MAGENTA,
+  COLOR_CYAN,
 } from '../../config/constants';
 
 export class Bat {
@@ -51,10 +53,10 @@ export class Bat {
 
     // Draw glow effect (dystopian neon style)
     ctx.shadowBlur = BAT_GLOW_BLUR;
-    ctx.shadowColor = '#ff00ff';
+    ctx.shadowColor = COLOR_MAGENTA;
 
     // Draw bat
-    ctx.fillStyle = '#ff00ff';
+    ctx.fillStyle = COLOR_MAGENTA;
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 
     // Draw turrets if lasers are active
@@ -87,7 +89,7 @@ export class Bat {
     const barrelHeight = this.height * BAT_TURRET_BARREL_HEIGHT_MULTIPLIER;
 
     // Draw turret base (trapezoid)
-    ctx.fillStyle = '#ff00ff';
+    ctx.fillStyle = COLOR_MAGENTA;
     ctx.beginPath();
     ctx.moveTo(centerX - turretWidth / 2, turretY);
     ctx.lineTo(centerX - turretWidth / 3, turretY - turretHeight);
@@ -97,7 +99,7 @@ export class Bat {
     ctx.fill();
 
     // Draw barrel (rectangle on top)
-    ctx.fillStyle = '#ff00ff';
+    ctx.fillStyle = COLOR_MAGENTA;
     ctx.fillRect(
       centerX - barrelWidth / 2,
       turretY - turretHeight - barrelHeight,
@@ -108,8 +110,8 @@ export class Bat {
     // Draw barrel tip (small rectangle)
     const tipWidth = barrelWidth * BAT_TURRET_TIP_WIDTH_MULTIPLIER;
     const tipHeight = this.height * BAT_TURRET_TIP_HEIGHT_MULTIPLIER;
-    ctx.fillStyle = '#00ffff'; // Cyan tip for contrast
-    ctx.shadowColor = '#00ffff';
+    ctx.fillStyle = COLOR_CYAN; // Cyan tip for contrast
+    ctx.shadowColor = COLOR_CYAN;
     ctx.fillRect(
       centerX - tipWidth / 2,
       turretY - turretHeight - barrelHeight - tipHeight,

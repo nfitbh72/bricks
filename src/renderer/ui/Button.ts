@@ -8,8 +8,7 @@ import {
   BUTTON_GLOW_NORMAL,
   BUTTON_GLOW_HOVERED,
   BUTTON_BORDER_WIDTH,
-  BUTTON_FONT_SIZE,
-  BUTTON_FONT_FAMILY,
+  FONT_TITLE_NORMAL,
 } from '../config/constants';
 
 export interface ButtonConfig {
@@ -83,7 +82,7 @@ export class Button {
 
     // Draw text
     ctx.fillStyle = glowColor;
-    ctx.font = `${BUTTON_FONT_SIZE}px ${BUTTON_FONT_FAMILY}`;
+    ctx.font = FONT_TITLE_NORMAL;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2);

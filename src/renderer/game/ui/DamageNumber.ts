@@ -6,9 +6,9 @@ import {
   DAMAGE_NUMBER_LIFETIME,
   DAMAGE_NUMBER_FADE_DURATION,
   DAMAGE_NUMBER_FLOAT_SPEED,
-  DAMAGE_NUMBER_FONT_SIZE_NORMAL,
-  DAMAGE_NUMBER_FONT_SIZE_CRITICAL,
   DAMAGE_NUMBER_GLOW_BLUR,
+  FONT_SIZE_BRICK,
+  FONT_SIZE_MINI,
 } from '../../config/constants';
 
 export class DamageNumber {
@@ -73,7 +73,7 @@ export class DamageNumber {
     // Set font and style
     ctx.fillStyle = color;
     ctx.globalAlpha = opacity;
-    ctx.font = this.isCritical ? `bold ${DAMAGE_NUMBER_FONT_SIZE_CRITICAL}px Arial` : `${DAMAGE_NUMBER_FONT_SIZE_NORMAL}px Arial`;
+    ctx.font = this.isCritical ? `bold ${FONT_SIZE_MINI}px Arial` : `${FONT_SIZE_BRICK}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 

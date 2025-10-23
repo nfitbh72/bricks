@@ -9,9 +9,11 @@ import {
   HOMING_MISSILE_ACCELERATION,
   HOMING_MISSILE_TURN_RATE,
   HOMING_MISSILE_SIZE,
+  HOMING_MISSILE_DAMAGE_PERCENT,
   HOMING_MISSILE_PULSE_SPEED,
   HOMING_MISSILE_COLOR,
   HOMING_MISSILE_MAX_LIFETIME,
+  COLOR_WHITE,
   PARTICLE_GLOW_BLUR,
 } from '../../../config/constants';
 
@@ -129,7 +131,7 @@ export class HomingMissile {
 
     // Draw bright core with pulse
     ctx.globalAlpha = pulse;
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = COLOR_WHITE;
     ctx.beginPath();
     ctx.moveTo(size * 0.6, 0);
     ctx.lineTo(-size * 0.2, -size * 0.2);

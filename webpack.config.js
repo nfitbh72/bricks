@@ -11,6 +11,18 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(ttf|otf|woff|woff2|eot)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/fonts/[name][ext]'
+        }
+      },
     ],
   },
   resolve: {

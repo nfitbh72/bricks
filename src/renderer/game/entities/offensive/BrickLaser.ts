@@ -7,7 +7,8 @@ import {
   LASER_BRICK_LASER_WIDTH, 
   LASER_BRICK_LASER_SPEED,
   LASER_BRICK_FIRE_DELAY,
-  LASER_BRICK_WARNING_COLOR
+  LASER_BRICK_WARNING_COLOR,
+  COLOR_WHITE,
 } from '../../../config/constants';
 
 export class BrickLaser {
@@ -85,7 +86,7 @@ export class BrickLaser {
       );
       
       // Draw bright core
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = COLOR_WHITE;
       ctx.fillRect(
         this.position.x - this.width / 4,
         this.position.y,

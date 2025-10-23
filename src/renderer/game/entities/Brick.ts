@@ -10,7 +10,28 @@ import {
   BRICK_GLOW_BLUR,
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
-  OFFENSIVE_BRICK_COLOR_LASER
+  OFFENSIVE_BRICK_COLOR_LASER,
+  FONT_MONO_BRICK,
+  COLOR_MAGENTA,
+  COLOR_CYAN,
+  COLOR_GREEN,
+  COLOR_YELLOW,
+  COLOR_HOT_PINK,
+  COLOR_SKY_BLUE,
+  COLOR_LIME,
+  COLOR_ORANGE,
+  COLOR_RED_PINK,
+  COLOR_SPRING_GREEN,
+  COLOR_PURPLE,
+  COLOR_ROSE,
+  COLOR_LIGHT_BLUE,
+  COLOR_YELLOW_GREEN,
+  COLOR_RED_ORANGE,
+  COLOR_BRIGHT_GREEN,
+  COLOR_WHITE,
+  COLOR_TEXT_GRAY,
+  COLOR_METALLIC_GRAY,
+  COLOR_BLACK,
 } from '../../config/constants';
 import { gridToPixel } from '../../config/brickLayout';
 
@@ -39,26 +60,26 @@ export class Brick {
   };
 
   /**
-   * Neon color palette (16 colors)
+   * Neon color palette for bricks
    * Colors are indexed by health % 16
    */
   private static readonly NEON_COLORS: string[] = [
-    '#ff00ff', // Magenta
-    '#00ffff', // Cyan
-    '#00ff00', // Green
-    '#ffff00', // Yellow
-    '#ff0080', // Hot Pink
-    '#0080ff', // Sky Blue
-    '#80ff00', // Lime
-    '#ff8000', // Orange
-    '#ff0040', // Red-Pink
-    '#00ff80', // Spring Green
-    '#8000ff', // Purple
-    '#ff00c0', // Rose
-    '#00c0ff', // Light Blue
-    '#c0ff00', // Yellow-Green
-    '#ff4000', // Red-Orange
-    '#40ff00', // Bright Green
+    COLOR_MAGENTA,        // Magenta
+    COLOR_CYAN,           // Cyan
+    COLOR_GREEN,          // Green
+    COLOR_YELLOW,         // Yellow
+    COLOR_HOT_PINK,       // Hot Pink
+    COLOR_SKY_BLUE,       // Sky Blue
+    COLOR_LIME,           // Lime
+    COLOR_ORANGE,         // Orange
+    COLOR_RED_PINK,       // Red-Pink
+    COLOR_SPRING_GREEN,   // Spring Green
+    COLOR_PURPLE,         // Purple
+    COLOR_ROSE,           // Rose
+    COLOR_LIGHT_BLUE,     // Light Blue
+    COLOR_YELLOW_GREEN,   // Yellow-Green
+    COLOR_RED_ORANGE,     // Red-Orange
+    COLOR_BRIGHT_GREEN,   // Bright Green
   ];
 
   constructor(config: BrickConfig, baseHealth: number = 1) {
@@ -200,7 +221,7 @@ export class Brick {
       case BrickType.OFFENSIVE_LASER:
         return OFFENSIVE_BRICK_COLOR_LASER;
       default:
-        return '#ffffff';
+        return COLOR_WHITE;
     }
   }
 
@@ -209,12 +230,12 @@ export class Brick {
    */
   private getColorByHealth(): string {
     if (this.health <= 0) {
-      return '#666666'; // Gray - destroyed
+      return COLOR_TEXT_GRAY; // Gray - destroyed
     }
     
     // Indestructible bricks have a special metallic gray color
     if (this.isIndestructible()) {
-      return '#888888'; // Metallic gray
+      return COLOR_METALLIC_GRAY; // Metallic gray
     }
     
     // Use health modulo 16 to index into neon color palette
@@ -268,8 +289,8 @@ export class Brick {
     // Draw health text (skip for indestructible bricks)
     if (!this.isIndestructible()) {
       ctx.shadowBlur = 0; // Remove shadow for text
-      ctx.fillStyle = '#000000';
-      ctx.font = '12px "Courier New", monospace';
+      ctx.fillStyle = COLOR_BLACK;
+      ctx.font = FONT_MONO_BRICK;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       

@@ -11,6 +11,8 @@ import {
   SPLITTING_FRAGMENT_SHAKE_INTENSITY,
   SPLITTING_FRAGMENT_GRAVITY,
   PARTICLE_GLOW_BLUR,
+  COLOR_BLACK,
+  COLOR_WHITE,
 } from '../../../config/constants';
 
 export class SplittingFragment {
@@ -122,12 +124,12 @@ export class SplittingFragment {
     ctx.fillRect(-size / 2, -size / 2, size, size);
 
     // Draw darker edge for depth
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillStyle = `${COLOR_BLACK}4D`; // 30% opacity (0.3 * 255 = 4D in hex)
     ctx.fillRect(-size / 2, size / 2 - 3, size, 3);
     ctx.fillRect(size / 2 - 3, -size / 2, 3, size);
 
     // Draw highlight for 3D effect
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillStyle = `${COLOR_WHITE}4D`; // 30% opacity (0.3 * 255 = 4D in hex)
     ctx.fillRect(-size / 2, -size / 2, size, 3);
     ctx.fillRect(-size / 2, -size / 2, 3, size);
 

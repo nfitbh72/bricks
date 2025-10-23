@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { Upgrade, UpgradeType } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
+import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, GLOW_LARGE } from '../config/constants';
 
 /**
  * Animation types for upgrade nodes
@@ -715,16 +716,16 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.stroke();
     
     // Title (left side)
-    this.ctx.shadowBlur = 20;
+    this.ctx.shadowBlur = GLOW_LARGE;
     this.ctx.shadowColor = '#00ffff';
     this.ctx.fillStyle = '#00ffff';
-    this.ctx.font = '32px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_NORMAL;
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(t('game.upgrades.title'), 20, this.HEADER_HEIGHT / 2);
     
     // Points counter (center)
-    this.ctx.font = '24px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_XSMALL;
     this.ctx.textAlign = 'center';
     const pointsKey = this.state.availablePoints === 1 ? 'game.upgrades.pointsAvailable' : 'game.upgrades.pointsAvailablePlural';
     this.ctx.fillText(
@@ -924,24 +925,24 @@ export class UpgradeTreeScreen extends Screen {
     
     // Title
     this.ctx.fillStyle = textColor;
-    this.ctx.font = '20px "Population Zero BB", Arial';
+    this.ctx.font = FONT_SECONDARY_TINY;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(node.upgrade.name.toUpperCase(), x, y - halfHeight + 6);
     
     // Progress indicator
     const progressText = `[${node.currentLevel}/${node.upgrade.times}]`;
-    this.ctx.font = '15px "Population Zero BB", Arial';
+    this.ctx.font = FONT_SECONDARY_MICRO;
     this.ctx.fillStyle = isPreview ? '#555555' : '#aaaaaa';
     this.ctx.fillText(progressText, x, y - halfHeight + 25);
     
     if (isPreview) {
       // Preview state: show ??? and LOCKED
       this.ctx.fillStyle = textColor;
-      this.ctx.font = '22px "Population Zero BB", Arial';
+      this.ctx.font = FONT_SECONDARY_TINY;
       this.ctx.fillText(t('game.upgrades.preview'), x, y - halfHeight + 55);
       
-      this.ctx.font = '13px "Population Zero BB", Arial';
+      this.ctx.font = FONT_SECONDARY_MICRO;
       this.ctx.fillText(t('game.upgrades.locked'), x, y + halfHeight - 14);
     } else {
       // Unlocked or maxed: show full details
@@ -949,13 +950,13 @@ export class UpgradeTreeScreen extends Screen {
       // Maxed indicator
       if (isMaxed) {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = '14px "Population Zero BB", Arial';
+        this.ctx.font = FONT_SECONDARY_MICRO;
         this.ctx.fillText(t('game.upgrades.maxed'), x, y - halfHeight + 40);
       }
       
       // Description (word wrap)
       this.ctx.fillStyle = textColor;
-      this.ctx.font = '18px "Population Zero BB", Arial';
+      this.ctx.font = FONT_SECONDARY_MICRO;
       this.renderWrappedText(
         node.upgrade.description,
         x,
@@ -967,11 +968,11 @@ export class UpgradeTreeScreen extends Screen {
       // Cost indicator (bottom)
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
-        this.ctx.font = 'bold 14px "Population Zero BB", Arial';
+        this.ctx.font = `bold ${FONT_SECONDARY_MICRO}`;
         this.ctx.fillText(t('game.upgrades.cost'), x, y + halfHeight - 14);
       } else {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = 'bold 14px "Population Zero BB", Arial';
+        this.ctx.font = `bold ${FONT_SECONDARY_MICRO}`;
         this.ctx.fillText(t('game.upgrades.fullyUpgraded'), x, y + halfHeight - 14);
       }
     }
@@ -1038,7 +1039,7 @@ export class UpgradeTreeScreen extends Screen {
     
     // Welcome text
     this.ctx.fillStyle = '#00ffff';
-    this.ctx.font = '28px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_SMALL;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     
@@ -1073,7 +1074,7 @@ export class UpgradeTreeScreen extends Screen {
     
     // Button text
     this.ctx.fillStyle = '#00ffff';
-    this.ctx.font = '24px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_XSMALL;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(t('game.upgrades.welcome.ok'), centerX, buttonY + buttonHeight / 2);

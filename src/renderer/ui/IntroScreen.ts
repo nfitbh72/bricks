@@ -5,6 +5,7 @@
 import { Screen } from './Screen';
 import { Button } from './Button';
 import { t } from '../i18n/LanguageManager';
+import { FONT_TITLE_HUGE, FONT_TITLE_MEDIUM, GLOW_HUGE, GLOW_LARGE, COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN } from '../config/constants';
 
 export class IntroScreen extends Screen {
   private onStart: () => void;
@@ -115,7 +116,7 @@ export class IntroScreen extends Screen {
    */
   render(): void {
     // Clear screen
-    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillStyle = COLOR_BLACK;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.save();
@@ -125,19 +126,19 @@ export class IntroScreen extends Screen {
     const baseY = contentMidY - this.TOTAL_CONTENT_HEIGHT / 2;
 
     // Draw title
-    this.ctx.shadowBlur = 40;
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.font = '72px "D Day Stencil", Arial';
+    this.ctx.shadowBlur = GLOW_HUGE;
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.fillStyle = COLOR_MAGENTA;
+    this.ctx.font = FONT_TITLE_HUGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText('BRICKS', this.canvas.width / 2, baseY);
 
     // Draw subtitle
-    this.ctx.font = '36px "D Day Stencil", Arial';
-    this.ctx.fillStyle = '#00ffff';
-    this.ctx.shadowColor = '#00ffff';
-    this.ctx.shadowBlur = 20;
+    this.ctx.font = FONT_TITLE_MEDIUM;
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.shadowColor = COLOR_CYAN;
+    this.ctx.shadowBlur = GLOW_LARGE;
     this.ctx.fillText('with UPGRADES', this.canvas.width / 2, baseY + 60);
 
     this.ctx.restore();

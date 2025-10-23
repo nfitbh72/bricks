@@ -1,0 +1,27 @@
+/**
+ * Base Styles
+ * Global HTML/body styles
+ */
+
+@use 'variables' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background-color: $color-black;
+  overflow: hidden;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: $color-black;
+  cursor: default; // Default cursor, will be changed dynamically
+}

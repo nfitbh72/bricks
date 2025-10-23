@@ -3,6 +3,7 @@
  */
 
 import { t, LanguageManager } from '../i18n/LanguageManager';
+import { FONT_SECONDARY_LARGE, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, FONT_SECONDARY_MINI, FONT_TITLE_XSMALL, FONT_MONO_MINI, GLOW_XLARGE, GLOW_NORMAL, GLOW_MEDIUM, GLOW_SMALL, COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN, COLOR_DARK_GRAY, COLOR_BORDER_GRAY, COLOR_LIGHT_GRAY } from '../config/constants';
 
 export interface GameOptions {
   musicVolume: number;      // 0 to 1
@@ -426,23 +427,23 @@ export class OptionsScreen {
     // Draw panel background with rounded corners
     this.ctx.save();
     this.drawRoundedRect(panel.x, panel.y, panel.width, panel.height, this.cornerRadius);
-    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillStyle = COLOR_BLACK;
     this.ctx.fill();
 
     // Draw glowing border
     this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.strokeStyle = '#ff00ff';
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.strokeStyle = COLOR_MAGENTA;
     this.ctx.lineWidth = 3;
     this.ctx.stroke();
     this.ctx.restore();
 
     // Draw title with dystopian font
     this.ctx.save();
-    this.ctx.shadowBlur = 30;
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.font = '48px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.shadowBlur = GLOW_XLARGE;
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.fillStyle = COLOR_MAGENTA;
+    this.ctx.font = FONT_SECONDARY_LARGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(t('ui.options.title'), panel.x + this.panelWidth / 2, panel.y + 20);
@@ -475,10 +476,10 @@ export class OptionsScreen {
 
     // Draw label with dystopian font
     this.ctx.save();
-    this.ctx.shadowBlur = isHovered ? 15 : 10;
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.font = '20px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.shadowBlur = isHovered ? GLOW_NORMAL : GLOW_MEDIUM;
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.fillStyle = COLOR_MAGENTA;
+    this.ctx.font = FONT_SECONDARY_TINY;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'bottom';
     this.ctx.fillText(label, slider.x + slider.width / 2, slider.y - 10);
@@ -488,9 +489,9 @@ export class OptionsScreen {
     this.ctx.save();
     const trackRadius = this.sliderHeight / 2;
     this.drawRoundedRect(slider.x, slider.y, slider.width, slider.height, trackRadius);
-    this.ctx.fillStyle = '#1a1a1a';
+    this.ctx.fillStyle = COLOR_DARK_GRAY;
     this.ctx.fill();
-    this.ctx.strokeStyle = '#333333';
+    this.ctx.strokeStyle = COLOR_BORDER_GRAY;
     this.ctx.lineWidth = 2;
     this.ctx.stroke();
     this.ctx.restore();
@@ -499,9 +500,9 @@ export class OptionsScreen {
     if (value > 0) {
       this.ctx.save();
       this.drawRoundedRect(slider.x, slider.y, slider.width * value, slider.height, trackRadius);
-      this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
+      this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
       this.ctx.shadowBlur = 15;
-      this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+      this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
       this.ctx.fill();
       this.ctx.restore();
     }
@@ -513,14 +514,14 @@ export class OptionsScreen {
 
     this.ctx.save();
     this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
-    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
+    this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.beginPath();
     this.ctx.arc(handleX, handleY, handleRadius, 0, Math.PI * 2);
     this.ctx.fill();
     
     // Inner circle for depth
-    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillStyle = COLOR_BLACK;
     this.ctx.beginPath();
     this.ctx.arc(handleX, handleY, handleRadius - 4, 0, Math.PI * 2);
     this.ctx.fill();
@@ -528,12 +529,12 @@ export class OptionsScreen {
 
     // Draw value percentage
     this.ctx.save();
-    this.ctx.fillStyle = '#00ffff';
-    this.ctx.font = '16px "PopulationZeroBB", monospace';
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.font = FONT_MONO_MINI;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.shadowBlur = 5;
-    this.ctx.shadowColor = '#00ffff';
+    this.ctx.shadowColor = COLOR_CYAN;
     this.ctx.fillText(`${Math.round(value * 100)}%`, slider.x + slider.width / 2, slider.y + slider.height + 5);
     this.ctx.restore();
   }
@@ -548,24 +549,24 @@ export class OptionsScreen {
     this.ctx.save();
     const checkboxRadius = 4;
     this.drawRoundedRect(checkbox.x, checkbox.y, checkbox.width, checkbox.height, checkboxRadius);
-    this.ctx.fillStyle = isHovered ? '#1a1a1a' : '#0a0a0a';
+    this.ctx.fillStyle = isHovered ? COLOR_DARK_GRAY : COLOR_BLACK;
     this.ctx.fill();
 
     // Draw checkbox border with glow
-    this.ctx.strokeStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.strokeStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.lineWidth = 2;
     this.ctx.shadowBlur = isHovered ? 15 : 10;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.stroke();
     this.ctx.restore();
 
     // Draw checkmark if checked
     if (checked) {
       this.ctx.save();
-      this.ctx.strokeStyle = '#ff00ff';
+      this.ctx.strokeStyle = COLOR_MAGENTA;
       this.ctx.lineWidth = 3;
       this.ctx.shadowBlur = 15;
-      this.ctx.shadowColor = '#ff00ff';
+      this.ctx.shadowColor = COLOR_MAGENTA;
       this.ctx.beginPath();
       this.ctx.moveTo(checkbox.x + 5, checkbox.y + 12);
       this.ctx.lineTo(checkbox.x + 10, checkbox.y + 17);
@@ -576,12 +577,12 @@ export class OptionsScreen {
 
     // Draw label with dystopian font
     this.ctx.save();
-    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
-    this.ctx.font = '18px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
+    this.ctx.font = FONT_SECONDARY_MICRO;
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'middle';
-    this.ctx.shadowBlur = 5;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowBlur = GLOW_SMALL;
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.fillText(label, checkbox.x + checkbox.width + 15, checkbox.y + checkbox.height / 2);
     this.ctx.restore();
   }
@@ -594,26 +595,26 @@ export class OptionsScreen {
     this.ctx.save();
     const buttonRadius = 8;
     this.drawRoundedRect(bounds.x, bounds.y, bounds.width, bounds.height, buttonRadius);
-    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#1a1a1a';
+    this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_DARK_GRAY;
     this.ctx.fill();
 
     // Draw button border with glow
-    this.ctx.strokeStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.strokeStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.lineWidth = 3;
     this.ctx.shadowBlur = isHovered ? 25 : 15;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.stroke();
     this.ctx.restore();
 
     // Draw button text with dystopian font
     this.ctx.save();
-    this.ctx.fillStyle = isHovered ? '#0a0a0a' : '#00ffff';
-    this.ctx.font = '24px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.fillStyle = isHovered ? COLOR_BLACK : COLOR_CYAN;
+    this.ctx.font = FONT_TITLE_XSMALL;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     if (!isHovered) {
       this.ctx.shadowBlur = 10;
-      this.ctx.shadowColor = '#00ffff';
+      this.ctx.shadowColor = COLOR_CYAN;
     }
     this.ctx.fillText(text, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     this.ctx.restore();
@@ -631,12 +632,12 @@ export class OptionsScreen {
 
     // Draw label
     this.ctx.save();
-    this.ctx.fillStyle = '#00ffff';
-    this.ctx.font = '18px "PopulationZeroBB", "D Day Stencil", Arial';
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.font = FONT_SECONDARY_MICRO;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'bottom';
-    this.ctx.shadowBlur = 5;
-    this.ctx.shadowColor = '#00ffff';
+    this.ctx.shadowBlur = GLOW_SMALL;
+    this.ctx.shadowColor = COLOR_CYAN;
     this.ctx.fillText(t('ui.options.language'), selector.x + selector.width / 2, selector.y - 10);
     this.ctx.restore();
 
@@ -644,29 +645,29 @@ export class OptionsScreen {
     this.ctx.save();
     const selectorRadius = 5;
     this.drawRoundedRect(selector.x, selector.y, selector.width, selector.height, selectorRadius);
-    this.ctx.fillStyle = isHovered ? '#1a1a1a' : '#0a0a0a';
+    this.ctx.fillStyle = isHovered ? COLOR_DARK_GRAY : COLOR_BLACK;
     this.ctx.fill();
-    this.ctx.strokeStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.strokeStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.lineWidth = 2;
     this.ctx.shadowBlur = isHovered ? 15 : 10;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.stroke();
     this.ctx.restore();
 
     // Draw current language text
     this.ctx.save();
-    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
-    this.ctx.font = '16px "PopulationZeroBB", Arial';
+    this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
+    this.ctx.font = FONT_SECONDARY_MINI;
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'middle';
-    this.ctx.shadowBlur = 5;
-    this.ctx.shadowColor = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.shadowBlur = GLOW_SMALL;
+    this.ctx.shadowColor = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.fillText(currentLangName, selector.x + 15, selector.y + selector.height / 2);
     this.ctx.restore();
 
     // Draw dropdown arrow
     this.ctx.save();
-    this.ctx.fillStyle = isHovered ? '#ff00ff' : '#00ffff';
+    this.ctx.fillStyle = isHovered ? COLOR_MAGENTA : COLOR_CYAN;
     this.ctx.beginPath();
     const arrowX = selector.x + selector.width - 20;
     const arrowY = selector.y + selector.height / 2;
@@ -695,28 +696,28 @@ export class OptionsScreen {
 
         // Draw item background
         this.ctx.save();
-        this.ctx.fillStyle = itemHovered ? '#1a1a1a' : '#0a0a0a';
+        this.ctx.fillStyle = itemHovered ? COLOR_DARK_GRAY : COLOR_BLACK;
         this.ctx.fillRect(itemBounds.x, itemBounds.y, itemBounds.width, itemBounds.height);
         
         // Draw item border
-        this.ctx.strokeStyle = itemHovered ? '#ff00ff' : '#333333';
+        this.ctx.strokeStyle = itemHovered ? COLOR_MAGENTA : COLOR_BORDER_GRAY;
         this.ctx.lineWidth = 1;
         if (itemHovered) {
           this.ctx.shadowBlur = 10;
-          this.ctx.shadowColor = '#ff00ff';
+          this.ctx.shadowColor = COLOR_MAGENTA;
         }
         this.ctx.strokeRect(itemBounds.x, itemBounds.y, itemBounds.width, itemBounds.height);
         this.ctx.restore();
 
         // Draw language name
         this.ctx.save();
-        this.ctx.fillStyle = isSelected ? '#ff00ff' : (itemHovered ? '#ff00ff' : '#00ffff');
-        this.ctx.font = isSelected ? 'bold 16px "PopulationZeroBB", Arial' : '16px "PopulationZeroBB", Arial';
+        this.ctx.fillStyle = isSelected ? COLOR_MAGENTA : (itemHovered ? COLOR_MAGENTA : COLOR_CYAN);
+        this.ctx.font = isSelected ? `bold ${FONT_SECONDARY_MINI}` : FONT_SECONDARY_MINI;
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'middle';
         if (itemHovered || isSelected) {
           this.ctx.shadowBlur = 5;
-          this.ctx.shadowColor = '#ff00ff';
+          this.ctx.shadowColor = COLOR_MAGENTA;
         }
         this.ctx.fillText(languageManager.getLanguageName(lang), itemBounds.x + 15, itemBounds.y + itemBounds.height / 2);
         this.ctx.restore();
@@ -724,8 +725,8 @@ export class OptionsScreen {
         // Draw checkmark for selected language
         if (isSelected) {
           this.ctx.save();
-          this.ctx.fillStyle = '#ff00ff';
-          this.ctx.font = '14px Arial';
+          this.ctx.fillStyle = COLOR_MAGENTA;
+          this.ctx.font = FONT_MONO_MINI;
           this.ctx.textAlign = 'right';
           this.ctx.textBaseline = 'middle';
           this.ctx.fillText('✓', itemBounds.x + itemBounds.width - 15, itemBounds.y + itemBounds.height / 2);

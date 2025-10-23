@@ -9,13 +9,18 @@ import {
   BALL_BASE_DAMAGE,
   BALL_SPEED_INCREASE_PER_SECOND,
   BALL_BOUNCE_MAX_ANGLE,
+  BALL_RADIUS,
+  BALL_GLOW_BLUR,
   BALL_TAIL_BASE_LENGTH,
   BALL_TAIL_SEGMENTS,
   BALL_TAIL_MAX_SPEED_MULTIPLIER,
-  BALL_GLOW_BLUR,
   BALL_TAIL_GLOW_BLUR,
   PIERCING_WARNING_DURATION,
   PIERCING_FLASH_INTERVAL,
+  COLOR_CYAN,
+  COLOR_TEXT_GRAY,
+  COLOR_WHITE,
+  COLOR_RED,
   STICKY_BALL_LAUNCH_ANGLE,
   STICKY_BALL_INDICATOR_LENGTH,
   STICKY_BALL_INDICATOR_WIDTH,
@@ -81,17 +86,17 @@ export class Ball {
     ctx.save();
 
     // Choose color based on state
-    let color = '#00ffff'; // Default cyan
+    let color = COLOR_CYAN; // Default cyan
     if (this.isGrey) {
-      color = '#666666'; // Grey when inactive
+      color = COLOR_TEXT_GRAY; // Grey when inactive
     } else if (this.isPiercing) {
       // Check if we're in warning period (last 0.5 seconds)
       if (this.piercingTimeRemaining <= PIERCING_WARNING_DURATION) {
         // Flash between white and red every 0.1 seconds
         const flashCycle = Math.floor(this.piercingTimeRemaining / PIERCING_FLASH_INTERVAL) % 2;
-        color = flashCycle === 0 ? '#ffffff' : '#ff0000';
+        color = flashCycle === 0 ? COLOR_WHITE : COLOR_RED;
       } else {
-        color = '#ff0000'; // Neon red when piercing
+        color = COLOR_RED; // Neon red when piercing
       }
     }
 

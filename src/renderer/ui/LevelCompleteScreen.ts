@@ -6,6 +6,7 @@ import { Screen } from './Screen';
 import { Button } from './Button';
 import { Leaderboard, LeaderboardEntry } from '../game/systems/Leaderboard';
 import { t } from '../i18n/LanguageManager';
+import { FONT_TITLE_XLARGE, FONT_TITLE_MEDIUM, FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, GLOW_HUGE, GLOW_LARGE, GLOW_NORMAL, GLOW_MEDIUM, COLOR_BLACK, COLOR_GREEN, COLOR_CYAN, COLOR_YELLOW, COLOR_MAGENTA, COLOR_TEXT_GRAY } from '../config/constants';
 
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
@@ -165,26 +166,26 @@ export class LevelCompleteScreen extends Screen {
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     } else {
       // Fallback: solid dark background
-      this.ctx.fillStyle = '#0a0a0a';
+      this.ctx.fillStyle = COLOR_BLACK;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     this.ctx.save();
 
     // Draw title
-    this.ctx.shadowBlur = 40;
-    this.ctx.shadowColor = '#00ff00';
-    this.ctx.fillStyle = '#00ff00';
-    this.ctx.font = '64px "D Day Stencil", Arial';
+    this.ctx.shadowBlur = GLOW_HUGE;
+    this.ctx.shadowColor = COLOR_GREEN;
+    this.ctx.fillStyle = COLOR_GREEN;
+    this.ctx.font = FONT_TITLE_XLARGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(t('ui.screens.levelComplete'), this.canvas.width / 2, this.canvas.height / 2 - 180);
 
     // Draw level number
-    this.ctx.font = '36px "D Day Stencil", Arial';
-    this.ctx.fillStyle = '#00ffff';
-    this.ctx.shadowColor = '#00ffff';
-    this.ctx.shadowBlur = 20;
+    this.ctx.font = FONT_TITLE_MEDIUM;
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.shadowColor = COLOR_CYAN;
+    this.ctx.shadowBlur = GLOW_LARGE;
     this.ctx.fillText(
       `${t('game.status.level')} ${this.currentLevel}`,
       this.canvas.width / 2,
@@ -192,10 +193,10 @@ export class LevelCompleteScreen extends Screen {
     );
 
     // Draw completion time
-    this.ctx.font = '32px "D Day Stencil", Arial';
-    this.ctx.fillStyle = '#ffff00';
-    this.ctx.shadowColor = '#ffff00';
-    this.ctx.shadowBlur = 20;
+    this.ctx.font = FONT_TITLE_NORMAL;
+    this.ctx.fillStyle = COLOR_YELLOW;
+    this.ctx.shadowColor = COLOR_YELLOW;
+    this.ctx.shadowBlur = GLOW_LARGE;
     this.ctx.fillText(
       `${t('game.status.time')}: ${this.formatTime(this.levelTime)}`,
       this.canvas.width / 2,
@@ -214,10 +215,10 @@ export class LevelCompleteScreen extends Screen {
       }
     } else {
       // Show prompt for name entry
-      this.ctx.font = '24px "D Day Stencil", Arial';
-      this.ctx.fillStyle = '#ff00ff';
-      this.ctx.shadowColor = '#ff00ff';
-      this.ctx.shadowBlur = 15;
+      this.ctx.font = FONT_TITLE_XSMALL;
+      this.ctx.fillStyle = COLOR_MAGENTA;
+      this.ctx.shadowColor = COLOR_MAGENTA;
+      this.ctx.shadowBlur = GLOW_NORMAL;
       this.ctx.textAlign = 'center';
       this.ctx.fillText(
         t('ui.screens.enterYourName'),
@@ -234,13 +235,13 @@ export class LevelCompleteScreen extends Screen {
     const startY = this.canvas.height / 2 + 20; // Increased gap from time
     const lineHeight = 40;
     
-    this.ctx.font = '28px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_SMALL;
     this.ctx.textAlign = 'left';
-    this.ctx.shadowBlur = 10;
+    this.ctx.shadowBlur = GLOW_MEDIUM;
     
     // Draw header
-    this.ctx.fillStyle = '#00ff00';
-    this.ctx.shadowColor = '#00ff00';
+    this.ctx.fillStyle = COLOR_GREEN;
+    this.ctx.shadowColor = COLOR_GREEN;
     this.ctx.fillText(t('ui.leaderboard.rank'), this.canvas.width / 2 - 200, startY - 40);
     this.ctx.fillText(t('ui.leaderboard.name'), this.canvas.width / 2 - 80, startY - 40);
     this.ctx.fillText(t('ui.leaderboard.time'), this.canvas.width / 2 + 80, startY - 40);
@@ -251,14 +252,14 @@ export class LevelCompleteScreen extends Screen {
       const rank = index + 1;
       
       // Rank
-      this.ctx.fillStyle = '#00ffff';
-      this.ctx.shadowColor = '#00ffff';
+      this.ctx.fillStyle = COLOR_CYAN;
+      this.ctx.shadowColor = COLOR_CYAN;
       this.ctx.fillText(`${rank}.`, this.canvas.width / 2 - 200, y);
       
       // Name (with flashing character for player entry)
       if (entry.isPlayer) {
-        this.ctx.fillStyle = '#ff00ff';
-        this.ctx.shadowColor = '#ff00ff';
+        this.ctx.fillStyle = COLOR_MAGENTA;
+        this.ctx.shadowColor = COLOR_MAGENTA;
         
         // Draw each character separately to handle flashing
         const nameChars = this.playerName.split('');
@@ -273,14 +274,14 @@ export class LevelCompleteScreen extends Screen {
           }
         }
       } else {
-        this.ctx.fillStyle = '#666666';
-        this.ctx.shadowColor = '#666666';
+        this.ctx.fillStyle = COLOR_TEXT_GRAY;
+        this.ctx.shadowColor = COLOR_TEXT_GRAY;
         this.ctx.fillText(entry.name, this.canvas.width / 2 - 80, y);
       }
       
       // Time
-      this.ctx.fillStyle = entry.isPlayer ? '#ffff00' : '#666666';
-      this.ctx.shadowColor = entry.isPlayer ? '#ffff00' : '#666666';
+      this.ctx.fillStyle = entry.isPlayer ? COLOR_YELLOW : COLOR_TEXT_GRAY;
+      this.ctx.shadowColor = entry.isPlayer ? COLOR_YELLOW : COLOR_TEXT_GRAY;
       this.ctx.fillText(Leaderboard.formatTime(entry.time), this.canvas.width / 2 + 80, y);
     });
   }

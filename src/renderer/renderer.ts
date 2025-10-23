@@ -2,6 +2,7 @@
  * Renderer process - initializes and starts the game
  */
 
+import './styles/index.scss';
 import { Game } from './game/core/Game';
 import { LanguageManager } from './i18n/LanguageManager';
 

@@ -5,6 +5,7 @@
 import { Screen } from './Screen';
 import { Button } from './Button';
 import { t } from '../i18n/LanguageManager';
+import { FONT_TITLE_XLARGE, FONT_TITLE_SMALL, GLOW_HUGE, GLOW_LARGE, COLOR_BLACK, COLOR_GREEN, COLOR_RED, COLOR_MAGENTA, COLOR_CYAN } from '../config/constants';
 
 export class GameOverScreen extends Screen {
   private onRestart: () => void;
@@ -87,28 +88,28 @@ export class GameOverScreen extends Screen {
    */
   render(): void {
     // Clear screen
-    this.ctx.fillStyle = '#0a0a0a';
+    this.ctx.fillStyle = COLOR_BLACK;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.save();
 
     // Draw title (always GAME OVER, but green if complete)
     const title = t('ui.screens.gameOver');
-    const titleColor = this.isComplete ? '#00ff00' : '#ff0000';
+    const titleColor = this.isComplete ? COLOR_GREEN : COLOR_RED;
     
-    this.ctx.shadowBlur = 40;
+    this.ctx.shadowBlur = GLOW_HUGE;
     this.ctx.shadowColor = titleColor;
     this.ctx.fillStyle = titleColor;
-    this.ctx.font = '64px "D Day Stencil", Arial';
+    this.ctx.font = FONT_TITLE_XLARGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(title, this.canvas.width / 2, this.canvas.height / 2 - 120);
 
     // Draw stats
-    this.ctx.font = '28px "D Day Stencil", Arial';
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.shadowBlur = 20;
+    this.ctx.font = FONT_TITLE_SMALL;
+    this.ctx.fillStyle = COLOR_MAGENTA;
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.shadowBlur = GLOW_LARGE;
     
     this.ctx.fillText(
       `Level Reached: ${this.levelReached}`,
@@ -116,8 +117,8 @@ export class GameOverScreen extends Screen {
       this.canvas.height / 2 - 40
     );
     
-    this.ctx.fillStyle = '#00ffff';
-    this.ctx.shadowColor = '#00ffff';
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.shadowColor = COLOR_CYAN;
     this.ctx.fillText(
       `Bricks Destroyed: ${this.bricksDestroyed}`,
       this.canvas.width / 2,

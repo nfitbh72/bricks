@@ -7,7 +7,9 @@
 - **Electron** (Node.js + Chromium) - Desktop app framework
 - **TypeScript** - Type-safe development
 - **Canvas API** - 2D rendering
-- **Jest** - Testing (658 tests)
+- **SCSS** - Typed stylesheets with variables
+- **Webpack** - Module bundling and asset processing
+- **Jest** - Testing (666 tests)
 
 ## Core Principles
 
@@ -307,6 +309,53 @@ console.log('Managers initialized:', {
   // ...
 });
 ```
+
+---
+
+## Styling Architecture
+
+### SCSS Module System
+
+The project uses a modular SCSS architecture with TypeScript integration:
+
+**Directory Structure:**
+```
+src/renderer/styles/
+├── _variables.scss  # Design tokens (colors, fonts, sizes)
+├── _fonts.scss      # Font-face declarations
+├── _mixins.scss     # Reusable style patterns
+├── base.scss        # Base HTML/body styles
+└── index.scss       # Main entry point
+```
+
+**Key Features:**
+- **Type-safe constants**: Font and color styles defined in `config/fontStyles.ts` and `config/colorStyles.ts`
+- **Centralized variables**: All colors, fonts, and sizes in `_variables.scss`
+- **Modern syntax**: Uses `@use` instead of deprecated `@import`
+- **Zero runtime cost**: SCSS compiled at build time
+
+**Usage in Canvas Rendering:**
+```typescript
+import { FONT_TITLE_HUGE, GLOW_LARGE, COLOR_MAGENTA, COLOR_CYAN } from '../config/constants';
+
+ctx.font = FONT_TITLE_HUGE;       // '72px "D Day Stencil", Arial'
+ctx.shadowBlur = GLOW_LARGE;      // 20
+ctx.fillStyle = COLOR_MAGENTA;    // '#ff00ff'
+ctx.shadowColor = COLOR_CYAN;     // '#00ffff'
+```
+
+**Adding New Styles:**
+
+*Fonts:*
+1. Add size to `_variables.scss`: `$font-size-custom: 40px;`
+2. Export constant in `fontStyles.ts`: `export const FONT_SIZE_CUSTOM = 40;`
+3. Create composite: `export const FONT_CUSTOM = \`${FONT_SIZE_CUSTOM}px ${FONT_PRIMARY}\`;`
+4. Use in components: `ctx.font = FONT_CUSTOM;`
+
+*Colors:*
+1. Add color to `_variables.scss`: `$color-custom: #abcdef;`
+2. Export constant in `colorStyles.ts`: `export const COLOR_CUSTOM = '#abcdef';`
+3. Use in components: `ctx.fillStyle = COLOR_CUSTOM;`
 
 ---
 

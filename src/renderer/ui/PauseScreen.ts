@@ -5,6 +5,7 @@
 import { Screen } from './Screen';
 import { Button } from './Button';
 import { t } from '../i18n/LanguageManager';
+import { FONT_TITLE_HUGE, GLOW_HUGE, COLOR_MAGENTA } from '../config/constants';
 
 export class PauseScreen extends Screen {
   private onResume: () => void;
@@ -96,10 +97,10 @@ export class PauseScreen extends Screen {
     this.ctx.save();
 
     // Draw "PAUSED" title
-    this.ctx.shadowBlur = 40;
-    this.ctx.shadowColor = '#ff00ff';
-    this.ctx.fillStyle = '#ff00ff';
-    this.ctx.font = '72px "D Day Stencil", Arial';
+    this.ctx.shadowBlur = GLOW_HUGE;
+    this.ctx.shadowColor = COLOR_MAGENTA;
+    this.ctx.fillStyle = COLOR_MAGENTA;
+    this.ctx.font = FONT_TITLE_HUGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(t('ui.screens.paused'), this.canvas.width / 2, this.canvas.height / 2 - 120);
