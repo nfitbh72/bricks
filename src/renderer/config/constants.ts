@@ -51,11 +51,11 @@ export const BAT_SPEED = 300;
 
 // Bat turret constants (relative to bat height)
 export const BAT_TURRET_WIDTH_MULTIPLIER = 1.05;
-export const BAT_TURRET_HEIGHT_MULTIPLIER = 1.4;
+export const BAT_TURRET_HEIGHT_MULTIPLIER = 0.93; // Reduced by ~33% from 1.4
 export const BAT_TURRET_BARREL_WIDTH_MULTIPLIER = 0.28;
-export const BAT_TURRET_BARREL_HEIGHT_MULTIPLIER = 1.05;
+export const BAT_TURRET_BARREL_HEIGHT_MULTIPLIER = 0.7; // Reduced proportionally from 1.05
 export const BAT_TURRET_TIP_WIDTH_MULTIPLIER = 0.6; // Multiplier of barrel width
-export const BAT_TURRET_TIP_HEIGHT_MULTIPLIER = 0.35;
+export const BAT_TURRET_TIP_HEIGHT_MULTIPLIER = 0.23; // Reduced proportionally from 0.35
 
 // Laser constants
 export const LASER_WIDTH = 4;
