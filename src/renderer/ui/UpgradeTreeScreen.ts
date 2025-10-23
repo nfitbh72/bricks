@@ -8,7 +8,7 @@ import { Button } from './Button';
 import { Upgrade } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
-import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_SECONDARY_TINY, FONT_SECONDARY_MICRO, GLOW_LARGE } from '../config/constants';
+import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_TITLE_TINY, FONT_TITLE_MICRO, GLOW_LARGE } from '../config/constants';
 
 /**
  * Animation types for upgrade nodes
@@ -925,24 +925,24 @@ export class UpgradeTreeScreen extends Screen {
     
     // Title
     this.ctx.fillStyle = textColor;
-    this.ctx.font = FONT_SECONDARY_TINY;
+    this.ctx.font = FONT_TITLE_TINY;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(node.upgrade.name.toUpperCase(), x, y - halfHeight + 6);
     
     // Progress indicator
     const progressText = `[${node.currentLevel}/${node.upgrade.times}]`;
-    this.ctx.font = FONT_SECONDARY_MICRO;
+    this.ctx.font = FONT_TITLE_MICRO;
     this.ctx.fillStyle = isPreview ? '#555555' : '#aaaaaa';
     this.ctx.fillText(progressText, x, y - halfHeight + 25);
     
     if (isPreview) {
       // Preview state: show ??? and LOCKED
       this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_SECONDARY_TINY;
+      this.ctx.font = FONT_TITLE_TINY;
       this.ctx.fillText(t('game.upgrades.preview'), x, y - halfHeight + 55);
       
-      this.ctx.font = FONT_SECONDARY_MICRO;
+      this.ctx.font = FONT_TITLE_MICRO;
       this.ctx.fillText(t('game.upgrades.locked'), x, y + halfHeight - 14);
     } else {
       // Unlocked or maxed: show full details
@@ -950,13 +950,13 @@ export class UpgradeTreeScreen extends Screen {
       // Maxed indicator
       if (isMaxed) {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = FONT_SECONDARY_MICRO;
+        this.ctx.font = FONT_TITLE_MICRO;
         this.ctx.fillText(t('game.upgrades.maxed'), x, y - halfHeight + 40);
       }
       
       // Description (word wrap)
       this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_SECONDARY_MICRO;
+      this.ctx.font = FONT_TITLE_MICRO;
       this.renderWrappedText(
         node.upgrade.description,
         x,
@@ -968,11 +968,11 @@ export class UpgradeTreeScreen extends Screen {
       // Cost indicator (bottom)
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
-        this.ctx.font = `bold ${FONT_SECONDARY_MICRO}`;
+        this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
         this.ctx.fillText(t('game.upgrades.cost'), x, y + halfHeight - 14);
       } else {
         this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = `bold ${FONT_SECONDARY_MICRO}`;
+        this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
         this.ctx.fillText(t('game.upgrades.fullyUpgraded'), x, y + halfHeight - 14);
       }
     }

@@ -29,6 +29,8 @@ export const FONT_TITLE_MEDIUM = `${FONT_SIZE_MEDIUM}px ${FONT_PRIMARY}`;
 export const FONT_TITLE_NORMAL = `${FONT_SIZE_NORMAL}px ${FONT_PRIMARY}`;
 export const FONT_TITLE_SMALL = `${FONT_SIZE_SMALL}px ${FONT_PRIMARY}`;
 export const FONT_TITLE_XSMALL = `${FONT_SIZE_XSMALL}px ${FONT_PRIMARY}`;
+export const FONT_TITLE_TINY = `${FONT_SIZE_TINY}px ${FONT_PRIMARY}`;
+export const FONT_TITLE_MICRO = `${FONT_SIZE_MICRO}px ${FONT_PRIMARY}`;
 
 // Secondary font (Population Zero BB)
 export const FONT_SECONDARY_LARGE = `${FONT_SIZE_LARGE}px ${FONT_SECONDARY}`;
