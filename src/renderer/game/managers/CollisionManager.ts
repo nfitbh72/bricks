@@ -91,26 +91,28 @@ export class CollisionManager {
       const collision = checkCircleRectCollision(ballBounds, brickBounds);
       
       if (collision.collided) {
-        // Check for piercing
+        // Indestructible bricks always cause bounce and never trigger piercing
+        const isIndestructible = brick.isIndestructible();
+        
+        // Check for piercing (only on destructible bricks)
         const piercingChance = gameUpgrades.getBallPiercingChance();
         const piercingDuration = gameUpgrades.getPiercingDuration();
         
         // Check if piercing is active (either from chance or from duration)
         let pierced = false;
-        if (this.piercingTimeRemaining > 0) {
-          // Piercing is active from duration
-          pierced = true;
-        } else if (piercingChance > 0 && Math.random() < piercingChance) {
-          // Piercing activated by chance
-          pierced = true;
-          // If duration upgrade is active, start the timer
-          if (piercingDuration > 0) {
-            this.piercingTimeRemaining = piercingDuration;
+        if (!isIndestructible) {
+          if (this.piercingTimeRemaining > 0) {
+            // Piercing is active from duration
+            pierced = true;
+          } else if (piercingChance > 0 && Math.random() < piercingChance) {
+            // Piercing activated by chance
+            pierced = true;
+            // If duration upgrade is active, start the timer
+            if (piercingDuration > 0) {
+              this.piercingTimeRemaining = piercingDuration;
+            }
           }
         }
-        
-        // Indestructible bricks always cause bounce, even when piercing
-        const isIndestructible = brick.isIndestructible();
         
         // Bounce ball (unless piercing and brick is destructible)
         if ((!pierced || isIndestructible) && collision.normal) {
