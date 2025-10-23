@@ -1,9 +1,9 @@
 /**
  * Debris entity - represents explosive fragments from exploding bricks
- * Travels in a fixed direction at constant speed
+ * Travels with initial velocity and falls due to gravity
  */
 
-import { EXPLODING_BRICK_DEBRIS_SIZE, PARTICLE_GLOW_BLUR } from '../../../config/constants';
+import { EXPLODING_BRICK_DEBRIS_SIZE, PARTICLE_GLOW_BLUR, SPLITTING_FRAGMENT_GRAVITY } from '../../../config/constants';
 
 export class Debris {
   private position: { x: number; y: number };
@@ -19,12 +19,15 @@ export class Debris {
   }
 
   /**
-   * Update debris position
+   * Update debris position with gravity
    */
   update(deltaTime: number): void {
     if (!this.active) return;
 
-    // Update position at constant velocity
+    // Apply gravity to vertical velocity
+    this.velocity.y += SPLITTING_FRAGMENT_GRAVITY * deltaTime;
+
+    // Update position
     this.position.x += this.velocity.x * deltaTime;
     this.position.y += this.velocity.y * deltaTime;
   }

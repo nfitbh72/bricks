@@ -862,7 +862,7 @@ export class UpgradeTreeScreen extends Screen {
     
     // Title
     this.ctx.fillStyle = textColor;
-    this.ctx.font = '18px "Population Zero BB", Arial';
+    this.ctx.font = '20px "Population Zero BB", Arial';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(node.upgrade.name.toUpperCase(), x, y - halfHeight + 6);
@@ -877,7 +877,7 @@ export class UpgradeTreeScreen extends Screen {
       // Preview state: show ??? and LOCKED
       this.ctx.fillStyle = textColor;
       this.ctx.font = '22px "Population Zero BB", Arial';
-      this.ctx.fillText('???', x, y - halfHeight + 45);
+      this.ctx.fillText('???', x, y - halfHeight + 55);
       
       this.ctx.font = '13px "Population Zero BB", Arial';
       this.ctx.fillText('LOCKED', x, y + halfHeight - 14);
@@ -893,7 +893,7 @@ export class UpgradeTreeScreen extends Screen {
       
       // Description (word wrap)
       this.ctx.fillStyle = textColor;
-      this.ctx.font = '14px "Population Zero BB", Arial';
+      this.ctx.font = '18px "Population Zero BB", Arial';
       this.renderWrappedText(
         node.upgrade.description,
         x,

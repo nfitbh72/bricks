@@ -199,13 +199,13 @@ describe('StateTransitionHandler', () => {
     });
 
     it('should transition to GAME_OVER when no more levels exist', () => {
-      mockContext.currentLevelId = 3; // Level 4 doesn't exist
+      mockContext.currentLevelId = 4; // Level 5 doesn't exist
       handler.updateContext(mockContext);
       handler.handleLevelCompleteTransition();
       
       expect(mockContext.gameState).toBe(GameState.GAME_OVER);
       expect(mockContext.screenManager.gameOverScreen.setStats).toHaveBeenCalledWith(
-        3, // Last completed level
+        4, // Last completed level
         mockContext.totalBricksDestroyed,
         true // Game complete
       );

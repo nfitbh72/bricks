@@ -3,7 +3,7 @@
  */
 
 import { Debris } from '../../src/renderer/game/entities/offensive/Debris';
-import { EXPLODING_BRICK_DEBRIS_SIZE } from '../../src/renderer/config/constants';
+import { EXPLODING_BRICK_DEBRIS_SIZE, SPLITTING_FRAGMENT_GRAVITY } from '../../src/renderer/config/constants';
 
 describe('Debris', () => {
   let debris: Debris;
@@ -34,17 +34,21 @@ describe('Debris', () => {
   });
 
   describe('update', () => {
-    it('should move in the direction of velocity', () => {
+    it('should move in the direction of velocity with gravity', () => {
       const deltaTime = 0.1;
       
       debris.update(deltaTime);
       
       const pos = debris.getPosition();
+      // X velocity is constant
       expect(pos.x).toBeCloseTo(initialX + velocityX * deltaTime, 1);
-      expect(pos.y).toBeCloseTo(initialY + velocityY * deltaTime, 1);
+      // Y velocity is affected by gravity: velocity.y += gravity * deltaTime, then position.y += velocity.y * deltaTime
+      const newVelocityY = velocityY + SPLITTING_FRAGMENT_GRAVITY * deltaTime;
+      const expectedY = initialY + newVelocityY * deltaTime;
+      expect(pos.y).toBeCloseTo(expectedY, 1);
     });
 
-    it('should maintain constant velocity', () => {
+    it('should accelerate downward due to gravity', () => {
       const deltaTime = 0.1;
       
       debris.update(deltaTime);
@@ -53,11 +57,15 @@ describe('Debris', () => {
       debris.update(deltaTime);
       const pos2 = debris.getPosition();
       
-      // Distance traveled should be constant (no acceleration)
+      // X distance should be constant (no horizontal acceleration)
       const dist1X = pos1.x - initialX;
       const dist2X = pos2.x - pos1.x;
-      
       expect(dist2X).toBeCloseTo(dist1X, 1);
+      
+      // Y distance should increase due to gravity (acceleration)
+      const dist1Y = pos1.y - initialY;
+      const dist2Y = pos2.y - pos1.y;
+      expect(dist2Y).toBeGreaterThan(dist1Y);
     });
 
     it('should not update when inactive', () => {

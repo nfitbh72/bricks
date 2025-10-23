@@ -55,7 +55,7 @@ export function createLevel2(): LevelConfig {
 
   return {
     id: 2,
-    name: 'Level 2: Two (duh!)',
+    name: 'Level 2: Debris in all directions',
     bricks: createBricksFromPattern(pattern),
     baseHealth: 2, // Normal bricks = 2 HP, Healthy bricks = 6 HP
   };
@@ -69,7 +69,7 @@ export function createLevel3(): LevelConfig {
   const pattern = [
     "IIIIIIIII",
     "IL L L LI",
-    "I M M M I",
+    "I S S S I",
     "IL L L LI",
     "I S S S I",
     "IHHHHHHHI",
@@ -87,9 +87,37 @@ export function createLevel3(): LevelConfig {
   
   return {
     id: 3,
-    name: 'Level 3: Skull Island (AI Generated LOL)',
+    name: 'Level 3: Beware of lasers and shattering falling bricks!',
     bricks: createBricksFromPattern(pattern),
     baseHealth: 3, // Normal bricks = 3 HP, Healthy bricks = 9 HP
+  };
+}
+
+export function createLevel4(): LevelConfig {
+  const pattern = [
+    "IIIIIIIII",
+    "IM M M MI",
+    "I S S S I",
+    "IM M M MI",
+    "I S S S I",
+    "IHHHHHHHI",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I"
+  ];
+  
+  return {
+    id: 4,
+    name: 'Level 4: We call it Homer',
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 4, // Normal bricks = 4 HP, Healthy bricks = 12 HP
   };
 }
 
@@ -104,6 +132,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel2();
     case 3:
       return createLevel3();
+    case 4:
+      return createLevel4();
     default:
       return undefined;
   }

@@ -579,9 +579,11 @@ export class Game {
       return; // Pause updates when not playing or paused
     }
 
-    // Update level timer (use real deltaTime)
-    this.levelTime += deltaTime;
-    this.statusBar.setLevelTime(this.levelTime);
+    // Update level timer only if ball is not sticky (use real deltaTime)
+    if (!this.ball.getIsSticky()) {
+      this.levelTime += deltaTime;
+      this.statusBar.setLevelTime(this.levelTime);
+    }
 
     // Handle input (use effective deltaTime for movement)
     this.handleInput(effectiveDeltaTime);
@@ -598,8 +600,10 @@ export class Game {
       this.bat.setTurretCount(this.gameUpgrades.getTotalShooterCount());
     }
 
-    // Update ball (use effective deltaTime for slow-mo)
-    this.ball.update(effectiveDeltaTime);
+    // Update ball only if not sticky (use effective deltaTime for slow-mo)
+    if (!this.ball.getIsSticky()) {
+      this.ball.update(effectiveDeltaTime);
+    }
 
     // Update weapons (use effective deltaTime for slow-mo)
     this.weaponManager.update(effectiveDeltaTime);
@@ -619,20 +623,22 @@ export class Game {
     // Update visual effects (use effective deltaTime for slow-mo)
     this.effectsManager.update(effectiveDeltaTime);
 
-    // Check wall collisions (bottom boundary is status bar top)
-    const statusBarTop = this.statusBar.getY();
-    const hitBackWall = this.ball.checkWallCollisions(
-      0,
-      this.canvas.width,
-      0,
-      statusBarTop
-    );
+    // Check wall collisions only if ball is not sticky (bottom boundary is status bar top)
+    if (!this.ball.getIsSticky()) {
+      const statusBarTop = this.statusBar.getY();
+      const hitBackWall = this.ball.checkWallCollisions(
+        0,
+        this.canvas.width,
+        0,
+        statusBarTop
+      );
 
-    if (hitBackWall) {
-      this.playerHealth--;
-      this.statusBar.setPlayerHealth(this.playerHealth);
-      // Trigger screen shake on back wall hit
-      this.effectsManager.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
+      if (hitBackWall) {
+        this.playerHealth--;
+        this.statusBar.setPlayerHealth(this.playerHealth);
+        // Trigger screen shake on back wall hit
+        this.effectsManager.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
+      }
     }
 
     // Check if we should trigger slow-motion (1 brick left, ball approaching)
@@ -645,8 +651,10 @@ export class Game {
       this.canvas.height
     );
 
-    // Check collisions
-    this.checkCollisions();
+    // Check collisions only if ball is not sticky
+    if (!this.ball.getIsSticky()) {
+      this.checkCollisions();
+    }
 
     // Check level completion with delay for animations
     if (this.level && this.level.isComplete() && this.gameState === GameState.PLAYING) {
