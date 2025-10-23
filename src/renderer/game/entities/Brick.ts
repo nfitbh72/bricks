@@ -294,10 +294,31 @@ export class Brick {
     ctx.closePath();
     ctx.fill();
 
-    // Draw border for definition
+    // Draw outer border for definition
     ctx.globalAlpha = 1;
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw inner glow for depth (lighter border inside)
+    ctx.shadowBlur = 0; // Remove outer glow for inner border
+    ctx.strokeStyle = this.lightenColor(color, 50);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.6;
+    
+    // Draw inner rounded rectangle (slightly smaller)
+    const innerPadding = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + cornerRadius + innerPadding, y + innerPadding);
+    ctx.lineTo(x + w - cornerRadius - innerPadding, y + innerPadding);
+    ctx.arcTo(x + w - innerPadding, y + innerPadding, x + w - innerPadding, y + cornerRadius + innerPadding, cornerRadius);
+    ctx.lineTo(x + w - innerPadding, y + h - cornerRadius - innerPadding);
+    ctx.arcTo(x + w - innerPadding, y + h - innerPadding, x + w - cornerRadius - innerPadding, y + h - innerPadding, cornerRadius);
+    ctx.lineTo(x + cornerRadius + innerPadding, y + h - innerPadding);
+    ctx.arcTo(x + innerPadding, y + h - innerPadding, x + innerPadding, y + h - cornerRadius - innerPadding, cornerRadius);
+    ctx.lineTo(x + innerPadding, y + cornerRadius + innerPadding);
+    ctx.arcTo(x + innerPadding, y + innerPadding, x + cornerRadius + innerPadding, y + innerPadding, cornerRadius);
+    ctx.closePath();
     ctx.stroke();
 
     // Draw health text (skip for indestructible bricks)
