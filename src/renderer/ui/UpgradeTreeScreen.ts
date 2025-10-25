@@ -459,7 +459,7 @@ export class UpgradeTreeScreen extends Screen {
       this.upgradeSound.play().catch(() => {
         // Ignore audio play errors
       });
-    } catch (_e) {
+    } catch {
       // Ignore audio errors
     }
   }
@@ -824,7 +824,6 @@ export class UpgradeTreeScreen extends Screen {
     const isHovered = this.state.hoveredNode === node;
     const isMaxed = node.state === 'maxed';
     const isPreview = node.state === 'preview';
-    const isUnlocked = node.state === 'unlocked';
     
     // Get animation progress
     const animProgress = this.getAnimationProgress(node);
