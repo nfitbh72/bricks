@@ -65,11 +65,12 @@ export const LASER_SPEED_MULTIPLIER = 3; // Laser speed = ball speed * 3
 export const LASER_DAMAGE_MULTIPLIER = 0.1; // Laser damage = ball damage * 0.1
 
 // Explosion constants (for ball explosions)
-export const EXPLOSION_RADIUS_MULTIPLIER = 1.3; // Explosion radius = brick width * 1.5
+export const EXPLOSION_RADIUS_MULTIPLIER = 1.4; // Explosion radius = brick width * 1.5
 
 // Bomb brick explosion constants (ellipse shape)
 export const BOMB_EXPLOSION_RADIUS_X_MULTIPLIER = 1.5; // Horizontal radius = brick width * 1.5
 export const BOMB_EXPLOSION_RADIUS_Y_MULTIPLIER = 0.75; // Vertical radius = brick height * 0.75 (narrower)
+export const BOMB_DAMAGE_MULTIPLIER = 3; // Bomb damage = ball damage * 3
 
 // Critical hit constants
 export const CRITICAL_HIT_DAMAGE_MULTIPLIER = 2; // Double damage on critical hits
