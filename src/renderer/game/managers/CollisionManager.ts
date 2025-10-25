@@ -121,9 +121,6 @@ export class CollisionManager {
         
         // Skip damage, explosions, and notifications for indestructible bricks
         if (!isIndestructible) {
-          // Track if brick was already destroyed before this hit
-          const wasDestroyed = brick.isDestroyed();
-          
           // Calculate damage (with critical hit check)
           let damage = ball.getDamage();
           let isCritical = false;
@@ -136,8 +133,8 @@ export class CollisionManager {
             }
           }
           
-          // Damage brick
-          brick.takeDamage(damage);
+          // Damage brick and get destruction info
+          const destructionInfo = brick.takeDamage(damage);
           
           // Notify hit (show damage numbers)
           if (this.callbacks.onBrickHit) {
@@ -150,13 +147,9 @@ export class CollisionManager {
           }
           
           // Track destroyed bricks and create particles
-          if (!wasDestroyed && brick.isDestroyed()) {
-            const brickPos = brick.getPosition();
-            const centerX = brickPos.x + brickBounds.width / 2;
-            const centerY = brickPos.y + brickBounds.height / 2;
-            
+          if (destructionInfo.justDestroyed) {
             if (this.callbacks.onBrickDestroyed) {
-              this.callbacks.onBrickDestroyed(brick, centerX, centerY, isCritical);
+              this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, isCritical);
             }
           }
         }
@@ -205,10 +198,9 @@ export class CollisionManager {
           
           // Skip damage and notifications for indestructible bricks
           if (!brick.isIndestructible()) {
-            // Damage brick
-            const wasDestroyed = brick.isDestroyed();
+            // Damage brick and get destruction info
             const laserDamage = laser.getDamage();
-            brick.takeDamage(laserDamage);
+            const destructionInfo = brick.takeDamage(laserDamage);
 
             // Notify hit (show damage numbers)
             if (this.callbacks.onBrickHit) {
@@ -216,13 +208,9 @@ export class CollisionManager {
             }
 
             // Track destroyed bricks
-            if (!wasDestroyed && brick.isDestroyed()) {
-              const brickPos = brick.getPosition();
-              const centerX = brickPos.x + brickBounds.width / 2;
-              const centerY = brickPos.y + brickBounds.height / 2;
-              
+            if (destructionInfo.justDestroyed) {
               if (this.callbacks.onBrickDestroyed) {
-                this.callbacks.onBrickDestroyed(brick, centerX, centerY, false);
+                this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, false);
               }
             }
           }
@@ -445,8 +433,7 @@ export class CollisionManager {
       
       // Apply explosion damage if within radius
       if (distance <= explosionRadius) {
-        const wasOtherDestroyed = otherBrick.isDestroyed();
-        otherBrick.takeDamage(explosionDamage);
+        const destructionInfo = otherBrick.takeDamage(explosionDamage);
         
         // Notify explosion damage
         if (this.callbacks.onExplosionDamage) {
@@ -454,9 +441,9 @@ export class CollisionManager {
         }
         
         // Track if explosion destroyed this brick
-        if (!wasOtherDestroyed && otherBrick.isDestroyed()) {
+        if (destructionInfo.justDestroyed) {
           if (this.callbacks.onBrickDestroyed) {
-            this.callbacks.onBrickDestroyed(otherBrick, otherCenterX, otherCenterY, false);
+            this.callbacks.onBrickDestroyed(otherBrick, destructionInfo.centerX, destructionInfo.centerY, false);
           }
         }
       }

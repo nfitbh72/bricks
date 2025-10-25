@@ -235,36 +235,21 @@ export class Game {
   }
 
   /**
-   * Set up collision callbacks
+   * Set up brick destruction callbacks
+   * This ensures all bricks trigger offensive entities when destroyed, regardless of damage source
    */
-  private setupCollisionCallbacks(): void {
-    this.collisionManager.setCallbacks({
-      onBrickHit: (brick, damage, isCritical) => {
-        const brickBounds = brick.getBounds();
-        const brickCenterX = brickBounds.x + brickBounds.width / 2;
-        const brickTopY = brickBounds.y - 5;
-        this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
-        
-        if (!brick.isDestroyed()) {
-          this.audioManager.playBrickDamage();
-        }
-      },
-      onBrickDestroyed: (brick, x, y, isCritical) => {
-        this.totalBricksDestroyed++;
-        const remainingBricks = this.level!.getRemainingBricks();
-        this.statusBar.setBrickCounts(
-          remainingBricks,
-          this.level!.getTotalBricks()
-        );
-        
-        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
-        
+  private setupBrickDestructionCallbacks(): void {
+    if (!this.level) return;
+    
+    const bricks = this.level.getBricks();
+    for (const brick of bricks) {
+      brick.setOnDestroyCallback((destroyedBrick, info) => {
         // Spawn offensive entities based on brick type
         const batCenterX = this.bat.getCenterX();
         const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
-          brick, 
-          x, 
-          y, 
+          destroyedBrick,
+          info.centerX,
+          info.centerY,
           batCenterX,
           this.level?.getBricks()
         );
@@ -290,8 +275,39 @@ export class Game {
           }
           
           // Extra particles for bomb explosion
-          this.effectsManager.createParticles(x, y, 40, brick.getColor(), 200);
+          this.effectsManager.createParticles(info.centerX, info.centerY, 40, destroyedBrick.getColor(), 200);
         }
+      });
+    }
+  }
+
+  /**
+   * Set up collision callbacks
+   */
+  private setupCollisionCallbacks(): void {
+    this.collisionManager.setCallbacks({
+      onBrickHit: (brick, damage, isCritical) => {
+        const brickBounds = brick.getBounds();
+        const brickCenterX = brickBounds.x + brickBounds.width / 2;
+        const brickTopY = brickBounds.y - 5;
+        this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
+        
+        if (!brick.isDestroyed()) {
+          this.audioManager.playBrickDamage();
+        }
+      },
+      onBrickDestroyed: (brick, x, y, isCritical) => {
+        this.totalBricksDestroyed++;
+        const remainingBricks = this.level!.getRemainingBricks();
+        this.statusBar.setBrickCounts(
+          remainingBricks,
+          this.level!.getTotalBricks()
+        );
+        
+        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
+        
+        // Note: Offensive entity spawning is now handled by brick's onDestroy callback
+        // This ensures all damage sources (ball, laser, bomb chains) trigger effects
         
         // Create particles (more for final brick)
         const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
@@ -504,6 +520,9 @@ export class Game {
     
     // Create level with canvas width for centering
     this.level = new Level(levelConfig, this.canvas.width);
+    
+    // Set up destruction callbacks for all bricks
+    this.setupBrickDestructionCallbacks();
     
     // Set player health: base + upgrade bonus
     const upgradeBonus = this.gameUpgrades.getHealthBonus();
@@ -746,49 +765,17 @@ export class Game {
           continue;
         }
         
-        const wasDestroyed = targetBrick.isDestroyed();
-        targetBrick.takeDamage(this.bombDamage);
+        // Apply damage - brick's onDestroy callback will handle offensive entity spawning
+        const destructionInfo = targetBrick.takeDamage(this.bombDamage);
         this.effectsManager.addDamageNumber(explosion.x, explosion.y - 5, this.bombDamage, false);
         
-        // If brick was just destroyed by bomb damage
-        if (!wasDestroyed && targetBrick.isDestroyed()) {
+        // If brick was just destroyed by bomb damage, create particles and update counts
+        if (destructionInfo.justDestroyed) {
           this.effectsManager.createParticles(explosion.x, explosion.y, 8, targetBrick.getColor(), 120);
           
-          // Spawn offensive entity if it's an offensive brick
-          if (targetBrick.isOffensive()) {
-            const batCenterX = this.bat.getCenterX();
-            const chainBricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
-              targetBrick,
-              explosion.x,
-              explosion.y,
-              batCenterX,
-              this.level?.getBricks()
-            );
-            
-            // If this was a bomb brick, queue its surrounding bricks for staggered explosion
-            if (chainBricksToDamage && chainBricksToDamage.length > 0) {
-              const totalDuration = 1.5;
-              const delayPerBrick = totalDuration / chainBricksToDamage.length;
-              
-              for (let j = 0; j < chainBricksToDamage.length; j++) {
-                const chainBrick = chainBricksToDamage[j];
-                const chainBounds = chainBrick.getBounds();
-                const chainX = chainBounds.x + chainBounds.width / 2;
-                const chainY = chainBounds.y + chainBounds.height / 2;
-                
-                // Queue this brick for delayed explosion
-                this.delayedBombExplosions.push({
-                  brick: chainBrick,
-                  x: chainX,
-                  y: chainY,
-                  delay: j * delayPerBrick
-                });
-              }
-              
-              // Extra particles for chain bomb explosion
-              this.effectsManager.createParticles(explosion.x, explosion.y, 40, targetBrick.getColor(), 200);
-            }
-          }
+          // Note: Offensive entity spawning and chain reactions are now handled by
+          // the brick's onDestroy callback, ensuring consistent behavior regardless
+          // of damage source (ball, laser, bomb, etc.)
           
           // Update brick counts
           this.totalBricksDestroyed++;

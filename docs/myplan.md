@@ -10,7 +10,7 @@ Just some notes about future features so that I don't forget
 - [X] Test coverage
 - [X] Integration tests
 - [X] Add a (fake) leaderboard for each level that has quite poor players.
-- [] sticky bat to start
+- [X] sticky bat to start
 - [] level orientation (bat doesn't have to be bottom of screen)
 - [X] the ball can hit the bottom of the bat
 - [X] visual effect to the ball - like a comet tail
@@ -20,8 +20,8 @@ Just some notes about future features so that I don't forget
     - [X] piercing can last for extra seconds
     - [] sticky bat with LR control and preview
     - [] laser bat becomes bomb bat - can only fire once a second but does a large-aoe (2.5 blocks) and medium-damage (2) explosion
-    - [] dual laser upgrade
-- [X] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
+    - [X] dual laser upgrade
+- [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
 - [X] Report on time taken to complete each level, and show the best time.  More upgrade points for faster level completion?
 - [X] move hardcoded values to constants
 - [X] use a dictionary and make the game multi-lingual

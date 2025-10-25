@@ -36,6 +36,13 @@ import {
 } from '../../config/constants';
 import { gridToPixel } from '../../config/brickLayout';
 
+export interface BrickDestructionInfo {
+  wasDestroyed: boolean;
+  justDestroyed: boolean;
+  centerX: number;
+  centerY: number;
+}
+
 export class Brick {
   private position: { x: number; y: number };
   private readonly width: number = BRICK_WIDTH;
@@ -44,6 +51,7 @@ export class Brick {
   private readonly maxHealth: number;
   private readonly type: BrickType;
   private readonly customColor: string | null;
+  private onDestroyCallback?: (brick: Brick, info: BrickDestructionInfo) => void;
 
   // Static cache for rendered brick images
   private static renderCache: Map<string, HTMLCanvasElement> = new Map();
@@ -104,12 +112,30 @@ export class Brick {
 
   /**
    * Reduce brick health by damage amount
+   * Returns destruction info and triggers onDestroy callback if brick was just destroyed
    */
-  takeDamage(amount: number): void {
+  takeDamage(amount: number): BrickDestructionInfo {
+    const wasDestroyed = this.isDestroyed();
     this.health -= amount;
     if (this.health < 0) {
       this.health = 0;
     }
+    const justDestroyed = !wasDestroyed && this.isDestroyed();
+    
+    const bounds = this.getBounds();
+    const info: BrickDestructionInfo = {
+      wasDestroyed,
+      justDestroyed,
+      centerX: bounds.x + bounds.width / 2,
+      centerY: bounds.y + bounds.height / 2,
+    };
+    
+    // Trigger destruction callback if brick was just destroyed
+    if (justDestroyed && this.onDestroyCallback) {
+      this.onDestroyCallback(this, info);
+    }
+    
+    return info;
   }
 
   /**
@@ -516,5 +542,12 @@ export class Brick {
    */
   setHealth(health: number): void {
     this.health = Math.max(0, Math.min(health, this.maxHealth));
+  }
+
+  /**
+   * Set callback to be triggered when brick is destroyed
+   */
+  setOnDestroyCallback(callback: (brick: Brick, info: BrickDestructionInfo) => void): void {
+    this.onDestroyCallback = callback;
   }
 }
