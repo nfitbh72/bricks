@@ -13,7 +13,11 @@ import { BrickType } from '../core/types';
 import { 
   EXPLODING_BRICK_DEBRIS_COUNT,
   EXPLODING_BRICK_DEBRIS_SPEED,
-  SPLITTING_FRAGMENT_SPEED
+  SPLITTING_FRAGMENT_SPEED,
+  BOMB_EXPLOSION_RADIUS_X_MULTIPLIER,
+  BOMB_EXPLOSION_RADIUS_Y_MULTIPLIER,
+  BRICK_WIDTH,
+  BRICK_HEIGHT
 } from '../../config/constants';
 
 export class OffensiveEntityManager {
@@ -70,7 +74,7 @@ export class OffensiveEntityManager {
         return null;
 
       case BrickType.OFFENSIVE_BOMB:
-        // Damage all bricks within 1.5-brick radius (catches all adjacent including diagonals)
+        // Damage all bricks within elliptical area (wider horizontally, narrower vertically)
         if (!allBricks) return null;
         
         const bombCenter = {
@@ -79,7 +83,9 @@ export class OffensiveEntityManager {
         };
         
         const bricksToDamage: Brick[] = [];
-        const radiusSquared = (brickBounds.width * 1.5) ** 2; // 1.5-brick radius to account for spacing
+        // Ellipse radii - wider horizontally to hit adjacent bricks, narrower vertically to limit chain reactions
+        const radiusX = BRICK_WIDTH * BOMB_EXPLOSION_RADIUS_X_MULTIPLIER;
+        const radiusY = BRICK_HEIGHT * BOMB_EXPLOSION_RADIUS_Y_MULTIPLIER;
         
         for (const otherBrick of allBricks) {
           if (otherBrick === brick || otherBrick.isDestroyed() || otherBrick.isIndestructible()) {
@@ -92,11 +98,12 @@ export class OffensiveEntityManager {
             y: otherBounds.y + otherBounds.height / 2
           };
           
-          const distanceSquared = 
-            (otherCenter.x - bombCenter.x) ** 2 + 
-            (otherCenter.y - bombCenter.y) ** 2;
+          // Ellipse equation: (dx/rx)^2 + (dy/ry)^2 <= 1
+          const dx = otherCenter.x - bombCenter.x;
+          const dy = otherCenter.y - bombCenter.y;
+          const ellipseValue = (dx / radiusX) ** 2 + (dy / radiusY) ** 2;
           
-          if (distanceSquared <= radiusSquared) {
+          if (ellipseValue <= 1) {
             bricksToDamage.push(otherBrick);
           }
         }

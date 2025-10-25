@@ -244,7 +244,7 @@ export class Game {
     const bricks = this.level.getBricks();
     for (const brick of bricks) {
       brick.setOnDestroyCallback((destroyedBrick, info) => {
-        // Spawn offensive entities based on brick type
+        // Spawn offensive entities based on brick type (falling bricks, lasers, missiles, etc.)
         const batCenterX = this.bat.getCenterX();
         const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
           destroyedBrick,
@@ -254,7 +254,8 @@ export class Game {
           this.level?.getBricks()
         );
         
-        // Handle bomb explosion damage - stagger explosions over 1.5 seconds
+        // Handle bomb chain reactions - ONLY for bomb bricks
+        // Bomb bricks damage adjacent bricks, which may trigger their own effects
         if (bricksToDamage && bricksToDamage.length > 0) {
           const totalDuration = 1.5; // Total time for all explosions
           const delayPerBrick = totalDuration / bricksToDamage.length;
@@ -265,7 +266,7 @@ export class Game {
             const targetX = targetBounds.x + targetBounds.width / 2;
             const targetY = targetBounds.y + targetBounds.height / 2;
             
-            // Queue this brick for delayed explosion
+            // Queue this brick for delayed explosion damage
             this.delayedBombExplosions.push({
               brick: targetBrick,
               x: targetX,
