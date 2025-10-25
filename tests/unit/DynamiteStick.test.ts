@@ -34,15 +34,19 @@ describe('DynamiteStick', () => {
   });
 
   describe('update', () => {
-    it('should stay in place (no gravity)', () => {
+    it('should drift slowly in random direction', () => {
       const dynamite = new DynamiteStick(100, 200, '#ff0000');
       const initialPos = dynamite.getPosition();
       
       dynamite.update(1); // 1 second
       
       const finalPos = dynamite.getPosition();
-      expect(finalPos.x).toBe(initialPos.x);
-      expect(finalPos.y).toBe(initialPos.y);
+      // Should have moved due to drift
+      const distance = Math.sqrt(
+        Math.pow(finalPos.x - initialPos.x, 2) + 
+        Math.pow(finalPos.y - initialPos.y, 2)
+      );
+      expect(distance).toBeGreaterThan(0);
     });
 
     it('should explode after fuse time', () => {

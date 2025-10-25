@@ -209,6 +209,7 @@ export const SPLITTING_FRAGMENT_GRAVITY = 500; // Gravity when falling (25% fast
 export const DYNAMITE_STICK_GRAVITY = 400; // UNUSED - kept for potential future use
 export const DYNAMITE_STICK_FUSE_TIME = 3.0; // Seconds before explosion
 export const DYNAMITE_STICK_FLASH_INTERVAL = 0.15; // Flash every 0.15 seconds
+export const DYNAMITE_STICK_DRIFT_SPEED = 30; // Slow drift speed in pixels per second
 export const DYNAMITE_STICK_WIDTH = 12; // Narrower than brick
 export const DYNAMITE_STICK_HEIGHT = 30; // Taller than brick (stick shape)
 export const DYNAMITE_EXPLOSION_RADIUS = 120; // Large circular explosion radius

@@ -6,6 +6,7 @@
 import {
   DYNAMITE_STICK_FUSE_TIME,
   DYNAMITE_STICK_FLASH_INTERVAL,
+  DYNAMITE_STICK_DRIFT_SPEED,
   DYNAMITE_STICK_WIDTH,
   DYNAMITE_STICK_HEIGHT,
   DYNAMITE_EXPLOSION_RADIUS,
@@ -44,7 +45,12 @@ export class DynamiteStick {
       x: x + (104 - this.width) / 2, // BRICK_WIDTH is 104
       y: y 
     };
-    this.velocity = { x: 0, y: 0 }; // Starts stationary, gravity will accelerate it
+    // Random drift direction
+    const angle = Math.random() * Math.PI * 2;
+    this.velocity = {
+      x: Math.cos(angle) * DYNAMITE_STICK_DRIFT_SPEED,
+      y: Math.sin(angle) * DYNAMITE_STICK_DRIFT_SPEED
+    };
     this.color = color;
     // Random rotation speed between -3 and 3 radians per second
     this.rotationSpeed = (Math.random() - 0.5) * 6;
@@ -79,7 +85,10 @@ export class DynamiteStick {
       return;
     }
 
-    // No gravity - dynamite stays in place while flashing
+    // Apply drift movement
+    this.position.x += this.velocity.x * deltaTime;
+    this.position.y += this.velocity.y * deltaTime;
+    
     // Update rotation for visual effect
     this.rotation += this.rotationSpeed * deltaTime;
   }
