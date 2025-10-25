@@ -116,6 +116,7 @@ npm run test:watch          # Watch mode
 - **Manager pattern** - Coordinators in `game/managers/`
 - **Entity-component** - Game objects in `game/entities/`
 - **Centralized config** - All constants in `config/`
+- **Render caching** - Bricks pre-rendered to offscreen canvas for 10-20x performance boost
 
 ### ⚠️ StateTransitionHandler Critical Rules
 

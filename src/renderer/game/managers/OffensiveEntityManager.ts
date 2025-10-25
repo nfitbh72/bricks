@@ -25,8 +25,9 @@ export class OffensiveEntityManager {
 
   /**
    * Spawn offensive entity when an offensive brick is destroyed
+   * Returns bricks to damage for OFFENSIVE_BOMB type, null otherwise
    */
-  spawnOffensiveEntity(brick: Brick, x: number, y: number, batCenterX: number): void {
+  spawnOffensiveEntity(brick: Brick, x: number, y: number, batCenterX: number, allBricks?: Brick[]): Brick[] | null {
     const brickType = brick.getType();
     const color = brick.getColor();
     const brickBounds = brick.getBounds();
@@ -35,7 +36,7 @@ export class OffensiveEntityManager {
       case BrickType.OFFENSIVE_FALLING:
         // Create falling brick at destroyed brick position
         this.fallingBricks.push(new FallingBrick(brickBounds.x, brickBounds.y, color));
-        break;
+        return null;
 
       case BrickType.OFFENSIVE_EXPLODING:
         // Create debris in 8 directions
@@ -46,17 +47,17 @@ export class OffensiveEntityManager {
           const velocityY = Math.sin(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
           this.debris.push(new Debris(x, y, velocityX, velocityY, color));
         }
-        break;
+        return null;
 
       case BrickType.OFFENSIVE_LASER:
         // Create laser targeting bat's current position
         this.brickLasers.push(new BrickLaser(x, y, batCenterX, color));
-        break;
+        return null;
 
       case BrickType.OFFENSIVE_HOMING:
         // Create homing missile at destroyed brick position
         this.homingMissiles.push(new HomingMissile(x, y, color));
-        break;
+        return null;
 
       case BrickType.OFFENSIVE_SPLITTING:
         // Create 4 diagonal fragments
@@ -66,7 +67,44 @@ export class OffensiveEntityManager {
           const velocityY = Math.sin(angle) * SPLITTING_FRAGMENT_SPEED;
           this.splittingFragments.push(new SplittingFragment(x, y, velocityX, velocityY, color));
         }
-        break;
+        return null;
+
+      case BrickType.OFFENSIVE_BOMB:
+        // Damage all bricks within 1.5-brick radius (catches all adjacent including diagonals)
+        if (!allBricks) return null;
+        
+        const bombCenter = {
+          x: brickBounds.x + brickBounds.width / 2,
+          y: brickBounds.y + brickBounds.height / 2
+        };
+        
+        const bricksToDamage: Brick[] = [];
+        const radiusSquared = (brickBounds.width * 1.5) ** 2; // 1.5-brick radius to account for spacing
+        
+        for (const otherBrick of allBricks) {
+          if (otherBrick === brick || otherBrick.isDestroyed() || otherBrick.isIndestructible()) {
+            continue;
+          }
+          
+          const otherBounds = otherBrick.getBounds();
+          const otherCenter = {
+            x: otherBounds.x + otherBounds.width / 2,
+            y: otherBounds.y + otherBounds.height / 2
+          };
+          
+          const distanceSquared = 
+            (otherCenter.x - bombCenter.x) ** 2 + 
+            (otherCenter.y - bombCenter.y) ** 2;
+          
+          if (distanceSquared <= radiusSquared) {
+            bricksToDamage.push(otherBrick);
+          }
+        }
+        
+        return bricksToDamage;
+
+      default:
+        return null;
     }
   }
 

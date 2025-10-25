@@ -19,6 +19,7 @@ const {
   COLOR_CYAN,
   COLOR_ORANGE,
   COLOR_RED,
+  COLOR_RED_ORANGE,
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
@@ -158,6 +159,7 @@ export const OFFENSIVE_BRICK_COLOR_EXPLODING = COLOR_RED; // Red warning color
 export const OFFENSIVE_BRICK_COLOR_LASER = COLOR_YELLOW; // Yellow warning color
 export const OFFENSIVE_BRICK_COLOR_HOMING = COLOR_MAGENTA; // Magenta warning color
 export const OFFENSIVE_BRICK_COLOR_SPLITTING = COLOR_ORANGE; // Orange warning color
+export const OFFENSIVE_BRICK_COLOR_BOMB = COLOR_RED_ORANGE; // Red-Orange bomb warning color
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared

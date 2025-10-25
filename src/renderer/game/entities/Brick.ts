@@ -11,6 +11,7 @@ import {
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER,
+  OFFENSIVE_BRICK_COLOR_BOMB,
   FONT_MONO_BRICK,
   COLOR_MAGENTA,
   COLOR_CYAN,
@@ -44,6 +45,10 @@ export class Brick {
   private readonly type: BrickType;
   private readonly customColor: string | null;
 
+  // Static cache for rendered brick images
+  private static renderCache: Map<string, HTMLCanvasElement> = new Map();
+  private static cacheEnabled: boolean = true;
+
   /**
    * Calculate health multiplier for brick type
    * Indestructible bricks use Infinity to represent unlimited health
@@ -57,6 +62,7 @@ export class Brick {
     [BrickType.OFFENSIVE_LASER]: 1,
     [BrickType.OFFENSIVE_HOMING]: 1,
     [BrickType.OFFENSIVE_SPLITTING]: 1,
+    [BrickType.OFFENSIVE_BOMB]: 1,
   };
 
   /**
@@ -128,7 +134,10 @@ export class Brick {
     return (
       this.type === BrickType.OFFENSIVE_FALLING ||
       this.type === BrickType.OFFENSIVE_EXPLODING ||
-      this.type === BrickType.OFFENSIVE_LASER
+      this.type === BrickType.OFFENSIVE_LASER ||
+      this.type === BrickType.OFFENSIVE_HOMING ||
+      this.type === BrickType.OFFENSIVE_SPLITTING ||
+      this.type === BrickType.OFFENSIVE_BOMB
     );
   }
 
@@ -220,6 +229,8 @@ export class Brick {
         return OFFENSIVE_BRICK_COLOR_EXPLODING;
       case BrickType.OFFENSIVE_LASER:
         return OFFENSIVE_BRICK_COLOR_LASER;
+      case BrickType.OFFENSIVE_BOMB:
+        return OFFENSIVE_BRICK_COLOR_BOMB;
       default:
         return COLOR_WHITE;
     }
@@ -264,6 +275,23 @@ export class Brick {
     const w = this.width;
     const h = this.height;
     const color = this.getColor();
+
+    // Use cached rendering if available and in browser environment
+    if (Brick.cacheEnabled && typeof document !== 'undefined') {
+      const cacheKey = this.getCacheKey();
+      let cachedCanvas = Brick.renderCache.get(cacheKey);
+      
+      if (!cachedCanvas) {
+        cachedCanvas = this.renderToCache();
+        Brick.renderCache.set(cacheKey, cachedCanvas);
+      }
+      
+      // Draw cached image with opacity
+      ctx.globalAlpha = opacity;
+      ctx.drawImage(cachedCanvas, x, y);
+      ctx.restore();
+      return;
+    }
 
     // Draw glow effect (dystopian neon style)
     ctx.shadowBlur = BRICK_GLOW_BLUR;
@@ -360,6 +388,120 @@ export class Brick {
     const g = Math.max(0, ((num >> 8) & 0xff) - percent);
     const b = Math.max(0, (num & 0xff) - percent);
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+
+  /**
+   * Generate cache key for this brick's appearance
+   */
+  private getCacheKey(): string {
+    const color = this.getColor();
+    const healthText = this.isIndestructible() ? 'I' : 
+      (this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1));
+    return `${color}_${healthText}_${this.isIndestructible()}`;
+  }
+
+  /**
+   * Render brick to an offscreen canvas for caching
+   */
+  private renderToCache(): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Failed to get 2D context for brick cache');
+    }
+
+    const w = this.width;
+    const h = this.height;
+    const color = this.getColor();
+
+    // Draw glow effect (dystopian neon style)
+    ctx.shadowBlur = BRICK_GLOW_BLUR;
+    ctx.shadowColor = color;
+
+    // Create gradient for 3D effect (top-left to bottom-right)
+    const gradient = ctx.createLinearGradient(0, 0, w, h);
+    gradient.addColorStop(0, this.lightenColor(color, 30));
+    gradient.addColorStop(0.5, color);
+    gradient.addColorStop(1, this.darkenColor(color, 30));
+
+    // Draw brick with gradient and rounded corners
+    const cornerRadius = 3;
+    ctx.fillStyle = gradient;
+    
+    // Draw rounded rectangle
+    ctx.beginPath();
+    ctx.moveTo(cornerRadius, 0);
+    ctx.lineTo(w - cornerRadius, 0);
+    ctx.arcTo(w, 0, w, cornerRadius, cornerRadius);
+    ctx.lineTo(w, h - cornerRadius);
+    ctx.arcTo(w, h, w - cornerRadius, h, cornerRadius);
+    ctx.lineTo(cornerRadius, h);
+    ctx.arcTo(0, h, 0, h - cornerRadius, cornerRadius);
+    ctx.lineTo(0, cornerRadius);
+    ctx.arcTo(0, 0, cornerRadius, 0, cornerRadius);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw outer border for definition
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw inner glow for depth (lighter border inside)
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = this.lightenColor(color, 50);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.6;
+    
+    // Draw inner rounded rectangle (slightly smaller)
+    const innerPadding = 2;
+    ctx.beginPath();
+    ctx.moveTo(cornerRadius + innerPadding, innerPadding);
+    ctx.lineTo(w - cornerRadius - innerPadding, innerPadding);
+    ctx.arcTo(w - innerPadding, innerPadding, w - innerPadding, cornerRadius + innerPadding, cornerRadius);
+    ctx.lineTo(w - innerPadding, h - cornerRadius - innerPadding);
+    ctx.arcTo(w - innerPadding, h - innerPadding, w - cornerRadius - innerPadding, h - innerPadding, cornerRadius);
+    ctx.lineTo(cornerRadius + innerPadding, h - innerPadding);
+    ctx.arcTo(innerPadding, h - innerPadding, innerPadding, h - cornerRadius - innerPadding, cornerRadius);
+    ctx.lineTo(innerPadding, cornerRadius + innerPadding);
+    ctx.arcTo(innerPadding, innerPadding, cornerRadius + innerPadding, innerPadding, cornerRadius);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Draw health text (skip for indestructible bricks)
+    if (!this.isIndestructible()) {
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = COLOR_BLACK;
+      ctx.font = FONT_MONO_BRICK;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      const healthText = this.health % 1 === 0 
+        ? this.health.toString() 
+        : this.health.toFixed(1);
+      
+      ctx.fillText(healthText, w / 2, h / 2);
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Clear the render cache (useful when changing levels or resetting)
+   */
+  static clearRenderCache(): void {
+    Brick.renderCache.clear();
+  }
+
+  /**
+   * Enable or disable render caching
+   */
+  static setRenderCacheEnabled(enabled: boolean): void {
+    Brick.cacheEnabled = enabled;
   }
 
   /**

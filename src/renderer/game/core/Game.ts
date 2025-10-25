@@ -4,6 +4,7 @@
 
 import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
+import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
 import { GameState, LevelConfig } from '../core/types';
@@ -57,6 +58,13 @@ export class Game {
   private levelCompleteTimer: number = 0;
   private isDevUpgradeMode: boolean = false;
   private levelTime: number = 0; // Time spent on current level in seconds
+  private bombDamage: number = 0; // Bomb brick damage (3x ball damage at level start)
+  private delayedBombExplosions: Array<{
+    brick: Brick;
+    x: number;
+    y: number;
+    delay: number;
+  }> = [];
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -253,7 +261,37 @@ export class Game {
         
         // Spawn offensive entities based on brick type
         const batCenterX = this.bat.getCenterX();
-        this.offensiveEntityManager.spawnOffensiveEntity(brick, x, y, batCenterX);
+        const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
+          brick, 
+          x, 
+          y, 
+          batCenterX,
+          this.level?.getBricks()
+        );
+        
+        // Handle bomb explosion damage - stagger explosions over 1.5 seconds
+        if (bricksToDamage && bricksToDamage.length > 0) {
+          const totalDuration = 1.5; // Total time for all explosions
+          const delayPerBrick = totalDuration / bricksToDamage.length;
+          
+          for (let i = 0; i < bricksToDamage.length; i++) {
+            const targetBrick = bricksToDamage[i];
+            const targetBounds = targetBrick.getBounds();
+            const targetX = targetBounds.x + targetBounds.width / 2;
+            const targetY = targetBounds.y + targetBounds.height / 2;
+            
+            // Queue this brick for delayed explosion
+            this.delayedBombExplosions.push({
+              brick: targetBrick,
+              x: targetX,
+              y: targetY,
+              delay: i * delayPerBrick
+            });
+          }
+          
+          // Extra particles for bomb explosion
+          this.effectsManager.createParticles(x, y, 40, brick.getColor(), 200);
+        }
         
         // Create particles (more for final brick)
         const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
@@ -461,6 +499,9 @@ export class Game {
    * Centers bricks horizontally on the canvas
    */
   loadLevel(levelConfig: LevelConfig): void {
+    // Clear brick render cache when loading new level
+    Brick.clearRenderCache();
+    
     // Create level with canvas width for centering
     this.level = new Level(levelConfig, this.canvas.width);
     
@@ -472,8 +513,14 @@ export class Game {
     this.weaponManager.clear();
     this.offensiveEntityManager.clear();
     
+    // Clear delayed bomb explosions
+    this.delayedBombExplosions = [];
+    
     // Reset level timer
     this.levelTime = 0;
+    
+    // Calculate bomb damage (3x ball damage at level start)
+    this.bombDamage = this.ball.getDamage() * 3;
     
     // Reset slow-motion state
     this.slowMotionManager.reset();
@@ -594,6 +641,9 @@ export class Game {
       this.statusBar.setLevelTime(this.levelTime);
     }
 
+    // Update delayed bomb explosions
+    this.updateDelayedBombExplosions(deltaTime);
+
     // Handle input (use effective deltaTime for movement)
     this.handleInput(effectiveDeltaTime);
 
@@ -673,6 +723,86 @@ export class Game {
         // Use level.getId() to ensure we show the level that was just completed
         this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime);
         this.levelCompleteTimer = 0;
+      }
+    }
+  }
+
+  /**
+   * Update delayed bomb explosions
+   */
+  private updateDelayedBombExplosions(deltaTime: number): void {
+    // Decrease delay timers
+    for (let i = this.delayedBombExplosions.length - 1; i >= 0; i--) {
+      const explosion = this.delayedBombExplosions[i];
+      explosion.delay -= deltaTime;
+      
+      // If delay has elapsed, trigger the explosion
+      if (explosion.delay <= 0) {
+        const targetBrick = explosion.brick;
+        
+        // Skip if brick is already destroyed
+        if (targetBrick.isDestroyed()) {
+          this.delayedBombExplosions.splice(i, 1);
+          continue;
+        }
+        
+        const wasDestroyed = targetBrick.isDestroyed();
+        targetBrick.takeDamage(this.bombDamage);
+        this.effectsManager.addDamageNumber(explosion.x, explosion.y - 5, this.bombDamage, false);
+        
+        // If brick was just destroyed by bomb damage
+        if (!wasDestroyed && targetBrick.isDestroyed()) {
+          this.effectsManager.createParticles(explosion.x, explosion.y, 8, targetBrick.getColor(), 120);
+          
+          // Spawn offensive entity if it's an offensive brick
+          if (targetBrick.isOffensive()) {
+            const batCenterX = this.bat.getCenterX();
+            const chainBricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
+              targetBrick,
+              explosion.x,
+              explosion.y,
+              batCenterX,
+              this.level?.getBricks()
+            );
+            
+            // If this was a bomb brick, queue its surrounding bricks for staggered explosion
+            if (chainBricksToDamage && chainBricksToDamage.length > 0) {
+              const totalDuration = 1.5;
+              const delayPerBrick = totalDuration / chainBricksToDamage.length;
+              
+              for (let j = 0; j < chainBricksToDamage.length; j++) {
+                const chainBrick = chainBricksToDamage[j];
+                const chainBounds = chainBrick.getBounds();
+                const chainX = chainBounds.x + chainBounds.width / 2;
+                const chainY = chainBounds.y + chainBounds.height / 2;
+                
+                // Queue this brick for delayed explosion
+                this.delayedBombExplosions.push({
+                  brick: chainBrick,
+                  x: chainX,
+                  y: chainY,
+                  delay: j * delayPerBrick
+                });
+              }
+              
+              // Extra particles for chain bomb explosion
+              this.effectsManager.createParticles(explosion.x, explosion.y, 40, targetBrick.getColor(), 200);
+            }
+          }
+          
+          // Update brick counts
+          this.totalBricksDestroyed++;
+          if (this.level) {
+            const remainingBricksAfterBomb = this.level.getRemainingBricks();
+            this.statusBar.setBrickCounts(
+              remainingBricksAfterBomb,
+              this.level.getTotalBricks()
+            );
+          }
+        }
+        
+        // Remove this explosion from the queue
+        this.delayedBombExplosions.splice(i, 1);
       }
     }
   }

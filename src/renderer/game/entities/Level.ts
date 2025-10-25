@@ -167,6 +167,7 @@ export class Level {
     this.bricks = this.createBricksFromConfig();
   }
 
+
   /**
    * Render all active bricks
    */

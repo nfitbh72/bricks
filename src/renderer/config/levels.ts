@@ -122,6 +122,38 @@ export function createLevel4(): LevelConfig {
   };
 }
 
+export function createLevel5(): LevelConfig {
+  const pattern = [
+    "IIIIIIIII",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "IHMMMMMHI",
+    "IMBMBMBMI",
+    "IMMBMBMMI",
+    "IMBMBMBMI",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I"
+  ];
+  
+  return {
+    id: 5,
+    name: t('game.levels.level5Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 5, // Normal bricks = 4 HP, Healthy bricks = 12 HP
+  };
+}
+
 /**
  * Get level by ID
  */
@@ -135,6 +167,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel3();
     case 4:
       return createLevel4();
+    case 5:
+      return createLevel5();
     default:
       return undefined;
   }

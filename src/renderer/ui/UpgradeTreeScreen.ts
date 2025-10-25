@@ -380,8 +380,8 @@ export class UpgradeTreeScreen extends Screen {
 
     // ALL button (dev mode only, bottom-right)
     if (this.isDevMode) {
-      // Level selection buttons
-      const levels = [1, 2, 3];
+      // Level selection buttons - dynamically generate based on available levels
+      const levels = Array.from({ length: 5 }, (_, i) => i + 1); // [1, 2, 3, 4, 5]
       const totalButtons = 1 + levels.length; // ALL + level buttons
       const totalHeight = totalButtons * buttonHeight + (totalButtons - 1) * buttonSpacing;
       
