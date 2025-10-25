@@ -20,7 +20,7 @@ import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
-import { PLAYER_STARTING_HEALTH } from '../../config/constants';
+import { PLAYER_STARTING_HEALTH, BOMB_DAMAGE_MULTIPLIER } from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -299,10 +299,12 @@ export class Game {
       },
       onBrickDestroyed: (brick, x, y, isCritical) => {
         this.totalBricksDestroyed++;
-        const remainingBricks = this.level!.getRemainingBricks();
+        if (!this.level) return;
+        
+        const remainingBricks = this.level.getRemainingBricks();
         this.statusBar.setBrickCounts(
           remainingBricks,
-          this.level!.getTotalBricks()
+          this.level.getTotalBricks()
         );
         
         console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
@@ -539,8 +541,8 @@ export class Game {
     // Reset level timer
     this.levelTime = 0;
     
-    // Calculate bomb damage (3x ball damage at level start)
-    this.bombDamage = this.ball.getDamage() * 3;
+    // Calculate bomb damage using multiplier constant
+    this.bombDamage = this.ball.getDamage() * BOMB_DAMAGE_MULTIPLIER;
     
     // Reset slow-motion state
     this.slowMotionManager.reset();
