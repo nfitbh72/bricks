@@ -165,6 +165,7 @@ export const OFFENSIVE_BRICK_COLOR_LASER = COLOR_YELLOW; // Yellow warning color
 export const OFFENSIVE_BRICK_COLOR_HOMING = COLOR_MAGENTA; // Magenta warning color
 export const OFFENSIVE_BRICK_COLOR_SPLITTING = COLOR_ORANGE; // Orange warning color
 export const OFFENSIVE_BRICK_COLOR_BOMB = COLOR_RED_ORANGE; // Red-Orange bomb warning color
+export const OFFENSIVE_BRICK_COLOR_DYNAMITE = COLOR_RED; // Red dynamite warning color
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
@@ -203,3 +204,14 @@ export const SPLITTING_FRAGMENT_FALL_DISTANCE = 100; // Distance before falling 
 export const SPLITTING_FRAGMENT_SHAKE_DURATION = 0.5; // Shake duration in seconds
 export const SPLITTING_FRAGMENT_SHAKE_INTENSITY = 3; // Shake intensity in pixels
 export const SPLITTING_FRAGMENT_GRAVITY = 500; // Gravity when falling (25% faster than 400)
+
+// Dynamite stick constants
+export const DYNAMITE_STICK_GRAVITY = 400; // UNUSED - kept for potential future use
+export const DYNAMITE_STICK_FUSE_TIME = 3.0; // Seconds before explosion
+export const DYNAMITE_STICK_FLASH_INTERVAL = 0.15; // Flash every 0.15 seconds
+export const DYNAMITE_STICK_WIDTH = 12; // Narrower than brick
+export const DYNAMITE_STICK_HEIGHT = 30; // Taller than brick (stick shape)
+export const DYNAMITE_EXPLOSION_RADIUS = 120; // Large circular explosion radius
+export const DYNAMITE_EXPLOSION_DURATION = 0.5; // Explosion visual effect duration in seconds
+export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
+export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0

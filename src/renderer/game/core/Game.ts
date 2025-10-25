@@ -844,6 +844,12 @@ export class Game {
     this.collisionManager.checkBrickLaserBatCollisions(this.offensiveEntityManager.getBrickLasers(), this.bat);
     this.collisionManager.checkHomingMissileBatCollisions(this.offensiveEntityManager.getHomingMissiles(), this.bat);
     this.collisionManager.checkSplittingFragmentBatCollisions(this.offensiveEntityManager.getSplittingFragments(), this.bat);
+    this.collisionManager.checkDynamiteStickCollisions(
+      this.offensiveEntityManager.getDynamiteSticks(),
+      this.bat,
+      this.level.getActiveBricks(),
+      this.ball.getDamage()
+    );
   }
 
   /**

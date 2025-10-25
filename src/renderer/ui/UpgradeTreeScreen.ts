@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { Upgrade } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
+import { TOTAL_LEVELS } from '../config/levels';
 import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_TITLE_TINY, FONT_TITLE_MICRO, GLOW_LARGE } from '../config/constants';
 
 /**
@@ -381,7 +382,7 @@ export class UpgradeTreeScreen extends Screen {
     // ALL button (dev mode only, bottom-right)
     if (this.isDevMode) {
       // Level selection buttons - dynamically generate based on available levels
-      const levels = Array.from({ length: 5 }, (_, i) => i + 1); // [1, 2, 3, 4, 5]
+      const levels = Array.from({ length: TOTAL_LEVELS }, (_, i) => i + 1);
       const totalButtons = 1 + levels.length; // ALL + level buttons
       const totalHeight = totalButtons * buttonHeight + (totalButtons - 1) * buttonSpacing;
       

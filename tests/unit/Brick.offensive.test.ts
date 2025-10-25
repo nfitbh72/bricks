@@ -8,6 +8,7 @@ import {
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER,
+  OFFENSIVE_BRICK_COLOR_DYNAMITE,
 } from '../../src/renderer/config/constants';
 
 describe('Brick - Offensive Types', () => {
@@ -22,6 +23,10 @@ describe('Brick - Offensive Types', () => {
 
     it('should have OFFENSIVE_LASER type', () => {
       expect(BrickType.OFFENSIVE_LASER).toBe('OFFENSIVE_LASER');
+    });
+
+    it('should have OFFENSIVE_DYNAMITE type', () => {
+      expect(BrickType.OFFENSIVE_DYNAMITE).toBe('OFFENSIVE_DYNAMITE');
     });
   });
 
@@ -38,6 +43,11 @@ describe('Brick - Offensive Types', () => {
 
     it('should return true for OFFENSIVE_LASER', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 1);
+      expect(brick.isOffensive()).toBe(true);
+    });
+
+    it('should return true for OFFENSIVE_DYNAMITE', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 1);
       expect(brick.isOffensive()).toBe(true);
     });
 
@@ -72,6 +82,11 @@ describe('Brick - Offensive Types', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 1);
       expect(brick.getType()).toBe(BrickType.OFFENSIVE_LASER);
     });
+
+    it('should return OFFENSIVE_DYNAMITE', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 1);
+      expect(brick.getType()).toBe(BrickType.OFFENSIVE_DYNAMITE);
+    });
   });
 
   describe('getColor - offensive bricks', () => {
@@ -88,6 +103,11 @@ describe('Brick - Offensive Types', () => {
     it('should return distinct color for OFFENSIVE_LASER', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 1);
       expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_LASER);
+    });
+
+    it('should return distinct color for OFFENSIVE_DYNAMITE', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 1);
+      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_DYNAMITE);
     });
 
     it('should use custom color if provided', () => {
@@ -115,6 +135,12 @@ describe('Brick - Offensive Types', () => {
 
     it('should have 1x health multiplier for OFFENSIVE_LASER', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 5);
+      expect(brick.getMaxHealth()).toBe(5);
+      expect(brick.getHealth()).toBe(5);
+    });
+
+    it('should have 1x health multiplier for OFFENSIVE_DYNAMITE', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 5);
       expect(brick.getMaxHealth()).toBe(5);
       expect(brick.getHealth()).toBe(5);
     });
@@ -147,6 +173,11 @@ describe('Brick - Offensive Types', () => {
 
     it('should return false for OFFENSIVE_LASER', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 1);
+      expect(brick.isIndestructible()).toBe(false);
+    });
+
+    it('should return false for OFFENSIVE_DYNAMITE', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 1);
       expect(brick.isIndestructible()).toBe(false);
     });
   });

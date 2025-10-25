@@ -22,6 +22,7 @@ describe('OffensiveEntityManager', () => {
       expect(manager.getFallingBricks()).toHaveLength(0);
       expect(manager.getDebris()).toHaveLength(0);
       expect(manager.getBrickLasers()).toHaveLength(0);
+      expect(manager.getDynamiteSticks()).toHaveLength(0);
     });
   });
 
@@ -59,6 +60,18 @@ describe('OffensiveEntityManager', () => {
       expect(manager.getDebris()).toHaveLength(0);
     });
 
+    it('should spawn dynamite stick for OFFENSIVE_DYNAMITE brick type', () => {
+      const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE, color: '#ff0000' }, 1);
+      
+      manager.spawnOffensiveEntity(brick, 125, 110, 500);
+      
+      const dynamiteSticks = manager.getDynamiteSticks();
+      expect(dynamiteSticks).toHaveLength(1);
+      expect(manager.getFallingBricks()).toHaveLength(0);
+      expect(manager.getDebris()).toHaveLength(0);
+      expect(manager.getBrickLasers()).toHaveLength(0);
+    });
+
     it('should not spawn anything for normal brick type', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.NORMAL, color: '#ffffff' }, 1);
       
@@ -67,6 +80,7 @@ describe('OffensiveEntityManager', () => {
       expect(manager.getFallingBricks()).toHaveLength(0);
       expect(manager.getDebris()).toHaveLength(0);
       expect(manager.getBrickLasers()).toHaveLength(0);
+      expect(manager.getDynamiteSticks()).toHaveLength(0);
     });
   });
 
@@ -166,6 +180,7 @@ describe('OffensiveEntityManager', () => {
       expect(manager.getFallingBricks()).toHaveLength(0);
       expect(manager.getDebris()).toHaveLength(0);
       expect(manager.getBrickLasers()).toHaveLength(0);
+      expect(manager.getDynamiteSticks()).toHaveLength(0);
     });
   });
 

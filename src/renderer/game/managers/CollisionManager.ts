@@ -13,6 +13,7 @@ import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { SplittingFragment } from '../entities/offensive/SplittingFragment';
+import { DynamiteStick } from '../entities/offensive/DynamiteStick';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -23,6 +24,8 @@ import {
   LASER_BRICK_LASER_DAMAGE_PERCENT,
   HOMING_MISSILE_DAMAGE_PERCENT,
   SPLITTING_FRAGMENT_DAMAGE_PERCENT,
+  DYNAMITE_BAT_DAMAGE_PERCENT,
+  DYNAMITE_BRICK_DAMAGE_MULTIPLIER,
 } from '../../config/constants';
 
 export interface CollisionCallbacks {
@@ -393,6 +396,98 @@ export class CollisionManager {
 
         // Deactivate fragment
         fragment.deactivate();
+      }
+    }
+  }
+
+  /**
+   * Check dynamite stick-bat collisions and handle explosions
+   */
+  checkDynamiteStickCollisions(
+    dynamiteSticks: DynamiteStick[],
+    bat: Bat,
+    allBricks: Brick[],
+    currentBallDamage: number
+  ): void {
+    const batBounds = bat.getBounds();
+
+    for (const dynamite of dynamiteSticks) {
+      if (!dynamite.isActive()) continue;
+
+      // Check if dynamite has exploded
+      if (dynamite.hasExploded()) {
+        const explosionResult = dynamite.getExplosionResult(allBricks);
+        
+        // Apply damage if explosion result is available (only happens once)
+        if (explosionResult) {
+          // Damage all bricks in explosion radius
+          const brickDamage = currentBallDamage * DYNAMITE_BRICK_DAMAGE_MULTIPLIER;
+          
+          for (const brick of explosionResult.bricksToDamage) {
+            const destructionInfo = brick.takeDamage(brickDamage);
+            
+            // Notify explosion damage
+            if (this.callbacks.onExplosionDamage) {
+              const brickBounds = brick.getBounds();
+              const centerX = brickBounds.x + brickBounds.width / 2;
+              const centerY = brickBounds.y + brickBounds.height / 2;
+              this.callbacks.onExplosionDamage(brick, brickDamage, centerX, centerY);
+            }
+            
+            // Track if explosion destroyed this brick
+            if (destructionInfo.justDestroyed) {
+              if (this.callbacks.onBrickDestroyed) {
+                this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, false);
+              }
+            }
+          }
+          
+          // Check if bat is in explosion radius
+          const batCenterX = batBounds.x + batBounds.width / 2;
+          const batCenterY = batBounds.y + batBounds.height / 2;
+          const dx = batCenterX - explosionResult.centerX;
+          const dy = batCenterY - explosionResult.centerY;
+          const distanceToBat = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distanceToBat <= explosionResult.radius) {
+            // Damage bat
+            bat.takeDamage(DYNAMITE_BAT_DAMAGE_PERCENT);
+            
+            // Notify bat damaged
+            if (this.callbacks.onBatDamaged) {
+              this.callbacks.onBatDamaged(DYNAMITE_BAT_DAMAGE_PERCENT);
+            }
+          }
+        }
+        
+        // Deactivate dynamite only after explosion animation completes
+        if (dynamite.isExplosionComplete()) {
+          dynamite.deactivate();
+        }
+        continue;
+      }
+
+      // Check collision with bat before explosion
+      const dynamiteBounds = dynamite.getBounds();
+      if (!dynamiteBounds) continue;
+
+      // Simple AABB collision
+      if (
+        dynamiteBounds.x < batBounds.x + batBounds.width &&
+        dynamiteBounds.x + dynamiteBounds.width > batBounds.x &&
+        dynamiteBounds.y < batBounds.y + batBounds.height &&
+        dynamiteBounds.y + dynamiteBounds.height > batBounds.y
+      ) {
+        // Damage bat
+        bat.takeDamage(DYNAMITE_BAT_DAMAGE_PERCENT);
+        
+        // Notify bat damaged
+        if (this.callbacks.onBatDamaged) {
+          this.callbacks.onBatDamaged(DYNAMITE_BAT_DAMAGE_PERCENT);
+        }
+
+        // Deactivate dynamite (no explosion on direct hit)
+        dynamite.deactivate();
       }
     }
   }

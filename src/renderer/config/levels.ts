@@ -7,6 +7,11 @@ import { createBricksFromPattern } from './brickLayout';
 import { t } from '../i18n/LanguageManager';
 
 /**
+ * Total number of levels in the game
+ */
+export const TOTAL_LEVELS = 6;
+
+/**
  * Create Level 1 configuration
  * Simple block pattern for introductory level
  */
@@ -154,6 +159,35 @@ export function createLevel5(): LevelConfig {
   };
 }
 
+export function createLevel6(): LevelConfig {
+  const pattern = [
+    "IIIIIIIII",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNNDNNNI",
+    "INNNDNNNI",
+    "INNNDNNNI",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I"
+  ];
+  
+  return {
+    id: 6,
+    name: t('game.levels.level5Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 6, // Normal bricks = 4 HP, Healthy bricks = 12 HP
+  };
+}
+
 /**
  * Get level by ID
  */
@@ -169,6 +203,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel4();
     case 5:
       return createLevel5();
+    case 6:
+      return createLevel6();
     default:
       return undefined;
   }

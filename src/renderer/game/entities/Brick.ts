@@ -12,6 +12,7 @@ import {
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER,
   OFFENSIVE_BRICK_COLOR_BOMB,
+  OFFENSIVE_BRICK_COLOR_DYNAMITE,
   FONT_MONO_BRICK,
   COLOR_MAGENTA,
   COLOR_CYAN,
@@ -71,6 +72,7 @@ export class Brick {
     [BrickType.OFFENSIVE_HOMING]: 1,
     [BrickType.OFFENSIVE_SPLITTING]: 1,
     [BrickType.OFFENSIVE_BOMB]: 1,
+    [BrickType.OFFENSIVE_DYNAMITE]: 1,
   };
 
   /**
@@ -163,7 +165,8 @@ export class Brick {
       this.type === BrickType.OFFENSIVE_LASER ||
       this.type === BrickType.OFFENSIVE_HOMING ||
       this.type === BrickType.OFFENSIVE_SPLITTING ||
-      this.type === BrickType.OFFENSIVE_BOMB
+      this.type === BrickType.OFFENSIVE_BOMB ||
+      this.type === BrickType.OFFENSIVE_DYNAMITE
     );
   }
 
@@ -257,6 +260,8 @@ export class Brick {
         return OFFENSIVE_BRICK_COLOR_LASER;
       case BrickType.OFFENSIVE_BOMB:
         return OFFENSIVE_BRICK_COLOR_BOMB;
+      case BrickType.OFFENSIVE_DYNAMITE:
+        return OFFENSIVE_BRICK_COLOR_DYNAMITE;
       default:
         return COLOR_WHITE;
     }

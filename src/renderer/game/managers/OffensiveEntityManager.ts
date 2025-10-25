@@ -8,6 +8,7 @@ import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { SplittingFragment } from '../entities/offensive/SplittingFragment';
+import { DynamiteStick } from '../entities/offensive/DynamiteStick';
 import { Brick } from '../entities/Brick';
 import { BrickType } from '../core/types';
 import { 
@@ -26,6 +27,7 @@ export class OffensiveEntityManager {
   private brickLasers: BrickLaser[] = [];
   private homingMissiles: HomingMissile[] = [];
   private splittingFragments: SplittingFragment[] = [];
+  private dynamiteSticks: DynamiteStick[] = [];
 
   /**
    * Spawn offensive entity when an offensive brick is destroyed
@@ -110,6 +112,11 @@ export class OffensiveEntityManager {
         
         return bricksToDamage;
 
+      case BrickType.OFFENSIVE_DYNAMITE:
+        // Create falling dynamite stick at destroyed brick position
+        this.dynamiteSticks.push(new DynamiteStick(brickBounds.x, brickBounds.y, color));
+        return null;
+
       default:
         return null;
     }
@@ -144,6 +151,11 @@ export class OffensiveEntityManager {
       fragment.update(deltaTime);
     }
 
+    // Update dynamite sticks
+    for (const dynamite of this.dynamiteSticks) {
+      dynamite.update(deltaTime);
+    }
+
     // Remove inactive or off-screen entities
     this.fallingBricks = this.fallingBricks.filter(
       (fb) => fb.isActive() && !fb.isOffScreen(canvasHeight)
@@ -159,6 +171,9 @@ export class OffensiveEntityManager {
     );
     this.splittingFragments = this.splittingFragments.filter(
       (sf) => sf.isActive() && !sf.isOffScreen(canvasWidth, canvasHeight)
+    );
+    this.dynamiteSticks = this.dynamiteSticks.filter(
+      (ds) => ds.isActive() && !ds.isOffScreen(canvasHeight)
     );
   }
 
@@ -189,6 +204,11 @@ export class OffensiveEntityManager {
     // Render splitting fragments
     for (const fragment of this.splittingFragments) {
       fragment.render(ctx);
+    }
+
+    // Render dynamite sticks
+    for (const dynamite of this.dynamiteSticks) {
+      dynamite.render(ctx);
     }
   }
 
@@ -228,6 +248,13 @@ export class OffensiveEntityManager {
   }
 
   /**
+   * Get all dynamite sticks (for collision detection)
+   */
+  getDynamiteSticks(): DynamiteStick[] {
+    return this.dynamiteSticks;
+  }
+
+  /**
    * Clear all offensive entities
    */
   clear(): void {
@@ -236,5 +263,6 @@ export class OffensiveEntityManager {
     this.brickLasers = [];
     this.homingMissiles = [];
     this.splittingFragments = [];
+    this.dynamiteSticks = [];
   }
 }
