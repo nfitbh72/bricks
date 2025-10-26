@@ -465,6 +465,20 @@ describe('GameUpgrades', () => {
     });
   });
 
+  describe('sticky bat', () => {
+    it('should return false for hasStickyBat with no upgrade', () => {
+      expect(gameUpgrades.hasStickyBat()).toBe(false);
+    });
+
+    it('should return true for hasStickyBat when unlocked', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BAT_ADD_STICKY, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.hasStickyBat()).toBe(true);
+    });
+  });
+
   describe('getSummary', () => {
     it('should return empty array with no upgrades', () => {
       const summary = gameUpgrades.getSummary();

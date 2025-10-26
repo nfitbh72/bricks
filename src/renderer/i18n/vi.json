@@ -129,6 +129,10 @@
       "explosionsPlus": {
         "name": "Nổ+",
         "description": "Tăng sát thương nổ 10%"
+      },
+      "stickyBat": {
+        "name": "Vợt Dính",
+        "description": "Giữ Phím Cách cho Vợt Dính"
       }
     }
   }

@@ -127,6 +127,10 @@
       "explosionsPlus": {
         "name": "Explosions+",
         "description": "Augmente les dégâts d'explosion de 10%"
+      },
+      "stickyBat": {
+        "name": "Batte Collante",
+        "description": "Maintenez Espace pour Batte Collante"
       }
     }
   }

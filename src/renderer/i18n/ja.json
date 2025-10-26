@@ -127,6 +127,10 @@
       "explosionsPlus": {
         "name": "爆発+",
         "description": "爆発ダメージを10%増加"
+      },
+      "stickyBat": {
+        "name": "粘着バット",
+        "description": "スペースキー長押しで粘着バット"
       }
     }
   }

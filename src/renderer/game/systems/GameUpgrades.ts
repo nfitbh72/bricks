@@ -89,6 +89,13 @@ export class GameUpgrades {
   }
 
   /**
+   * Check if sticky bat is unlocked
+   */
+  hasStickyBat(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BAT_ADD_STICKY) > 0;
+  }
+
+  /**
    * Get ball acceleration multiplier (reduced by upgrade)
    */
   getBallAccelerationMultiplier(): number {

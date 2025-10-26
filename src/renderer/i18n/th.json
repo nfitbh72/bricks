@@ -129,6 +129,10 @@
       "explosionsPlus": {
         "name": "ระเบิด+",
         "description": "เพิ่มความเสียหายระเบิด 10%"
+      },
+      "stickyBat": {
+        "name": "ไม้ตีเหนียว",
+        "description": "กดค้าง Space สำหรับไม้ตีเหนียว"
       }
     }
   }

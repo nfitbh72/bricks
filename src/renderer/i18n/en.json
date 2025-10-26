@@ -129,6 +129,10 @@
       "explosionsPlus": {
         "name": "Explosions+",
         "description": "Increase explosion damage by 10%"
+      },
+      "stickyBat": {
+        "name": "Sticky Bat",
+        "description": "Hold Space for a Sticky Bat"
       }
     }
   }

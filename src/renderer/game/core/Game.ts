@@ -200,10 +200,11 @@ export class Game {
       },
       onSpace: () => {
         if (this.gameState === GameState.PLAYING) {
-          // Launch ball if sticky, otherwise shoot laser
-          if (this.ball.getIsSticky()) {
+          // If sticky bat is unlocked, don't launch on Space press (use hold/release instead)
+          // Otherwise, launch ball if sticky, or shoot laser
+          if (this.ball.getIsSticky() && !this.gameUpgrades.hasStickyBat()) {
             this.ball.launchFromSticky();
-          } else {
+          } else if (!this.ball.getIsSticky()) {
             this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
           }
         }
@@ -672,6 +673,11 @@ export class Game {
     // Update sticky ball position to follow bat
     if (this.ball.getIsSticky()) {
       this.ball.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
+      
+      // If sticky bat is unlocked and Space is released, launch the ball
+      if (this.gameUpgrades.hasStickyBat() && !this.inputManager.isSpaceHeld()) {
+        this.ball.launchFromSticky();
+      }
     }
 
     // Update bat turret visibility and count based on laser upgrade
@@ -830,6 +836,21 @@ export class Game {
     if (!this.level) return;
 
     // Ball-Bat collision
+    // If sticky bat is unlocked and Space is held, make ball sticky on contact
+    if (this.gameUpgrades.hasStickyBat() && this.inputManager.isSpaceHeld() && !this.ball.getIsSticky()) {
+      const ballBounds = this.ball.getBounds();
+      const batBounds = this.bat.getBounds();
+      const ballRadius = this.ball.getRadius();
+      
+      // Check if ball is touching bat
+      if (ballBounds.y + ballRadius >= batBounds.y &&
+          ballBounds.x + ballRadius >= batBounds.x &&
+          ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
+        // Make ball sticky on top of bat
+        this.ball.setSticky(true, 0, -ballRadius);
+      }
+    }
+    
     this.collisionManager.checkBallBatCollision(this.ball, this.bat);
 
     // Ball-Brick collisions

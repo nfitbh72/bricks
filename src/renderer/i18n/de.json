@@ -127,6 +127,10 @@
       "explosionsPlus": {
         "name": "Explosionen+",
         "description": "Erhöht Explosionsschaden um 10%"
+      },
+      "stickyBat": {
+        "name": "Klebriger Schläger",
+        "description": "Leertaste halten für klebrigen Schläger"
       }
     }
   }

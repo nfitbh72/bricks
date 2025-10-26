@@ -52,10 +52,20 @@ export function getUpgrades() : Upgrade[] {
                             name: t('game.upgrades.slowerBall.name'),
                             description: t('game.upgrades.slowerBall.description'),
                             times: 3,
-                            previewNextUpgrades: 0,
-                            unlockNextUpgradesAfterTimes: 0,
+                            previewNextUpgrades: 1,
+                            unlockNextUpgradesAfterTimes: 2,
                             type: UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT,
-                            nextUpgrades: [],
+                            nextUpgrades: [
+                                {
+                                    name: t('game.upgrades.stickyBat.name'),
+                                    description: t('game.upgrades.stickyBat.description'),
+                                    times: 1,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    type: UpgradeType.BAT_ADD_STICKY,
+                                    nextUpgrades: [],
+                                }
+                            ],
                         }
                     ],
                 }

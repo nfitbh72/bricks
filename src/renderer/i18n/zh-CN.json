@@ -129,6 +129,10 @@
       "explosionsPlus": {
         "name": "爆炸+",
         "description": "增加爆炸伤害10%"
+      },
+      "stickyBat": {
+        "name": "粘性球拍",
+        "description": "按住空格键启用粘性球拍"
       }
     }
   }

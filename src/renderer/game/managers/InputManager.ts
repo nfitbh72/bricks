@@ -138,6 +138,13 @@ export class InputManager {
   }
 
   /**
+   * Check if Space key is currently held down
+   */
+  isSpaceHeld(): boolean {
+    return this.keys.has(' ');
+  }
+
+  /**
    * Clear all pressed keys (useful for state transitions)
    */
   clearKeys(): void {

@@ -129,6 +129,10 @@
       "explosionsPlus": {
         "name": "Ledakan+",
         "description": "Tingkatkan kerusakan ledakan 10%"
+      },
+      "stickyBat": {
+        "name": "Bat Lengket",
+        "description": "Tahan Spasi untuk Bat Lengket"
       }
     }
   }

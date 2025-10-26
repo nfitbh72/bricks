@@ -127,6 +127,10 @@
       "explosionsPlus": {
         "name": "Explosiones+",
         "description": "Aumenta el daño de explosión en 10%"
+      },
+      "stickyBat": {
+        "name": "Bate Pegajoso",
+        "description": "Mantén Espacio para Bate Pegajoso"
       }
     }
   }
