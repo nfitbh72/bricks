@@ -65,6 +65,13 @@ export class AudioManager {
   }
 
   /**
+   * Play indestructible brick hit sound (ding)
+   */
+  playIndestructibleBrickHit(): void {
+    this.playSound(this.brickHitSound);
+  }
+
+  /**
    * Play brick explode sound
    */
   playBrickExplode(): void {

@@ -102,14 +102,14 @@ export class CollisionManager {
         const piercingDuration = gameUpgrades.getPiercingDuration();
         
         // Check if piercing is active (either from chance or from duration)
-        let pierced = false;
+        let piercingAttempted = false;
         if (!isIndestructible) {
           if (this.piercingTimeRemaining > 0) {
             // Piercing is active from duration
-            pierced = true;
+            piercingAttempted = true;
           } else if (piercingChance > 0 && Math.random() < piercingChance) {
             // Piercing activated by chance
-            pierced = true;
+            piercingAttempted = true;
             // If duration upgrade is active, start the timer
             if (piercingDuration > 0) {
               this.piercingTimeRemaining = piercingDuration;
@@ -117,10 +117,17 @@ export class CollisionManager {
           }
         }
         
-        // Bounce ball (unless piercing and brick is destructible)
-        if ((!pierced || isIndestructible) && collision.normal) {
+        // For indestructible bricks, always bounce immediately
+        if (isIndestructible && collision.normal) {
           ball.bounce(collision.normal);
+          // Notify hit for sound/effects (no damage for indestructible)
+          if (this.callbacks.onBrickHit) {
+            this.callbacks.onBrickHit(brick, 0, false);
+          }
         }
+        
+        // Track if brick was destroyed (for piercing logic)
+        let brickDestroyed = false;
         
         // Skip damage, explosions, and notifications for indestructible bricks
         if (!isIndestructible) {
@@ -138,6 +145,7 @@ export class CollisionManager {
           
           // Damage brick and get destruction info
           const destructionInfo = brick.takeDamage(damage);
+          brickDestroyed = destructionInfo.justDestroyed;
           
           // Notify hit (show damage numbers)
           if (this.callbacks.onBrickHit) {
@@ -155,6 +163,12 @@ export class CollisionManager {
               this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, isCritical);
             }
           }
+          
+          // Bounce ball if piercing didn't destroy the brick
+          // (Only skip bounce if piercing was attempted AND brick was destroyed)
+          if ((!piercingAttempted || !brickDestroyed) && collision.normal) {
+            ball.bounce(collision.normal);
+          }
         }
         
         // Restore ball to normal if it was grey
@@ -162,11 +176,12 @@ export class CollisionManager {
           ball.restoreToNormal();
         }
         
-        // If not piercing, stop checking more bricks
-        if (!pierced) {
+        // Continue piercing only if piercing was attempted AND brick was destroyed
+        const shouldContinuePiercing = piercingAttempted && brickDestroyed;
+        if (!shouldContinuePiercing) {
           break;
         }
-        // If piercing, continue to next brick (even after hitting indestructible)
+        // If piercing and brick was destroyed, continue to next brick
       }
     }
   }

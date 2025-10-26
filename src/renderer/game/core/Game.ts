@@ -289,13 +289,21 @@ export class Game {
   private setupCollisionCallbacks(): void {
     this.collisionManager.setCallbacks({
       onBrickHit: (brick, damage, isCritical) => {
-        const brickBounds = brick.getBounds();
-        const brickCenterX = brickBounds.x + brickBounds.width / 2;
-        const brickTopY = brickBounds.y - 5;
-        this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
+        // Only show damage numbers for destructible bricks
+        if (!brick.isIndestructible()) {
+          const brickBounds = brick.getBounds();
+          const brickCenterX = brickBounds.x + brickBounds.width / 2;
+          const brickTopY = brickBounds.y - 5;
+          this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
+        }
         
         if (!brick.isDestroyed()) {
-          this.audioManager.playBrickDamage();
+          // Play ding sound for indestructible bricks, regular damage sound for others
+          if (brick.isIndestructible()) {
+            this.audioManager.playIndestructibleBrickHit();
+          } else {
+            this.audioManager.playBrickDamage();
+          }
         }
       },
       onBrickDestroyed: (brick, x, y, isCritical) => {
