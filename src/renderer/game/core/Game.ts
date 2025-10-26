@@ -20,7 +20,7 @@ import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
-import { PLAYER_STARTING_HEALTH, BOMB_DAMAGE_MULTIPLIER } from '../../config/constants';
+import { PLAYER_STARTING_HEALTH, BOMB_DAMAGE_MULTIPLIER, BAT_WIDTH, BAT_HEIGHT } from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -84,8 +84,8 @@ export class Game {
     // Initialize ball and bat with scaled dimensions
     // Base sizes (at 4K): bat = 150x20, ball radius = 10, ball speed = 600
     const baseRadius = 10;
-    const baseBatWidth = 150;
-    const baseBatHeight = 20;
+    const baseBatWidth = BAT_WIDTH; // Use constant from config
+    const baseBatHeight = BAT_HEIGHT; // Use constant from config
     const baseBallSpeed = 600;
     
     const ballRadius = baseRadius * scaleFactor;

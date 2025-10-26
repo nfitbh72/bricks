@@ -46,8 +46,8 @@ export const BALL_TAIL_SEGMENTS = 8;
 export const BALL_TAIL_MAX_SPEED_MULTIPLIER = 3; // Tail length scales up to 3x at high speeds
 
 // Bat constants
-export const BAT_WIDTH = 195; // 30% wider than original 150
-export const BAT_HEIGHT = 10;
+export const BAT_WIDTH = 250; // 50% larger than 195 (previously 30% wider than original 150)
+export const BAT_HEIGHT = 30;
 export const BAT_SPEED = 300;
 
 // Bat turret constants (relative to bat height)
