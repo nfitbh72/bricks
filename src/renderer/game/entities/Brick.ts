@@ -73,6 +73,7 @@ export class Brick {
     [BrickType.OFFENSIVE_SPLITTING]: 1,
     [BrickType.OFFENSIVE_BOMB]: 1,
     [BrickType.OFFENSIVE_DYNAMITE]: 1,
+    [BrickType.BOSS_1]: 10,
   };
 
   /**

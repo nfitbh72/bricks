@@ -42,7 +42,10 @@
       "level1Name": "Level 1: One",
       "level2Name": "Level 2: Debris in all directions",
       "level3Name": "Level 3: Beware of lasers and shattering falling bricks!",
-      "level4Name": "Level 4: We call it Homer"
+      "level4Name": "Level 4: We call it Homer",
+      "level5Name": "Level 5: Bombs Away",
+      "level6Name": "Level 6: Dynamite",
+      "level7Name": "Level 7: Boss Battle"
     },
     "bricks": {
       "offensive": {

@@ -19,6 +19,7 @@ import { BrickConfig, BrickType } from '../game/core/types';
  * 'S' = OFFENSIVE_SPLITTING brick (splits into 4 diagonal fragments)
  * 'B' = OFFENSIVE_BOMB brick (damages surrounding bricks in 1-brick radius)
  * 'D' = OFFENSIVE_DYNAMITE brick (stays in place, flashes, and explodes after 3 seconds)
+ * '1' = BOSS_1 brick (boss brick with special mechanics)
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
@@ -49,6 +50,8 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
         type = BrickType.OFFENSIVE_BOMB;
       } else if (char === 'D') {
         type = BrickType.OFFENSIVE_DYNAMITE;
+      } else if (char === '1') {
+        type = BrickType.BOSS_1;
       }
       
       if (type !== null) {

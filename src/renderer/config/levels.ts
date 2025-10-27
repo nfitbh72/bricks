@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 6;
+export const TOTAL_LEVELS = 7;
 
 /**
  * Create Level 1 configuration
@@ -182,9 +182,45 @@ export function createLevel6(): LevelConfig {
   
   return {
     id: 6,
-    name: t('game.levels.level5Name'),
+    name: t('game.levels.level6Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 6, // Normal bricks = 4 HP, Healthy bricks = 12 HP
+    baseHealth: 6, // Normal bricks = 6 HP, Healthy bricks = 18 HP
+  };
+}
+
+/**
+ * Create Level 7 configuration
+ * Boss level with Boss 1 brick in the middle
+ */
+export function createLevel7(): LevelConfig {
+  const pattern = [
+    "IIIIIIIII",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNN1NNNI",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "INNNNNNNI",
+    "IHHHHHHHI",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I",
+    "I       I"
+  ];
+  
+  return {
+    id: 7,
+    name: t('game.levels.level7Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 7, // Normal bricks = 7 HP, Healthy bricks = 21 HP
   };
 }
 
@@ -205,6 +241,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel5();
     case 6:
       return createLevel6();
+    case 7:
+      return createLevel7();
     default:
       return undefined;
   }
