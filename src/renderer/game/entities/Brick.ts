@@ -73,7 +73,7 @@ export class Brick {
     [BrickType.OFFENSIVE_SPLITTING]: 1,
     [BrickType.OFFENSIVE_BOMB]: 1,
     [BrickType.OFFENSIVE_DYNAMITE]: 1,
-    [BrickType.BOSS_1]: 10,
+    [BrickType.BOSS_1]: 1,
   };
 
   /**
@@ -389,12 +389,18 @@ export class Brick {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
-      // Display health rounded to 1 decimal place if fractional, otherwise as integer
-      const healthText = this.health % 1 === 0 
-        ? this.health.toString() 
-        : this.health.toFixed(1);
+      // Display "BOSS" for BOSS_1 bricks, otherwise display health
+      let displayText: string;
+      if (this.type === BrickType.BOSS_1) {
+        displayText = 'BOSS';
+      } else {
+        // Display health rounded to 1 decimal place if fractional, otherwise as integer
+        displayText = this.health % 1 === 0 
+          ? this.health.toString() 
+          : this.health.toFixed(1);
+      }
       
-      ctx.fillText(healthText, x + w / 2, y + h / 2);
+      ctx.fillText(displayText, x + w / 2, y + h / 2);
     }
 
     ctx.restore();
@@ -427,8 +433,14 @@ export class Brick {
    */
   private getCacheKey(): string {
     const color = this.getColor();
-    const healthText = this.isIndestructible() ? 'I' : 
-      (this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1));
+    let healthText: string;
+    if (this.isIndestructible()) {
+      healthText = 'I';
+    } else if (this.type === BrickType.BOSS_1) {
+      healthText = 'BOSS';
+    } else {
+      healthText = this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1);
+    }
     return `${color}_${healthText}_${this.isIndestructible()}`;
   }
 
@@ -512,11 +524,17 @@ export class Brick {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
-      const healthText = this.health % 1 === 0 
-        ? this.health.toString() 
-        : this.health.toFixed(1);
+      // Display "BOSS" for BOSS_1 bricks, otherwise display health
+      let displayText: string;
+      if (this.type === BrickType.BOSS_1) {
+        displayText = 'BOSS';
+      } else {
+        displayText = this.health % 1 === 0 
+          ? this.health.toString() 
+          : this.health.toFixed(1);
+      }
       
-      ctx.fillText(healthText, w / 2, h / 2);
+      ctx.fillText(displayText, w / 2, h / 2);
     }
 
     return canvas;

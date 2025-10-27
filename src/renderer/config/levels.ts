@@ -220,7 +220,7 @@ export function createLevel7(): LevelConfig {
     id: 7,
     name: t('game.levels.level7Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 7, // Normal bricks = 7 HP, Healthy bricks = 21 HP
+    baseHealth: 6, // Normal bricks = 6 HP, Healthy bricks = 18 HP
   };
 }
 
