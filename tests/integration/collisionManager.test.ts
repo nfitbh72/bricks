@@ -144,7 +144,7 @@ describe('CollisionManager Integration', () => {
 
         expect(indestructibleBrick.getHealth()).toBe(initialHealth);
         expect(indestructibleBrick.isDestroyed()).toBe(false);
-        expect(onBrickHit).not.toHaveBeenCalled(); // No damage numbers
+        expect(onBrickHit).toHaveBeenCalledWith(indestructibleBrick, 0, false); // Called for sound, but 0 damage
         expect(onBrickDestroyed).not.toHaveBeenCalled();
       }
     });

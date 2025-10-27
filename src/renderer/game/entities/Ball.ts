@@ -44,6 +44,8 @@ export class Ball {
   private isSticky: boolean = false; // Ball sticks to bat at level start
   private stickyOffsetX: number = 0; // Offset from bat center when sticky
   private stickyOffsetY: number = 0; // Offset above bat when sticky
+  private launchAngle: number = STICKY_BALL_LAUNCH_ANGLE; // Launch angle when released from sticky
+  private isInitialSticky: boolean = false; // True if this is the initial level start sticky (not from sticky bat upgrade)
 
   constructor(x: number, y: number, radius: number, speed: number) {
     this.position = { x, y };
@@ -433,13 +435,16 @@ export class Ball {
   /**
    * Set sticky state (ball sticks to bat)
    */
-  setSticky(sticky: boolean, offsetX: number = 0, offsetY: number = -30): void {
+  setSticky(sticky: boolean, offsetX: number = 0, offsetY: number = -30, isInitial: boolean = false): void {
     this.isSticky = sticky;
     this.stickyOffsetX = offsetX;
     this.stickyOffsetY = offsetY;
+    this.isInitialSticky = isInitial;
     if (sticky) {
       // Reset velocity when becoming sticky
       this.velocity = { x: 0, y: 0 };
+      // Reset launch angle to default
+      this.launchAngle = STICKY_BALL_LAUNCH_ANGLE;
     }
   }
 
@@ -448,6 +453,13 @@ export class Ball {
    */
   getIsSticky(): boolean {
     return this.isSticky;
+  }
+
+  /**
+   * Check if this is the initial sticky state (level start)
+   */
+  getIsInitialSticky(): boolean {
+    return this.isInitialSticky;
   }
 
   /**
@@ -466,15 +478,34 @@ export class Ball {
   launchFromSticky(): void {
     if (this.isSticky) {
       this.isSticky = false;
-      this.launch(STICKY_BALL_LAUNCH_ANGLE);
+      this.isInitialSticky = false;
+      this.launch(this.launchAngle);
     }
+  }
+
+  /**
+   * Adjust launch angle while sticky (for left/right arrow control)
+   */
+  adjustLaunchAngle(delta: number): void {
+    if (this.isSticky) {
+      this.launchAngle += delta;
+      // Clamp angle between -150 (far left) and -30 (far right)
+      this.launchAngle = Math.max(-150, Math.min(-30, this.launchAngle));
+    }
+  }
+
+  /**
+   * Get current launch angle (for rendering indicator)
+   */
+  getLaunchAngle(): number {
+    return this.launchAngle;
   }
 
   /**
    * Render launch direction indicator when ball is sticky
    */
   private renderLaunchIndicator(ctx: CanvasRenderingContext2D): void {
-    const angle = STICKY_BALL_LAUNCH_ANGLE;
+    const angle = this.launchAngle;
     const radians = (angle * Math.PI) / 180;
     const endX = this.position.x + Math.cos(radians) * STICKY_BALL_INDICATOR_LENGTH;
     const endY = this.position.y + Math.sin(radians) * STICKY_BALL_INDICATOR_LENGTH;

@@ -200,9 +200,11 @@ export class Game {
       },
       onSpace: () => {
         if (this.gameState === GameState.PLAYING) {
-          // If sticky bat is unlocked, don't launch on Space press (use hold/release instead)
-          // Otherwise, launch ball if sticky, or shoot laser
-          if (this.ball.getIsSticky() && !this.gameUpgrades.hasStickyBat()) {
+          // Launch on space press if:
+          // 1. Ball is in initial sticky state (level start), OR
+          // 2. Ball is sticky but sticky bat upgrade is not active
+          // Otherwise shoot laser if ball is not sticky
+          if (this.ball.getIsSticky() && (this.ball.getIsInitialSticky() || !this.gameUpgrades.hasStickyBat())) {
             this.ball.launchFromSticky();
           } else if (!this.ball.getIsSticky()) {
             this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
@@ -592,7 +594,7 @@ export class Game {
     
     // Make ball sticky at level start - position on top of bat
     const ballRadius = this.ball.getRadius();
-    this.ball.setSticky(true, 0, -ballRadius);
+    this.ball.setSticky(true, 0, -ballRadius, true); // true = initial sticky
   }
 
   /**
@@ -682,8 +684,9 @@ export class Game {
     if (this.ball.getIsSticky()) {
       this.ball.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
       
-      // If sticky bat is unlocked and Space is released, launch the ball
-      if (this.gameUpgrades.hasStickyBat() && !this.inputManager.isSpaceHeld()) {
+      // If sticky bat upgrade is active AND this is not the initial sticky state,
+      // launch when Space is released
+      if (this.gameUpgrades.hasStickyBat() && !this.ball.getIsInitialSticky() && !this.inputManager.isSpaceHeld()) {
         this.ball.launchFromSticky();
       }
     }
@@ -815,19 +818,35 @@ export class Game {
    * Handle keyboard and mouse input
    */
   private handleInput(deltaTime: number): void {
+    // Get keyboard movement input
+    const movement = this.inputManager.getMovementInput();
+    
+    // If ball is sticky, left/right arrows adjust launch angle (works in both mouse and keyboard mode)
+    if (this.ball.getIsSticky()) {
+      if (movement.left) {
+        this.ball.adjustLaunchAngle(-2); // Adjust left (more negative angle)
+      }
+      if (movement.right) {
+        this.ball.adjustLaunchAngle(2); // Adjust right (less negative angle)
+      }
+    }
+    
     if (this.inputManager.isMouseControlEnabled()) {
       // Mouse control (2D)
       const mousePos = this.inputManager.getMousePosition();
       this.bat.setMousePosition(mousePos.x, mousePos.y);
     } else {
       // Keyboard control (WASD + Arrow keys)
-      const movement = this.inputManager.getMovementInput();
-      if (movement.left) {
-        this.bat.moveLeft(deltaTime);
+      // Only move bat if ball is not sticky
+      if (!this.ball.getIsSticky()) {
+        if (movement.left) {
+          this.bat.moveLeft(deltaTime);
+        }
+        if (movement.right) {
+          this.bat.moveRight(deltaTime);
+        }
       }
-      if (movement.right) {
-        this.bat.moveRight(deltaTime);
-      }
+      
       if (movement.up) {
         this.bat.moveUp(deltaTime);
       }
@@ -854,8 +873,8 @@ export class Game {
       if (ballBounds.y + ballRadius >= batBounds.y &&
           ballBounds.x + ballRadius >= batBounds.x &&
           ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
-        // Make ball sticky on top of bat
-        this.ball.setSticky(true, 0, -ballRadius);
+        // Make ball sticky on top of bat (not initial, so uses hold/release behavior)
+        this.ball.setSticky(true, 0, -ballRadius, false);
       }
     }
     

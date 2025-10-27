@@ -10,7 +10,8 @@ Just some notes about future features so that I don't forget
 - [X] Test coverage
 - [X] Integration tests
 - [X] Add a (fake) leaderboard for each level that has quite poor players.
-- [X] sticky bat to start
+- [X] sticky bat to start and as an upgrade
+- [] piercing should still bounce if it doesn't kill the brick
 - [] level orientation (bat doesn't have to be bottom of screen)
 - [X] the ball can hit the bottom of the bat
 - [X] visual effect to the ball - like a comet tail
@@ -18,7 +19,7 @@ Just some notes about future features so that I don't forget
 - [] Add loads of Upgrades
     - [X] slower ball
     - [X] piercing can last for extra seconds
-    - [] sticky bat with LR control and preview
+    - [X] sticky bat with LR control and preview
     - [] laser bat becomes bomb bat - can only fire once a second but does a large-aoe (2.5 blocks) and medium-damage (2) explosion
     - [X] dual laser upgrade
 - [] Change the upgrade tree to be a predetermined layout and more of a wheel and spoke approach
