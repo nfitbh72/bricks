@@ -17,6 +17,7 @@ export class InputManager {
   private mouseY: number = 0;
   private useMouseControl: boolean = false;
   private callbacks: InputCallbacks = {};
+  private spacePressed: boolean = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -41,8 +42,9 @@ export class InputManager {
         return;
       }
       
-      // Handle Space key
-      if (e.key === ' ') {
+      // Handle Space key (only fire once per key press, not on repeat)
+      if (e.key === ' ' && !this.spacePressed) {
+        this.spacePressed = true;
         if (this.callbacks.onSpace) {
           this.callbacks.onSpace();
         }
@@ -57,6 +59,11 @@ export class InputManager {
     window.addEventListener('keyup', (e) => {
       this.keys.delete(e.key.toLowerCase());
       this.keys.delete(e.key);
+      
+      // Reset space pressed flag on key release
+      if (e.key === ' ') {
+        this.spacePressed = false;
+      }
     });
 
     // Mouse
@@ -149,5 +156,6 @@ export class InputManager {
    */
   clearKeys(): void {
     this.keys.clear();
+    this.spacePressed = false;
   }
 }
