@@ -7,7 +7,8 @@ import { Bat } from '../entities/Bat';
 import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
-import { GameState, LevelConfig } from '../core/types';
+import { Boss1 } from '../entities/offensive/Boss1';
+import { GameState, LevelConfig, BrickType } from '../core/types';
 import { calculateGameElementScale } from '../core/utils';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { AudioManager } from '../managers/AudioManager';
@@ -65,6 +66,9 @@ export class Game {
     y: number;
     delay: number;
   }> = [];
+
+  // Boss
+  private boss: Boss1 | null = null;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -247,6 +251,12 @@ export class Game {
     const bricks = this.level.getBricks();
     for (const brick of bricks) {
       brick.setOnDestroyCallback((destroyedBrick, info) => {
+        // Check if this is a BOSS_1 brick - activate boss instead of destroying
+        if (destroyedBrick.getType() === BrickType.BOSS_1 && !this.boss) {
+          this.activateBoss(destroyedBrick, info);
+          return;
+        }
+
         // Spawn offensive entities based on brick type (falling bricks, lasers, missiles, etc.)
         const batCenterX = this.bat.getCenterX();
         const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
@@ -283,6 +293,39 @@ export class Game {
         }
       });
     }
+  }
+
+  /**
+   * Activate the boss when BOSS_1 brick is hit
+   */
+  private activateBoss(brick: Brick, info: { centerX: number; centerY: number }): void {
+    if (!this.level) return;
+
+    // Restore brick health (prevent destruction)
+    brick.restore();
+
+    // Calculate boss health: 6 * base health
+    const baseHealth = this.level.getConfig().baseHealth || 1;
+    const bossHealth = 6 * baseHealth;
+
+    // Create boss at brick position
+    this.boss = new Boss1(
+      info.centerX - brick.getWidth() / 2,
+      info.centerY - brick.getHeight() / 2,
+      bossHealth,
+      brick.getColor(),
+      this.canvas.width,
+      this.canvas.height
+    );
+
+    // Give boss access to remaining bricks (excluding indestructible and the boss brick itself)
+    const availableBricks = this.level.getBricks().filter(b => 
+      b !== brick && !b.isIndestructible() && !b.isDestroyed()
+    );
+    this.boss.setAvailableBricks(availableBricks);
+
+    // Create particles for boss activation
+    this.effectsManager.createParticles(info.centerX, info.centerY, 50, brick.getColor(), 300);
   }
 
   /**
@@ -546,6 +589,9 @@ export class Game {
     this.weaponManager.clear();
     this.offensiveEntityManager.clear();
     
+    // Clear boss
+    this.boss = null;
+    
     // Clear delayed bomb explosions
     this.delayedBombExplosions = [];
     
@@ -714,6 +760,11 @@ export class Game {
       this.bat.getCenterX(),
       this.bat.getCenterY()
     );
+
+    // Update boss if active (use effective deltaTime for slow-mo)
+    if (this.boss && this.boss.isActive()) {
+      this.boss.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+    }
 
     // Update collision manager (use effective deltaTime for slow-mo)
     this.collisionManager.update(effectiveDeltaTime, this.ball);
@@ -898,6 +949,99 @@ export class Game {
       this.level.getActiveBricks(),
       this.ball.getDamage()
     );
+
+    // Boss collisions
+    if (this.boss && this.boss.isActive()) {
+      this.checkBossCollisions();
+    }
+  }
+
+  /**
+   * Check boss-related collisions
+   */
+  private checkBossCollisions(): void {
+    if (!this.boss) return;
+
+    // Ball-Boss collision
+    const ballBounds = this.ball.getBounds();
+    const bossBounds = this.boss.getBounds();
+    if (ballBounds && bossBounds) {
+      // Convert ball circle to rect for collision
+      const ballRect = {
+        x: ballBounds.x - ballBounds.radius,
+        y: ballBounds.y - ballBounds.radius,
+        width: ballBounds.radius * 2,
+        height: ballBounds.radius * 2
+      };
+      if (this.checkRectCollision(ballRect, bossBounds)) {
+        const damage = this.ball.getDamage();
+        this.boss.takeDamage(damage);
+        this.ball.reverseY();
+        
+        // Create particles and damage number
+        this.effectsManager.createParticles(
+          bossBounds.x + bossBounds.width / 2,
+          bossBounds.y + bossBounds.height / 2,
+          8,
+          '#ff0000',
+          100
+        );
+        this.effectsManager.addDamageNumber(
+          bossBounds.x + bossBounds.width / 2,
+          bossBounds.y - 5,
+          damage,
+          false
+        );
+
+        // Check if boss is destroyed
+        if (this.boss.isDestroyed()) {
+          this.effectsManager.createParticles(
+            bossBounds.x + bossBounds.width / 2,
+            bossBounds.y + bossBounds.height / 2,
+            50,
+            '#ff0000',
+            300
+          );
+        }
+      }
+    }
+
+    // Thrown brick-Bat collisions
+    const thrownBricks = this.boss.getThrownBricks();
+    const batBounds = this.bat.getBounds();
+    for (const thrownBrick of thrownBricks) {
+      const brickBounds = thrownBrick.getBounds();
+      if (brickBounds && this.checkRectCollision(brickBounds, batBounds)) {
+        thrownBrick.deactivate();
+        
+        // Damage bat (shrink it by 10%)
+        this.bat.takeDamage(10);
+        
+        this.effectsManager.triggerScreenShake(5, 0.3);
+        this.effectsManager.createParticles(
+          brickBounds.x + brickBounds.width / 2,
+          brickBounds.y + brickBounds.height / 2,
+          15,
+          '#ff0000',
+          150
+        );
+      }
+    }
+  }
+
+  /**
+   * Simple rectangle collision check
+   */
+  private checkRectCollision(
+    a: { x: number; y: number; width: number; height: number },
+    b: { x: number; y: number; width: number; height: number }
+  ): boolean {
+    return (
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y
+    );
   }
 
   /**
@@ -934,6 +1078,11 @@ export class Game {
       options.showParticles,
       options.showDamageNumbers
     );
+
+    // Render boss if active
+    if (this.boss && this.boss.isActive()) {
+      this.boss.render(this.ctx);
+    }
   }
 
 
