@@ -5,7 +5,7 @@
 import { Brick } from '../Brick';
 import { BossArm } from './BossArm';
 import { ThrownBrick } from './ThrownBrick';
-import { BRICK_WIDTH, BRICK_HEIGHT } from '../../../config/constants';
+import { BRICK_WIDTH, BRICK_HEIGHT, BOSS_MOVE_SPEED, BOSS_THROW_INTERVAL, BOSS_THROWN_BRICK_SPEED } from '../../../config/constants';
 
 export class Boss1 {
   private x: number;
@@ -20,16 +20,18 @@ export class Boss1 {
   private thrownBricks: ThrownBrick[] = [];
   private velocityX: number = 0;
   private velocityY: number = 0;
-  private readonly moveSpeed: number = 150;
+  private readonly moveSpeed: number = BOSS_MOVE_SPEED;
   private targetX: number;
   private targetY: number;
   private throwCooldown: number = 0;
-  private readonly throwInterval: number = 2.0; // Throw every 2 seconds
+  private readonly throwInterval: number = BOSS_THROW_INTERVAL;
   private availableBricks: Brick[] = [];
   private readonly minX: number;
   private readonly maxX: number;
   private readonly minY: number;
   private readonly maxY: number;
+  private readonly canvasWidth: number;
+  private readonly canvasHeight: number;
 
   constructor(x: number, y: number, health: number, color: string, canvasWidth: number, canvasHeight: number) {
     this.x = x;
@@ -37,6 +39,8 @@ export class Boss1 {
     this.health = health;
     this.maxHealth = health;
     this.color = color;
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
     
     // Set movement boundaries (stay within play area)
     this.minX = BRICK_WIDTH;
@@ -102,7 +106,7 @@ export class Boss1 {
     // Update thrown bricks
     for (const brick of this.thrownBricks) {
       brick.update(deltaTime);
-      if (brick.isOffScreen(800)) {
+      if (brick.isOffScreen(this.canvasWidth, this.canvasHeight)) {
         brick.deactivate();
       }
     }
@@ -140,7 +144,7 @@ export class Boss1 {
       this.y + this.height / 2,
       batX,
       batY,
-      300, // Speed
+      BOSS_THROWN_BRICK_SPEED,
       brickColor
     );
 

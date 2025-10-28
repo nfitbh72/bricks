@@ -79,7 +79,7 @@ export class ThrownBrick {
     this.active = false;
   }
 
-  isOffScreen(canvasHeight: number): boolean {
-    return this.y > canvasHeight + 50 || this.y < -50 || this.x < -50 || this.x > 1000;
+  isOffScreen(canvasWidth: number, canvasHeight: number): boolean {
+    return this.y > canvasHeight + 50 || this.y < -50 || this.x < -50 || this.x > canvasWidth + 50;
   }
 }

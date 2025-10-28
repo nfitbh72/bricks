@@ -806,7 +806,9 @@ export class Game {
     }
 
     // Check level completion with delay for animations
-    if (this.level && this.level.isComplete() && this.gameState === GameState.PLAYING) {
+    // Level is complete when all destructible bricks are destroyed AND boss is destroyed (if it exists)
+    const bossDefeated = !this.boss || this.boss.isDestroyed();
+    if (this.level && this.level.isComplete() && bossDefeated && this.gameState === GameState.PLAYING) {
       this.levelCompleteTimer += deltaTime * 1000; // Convert to ms
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
         this.gameState = GameState.LEVEL_COMPLETE;

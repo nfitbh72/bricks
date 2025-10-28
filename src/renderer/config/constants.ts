@@ -216,3 +216,8 @@ export const DYNAMITE_EXPLOSION_RADIUS = 120; // Large circular explosion radius
 export const DYNAMITE_EXPLOSION_DURATION = 0.5; // Explosion visual effect duration in seconds
 export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0
+
+// Boss constants
+export const BOSS_MOVE_SPEED = 250; // Pixels per second (increased from 150)
+export const BOSS_THROW_INTERVAL = 1.0; // Seconds between brick throws (decreased from 2.0)
+export const BOSS_THROWN_BRICK_SPEED = 500; // Pixels per second (increased from 300)
