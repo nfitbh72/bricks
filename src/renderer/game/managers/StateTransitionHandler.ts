@@ -64,7 +64,7 @@ export class StateTransitionHandler {
       
       // Show tutorial for level 1
       this.context.setGameState(GameState.TUTORIAL);
-    });
+    }, 1); // Pass level 1
   }
 
   /**
@@ -103,7 +103,7 @@ export class StateTransitionHandler {
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
       this.context.setGameState(GameState.INTRO);
-    });
+    }, 1); // Pass level 1 when restarting
   }
 
   /**
@@ -225,7 +225,7 @@ export class StateTransitionHandler {
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
       this.context.setGameState(GameState.INTRO);
-    });
+    }); // No level shown when going to intro
   }
 
   /**

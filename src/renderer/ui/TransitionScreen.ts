@@ -31,6 +31,7 @@ export class TransitionScreen {
    * Start transition
    */
   start(onComplete: () => void, nextLevel?: number): void {
+    console.log(`[TransitionScreen] start called with nextLevel=${nextLevel}`);
     this.startTime = performance.now();
     this.rotation = 0;
     this.opacity = 0;
@@ -39,9 +40,14 @@ export class TransitionScreen {
     this.nextLevel = nextLevel ?? null;
     this.leaderboardEntries = [];
     
+    console.log(`[TransitionScreen] nextLevel set to: ${this.nextLevel}`);
+    
     // Load leaderboard for next level if provided
     if (this.nextLevel) {
+      console.log(`[TransitionScreen] Loading leaderboard for level ${this.nextLevel}`);
       this.loadLeaderboard(this.nextLevel);
+    } else {
+      console.log('[TransitionScreen] No nextLevel provided, skipping leaderboard load');
     }
   }
 
@@ -50,9 +56,11 @@ export class TransitionScreen {
    */
   private async loadLeaderboard(levelId: number): Promise<void> {
     try {
+      console.log(`[TransitionScreen] loadLeaderboard called for level ${levelId}`);
       this.leaderboardEntries = await Leaderboard.getLeaderboard(levelId);
+      console.log(`[TransitionScreen] Loaded ${this.leaderboardEntries.length} entries:`, this.leaderboardEntries);
     } catch (error) {
-      console.error('Failed to load leaderboard for transition:', error);
+      console.error('[TransitionScreen] Failed to load leaderboard for transition:', error);
       this.leaderboardEntries = [];
     }
   }
@@ -135,6 +143,13 @@ export class TransitionScreen {
    * Render the leaderboard for the next level
    */
   private renderLeaderboard(): void {
+    console.log(`[TransitionScreen] renderLeaderboard called. nextLevel=${this.nextLevel}, entries=${this.leaderboardEntries.length}`);
+    
+    if (this.leaderboardEntries.length === 0) {
+      console.log('[TransitionScreen] No leaderboard entries to render');
+      return;
+    }
+    
     this.ctx.save();
     this.ctx.globalAlpha = this.opacity;
 

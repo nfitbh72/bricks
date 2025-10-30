@@ -415,7 +415,7 @@ export class Game {
       totalBricksDestroyed: this.totalBricksDestroyed,
       isDevUpgradeMode: this.isDevUpgradeMode,
       loadLevel: (config) => this.loadLevel(config),
-      startTransition: (onComplete) => this.startTransition(onComplete),
+      startTransition: (onComplete, nextLevel) => this.startTransition(onComplete, nextLevel),
       applyOptions: () => this.applyOptions(),
       setCurrentLevelId: (id: number) => { this.currentLevelId = id; },
       setTotalBricksDestroyed: (count: number) => { this.totalBricksDestroyed = count; },

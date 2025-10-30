@@ -4,6 +4,9 @@ Just some notes about future features so that I don't forget
 
 ## Future Features
 
+- [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
+- [X] Make the leaderboards permanent, explain where you are going to store the data
+- [] There is special animation when the last brick of the level is destroyed, make this the last *destructible* brick that dies, not necessarily the last brick in the level
 - [X] Add base health to each level in the config
 - [X] Indestructible bricks
 - [] Add many maps
@@ -11,7 +14,7 @@ Just some notes about future features so that I don't forget
 - [X] Integration tests
 - [X] Add a (fake) leaderboard for each level that has quite poor players.
 - [X] sticky bat to start and as an upgrade
-- [] piercing should still bounce if it doesn't kill the brick
+- [X] piercing should still bounce if it doesn't kill the brick
 - [] level orientation (bat doesn't have to be bottom of screen)
 - [X] the ball can hit the bottom of the bat
 - [X] visual effect to the ball - like a comet tail
