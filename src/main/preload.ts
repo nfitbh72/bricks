@@ -4,4 +4,6 @@ import { contextBridge, ipcRenderer } from 'electron';
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electron', {
   quit: () => ipcRenderer.send('quit-app'),
+  loadLeaderboards: () => ipcRenderer.invoke('load-leaderboards'),
+  saveLeaderboards: (data: unknown) => ipcRenderer.invoke('save-leaderboards', data),
 });

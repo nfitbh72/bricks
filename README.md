@@ -55,7 +55,7 @@ src/renderer/game/
 │
 ├── systems/                 # Game systems
 │   ├── GameUpgrades.ts      # 💪 Upgrade logic
-│   └── Leaderboard.ts
+│   └── Leaderboard.ts       # 🏆 Persistent leaderboards
 │
 ├── weapons/
 │   └── Laser.ts             # Player laser
@@ -89,9 +89,31 @@ src/renderer/i18n/           # 🌍 Translations
 ```
 
 ### Entry Points
-- `src/main/main.ts` - Electron main process
+- `src/main/main.ts` - Electron main process (IPC handlers for file I/O)
+- `src/main/preload.ts` - Context bridge (exposes IPC to renderer)
 - `src/renderer/renderer.ts` - Game initialization
 - `src/renderer/index.html` - HTML entry
+
+## 💾 Data Persistence
+
+### Leaderboard Storage
+Leaderboards are automatically saved to disk using Electron's file system APIs:
+
+**Storage Location:**
+- **macOS**: `~/Library/Application Support/bricks/leaderboards.json`
+- **Windows**: `%APPDATA%/bricks/leaderboards.json`
+- **Linux**: `~/.config/bricks/leaderboards.json`
+
+**How it works:**
+1. Leaderboard data is loaded on first access via `Leaderboard.load()`
+2. Player scores are saved immediately when name entry completes
+3. Data persists across app restarts
+4. Falls back to fake leaderboard data if no saved data exists
+
+**Implementation:**
+- Main process (`main.ts`) handles file I/O via IPC handlers
+- Preload script (`preload.ts`) exposes safe APIs to renderer
+- Leaderboard system (`Leaderboard.ts`) manages caching and persistence
 
 ## 🔑 Key Reminders
 

@@ -10,6 +10,7 @@
 - **SCSS** - Typed stylesheets with variables
 - **Webpack** - Module bundling and asset processing
 - **Jest** - Testing (666 tests)
+- **IPC (Inter-Process Communication)** - Main ↔ Renderer data exchange
 
 ## Core Principles
 
@@ -191,6 +192,12 @@ this.effectsManager.triggerScreenShake(
 - Ray-tracing prediction
 - Time dilation calculations
 
+### 🏆 Leaderboard System
+- Persistent storage via Electron file system
+- Automatic save/load on level completion
+- Fake leaderboard generation for new levels
+- Player name entry with 3-character limit
+
 ## Key Interfaces
 
 ### BrickType Enum
@@ -310,6 +317,89 @@ console.log('Managers initialized:', {
   // ...
 });
 ```
+
+---
+
+## Data Persistence
+
+### Leaderboard Storage
+
+The game uses Electron's IPC (Inter-Process Communication) to persist leaderboard data to disk.
+
+**Architecture:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Renderer Process (Game UI)                                  │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ Leaderboard.ts                                       │  │
+│  │ - load() → window.electron.loadLeaderboards()       │  │
+│  │ - save() → window.electron.saveLeaderboards(data)   │  │
+│  │ - Caches data in memory                             │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                           ↕ IPC                             │
+└─────────────────────────────────────────────────────────────┘
+                            ↕
+┌─────────────────────────────────────────────────────────────┐
+│ Main Process (Node.js)                                      │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ main.ts                                              │  │
+│  │ - ipcMain.handle('load-leaderboards')               │  │
+│  │ - ipcMain.handle('save-leaderboards')               │  │
+│  │ - fs.readFileSync() / fs.writeFileSync()            │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                           ↕                                 │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ File System                                          │  │
+│  │ ~/Library/Application Support/bricks/                │  │
+│  │   └── leaderboards.json                             │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Storage Location:**
+- **macOS**: `~/Library/Application Support/bricks/leaderboards.json`
+- **Windows**: `%APPDATA%/bricks/leaderboards.json`
+- **Linux**: `~/.config/bricks/leaderboards.json`
+
+**Data Flow:**
+
+1. **On Level Complete:**
+   - `LevelCompleteScreen.setLevel()` calls `Leaderboard.getLeaderboard(levelId)`
+   - First call triggers `Leaderboard.load()` which fetches from disk via IPC
+   - Data cached in memory for subsequent access
+
+2. **On Name Entry Complete:**
+   - Player enters 3-character name
+   - `Leaderboard.updateLeaderboard()` updates cache and saves to disk
+   - IPC call to main process writes JSON file
+
+3. **File Format:**
+   ```json
+   {
+     "1": [
+       { "name": "AAA", "time": 45.2, "isPlayer": false },
+       { "name": "BBB", "time": 52.8, "isPlayer": false }
+     ],
+     "2": [
+       { "name": "CCC", "time": 38.1, "isPlayer": false }
+     ]
+   }
+   ```
+
+**Security:**
+- Context isolation enabled (renderer cannot access Node.js directly)
+- Preload script (`preload.ts`) exposes only specific IPC methods
+- Type-safe API via TypeScript definitions (`global.d.ts`)
+
+**Implementation Files:**
+- `src/main/main.ts` - IPC handlers for file I/O
+- `src/main/preload.ts` - Context bridge exposing safe APIs
+- `src/renderer/global.d.ts` - TypeScript definitions for window.electron
+- `src/renderer/game/systems/Leaderboard.ts` - Business logic and caching
+- `src/renderer/ui/LevelCompleteScreen.ts` - UI integration
 
 ---
 

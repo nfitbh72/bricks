@@ -821,7 +821,7 @@ export class Game {
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
         this.gameState = GameState.LEVEL_COMPLETE;
         // Use level.getId() to ensure we show the level that was just completed
-        this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime);
+        this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime, this.isDevUpgradeMode);
         this.levelCompleteTimer = 0;
       }
     }

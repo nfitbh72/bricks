@@ -19,6 +19,7 @@ export class LevelCompleteScreen extends Screen {
   private nameEntryIndex: number = 0; // Which character is being entered (0-2)
   private flashTimer: number = 0;
   private showFlash: boolean = true;
+  private isDevMode: boolean = false;
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
@@ -29,14 +30,17 @@ export class LevelCompleteScreen extends Screen {
   /**
    * Set current level, time, and load its background image
    */
-  setLevel(level: number, time: number = 0): void {
+  async setLevel(level: number, time: number = 0, isDevMode: boolean = false): Promise<void> {
     this.currentLevel = level;
     this.levelTime = time;
+    this.isDevMode = isDevMode;
     this.loadBackgroundImage(level);
     
-    // Generate leaderboard
-    this.leaderboardEntries = Leaderboard.generateFakeLeaderboard(level);
-    this.isOnLeaderboard = Leaderboard.isPlayerOnLeaderboard(time, this.leaderboardEntries);
+    // Load leaderboard from persistent storage
+    this.leaderboardEntries = await Leaderboard.getLeaderboard(level);
+    
+    // Don't add player to leaderboard if in dev mode
+    this.isOnLeaderboard = !isDevMode && Leaderboard.isPlayerOnLeaderboard(time, this.leaderboardEntries);
     
     // Reset name entry
     this.playerName = 'AAA';
@@ -117,8 +121,13 @@ export class LevelCompleteScreen extends Screen {
         this.leaderboardEntries = Leaderboard.insertPlayer(
           this.levelTime,
           this.playerName,
-          Leaderboard.generateFakeLeaderboard(this.currentLevel)
+          this.leaderboardEntries
         );
+        
+        // If name entry is complete, save to persistent storage (but not in dev mode)
+        if (this.nameEntryIndex >= 3 && !this.isDevMode) {
+          Leaderboard.updateLeaderboard(this.currentLevel, this.leaderboardEntries);
+        }
       }
     }
     
