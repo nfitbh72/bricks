@@ -8,9 +8,7 @@ import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
 import { Boss1 } from '../entities/offensive/Boss1';
-import { Wall } from '../entities/Wall';
 import { GameState, LevelConfig, BrickType } from '../core/types';
-import { calculateGameElementScale } from '../core/utils';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { AudioManager } from '../managers/AudioManager';
 import { InputManager } from '../managers/InputManager';
@@ -22,7 +20,15 @@ import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
-import { PLAYER_STARTING_HEALTH, BOMB_DAMAGE_MULTIPLIER, BAT_WIDTH, BAT_HEIGHT } from '../../config/constants';
+import { 
+  PLAYER_STARTING_HEALTH, 
+  BOMB_DAMAGE_MULTIPLIER, 
+  BAT_WIDTH, 
+  BAT_HEIGHT, 
+  BAT_SPEED,
+  BALL_RADIUS,
+  BALL_SPEED
+} from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -31,9 +37,6 @@ export class Game {
   private bat: Bat;
   private level: Level | null = null;
   private statusBar: StatusBar;
-  private leftWall: Wall | null = null;
-  private rightWall: Wall | null = null;
-  private readonly maxPlayAreaWidth: number = 1800;
   private gameState: GameState = GameState.INTRO;
   private playerHealth: number = PLAYER_STARTING_HEALTH;
   private animationFrameId: number | null = null;
@@ -86,20 +89,11 @@ export class Game {
     }
     this.ctx = context;
 
-    // Calculate scale factor based on canvas size
-    const scaleFactor = calculateGameElementScale(canvas.width, canvas.height);
-    
-    // Initialize ball and bat with scaled dimensions
-    // Base sizes (at 4K): bat = 150x20, ball radius = 10, ball speed = 600
-    const baseRadius = 10;
-    const baseBatWidth = BAT_WIDTH; // Use constant from config
-    const baseBatHeight = BAT_HEIGHT; // Use constant from config
-    const baseBallSpeed = 600;
-    
-    const ballRadius = baseRadius * scaleFactor;
-    const batWidth = baseBatWidth * scaleFactor;
-    const batHeight = baseBatHeight * scaleFactor;
-    const ballSpeed = baseBallSpeed * scaleFactor;
+    // Use fixed dimensions from constants (no scaling)
+    const batWidth = BAT_WIDTH;
+    const batHeight = BAT_HEIGHT;
+    const ballRadius = BALL_RADIUS;
+    const ballSpeed = BALL_SPEED;
     
     // Initialize upgrade manager
     this.gameUpgrades = new GameUpgrades();
@@ -109,13 +103,8 @@ export class Game {
     const batY = canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
     
-    this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, 300);
-    
-    // Create walls if canvas is wider than max play area
-    this.createWalls();
-    
-    // Set bat bounds considering walls
-    this.updateBatBounds();
+    this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, BAT_SPEED);
+    this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
     this.ball = new Ball(centerX, ballY, ballRadius, ballSpeed);
 
@@ -190,43 +179,6 @@ export class Game {
 
     // Load background image
     this.loadBackgroundImage();
-  }
-
-  /**
-   * Create side walls if canvas width exceeds max play area width
-   */
-  private createWalls(): void {
-    if (this.canvas.width > this.maxPlayAreaWidth) {
-      const wallWidth = (this.canvas.width - this.maxPlayAreaWidth) / 2;
-      const wallHeight = this.canvas.height;
-      
-      // Left wall
-      this.leftWall = new Wall(0, 0, wallWidth, wallHeight);
-      
-      // Right wall
-      this.rightWall = new Wall(this.canvas.width - wallWidth, 0, wallWidth, wallHeight);
-    } else {
-      this.leftWall = null;
-      this.rightWall = null;
-    }
-  }
-
-  /**
-   * Update bat bounds to respect walls
-   */
-  private updateBatBounds(): void {
-    const minX = this.leftWall ? this.leftWall.getRightEdge() : 0;
-    const maxX = this.rightWall ? this.rightWall.getLeftEdge() : this.canvas.width;
-    this.bat.setBounds(minX, maxX, 0, this.canvas.height);
-  }
-
-  /**
-   * Get play area boundaries (considering walls)
-   */
-  private getPlayAreaBounds(): { minX: number; maxX: number } {
-    const minX = this.leftWall ? this.leftWall.getRightEdge() : 0;
-    const maxX = this.rightWall ? this.rightWall.getLeftEdge() : this.canvas.width;
-    return { minX, maxX };
   }
 
   /**
@@ -829,10 +781,9 @@ export class Game {
     // Check wall collisions only if ball is not sticky (bottom boundary is status bar top)
     if (!this.ball.getIsSticky()) {
       const statusBarTop = this.statusBar.getY();
-      const { minX, maxX } = this.getPlayAreaBounds();
       const hitBackWall = this.ball.checkWallCollisions(
-        minX,
-        maxX,
+        0,
+        this.canvas.width,
         0,
         statusBarTop
       );
@@ -1133,9 +1084,7 @@ export class Game {
       this.weaponManager,
       this.offensiveEntityManager,
       options.showParticles,
-      options.showDamageNumbers,
-      this.leftWall,
-      this.rightWall
+      options.showDamageNumbers
     );
 
     // Render boss if active
@@ -1185,19 +1134,5 @@ export class Game {
    */
   setGameState(state: GameState): void {
     this.gameState = state;
-  }
-
-  /**
-   * Handle window resize - recreate walls and update bounds
-   */
-  handleResize(): void {
-    // Recreate walls based on new canvas size
-    this.createWalls();
-    
-    // Update bat bounds to respect new walls
-    this.updateBatBounds();
-    
-    // Update status bar size
-    this.statusBar = new StatusBar(this.canvas.width, this.canvas.height);
   }
 }

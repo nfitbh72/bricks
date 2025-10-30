@@ -6,7 +6,6 @@ import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
-import { Wall } from '../entities/Wall';
 import { EffectsManager } from './EffectsManager';
 import { WeaponManager } from './WeaponManager';
 import { OffensiveEntityManager } from './OffensiveEntityManager';
@@ -60,9 +59,7 @@ export class RenderManager {
     weaponManager: WeaponManager,
     offensiveEntityManager: OffensiveEntityManager,
     showParticles: boolean,
-    showDamageNumbers: boolean,
-    leftWall: Wall | null = null,
-    rightWall: Wall | null = null
+    showDamageNumbers: boolean
   ): void {
     // Clear canvas with black
     this.ctx.fillStyle = '#0a0a0a';
@@ -101,14 +98,6 @@ export class RenderManager {
     effectsManager.render(this.ctx, showParticles, showDamageNumbers);
 
     this.ctx.restore();
-
-    // Render walls (not affected by screen shake or zoom)
-    if (leftWall) {
-      leftWall.render(this.ctx);
-    }
-    if (rightWall) {
-      rightWall.render(this.ctx);
-    }
 
     // Render launch instruction if ball is sticky
     if (ball.getIsSticky()) {

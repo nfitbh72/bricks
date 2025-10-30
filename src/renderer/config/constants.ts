@@ -23,9 +23,9 @@ const {
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
-export const BRICK_WIDTH = 104; // 30% wider than original 80
-export const BRICK_HEIGHT = 20;
-export const BRICK_SPACING = 2;
+export const BRICK_WIDTH = 120; // 30% wider than original 80
+export const BRICK_HEIGHT = 25;
+export const BRICK_SPACING = 1;
 export const BRICK_LAYOUT_TOP_MARGIN = 200;
 
 // Letter pattern constants
@@ -34,7 +34,7 @@ export const LETTER_BRICK_ROWS = 5; // Each letter is 5 bricks tall
 export const LETTER_SPACING = 10;   // Space between letters (in pixels)
 
 // Ball constants
-export const BALL_RADIUS = 8;
+export const BALL_RADIUS = 4;
 export const BALL_SPEED = 300;
 export const BALL_BASE_DAMAGE = 1;
 export const BALL_SPEED_INCREASE_PER_SECOND = 2.5; // 300 per minute = 5 per second

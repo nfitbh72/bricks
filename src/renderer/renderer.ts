@@ -27,6 +27,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   console.log('Canvas size:', canvas.width, 'x', canvas.height);
 
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
   // Wait a bit for fonts to load, then initialize language and start game
   setTimeout(async () => {
     console.log('Initializing language manager...');
@@ -40,13 +46,6 @@ window.addEventListener('DOMContentLoaded', () => {
       console.log('Game created, starting...');
       game.start();
       console.log('Game started! State:', game.getGameState());
-
-      // Handle window resize
-      window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        game.handleResize();
-      });
     } catch (error) {
       console.error('Error creating/starting game:', error);
     }
