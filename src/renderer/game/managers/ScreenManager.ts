@@ -230,9 +230,9 @@ export class ScreenManager {
   /**
    * Start transition animation
    */
-  startTransition(onComplete: () => void): void {
+  startTransition(onComplete: () => void, nextLevel?: number): void {
     this.isTransitioning = true;
-    this.transitionScreen.start(onComplete);
+    this.transitionScreen.start(onComplete, nextLevel);
   }
 
   /**

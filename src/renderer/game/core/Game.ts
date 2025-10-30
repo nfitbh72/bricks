@@ -570,8 +570,8 @@ export class Game {
   /**
    * Start transition animation
    */
-  private startTransition(onComplete: () => void): void {
-    this.screenManager.startTransition(onComplete);
+  private startTransition(onComplete: () => void, nextLevel?: number): void {
+    this.screenManager.startTransition(onComplete, nextLevel);
   }
 
 

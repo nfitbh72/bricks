@@ -23,7 +23,7 @@ export interface StateTransitionContext {
   totalBricksDestroyed: number;
   isDevUpgradeMode: boolean;
   loadLevel: (config: LevelConfig) => void;
-  startTransition: (onComplete: () => void) => void;
+  startTransition: (onComplete: () => void, nextLevel?: number) => void;
   applyOptions: () => void;
   setCurrentLevelId: (id: number) => void;
   setTotalBricksDestroyed: (count: number) => void;
@@ -147,20 +147,21 @@ export class StateTransitionHandler {
     // Apply all purchased upgrades before transitioning
     this.applyUpgrades();
     
+    // Check if we're in dev mode
+    const wasDevMode = this.context.isDevUpgradeMode;
+    
+    // In dev mode, load current level. In normal mode, load next level.
+    const levelIdToLoad = wasDevMode ? this.context.currentLevelId : this.context.currentLevelId + 1;
+    
     this.context.startTransition(() => {
-      // Check if we're in dev mode
-      const wasDevMode = this.context.isDevUpgradeMode;
       this.context.setIsDevUpgradeMode(false);
-      
-      // In dev mode, load current level. In normal mode, load next level.
-      const levelIdToLoad = wasDevMode ? this.context.currentLevelId : this.context.currentLevelId + 1;
       this.context.setCurrentLevelId(levelIdToLoad);
       const levelConfig = getLevel(levelIdToLoad);
       
       if (levelConfig) {
         this.context.loadLevel(levelConfig);
       }
-    });
+    }, levelIdToLoad);
   }
 
   /**
@@ -183,7 +184,7 @@ export class StateTransitionHandler {
       if (levelConfig) {
         this.context.loadLevel(levelConfig);
       }
-    });
+    }, levelId);
   }
 
   /**

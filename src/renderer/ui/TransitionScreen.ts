@@ -2,7 +2,9 @@
  * Transition screen with spinning brick and fade effect
  */
 
-import { COLOR_BLACK, COLOR_MAGENTA } from '../config/constants';
+import { COLOR_BLACK, COLOR_MAGENTA, COLOR_CYAN, COLOR_GREEN, COLOR_TEXT_GRAY, FONT_TITLE_LARGE, FONT_TITLE_SMALL, FONT_TITLE_XSMALL, GLOW_LARGE, GLOW_MEDIUM } from '../config/constants';
+import { Leaderboard, LeaderboardEntry } from '../game/systems/Leaderboard';
+import { t } from '../i18n/LanguageManager';
 
 export class TransitionScreen {
   private canvas: HTMLCanvasElement;
@@ -13,6 +15,8 @@ export class TransitionScreen {
   private startTime: number = 0;
   private duration: number = 2000; // 2 seconds
   private onComplete: (() => void) | null = null;
+  private nextLevel: number | null = null;
+  private leaderboardEntries: LeaderboardEntry[] = [];
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -26,12 +30,31 @@ export class TransitionScreen {
   /**
    * Start transition
    */
-  start(onComplete: () => void): void {
+  start(onComplete: () => void, nextLevel?: number): void {
     this.startTime = performance.now();
     this.rotation = 0;
     this.opacity = 0;
     this.fadeIn = true;
     this.onComplete = onComplete;
+    this.nextLevel = nextLevel ?? null;
+    this.leaderboardEntries = [];
+    
+    // Load leaderboard for next level if provided
+    if (this.nextLevel) {
+      this.loadLeaderboard(this.nextLevel);
+    }
+  }
+
+  /**
+   * Load leaderboard for the next level
+   */
+  private async loadLeaderboard(levelId: number): Promise<void> {
+    try {
+      this.leaderboardEntries = await Leaderboard.getLeaderboard(levelId);
+    } catch (error) {
+      console.error('Failed to load leaderboard for transition:', error);
+      this.leaderboardEntries = [];
+    }
   }
 
   /**
@@ -99,6 +122,63 @@ export class TransitionScreen {
     this.ctx.strokeStyle = COLOR_MAGENTA;
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(-brickWidth / 2, -brickHeight / 2, brickWidth, brickHeight);
+
+    this.ctx.restore();
+
+    // Render leaderboard if next level is set
+    if (this.nextLevel !== null) {
+      this.renderLeaderboard();
+    }
+  }
+
+  /**
+   * Render the leaderboard for the next level
+   */
+  private renderLeaderboard(): void {
+    this.ctx.save();
+    this.ctx.globalAlpha = this.opacity;
+
+    const centerX = this.canvas.width / 2;
+    const startY = this.canvas.height / 2 + 80;
+    const lineHeight = 35;
+
+    // Draw "Next Level" title
+    this.ctx.font = FONT_TITLE_LARGE;
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.shadowBlur = GLOW_LARGE;
+    this.ctx.shadowColor = COLOR_CYAN;
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(`${t('game.status.level')} ${this.nextLevel}`, centerX, startY - 40);
+
+    // Draw leaderboard header
+    this.ctx.font = FONT_TITLE_XSMALL;
+    this.ctx.fillStyle = COLOR_GREEN;
+    this.ctx.shadowBlur = GLOW_MEDIUM;
+    this.ctx.shadowColor = COLOR_GREEN;
+    this.ctx.textAlign = 'left';
+    this.ctx.fillText(t('ui.leaderboard.rank'), centerX - 200, startY + 20);
+    this.ctx.fillText(t('ui.leaderboard.name'), centerX - 80, startY + 20);
+    this.ctx.fillText(t('ui.leaderboard.time'), centerX + 80, startY + 20);
+
+    // Draw leaderboard entries
+    this.ctx.font = FONT_TITLE_SMALL;
+    this.leaderboardEntries.forEach((entry, index) => {
+      const y = startY + 60 + index * lineHeight;
+      const rank = index + 1;
+
+      // Rank
+      this.ctx.fillStyle = COLOR_CYAN;
+      this.ctx.shadowColor = COLOR_CYAN;
+      this.ctx.fillText(`${rank}.`, centerX - 200, y);
+
+      // Name
+      this.ctx.fillStyle = COLOR_TEXT_GRAY;
+      this.ctx.shadowColor = COLOR_TEXT_GRAY;
+      this.ctx.fillText(entry.name, centerX - 80, y);
+
+      // Time
+      this.ctx.fillText(Leaderboard.formatTime(entry.time), centerX + 80, y);
+    });
 
     this.ctx.restore();
   }
