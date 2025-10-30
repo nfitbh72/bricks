@@ -31,6 +31,8 @@ export class LevelCompleteScreen extends Screen {
    * Set current level, time, and load its background image
    */
   async setLevel(level: number, time: number = 0, isDevMode: boolean = false): Promise<void> {
+    console.log(`[LevelCompleteScreen] setLevel called: level=${level}, time=${time}, isDevMode=${isDevMode}`);
+    
     this.currentLevel = level;
     this.levelTime = time;
     this.isDevMode = isDevMode;
@@ -38,9 +40,11 @@ export class LevelCompleteScreen extends Screen {
     
     // Load leaderboard from persistent storage
     this.leaderboardEntries = await Leaderboard.getLeaderboard(level);
+    console.log(`[LevelCompleteScreen] Loaded ${this.leaderboardEntries.length} leaderboard entries:`, this.leaderboardEntries);
     
     // Don't add player to leaderboard if in dev mode
     this.isOnLeaderboard = !isDevMode && Leaderboard.isPlayerOnLeaderboard(time, this.leaderboardEntries);
+    console.log(`[LevelCompleteScreen] isOnLeaderboard=${this.isOnLeaderboard}`);
     
     // Reset name entry
     this.playerName = 'AAA';
@@ -51,6 +55,7 @@ export class LevelCompleteScreen extends Screen {
     // If player is on leaderboard, insert them
     if (this.isOnLeaderboard) {
       this.leaderboardEntries = Leaderboard.insertPlayer(time, this.playerName, this.leaderboardEntries);
+      console.log(`[LevelCompleteScreen] Player inserted into leaderboard:`, this.leaderboardEntries);
     }
   }
 
