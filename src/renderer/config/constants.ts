@@ -34,20 +34,20 @@ export const LETTER_BRICK_ROWS = 5; // Each letter is 5 bricks tall
 export const LETTER_SPACING = 10;   // Space between letters (in pixels)
 
 // Ball constants
-export const BALL_RADIUS = 4;
+export const BALL_RADIUS = 6;
 export const BALL_SPEED = 300;
 export const BALL_BASE_DAMAGE = 1;
 export const BALL_SPEED_INCREASE_PER_SECOND = 2.5; // 300 per minute = 5 per second
 export const BALL_BOUNCE_MAX_ANGLE = 60; // Maximum deflection angle in degrees when hitting bat
 
 // Ball visual effects
-export const BALL_TAIL_BASE_LENGTH = 20;
+export const BALL_TAIL_BASE_LENGTH = 30;
 export const BALL_TAIL_SEGMENTS = 8;
 export const BALL_TAIL_MAX_SPEED_MULTIPLIER = 3; // Tail length scales up to 3x at high speeds
 
 // Bat constants
-export const BAT_WIDTH = 250; // 50% larger than 195 (previously 30% wider than original 150)
-export const BAT_HEIGHT = 30;
+export const BAT_WIDTH = 120; // 50% larger than 195 (previously 30% wider than original 150)
+export const BAT_HEIGHT = 15;
 export const BAT_SPEED = 300;
 
 // Bat turret constants (relative to bat height)

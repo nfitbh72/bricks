@@ -95,7 +95,7 @@ export function createLevel3(): LevelConfig {
     id: 3,
     name: t('game.levels.level3Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 3, // Normal bricks = 3 HP, Healthy bricks = 9 HP
+    baseHealth: 2, // Normal bricks = 3 HP, Healthy bricks = 9 HP
   };
 }
 
@@ -123,7 +123,7 @@ export function createLevel4(): LevelConfig {
     id: 4,
     name: t('game.levels.level4Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 4, // Normal bricks = 4 HP, Healthy bricks = 12 HP
+    baseHealth: 3, // Normal bricks = 4 HP, Healthy bricks = 12 HP
   };
 }
 
@@ -155,7 +155,7 @@ export function createLevel5(): LevelConfig {
     id: 5,
     name: t('game.levels.level5Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 5, // Normal bricks = 4 HP, Healthy bricks = 12 HP
+    baseHealth: 3, // Normal bricks = 4 HP, Healthy bricks = 12 HP
   };
 }
 
@@ -184,7 +184,7 @@ export function createLevel6(): LevelConfig {
     id: 6,
     name: t('game.levels.level6Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 6, // Normal bricks = 6 HP, Healthy bricks = 18 HP
+    baseHealth: 4, // Normal bricks = 6 HP, Healthy bricks = 18 HP
   };
 }
 
@@ -220,7 +220,7 @@ export function createLevel7(): LevelConfig {
     id: 7,
     name: t('game.levels.level7Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 6, // Normal bricks = 6 HP, Healthy bricks = 18 HP
+    baseHealth: 4, // Normal bricks = 6 HP, Healthy bricks = 18 HP
   };
 }
 
