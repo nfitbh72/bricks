@@ -7,13 +7,19 @@
       "resume": "RESUME",
       "options": "OPTIONS",
       "back": "BACK",
-      "startGame": "START GAME"
+      "startGame": "START GAME",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "LEVEL COMPLETE!",
       "gameOver": "GAME OVER",
       "paused": "PAUSED",
-      "enterYourName": "ENTER YOUR NAME"
+      "enterYourName": "ENTER YOUR NAME",
+      "tutorial": {
+        "title": "HOW TO PLAY",
+        "line1": "Clear all bricks to clear the level.",
+        "line2": "The ball will bounce at different angles depending on which part of the bat you hit with."
+      }
     },
     "options": {
       "title": "OPTIONS",

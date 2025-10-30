@@ -7,13 +7,19 @@
       "resume": "LANJUTKAN",
       "options": "OPSI",
       "back": "KEMBALI",
-      "startGame": "MULAI PERMAINAN"
+      "startGame": "MULAI PERMAINAN",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "LEVEL SELESAI!",
       "gameOver": "PERMAINAN BERAKHIR",
       "paused": "DIJEDA",
-      "enterYourName": "MASUKKAN NAMA ANDA"
+      "enterYourName": "MASUKKAN NAMA ANDA",
+      "tutorial": {
+        "title": "CARA BERMAIN",
+        "line1": "Hancurkan semua bata untuk menyelesaikan level.",
+        "line2": "Bola akan memantul pada sudut yang berbeda tergantung pada bagian pemukul yang Anda pukul."
+      }
     },
     "options": {
       "title": "OPSI",
@@ -42,7 +48,10 @@
       "level1Name": "Level 1: Satu",
       "level2Name": "Level 2: Puing ke segala arah",
       "level3Name": "Level 3: Hati-hati dengan laser dan bata jatuh yang pecah!",
-      "level4Name": "Level 4: Kami menyebutnya Homer"
+      "level4Name": "Level 4: Kami menyebutnya Homer",
+      "level5Name": "Level 5: Bom Meledak",
+      "level6Name": "Level 6: Dinamit",
+      "level7Name": "Level 7: Pertarungan Bos"
     },
     "bricks": {
       "offensive": {

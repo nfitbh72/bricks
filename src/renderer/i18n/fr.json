@@ -7,13 +7,19 @@
       "resume": "REPRENDRE",
       "options": "OPTIONS",
       "back": "RETOUR",
-      "startGame": "DÉMARRER"
+      "startGame": "DÉMARRER",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "NIVEAU TERMINÉ!",
       "gameOver": "GAME OVER",
       "paused": "PAUSE",
-      "enterYourName": "ENTREZ VOTRE NOM"
+      "enterYourName": "ENTREZ VOTRE NOM",
+      "tutorial": {
+        "title": "COMMENT JOUER",
+        "line1": "Détruisez toutes les briques pour terminer le niveau.",
+        "line2": "La balle rebondira à différents angles selon la partie de la raquette que vous frappez."
+      }
     },
     "options": {
       "title": "OPTIONS",
@@ -42,7 +48,24 @@
       "level1Name": "Niveau 1: Un",
       "level2Name": "Niveau 2: Débris dans toutes les directions",
       "level3Name": "Niveau 3: Attention aux lasers et aux briques qui tombent et se brisent!",
-      "level4Name": "Niveau 4: On l'appelle Homer"
+      "level4Name": "Niveau 4: On l'appelle Homer",
+      "level5Name": "Niveau 5: Bombardement",
+      "level6Name": "Niveau 6: Dynamite",
+      "level7Name": "Niveau 7: Combat de Boss"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "Brique Tombante",
+        "exploding": "Brique Explosive",
+        "laser": "Brique Laser",
+        "homing": "Brique Missile Guidé",
+        "splitting": "Brique Divisante",
+        "warningFalling": "Attention! Brique qui tombe!",
+        "warningExploding": "Danger! Brique qui explose!",
+        "warningLaser": "Alerte! Laser en charge!",
+        "warningHoming": "Arrivée! Missile en poursuite!",
+        "warningSplitting": "Attention! Fragments arrivent!"
+      }
     },
     "upgrades": {
       "title": "NEXUS D'AMÉLIORATION",
@@ -87,18 +110,6 @@
       "ballDamage": {
         "name": "Dégâts de Balle",
         "description": "Augmente les dégâts de la balle de 1"
-      },
-      "offensive": {
-        "falling": "Brique Tombante",
-        "exploding": "Brique Explosive",
-        "laser": "Brique Laser",
-        "homing": "Brique Missile Guidé",
-        "splitting": "Brique Divisante",
-        "warningFalling": "Attention! Brique qui tombe!",
-        "warningExploding": "Danger! Brique qui explose!",
-        "warningLaser": "Alerte! Laser en charge!",
-        "warningHoming": "Arrivée! Missile en poursuite!",
-        "warningSplitting": "Attention! Fragments arrivent!"
       },
       "piercing": {
         "name": "Perçage",

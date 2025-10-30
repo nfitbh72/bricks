@@ -7,13 +7,19 @@
       "resume": "IPAGPATULOY",
       "options": "MGA OPSYON",
       "back": "BUMALIK",
-      "startGame": "MAGSIMULA"
+      "startGame": "MAGSIMULA",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "NATAPOS ANG LEVEL!",
       "gameOver": "TAPOS NA ANG LARO",
       "paused": "NAKAHINTO",
-      "enterYourName": "ILAGAY ANG IYONG PANGALAN"
+      "enterYourName": "ILAGAY ANG IYONG PANGALAN",
+      "tutorial": {
+        "title": "PAANO MAGLARO",
+        "line1": "Sirain ang lahat ng laryo upang tapusin ang antas.",
+        "line2": "Ang bola ay tatalon sa iba't ibang anggulo depende sa bahaging tinamaan mo ng palo."
+      }
     },
     "options": {
       "title": "MGA OPSYON",
@@ -42,7 +48,10 @@
       "level1Name": "Antas 1: Isa",
       "level2Name": "Antas 2: Mga guho sa lahat ng direksyon",
       "level3Name": "Antas 3: Mag-ingat sa mga laser at mga nahuhulog na laryo na nadudurog!",
-      "level4Name": "Antas 4: Tinatawag namin itong Homer"
+      "level4Name": "Antas 4: Tinatawag namin itong Homer",
+      "level5Name": "Antas 5: Mga Bomba",
+      "level6Name": "Antas 6: Dinamita",
+      "level7Name": "Antas 7: Labanan ang Boss"
     },
     "bricks": {
       "offensive": {

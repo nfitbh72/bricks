@@ -9,6 +9,7 @@ import { TransitionScreen } from '../../ui/TransitionScreen';
 import { PauseScreen } from '../../ui/PauseScreen';
 import { UpgradeTreeScreen } from '../../ui/UpgradeTreeScreen';
 import { OptionsScreen } from '../../ui/OptionsScreen';
+import { TutorialScreen } from '../../ui/TutorialScreen';
 import { GameState } from '../core/types';
 import { getUpgrades } from '../../config/upgrades';
 
@@ -24,6 +25,7 @@ export interface ScreenCallbacks {
   onResume: () => void;
   onQuitFromPause: () => void;
   onCloseOptions: () => void;
+  onCloseTutorial: () => void;
 }
 
 export class ScreenManager {
@@ -31,6 +33,7 @@ export class ScreenManager {
   
   // UI Screens
   public introScreen: IntroScreen;
+  public tutorialScreen: TutorialScreen;
   public gameOverScreen: GameOverScreen;
   public levelCompleteScreen: LevelCompleteScreen;
   public upgradeTreeScreen: UpgradeTreeScreen;
@@ -51,6 +54,11 @@ export class ScreenManager {
       callbacks.onQuit,
       callbacks.onDevUpgrades,
       callbacks.onOpenOptions
+    );
+    
+    this.tutorialScreen = new TutorialScreen(
+      canvas,
+      callbacks.onCloseTutorial
     );
     
     this.gameOverScreen = new GameOverScreen(
@@ -94,6 +102,9 @@ export class ScreenManager {
       case GameState.INTRO:
         this.introScreen.handleMouseMove(x, y);
         break;
+      case GameState.TUTORIAL:
+        this.tutorialScreen.handleMouseMove(x, y);
+        break;
       case GameState.GAME_OVER:
         this.gameOverScreen.handleMouseMove(x, y);
         break;
@@ -117,6 +128,9 @@ export class ScreenManager {
       case GameState.INTRO:
         this.introScreen.handleClick(x, y);
         break;
+      case GameState.TUTORIAL:
+        this.tutorialScreen.handleClick(x, y);
+        break;
       case GameState.GAME_OVER:
         this.gameOverScreen.handleClick(x, y);
         break;
@@ -139,6 +153,9 @@ export class ScreenManager {
     switch (currentState) {
       case GameState.INTRO:
         this.introScreen.handleKeyPress(key);
+        break;
+      case GameState.TUTORIAL:
+        this.tutorialScreen.handleKeyPress(key);
         break;
       case GameState.GAME_OVER:
         this.gameOverScreen.handleKeyPress(key);
@@ -171,6 +188,12 @@ export class ScreenManager {
     switch (currentState) {
       case GameState.INTRO:
         this.introScreen.render();
+        break;
+      case GameState.TUTORIAL:
+        // Render game in background
+        renderGameplayFn();
+        // Render tutorial overlay
+        this.tutorialScreen.render();
         break;
       case GameState.GAME_OVER:
         this.gameOverScreen.render();

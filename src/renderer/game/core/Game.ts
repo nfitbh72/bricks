@@ -129,6 +129,7 @@ export class Game {
       onResume: () => this.handleResume(),
       onQuitFromPause: () => this.handleQuitFromPause(),
       onCloseOptions: () => this.handleCloseOptions(),
+      onCloseTutorial: () => this.handleCloseTutorial(),
     });
     
     // Set volume change callback for real-time updates
@@ -544,6 +545,13 @@ export class Game {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleCloseOptions();
     // Note: No sync needed - handler uses setters directly
+  }
+
+  /**
+   * Handle closing tutorial screen
+   */
+  private handleCloseTutorial(): void {
+    this.gameState = GameState.PLAYING;
   }
 
   /**

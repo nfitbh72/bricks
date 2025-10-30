@@ -34,6 +34,7 @@ export interface Circle {
  */
 export enum GameState {
   INTRO = 'INTRO',
+  TUTORIAL = 'TUTORIAL',
   PLAYING = 'PLAYING',
   PAUSED = 'PAUSED',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',

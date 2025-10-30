@@ -7,13 +7,19 @@
       "resume": "REANUDAR",
       "options": "OPCIONES",
       "back": "VOLVER",
-      "startGame": "INICIAR JUEGO"
+      "startGame": "INICIAR JUEGO",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "¡NIVEL COMPLETADO!",
       "gameOver": "JUEGO TERMINADO",
       "paused": "PAUSADO",
-      "enterYourName": "INGRESA TU NOMBRE"
+      "enterYourName": "INGRESA TU NOMBRE",
+      "tutorial": {
+        "title": "CÓMO JUGAR",
+        "line1": "Destruye todos los ladrillos para completar el nivel.",
+        "line2": "La bola rebotará en diferentes ángulos dependiendo de qué parte de la paleta golpees."
+      }
     },
     "options": {
       "title": "OPCIONES",
@@ -42,7 +48,24 @@
       "level1Name": "Nivel 1: Uno",
       "level2Name": "Nivel 2: Escombros en todas direcciones",
       "level3Name": "Nivel 3: ¡Cuidado con los láseres y los ladrillos que caen y se rompen!",
-      "level4Name": "Nivel 4: Lo llamamos Homer"
+      "level4Name": "Nivel 4: Lo llamamos Homer",
+      "level5Name": "Nivel 5: Bombas Fuera",
+      "level6Name": "Nivel 6: Dinamita",
+      "level7Name": "Nivel 7: Batalla de Jefe"
+    },
+    "bricks": {
+      "offensive": {
+        "falling": "Ladrillo Cayendo",
+        "exploding": "Ladrillo Explosivo",
+        "laser": "Ladrillo Láser",
+        "homing": "Ladrillo Misil Guiado",
+        "splitting": "Ladrillo Divisor",
+        "warningFalling": "¡Cuidado! ¡Ladrillo cayendo!",
+        "warningExploding": "¡Peligro! ¡Ladrillo explotando!",
+        "warningLaser": "¡Advertencia! ¡Láser cargando!",
+        "warningHoming": "¡Entrante! ¡Misil rastreando!",
+        "warningSplitting": "¡Cuidado! ¡Fragmentos entrantes!"
+      }
     },
     "upgrades": {
       "title": "NEXO DE MEJORAS",
@@ -79,18 +102,6 @@
       "lives": {
         "name": "Vidas",
         "description": "Aumenta el número de vidas en 1"
-      },
-      "offensive": {
-        "falling": "Ladrillo Cayendo",
-        "exploding": "Ladrillo Explosivo",
-        "laser": "Ladrillo Láser",
-        "homing": "Ladrillo Misil Guiado",
-        "splitting": "Ladrillo Divisor",
-        "warningFalling": "¡Cuidado! ¡Ladrillo cayendo!",
-        "warningExploding": "¡Peligro! ¡Ladrillo explotando!",
-        "warningLaser": "¡Advertencia! ¡Láser cargando!",
-        "warningHoming": "¡Entrante! ¡Misil rastreando!",
-        "warningSplitting": "¡Cuidado! ¡Fragmentos entrantes!"
       },
       "slowerBall": {
         "name": "Bola Más Lenta",

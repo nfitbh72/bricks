@@ -7,13 +7,19 @@
       "resume": "TIẾP TỤC",
       "options": "TÙY CHỌN",
       "back": "QUAY LẠI",
-      "startGame": "BẮT ĐẦU"
+      "startGame": "BẮT ĐẦU",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "HOÀN THÀNH!",
       "gameOver": "KẾT THÚC",
       "paused": "TẠM DỪNG",
-      "enterYourName": "NHẬP TÊN CỦA BẠN"
+      "enterYourName": "NHẬP TÊN CỦA BẠN",
+      "tutorial": {
+        "title": "CÁCH CHƠI",
+        "line1": "Phá hủy tất cả gạch để hoàn thành màn chơi.",
+        "line2": "Quả bóng sẽ nảy ở các góc khác nhau tùy thuộc vào phần vợt bạn đánh trúng."
+      }
     },
     "options": {
       "title": "TÙY CHỌN",
@@ -42,7 +48,10 @@
       "level1Name": "Màn 1: Một",
       "level2Name": "Màn 2: Mảnh vỡ bay khắp nơi",
       "level3Name": "Màn 3: Cẩn thận với laser và gạch rơi vỡ vụn!",
-      "level4Name": "Màn 4: Chúng tôi gọi nó là Homer"
+      "level4Name": "Màn 4: Chúng tôi gọi nó là Homer",
+      "level5Name": "Màn 5: Bom Nổ",
+      "level6Name": "Màn 6: Thuốc Nổ",
+      "level7Name": "Màn 7: Trận Đánh Boss"
     },
     "bricks": {
       "offensive": {

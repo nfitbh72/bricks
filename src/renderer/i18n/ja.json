@@ -7,13 +7,19 @@
       "resume": "再開",
       "options": "オプション",
       "back": "戻る",
-      "startGame": "ゲーム開始"
+      "startGame": "ゲーム開始",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "レベルクリア！",
       "gameOver": "ゲームオーバー",
       "paused": "一時停止",
-      "enterYourName": "名前を入力"
+      "enterYourName": "名前を入力",
+      "tutorial": {
+        "title": "遊び方",
+        "line1": "すべてのブロックを壊してレベルをクリアしよう。",
+        "line2": "ボールはパドルのどの部分に当たるかによって異なる角度で跳ね返ります。"
+      }
     },
     "options": {
       "title": "オプション",
@@ -22,18 +28,6 @@
       "particles": "パーティクル",
       "damageNumbers": "ダメージ数値",
       "language": "言語"
-    },
-    "offensive": {
-      "falling": "落下ブロック",
-      "exploding": "爆発ブロック",
-      "laser": "レーザーブロック",
-      "homing": "誘導ミサイルブロック",
-      "splitting": "分裂ブロック",
-      "warningFalling": "注意！ブロックが落ちてくる！",
-      "warningExploding": "危険！ブロックが爆発する！",
-      "warningLaser": "警告！レーザー充電中！",
-      "warningHoming": "接近！ミサイル追尾中！",
-      "warningSplitting": "注意！破片が飛んでくる！"
     },
     "leaderboard": {
       "rank": "順位",
@@ -51,10 +45,13 @@
       "level1": "レベル1：効果的なデザイン",
       "level2": "レベル2：挨拶",
       "level3": "レベル3：スカル島",
-      "level1Name": "レベル1：ワン",
-      "level2Name": "レベル2：あらゆる方向への破片",
-      "level3Name": "レベル3：レーザーと砕け散る落下ブロックに注意！",
-      "level4Name": "レベル4：ホーマーと呼んでいます"
+      "level1Name": "レベル1：一",
+      "level2Name": "レベル2：全方向に破片",
+      "level3Name": "レベル3：レーザーと砕ける落下ブロックに注意！",
+      "level4Name": "レベル4：ホーマーと呼ぶ",
+      "level5Name": "レベル5：爆弾投下",
+      "level6Name": "レベル6：ダイナマイト",
+      "level7Name": "レベル7：ボス戦"
     },
     "upgrades": {
       "title": "アップグレードセンター",

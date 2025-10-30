@@ -61,6 +61,9 @@ export class StateTransitionHandler {
       this.context.setCurrentLevelId(1);
       this.context.setTotalBricksDestroyed(0);
       this.context.loadLevel(levelConfig);
+      
+      // Show tutorial for level 1
+      this.context.setGameState(GameState.TUTORIAL);
     });
   }
 

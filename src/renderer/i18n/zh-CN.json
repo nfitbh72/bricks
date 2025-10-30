@@ -7,13 +7,19 @@
       "resume": "恢复",
       "options": "选项",
       "back": "返回",
-      "startGame": "开始游戏"
+      "startGame": "开始游戏",
+      "ok": "OK"
     },
     "screens": {
       "levelComplete": "关卡完成！",
       "gameOver": "游戏结束",
       "paused": "暂停",
-      "enterYourName": "输入你的名字"
+      "enterYourName": "输入你的名字",
+      "tutorial": {
+        "title": "游戏方法",
+        "line1": "摧毁所有砖块以完成关卡。",
+        "line2": "球会根据你击中球拍的部位以不同角度弹跳。"
+      }
     },
     "options": {
       "title": "选项",
@@ -42,7 +48,10 @@
       "level1Name": "第1关：一",
       "level2Name": "第2关：碎片四处飞散",
       "level3Name": "第3关：小心激光和破碎的坠落砖块！",
-      "level4Name": "第4关：我们称之为荷马"
+      "level4Name": "第4关：我们称之为荷马",
+      "level5Name": "第5关：炸弹来袭",
+      "level6Name": "第6关：炸药",
+      "level7Name": "第7关：首领战"
     },
     "bricks": {
       "offensive": {
