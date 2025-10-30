@@ -26,7 +26,14 @@ export class Leaderboard {
     if (this.isLoaded) return;
     
     try {
-      const data = await window.electron?.loadLeaderboards();
+      // Check if electron API is available
+      if (!window.electron) {
+        console.warn('Electron API not available, using fake leaderboards only');
+        this.isLoaded = true;
+        return;
+      }
+      
+      const data = await window.electron.loadLeaderboards();
       if (!data) {
         this.isLoaded = true;
         return;
@@ -74,8 +81,10 @@ export class Leaderboard {
       return [...this.cachedData[levelId]]; // Return copy to prevent mutation
     }
     
-    // Generate fake leaderboard if no data exists
-    return this.generateFakeLeaderboard(levelId);
+    // Generate fake leaderboard if no data exists and cache it
+    const fakeLeaderboard = this.generateFakeLeaderboard(levelId);
+    this.cachedData[levelId] = fakeLeaderboard;
+    return [...fakeLeaderboard];
   }
 
   /**
