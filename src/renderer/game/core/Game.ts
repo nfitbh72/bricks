@@ -8,6 +8,7 @@ import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
 import { Boss1 } from '../entities/offensive/Boss1';
+import { Wall } from '../entities/Wall';
 import { GameState, LevelConfig, BrickType } from '../core/types';
 import { calculateGameElementScale } from '../core/utils';
 import { GameUpgrades } from '../systems/GameUpgrades';
@@ -30,6 +31,9 @@ export class Game {
   private bat: Bat;
   private level: Level | null = null;
   private statusBar: StatusBar;
+  private leftWall: Wall | null = null;
+  private rightWall: Wall | null = null;
+  private readonly maxPlayAreaWidth: number = 1800;
   private gameState: GameState = GameState.INTRO;
   private playerHealth: number = PLAYER_STARTING_HEALTH;
   private animationFrameId: number | null = null;
@@ -106,7 +110,12 @@ export class Game {
     const ballY = batY - 30; // Ball above the bat
     
     this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, 300);
-    this.bat.setBounds(0, canvas.width, 0, canvas.height);
+    
+    // Create walls if canvas is wider than max play area
+    this.createWalls();
+    
+    // Set bat bounds considering walls
+    this.updateBatBounds();
     
     this.ball = new Ball(centerX, ballY, ballRadius, ballSpeed);
 
@@ -181,6 +190,43 @@ export class Game {
 
     // Load background image
     this.loadBackgroundImage();
+  }
+
+  /**
+   * Create side walls if canvas width exceeds max play area width
+   */
+  private createWalls(): void {
+    if (this.canvas.width > this.maxPlayAreaWidth) {
+      const wallWidth = (this.canvas.width - this.maxPlayAreaWidth) / 2;
+      const wallHeight = this.canvas.height;
+      
+      // Left wall
+      this.leftWall = new Wall(0, 0, wallWidth, wallHeight);
+      
+      // Right wall
+      this.rightWall = new Wall(this.canvas.width - wallWidth, 0, wallWidth, wallHeight);
+    } else {
+      this.leftWall = null;
+      this.rightWall = null;
+    }
+  }
+
+  /**
+   * Update bat bounds to respect walls
+   */
+  private updateBatBounds(): void {
+    const minX = this.leftWall ? this.leftWall.getRightEdge() : 0;
+    const maxX = this.rightWall ? this.rightWall.getLeftEdge() : this.canvas.width;
+    this.bat.setBounds(minX, maxX, 0, this.canvas.height);
+  }
+
+  /**
+   * Get play area boundaries (considering walls)
+   */
+  private getPlayAreaBounds(): { minX: number; maxX: number } {
+    const minX = this.leftWall ? this.leftWall.getRightEdge() : 0;
+    const maxX = this.rightWall ? this.rightWall.getLeftEdge() : this.canvas.width;
+    return { minX, maxX };
   }
 
   /**
@@ -783,9 +829,10 @@ export class Game {
     // Check wall collisions only if ball is not sticky (bottom boundary is status bar top)
     if (!this.ball.getIsSticky()) {
       const statusBarTop = this.statusBar.getY();
+      const { minX, maxX } = this.getPlayAreaBounds();
       const hitBackWall = this.ball.checkWallCollisions(
-        0,
-        this.canvas.width,
+        minX,
+        maxX,
         0,
         statusBarTop
       );
@@ -1086,7 +1133,9 @@ export class Game {
       this.weaponManager,
       this.offensiveEntityManager,
       options.showParticles,
-      options.showDamageNumbers
+      options.showDamageNumbers,
+      this.leftWall,
+      this.rightWall
     );
 
     // Render boss if active
@@ -1136,5 +1185,19 @@ export class Game {
    */
   setGameState(state: GameState): void {
     this.gameState = state;
+  }
+
+  /**
+   * Handle window resize - recreate walls and update bounds
+   */
+  handleResize(): void {
+    // Recreate walls based on new canvas size
+    this.createWalls();
+    
+    // Update bat bounds to respect new walls
+    this.updateBatBounds();
+    
+    // Update status bar size
+    this.statusBar = new StatusBar(this.canvas.width, this.canvas.height);
   }
 }
