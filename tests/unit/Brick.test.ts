@@ -4,7 +4,7 @@
 
 import { Brick } from '../../src/renderer/game/entities/Brick';
 import { BrickConfig, BrickType } from '../../src/renderer/game/core/types';
-import { BRICK_WIDTH, BRICK_HEIGHT } from '../../src/renderer/config/constants';
+import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING } from '../../src/renderer/config/constants';
 
 // Helper to create brick config from grid position
 function createBrickConfig(col: number, row: number, type: BrickType, color?: string): BrickConfig {
@@ -17,8 +17,8 @@ describe('Brick', () => {
       const brick = new Brick(createBrickConfig(2, 3, BrickType.HEALTHY));
       const position = brick.getPosition();
       // Grid position (2, 3) converts to pixel position
-      expect(position.x).toBe(2 * (BRICK_WIDTH + 2)); // col 2
-      expect(position.y).toBe(3 * (BRICK_HEIGHT + 2)); // row 3
+      expect(position.x).toBe(2 * (BRICK_WIDTH + BRICK_SPACING)); // col 2
+      expect(position.y).toBe(3 * (BRICK_HEIGHT + BRICK_SPACING)); // row 3
     });
 
     it('should initialize with correct dimensions', () => {
@@ -161,9 +161,9 @@ describe('Brick', () => {
     it('should return bounds for different grid position', () => {
       const brick = new Brick(createBrickConfig(1, 1, BrickType.NORMAL));
       const bounds = brick.getBounds();
-      // Grid (1,1) = pixel (1*(BRICK_WIDTH+2), 1*(BRICK_HEIGHT+2))
-      expect(bounds.x).toBe(1 * (BRICK_WIDTH + 2));
-      expect(bounds.y).toBe(1 * (BRICK_HEIGHT + 2));
+      // Grid (1,1) = pixel (1*(BRICK_WIDTH+BRICK_SPACING), 1*(BRICK_HEIGHT+BRICK_SPACING))
+      expect(bounds.x).toBe(1 * (BRICK_WIDTH + BRICK_SPACING));
+      expect(bounds.y).toBe(1 * (BRICK_HEIGHT + BRICK_SPACING));
       expect(bounds.width).toBe(BRICK_WIDTH);
       expect(bounds.height).toBe(BRICK_HEIGHT);
     });

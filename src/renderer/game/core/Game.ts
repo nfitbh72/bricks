@@ -226,9 +226,15 @@ export class Game {
         }
       },
       onClick: (x: number, y: number) => {
+        // Capture state BEFORE screen handlers run to prevent click-through
+        // when dialogs/screens transition to PLAYING state
+        const stateBeforeClick = this.gameState;
+        
         this.screenManager.handleClick(x, y, this.gameState);
         
-        if (this.gameState === GameState.PLAYING) {
+        // Only process game clicks if we were already in PLAYING state
+        // This prevents tutorial/dialog dismissal from also launching the ball
+        if (stateBeforeClick === GameState.PLAYING) {
           // Launch ball if sticky, otherwise shoot laser
           if (this.ball.getIsSticky()) {
             this.ball.launchFromSticky();
