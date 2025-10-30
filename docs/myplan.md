@@ -7,6 +7,7 @@ Just some notes about future features so that I don't forget
 - [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
 - [X] Make the leaderboards permanent, explain where you are going to store the data
 - [] There is special animation when the last brick of the level is destroyed, make this the last *destructible* brick that dies, not necessarily the last brick in the level
+- [] check coverage of non-ui components, recommend useful tests that can be added
 - [X] Add base health to each level in the config
 - [X] Indestructible bricks
 - [] Add many maps
@@ -30,7 +31,7 @@ Just some notes about future features so that I don't forget
 - [X] move hardcoded values to constants
 - [X] use a dictionary and make the game multi-lingual
 - [X] Ball speed up mechanics
-- [] Boss bricks: Large multi-segment bricks with special patterns
+- [X] Boss bricks: Large multi-segment bricks with special patterns
 - [X] Offensive Bricks that would damage the bat (making the bat smaller)
     - [X] Bricks that fall instead of crumbling
     - [X] Bricks that explode and send avoidable debris in 8 different directions
