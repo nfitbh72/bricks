@@ -15,6 +15,7 @@ import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { DynamiteStick } from '../entities/offensive/DynamiteStick';
+import { Boss1 } from '../entities/offensive/Boss1';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -25,6 +26,7 @@ import {
   HOMING_MISSILE_DAMAGE_PERCENT,
   SPLITTING_FRAGMENT_DAMAGE_PERCENT,
   DYNAMITE_BAT_DAMAGE_PERCENT,
+  BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT,
   DYNAMITE_BRICK_DAMAGE_MULTIPLIER,
 } from '../../config/constants';
 
@@ -636,5 +638,86 @@ export class CollisionManager {
         }
       }
     }
+  }
+
+  /**
+   * Check boss-ball collisions
+   */
+  checkBossBallCollisions(
+    boss: Boss1,
+    ball: Ball,
+    onBossDamaged: (damage: number, x: number, y: number) => void,
+    onBossDestroyed: (x: number, y: number) => void
+  ): void {
+    const ballBounds = ball.getBounds();
+    const bossBounds = boss.getBounds();
+    
+    if (!ballBounds || !bossBounds) return;
+
+    // Convert ball circle to rect for collision
+    const ballRect = {
+      x: ballBounds.x - ballBounds.radius,
+      y: ballBounds.y - ballBounds.radius,
+      width: ballBounds.radius * 2,
+      height: ballBounds.radius * 2
+    };
+
+    if (this.checkRectCollision(ballRect, bossBounds)) {
+      const damage = ball.getDamage();
+      boss.takeDamage(damage);
+      ball.reverseY();
+      
+      // Notify damage
+      const centerX = bossBounds.x + bossBounds.width / 2;
+      const centerY = bossBounds.y + bossBounds.height / 2;
+      onBossDamaged(damage, centerX, centerY);
+
+      // Check if boss is destroyed
+      if (boss.isDestroyed()) {
+        onBossDestroyed(centerX, centerY);
+      }
+    }
+  }
+
+  /**
+   * Check boss thrown brick-bat collisions
+   */
+  checkBossThrownBrickCollisions(
+    boss: Boss1,
+    bat: Bat,
+    onThrownBrickHit: (x: number, y: number) => void
+  ): void {
+    const thrownBricks = boss.getThrownBricks();
+    const batBounds = bat.getBounds();
+
+    for (const thrownBrick of thrownBricks) {
+      const brickBounds = thrownBrick.getBounds();
+      if (brickBounds && this.checkRectCollision(brickBounds, batBounds)) {
+        thrownBrick.deactivate();
+        
+        // Damage bat
+        bat.takeDamage(BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT);
+        
+        // Notify hit for effects
+        const centerX = brickBounds.x + brickBounds.width / 2;
+        const centerY = brickBounds.y + brickBounds.height / 2;
+        onThrownBrickHit(centerX, centerY);
+      }
+    }
+  }
+
+  /**
+   * Simple rectangle collision check
+   */
+  private checkRectCollision(
+    a: { x: number; y: number; width: number; height: number },
+    b: { x: number; y: number; width: number; height: number }
+  ): boolean {
+    return (
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y
+    );
   }
 }

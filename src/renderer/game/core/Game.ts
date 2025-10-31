@@ -33,8 +33,7 @@ import {
   SCREEN_SHAKE_BACK_WALL_INTENSITY,
   SCREEN_SHAKE_BACK_WALL_DURATION,
   SCREEN_SHAKE_BOMB_BRICK_INTENSITY,
-  SCREEN_SHAKE_BOMB_BRICK_DURATION,
-  BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT
+  SCREEN_SHAKE_BOMB_BRICK_DURATION
 } from '../../config/constants';
 
 export class Game {
@@ -969,96 +968,32 @@ export class Game {
 
     // Boss collisions
     if (this.boss && this.boss.isActive()) {
-      this.checkBossCollisions();
-    }
-  }
-
-  /**
-   * Check boss-related collisions
-   */
-  private checkBossCollisions(): void {
-    if (!this.boss) return;
-
-    // Ball-Boss collision
-    const ballBounds = this.ball.getBounds();
-    const bossBounds = this.boss.getBounds();
-    if (ballBounds && bossBounds) {
-      // Convert ball circle to rect for collision
-      const ballRect = {
-        x: ballBounds.x - ballBounds.radius,
-        y: ballBounds.y - ballBounds.radius,
-        width: ballBounds.radius * 2,
-        height: ballBounds.radius * 2
-      };
-      if (this.checkRectCollision(ballRect, bossBounds)) {
-        const damage = this.ball.getDamage();
-        this.boss.takeDamage(damage);
-        this.ball.reverseY();
-        
-        // Create particles and damage number
-        this.effectsManager.createParticles(
-          bossBounds.x + bossBounds.width / 2,
-          bossBounds.y + bossBounds.height / 2,
-          8,
-          '#ff0000',
-          100
-        );
-        this.effectsManager.addDamageNumber(
-          bossBounds.x + bossBounds.width / 2,
-          bossBounds.y - 5,
-          damage,
-          false
-        );
-
-        // Check if boss is destroyed
-        if (this.boss.isDestroyed()) {
-          this.effectsManager.createParticles(
-            bossBounds.x + bossBounds.width / 2,
-            bossBounds.y + bossBounds.height / 2,
-            50,
-            '#ff0000',
-            300
-          );
+      // Ball-Boss collision
+      this.collisionManager.checkBossBallCollisions(
+        this.boss,
+        this.ball,
+        (damage, x, y) => {
+          // Create particles and damage number
+          this.effectsManager.createParticles(x, y, 8, '#ff0000', 100);
+          this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+        },
+        (x, y) => {
+          // Boss destroyed - create big explosion
+          this.effectsManager.createParticles(x, y, 50, '#ff0000', 300);
         }
-      }
-    }
+      );
 
-    // Thrown brick-Bat collisions
-    const thrownBricks = this.boss.getThrownBricks();
-    const batBounds = this.bat.getBounds();
-    for (const thrownBrick of thrownBricks) {
-      const brickBounds = thrownBrick.getBounds();
-      if (brickBounds && this.checkRectCollision(brickBounds, batBounds)) {
-        thrownBrick.deactivate();
-        
-        // Damage bat
-        this.bat.takeDamage(BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT);
-        
-        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BOMB_BRICK_INTENSITY, SCREEN_SHAKE_BOMB_BRICK_DURATION);
-        this.effectsManager.createParticles(
-          brickBounds.x + brickBounds.width / 2,
-          brickBounds.y + brickBounds.height / 2,
-          15,
-          '#ff0000',
-          150
-        );
-      }
+      // Thrown brick-Bat collision
+      this.collisionManager.checkBossThrownBrickCollisions(
+        this.boss,
+        this.bat,
+        (x, y) => {
+          // Screen shake and particles
+          this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BOMB_BRICK_INTENSITY, SCREEN_SHAKE_BOMB_BRICK_DURATION);
+          this.effectsManager.createParticles(x, y, 15, '#ff0000', 150);
+        }
+      );
     }
-  }
-
-  /**
-   * Simple rectangle collision check
-   */
-  private checkRectCollision(
-    a: { x: number; y: number; width: number; height: number },
-    b: { x: number; y: number; width: number; height: number }
-  ): boolean {
-    return (
-      a.x < b.x + b.width &&
-      a.x + a.width > b.x &&
-      a.y < b.y + b.height &&
-      a.y + a.height > b.y
-    );
   }
 
   /**
