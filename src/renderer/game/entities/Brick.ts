@@ -275,15 +275,16 @@ export class Brick {
       return;
     }
 
-    // Draw glow effect (dystopian neon style)
+    // Draw strong outer glow effect (dystopian neon style)
     ctx.shadowBlur = BRICK_GLOW_BLUR;
     ctx.shadowColor = color;
 
-    // Create gradient for 3D effect (top-left to bottom-right)
+    // Create brighter gradient for 3D effect (top-left to bottom-right)
     const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
-    gradient.addColorStop(0, this.lightenColor(color, 30));
-    gradient.addColorStop(0.5, color);
-    gradient.addColorStop(1, this.darkenColor(color, 30));
+    gradient.addColorStop(0, this.lightenColor(color, 50)); // Brighter highlight
+    gradient.addColorStop(0.3, this.lightenColor(color, 20)); // Mid-highlight
+    gradient.addColorStop(0.7, color);
+    gradient.addColorStop(1, this.darkenColor(color, 20)); // Subtle shadow
 
     // Draw brick with gradient and rounded corners
     const cornerRadius = BRICK_CORNER_RADIUS;
@@ -304,17 +305,20 @@ export class Brick {
     ctx.closePath();
     ctx.fill();
 
-    // Draw outer border for definition
+    // Draw bright outer border with glow for extra shine
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = color;
+    ctx.shadowBlur = 8; // Add glow to border
+    ctx.shadowColor = this.lightenColor(color, 30);
+    ctx.strokeStyle = this.lightenColor(color, 40); // Brighter border
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw inner glow for depth (lighter border inside)
-    ctx.shadowBlur = 0; // Remove outer glow for inner border
-    ctx.strokeStyle = this.lightenColor(color, 50);
+    // Draw bright inner highlight for depth
+    ctx.shadowBlur = 5; // Subtle inner glow
+    ctx.shadowColor = this.lightenColor(color, 60);
+    ctx.strokeStyle = this.lightenColor(color, 70); // Very bright inner highlight
     ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.8; // More visible
     
     // Draw inner rounded rectangle (slightly smaller)
     const innerPadding = 2;
@@ -410,15 +414,16 @@ export class Brick {
     const h = this.height;
     const color = this.getColor();
 
-    // Draw glow effect (dystopian neon style)
+    // Draw strong outer glow effect (dystopian neon style)
     ctx.shadowBlur = BRICK_GLOW_BLUR;
     ctx.shadowColor = color;
 
-    // Create gradient for 3D effect (top-left to bottom-right)
+    // Create brighter gradient for 3D effect (top-left to bottom-right)
     const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0, this.lightenColor(color, 30));
-    gradient.addColorStop(0.5, color);
-    gradient.addColorStop(1, this.darkenColor(color, 30));
+    gradient.addColorStop(0, this.lightenColor(color, 50)); // Brighter highlight
+    gradient.addColorStop(0.3, this.lightenColor(color, 20)); // Mid-highlight
+    gradient.addColorStop(0.7, color);
+    gradient.addColorStop(1, this.darkenColor(color, 20)); // Subtle shadow
 
     // Draw brick with gradient and rounded corners
     const cornerRadius = BRICK_CORNER_RADIUS;
@@ -438,17 +443,20 @@ export class Brick {
     ctx.closePath();
     ctx.fill();
 
-    // Draw outer border for definition
+    // Draw bright outer border with glow for extra shine
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = color;
+    ctx.shadowBlur = 8; // Add glow to border
+    ctx.shadowColor = this.lightenColor(color, 30);
+    ctx.strokeStyle = this.lightenColor(color, 40); // Brighter border
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw inner glow for depth (lighter border inside)
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = this.lightenColor(color, 50);
+    // Draw bright inner highlight for depth
+    ctx.shadowBlur = 5; // Subtle inner glow
+    ctx.shadowColor = this.lightenColor(color, 60);
+    ctx.strokeStyle = this.lightenColor(color, 70); // Very bright inner highlight
     ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.8; // More visible
     
     // Draw inner rounded rectangle (slightly smaller)
     const innerPadding = 2;

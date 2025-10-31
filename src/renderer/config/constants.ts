@@ -29,7 +29,7 @@ export const BRICK_WIDTH = 120; // 30% wider than original 80
 export const BRICK_HEIGHT = 25;
 export const BRICK_SPACING = 1;
 export const BRICK_LAYOUT_TOP_MARGIN = 200;
-export const BRICK_CORNER_RADIUS = 5; // Corner radius for rounded edges
+export const BRICK_CORNER_RADIUS = 7; // Corner radius for rounded edges
 
 // Letter pattern constants
 export const LETTER_BRICK_COLS = 5; // Each letter is 5 bricks wide
@@ -99,7 +99,7 @@ export const DAMAGE_NUMBER_GLOW_BLUR = 10;
 export const BALL_GLOW_BLUR = 20;
 export const BALL_TAIL_GLOW_BLUR = 15;
 export const BAT_GLOW_BLUR = 15;
-export const BRICK_GLOW_BLUR = 10;
+export const BRICK_GLOW_BLUR = 25; // Increased for shinier appearance
 export const BACKGROUND_IMAGE_OPACITY = 0.3;
 
 // Audio constants
