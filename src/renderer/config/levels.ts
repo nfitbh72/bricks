@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 7;
+export const TOTAL_LEVELS = 8;
 
 /**
  * Create Level 1 configuration
@@ -225,6 +225,30 @@ export function createLevel7(): LevelConfig {
 }
 
 /**
+ * Create Level 8 configuration
+ * 8x8 grid with only offensive bricks in a spiral mandala pattern
+ */
+export function createLevel8(): LevelConfig {
+  const pattern = [
+    "LLLLLLLL",
+    "LMSBDSML",
+    "LSFFFFSL",
+    "LBFEEEFB",
+    "LDFEEEFD",
+    "LSFFFFSL",
+    "LMSBDSML",
+    "LLLLLLLL"
+  ];
+  
+  return {
+    id: 8,
+    name: t('game.levels.level8Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 5, // Higher health for challenging offensive-only level
+  };
+}
+
+/**
  * Get level by ID
  */
 export function getLevel(id: number): LevelConfig | undefined {
@@ -243,6 +267,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel6();
     case 7:
       return createLevel7();
+    case 8:
+      return createLevel8();
     default:
       return undefined;
   }

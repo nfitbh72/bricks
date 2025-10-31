@@ -121,10 +121,20 @@ export function getUpgrades() : Upgrade[] {
                             name: t('game.upgrades.criticalHitsPlus.name'),
                             description: t('game.upgrades.criticalHitsPlus.description'),
                             times: 3,
-                            previewNextUpgrades: 0,
-                            unlockNextUpgradesAfterTimes: 0,
+                            previewNextUpgrades: 1,
+                            unlockNextUpgradesAfterTimes: 2,
                             type: UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT,
-                            nextUpgrades: [],
+                            nextUpgrades: [
+                                {
+                                    name: t('game.upgrades.criticalDamage.name'),
+                                    description: t('game.upgrades.criticalDamage.description'),
+                                    times: 3,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    type: UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT,
+                                    nextUpgrades: [],
+                                }
+                            ],
                         }
                     ],
                 },

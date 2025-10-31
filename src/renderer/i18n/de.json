@@ -52,7 +52,8 @@
       "level4Name": "Level 4: Wir nennen es Homer",
       "level5Name": "Level 5: Bomben weg",
       "level6Name": "Level 6: Dynamit",
-      "level7Name": "Level 7: Boss-Kampf"
+      "level7Name": "Level 7: Boss-Kampf",
+      "level8Name": "Level 8: Offensives Mandala"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "Kritische Treffer+",
         "description": "Erhöht kritische Trefferchance um 10%"
+      },
+      "criticalDamage": {
+        "name": "Kritischer Schaden",
+        "description": "Erhöht kritischen Schaden um 10% und kritische Chance um 10%"
       },
       "explosions": {
         "name": "Explosionen",

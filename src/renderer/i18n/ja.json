@@ -52,7 +52,8 @@
       "level4Name": "レベル4：ホーマーと呼ぶ",
       "level5Name": "レベル5：爆弾投下",
       "level6Name": "レベル6：ダイナマイト",
-      "level7Name": "レベル7：ボス戦"
+      "level7Name": "レベル7：ボス戦",
+      "level8Name": "レベル8：攻撃的なマンダラ"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "クリティカルヒット+",
         "description": "クリティカル確率を10%増加"
+      },
+      "criticalDamage": {
+        "name": "クリティカルダメージ",
+        "description": "クリティカルダメージを10%、クリティカル確率を10%増加"
       },
       "explosions": {
         "name": "爆発",

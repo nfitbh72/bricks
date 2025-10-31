@@ -52,7 +52,8 @@
       "level4Name": "Màn 4: Chúng tôi gọi nó là Homer",
       "level5Name": "Màn 5: Bom Nổ",
       "level6Name": "Màn 6: Thuốc Nổ",
-      "level7Name": "Màn 7: Trận Đánh Boss"
+      "level7Name": "Màn 7: Trận Đánh Boss",
+      "level8Name": "Màn 8: Mandala Tấn Công"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "Đòn Chí Mạng+",
         "description": "Tăng cơ hội chí mạng 10%"
+      },
+      "criticalDamage": {
+        "name": "Sát Thương Chí Mạng",
+        "description": "Tăng sát thương chí mạng 10% và cơ hội chí mạng 10%"
       },
       "explosions": {
         "name": "Nổ",

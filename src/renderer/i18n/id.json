@@ -52,7 +52,8 @@
       "level4Name": "Level 4: Kami menyebutnya Homer",
       "level5Name": "Level 5: Bom Meledak",
       "level6Name": "Level 6: Dinamit",
-      "level7Name": "Level 7: Pertarungan Bos"
+      "level7Name": "Level 7: Pertarungan Bos",
+      "level8Name": "Level 8: Mandala Ofensif"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "Pukulan Kritis+",
         "description": "Tingkatkan peluang kritis 10%"
+      },
+      "criticalDamage": {
+        "name": "Kerusakan Kritis",
+        "description": "Tingkatkan kerusakan kritis 10% dan peluang kritis 10%"
       },
       "explosions": {
         "name": "Ledakan",

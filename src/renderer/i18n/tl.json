@@ -52,7 +52,8 @@
       "level4Name": "Antas 4: Tinatawag namin itong Homer",
       "level5Name": "Antas 5: Mga Bomba",
       "level6Name": "Antas 6: Dinamita",
-      "level7Name": "Antas 7: Labanan ang Boss"
+      "level7Name": "Antas 7: Labanan ang Boss",
+      "level8Name": "Antas 8: Mandala ng Pag-atake"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "Mga Critical Hit+",
         "description": "Dagdagan ang pagkakataon ng critical hit ng 10%"
+      },
+      "criticalDamage": {
+        "name": "Critical Damage",
+        "description": "Dagdagan ang critical damage ng 10% at critical chance ng 10%"
       },
       "explosions": {
         "name": "Mga Pagsabog",

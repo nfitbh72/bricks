@@ -154,11 +154,8 @@ export class StateTransitionHandler {
     // Apply all purchased upgrades before transitioning
     this.applyUpgrades();
     
-    // Check if we're in dev mode
-    const wasDevMode = this.context.isDevUpgradeMode;
-    
-    // In dev mode, load current level. In normal mode, load next level.
-    const levelIdToLoad = wasDevMode ? this.context.currentLevelId : this.context.currentLevelId + 1;
+    // Always load next level (both in dev mode and normal mode)
+    const levelIdToLoad = this.context.currentLevelId + 1;
     
     this.context.startTransition(() => {
       // Don't reset isDevUpgradeMode - it should persist throughout the dev session

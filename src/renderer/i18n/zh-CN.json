@@ -52,7 +52,8 @@
       "level4Name": "第4关：我们称之为荷马",
       "level5Name": "第5关：炸弹来袭",
       "level6Name": "第6关：炸药",
-      "level7Name": "第7关：首领战"
+      "level7Name": "第7关：首领战",
+      "level8Name": "第8关：攻击曼达拉"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "暴击+",
         "description": "增加暴击几率10%"
+      },
+      "criticalDamage": {
+        "name": "暴击伤害",
+        "description": "增加暴击伤害10%和暴击几率10%"
       },
       "explosions": {
         "name": "爆炸",

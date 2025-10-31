@@ -52,7 +52,8 @@
       "level4Name": "Level 4: We call it Homer",
       "level5Name": "Level 5: Bombs Away",
       "level6Name": "Level 6: Dynamite",
-      "level7Name": "Level 7: Boss Battle"
+      "level7Name": "Level 7: Boss Battle",
+      "level8Name": "Level 8: Offensive Mandala"
     },
     "bricks": {
       "offensive": {
@@ -131,6 +132,10 @@
       "criticalHitsPlus": {
         "name": "Critical Hits+",
         "description": "Increase critical hit chance by 10%"
+      },
+      "criticalDamage": {
+        "name": "Critical Damage",
+        "description": "Increase crit damage by 10% and crit chance by 10%"
       },
       "explosions": {
         "name": "Explosions",

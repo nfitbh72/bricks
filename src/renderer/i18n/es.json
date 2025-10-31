@@ -52,7 +52,8 @@
       "level4Name": "Nivel 4: Lo llamamos Homer",
       "level5Name": "Nivel 5: Bombas Fuera",
       "level6Name": "Nivel 6: Dinamita",
-      "level7Name": "Nivel 7: Batalla de Jefe"
+      "level7Name": "Nivel 7: Batalla de Jefe",
+      "level8Name": "Nivel 8: Mandala Ofensivo"
     },
     "bricks": {
       "offensive": {
@@ -130,7 +131,11 @@
       },
       "criticalHitsPlus": {
         "name": "Golpes Críticos+",
-        "description": "Aumenta la probabilidad de golpe crítico en 10%"
+        "description": "Aumentar la probabilidad de golpe crítico en un 10%"
+      },
+      "criticalDamage": {
+        "name": "Daño Crítico",
+        "description": "Aumentar el daño crítico en un 10% y la probabilidad crítica en un 10%"
       },
       "explosions": {
         "name": "Explosiones",

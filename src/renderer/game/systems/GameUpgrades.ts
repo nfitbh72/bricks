@@ -229,6 +229,35 @@ export class GameUpgrades {
   }
 
   /**
+   * Get critical hit damage multiplier
+   * Base multiplier is 2.0x (double damage), increases by 10% per upgrade level
+   * Also increases crit chance by 10% per level
+   */
+  getCriticalHitDamageMultiplier(): number {
+    if (!this.hasCriticalHits()) return 2.0;
+    
+    const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT);
+    const baseDamage = 2.0; // 2x damage base
+    const bonusDamage = damageLevel * 0.1; // +10% per level
+    
+    return baseDamage + bonusDamage;
+  }
+
+  /**
+   * Get total critical hit chance including damage upgrade bonus
+   * Critical Damage upgrade also increases crit chance by 10% per level
+   */
+  getTotalCriticalHitChance(): number {
+    if (!this.hasCriticalHits()) return 0;
+    
+    const baseChance = this.getCriticalHitChance();
+    const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT);
+    const bonusChance = damageLevel * 0.1; // +10% chance per level
+    
+    return Math.min(baseChance + bonusChance, 1.0); // Cap at 100%
+  }
+
+  /**
    * Get all active upgrades as a readable summary
    */
   getSummary(): string[] {

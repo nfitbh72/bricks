@@ -199,13 +199,13 @@ describe('StateTransitionHandler', () => {
     });
 
     it('should transition to GAME_OVER when no more levels exist', () => {
-      mockContext.currentLevelId = 7; // Level 8 doesn't exist
+      mockContext.currentLevelId = 8; // Level 9 doesn't exist
       handler.updateContext(mockContext);
       handler.handleLevelCompleteTransition();
       
       expect(mockContext.gameState).toBe(GameState.GAME_OVER);
       expect(mockContext.screenManager.gameOverScreen.setStats).toHaveBeenCalledWith(
-        7, // Last completed level
+        8, // Last completed level
         mockContext.totalBricksDestroyed,
         true // Game complete
       );
@@ -223,7 +223,7 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.loadLevel).toHaveBeenCalled();
     });
 
-    it('should keep dev mode and load current level (not increment)', () => {
+    it('should keep dev mode and load next level', () => {
       mockContext.isDevUpgradeMode = true;
       mockContext.currentLevelId = 1;
       
@@ -231,7 +231,7 @@ describe('StateTransitionHandler', () => {
       handler.handleUpgradeComplete();
       
       expect(mockContext.isDevUpgradeMode).toBe(true); // Dev mode should persist
-      expect(mockContext.currentLevelId).toBe(1); // Should stay at 1 in dev mode
+      expect(mockContext.currentLevelId).toBe(2); // Should increment to next level
     });
   });
 

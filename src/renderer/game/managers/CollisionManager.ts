@@ -18,7 +18,6 @@ import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
   EXPLOSION_RADIUS_MULTIPLIER,
-  CRITICAL_HIT_DAMAGE_MULTIPLIER,
   FALLING_BRICK_DAMAGE_PERCENT,
   EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT,
   LASER_BRICK_LASER_DAMAGE_PERCENT,
@@ -136,9 +135,9 @@ export class CollisionManager {
           let isCritical = false;
           
           if (gameUpgrades.hasCriticalHits()) {
-            const critChance = gameUpgrades.getCriticalHitChance();
+            const critChance = gameUpgrades.getTotalCriticalHitChance();
             if (Math.random() < critChance) {
-              damage *= CRITICAL_HIT_DAMAGE_MULTIPLIER;
+              damage *= gameUpgrades.getCriticalHitDamageMultiplier();
               isCritical = true;
             }
           }
