@@ -105,9 +105,9 @@
         "name": "Nyawa",
         "description": "Tingkatkan jumlah nyawa 1"
       },
-      "slowerBall": {
-        "name": "Bola Lebih Lambat",
-        "description": "Kurangi akselerasi bola 25%"
+      "bombs": {
+        "name": "Bom",
+        "description": "Klik kanan untuk menembakkan bom yang meledak saat terkena"
       },
       "ballDamage": {
         "name": "Kerusakan Bola",

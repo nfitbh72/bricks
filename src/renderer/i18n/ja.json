@@ -105,9 +105,9 @@
         "name": "ライフ",
         "description": "ライフ数を1増加"
       },
-      "slowerBall": {
-        "name": "ボール減速",
-        "description": "ボールの加速度を25%減少"
+      "bombs": {
+        "name": "爆弾",
+        "description": "右クリックで爆弾を発射、衝突時に爆発"
       },
       "ballDamage": {
         "name": "ボールダメージ",

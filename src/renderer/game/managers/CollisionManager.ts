@@ -6,6 +6,7 @@ import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
 import { Brick } from '../entities/Brick';
 import { Laser } from '../weapons/Laser';
+import { Bomb } from '../weapons/Bomb';
 import { Level } from '../entities/Level';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { FallingBrick } from '../entities/offensive/FallingBrick';
@@ -228,6 +229,83 @@ export class CollisionManager {
             if (destructionInfo.justDestroyed) {
               if (this.callbacks.onBrickDestroyed) {
                 this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, false);
+              }
+            }
+          }
+          
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Check bomb-brick collisions with area damage
+   */
+  checkBombBrickCollisions(
+    bombs: Bomb[],
+    level: Level
+  ): void {
+    const bricks = level.getActiveBricks();
+    const bombsToCheck = [...bombs];
+
+    for (const bomb of bombsToCheck) {
+      if (!bomb.isActive() || bomb.hasExploded()) continue;
+
+      const bombBounds = bomb.getBounds();
+
+      for (const brick of bricks) {
+        const brickBounds = brick.getBounds();
+
+        // Simple AABB collision
+        if (
+          bombBounds.x < brickBounds.x + brickBounds.width &&
+          bombBounds.x + bombBounds.width > brickBounds.x &&
+          bombBounds.y < brickBounds.y + brickBounds.height &&
+          bombBounds.y + bombBounds.height > brickBounds.y
+        ) {
+          // Trigger explosion
+          bomb.explode();
+          
+          // Skip damage for indestructible bricks
+          if (brick.isIndestructible()) {
+            break;
+          }
+
+          // Get explosion center
+          const bombPos = bomb.getPosition();
+          const explosionRadius = bomb.getExplosionRadius();
+          
+          // Damage all bricks within explosion radius
+          for (const targetBrick of bricks) {
+            if (targetBrick.isIndestructible()) continue;
+
+            const targetBounds = targetBrick.getBounds();
+            const targetCenter = {
+              x: targetBounds.x + targetBounds.width / 2,
+              y: targetBounds.y + targetBounds.height / 2
+            };
+
+            // Calculate distance from explosion center
+            const dx = targetCenter.x - bombPos.x;
+            const dy = targetCenter.y - bombPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= explosionRadius) {
+              // Damage brick
+              const bombDamage = bomb.getDamage();
+              const destructionInfo = targetBrick.takeDamage(bombDamage);
+
+              // Notify hit (show damage numbers)
+              if (this.callbacks.onBrickHit) {
+                this.callbacks.onBrickHit(targetBrick, bombDamage, false);
+              }
+
+              // Track destroyed bricks
+              if (destructionInfo.justDestroyed) {
+                if (this.callbacks.onBrickDestroyed) {
+                  this.callbacks.onBrickDestroyed(targetBrick, destructionInfo.centerX, destructionInfo.centerY, false);
+                }
               }
             }
           }

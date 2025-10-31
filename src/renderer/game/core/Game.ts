@@ -22,7 +22,7 @@ import { StateTransitionHandler, StateTransitionContext } from '../managers/Stat
 import { RenderManager } from '../managers/RenderManager';
 import { 
   PLAYER_STARTING_HEALTH, 
-  BOMB_DAMAGE_MULTIPLIER, 
+  BOMB_BRICK_DAMAGE_MULTIPLIER, 
   BAT_WIDTH, 
   BAT_HEIGHT, 
   BAT_SPEED,
@@ -241,6 +241,12 @@ export class Game {
           } else {
             this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
           }
+        }
+      },
+      onRightClick: (_x: number, _y: number) => {
+        // Only shoot bombs during active gameplay
+        if (this.gameState === GameState.PLAYING && !this.ball.getIsSticky()) {
+          this.weaponManager.shootBomb(this.bat, this.ball, this.gameUpgrades);
         }
       },
     });
@@ -611,7 +617,7 @@ export class Game {
     this.levelTime = 0;
     
     // Calculate bomb damage using multiplier constant
-    this.bombDamage = this.ball.getDamage() * BOMB_DAMAGE_MULTIPLIER;
+    this.bombDamage = this.ball.getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
     
     // Reset slow-motion state
     this.slowMotionManager.reset();
@@ -950,6 +956,9 @@ export class Game {
 
     // Laser-Brick collisions
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
+
+    // Bomb-Brick collisions
+    this.collisionManager.checkBombBrickCollisions(this.weaponManager.getBombs(), this.level);
 
     // Offensive entity-Bat collisions
     this.collisionManager.checkFallingBrickBatCollisions(this.offensiveEntityManager.getFallingBricks(), this.bat);

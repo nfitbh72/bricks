@@ -49,12 +49,12 @@ export function getUpgrades() : Upgrade[] {
                     type: UpgradeType.HEALTH_INCREASE_1,
                     nextUpgrades: [
                         {
-                            name: t('game.upgrades.slowerBall.name'),
-                            description: t('game.upgrades.slowerBall.description'),
-                            times: 3,
+                            name: t('game.upgrades.bombs.name'),
+                            description: t('game.upgrades.bombs.description'),
+                            times: 1,
                             previewNextUpgrades: 1,
-                            unlockNextUpgradesAfterTimes: 2,
-                            type: UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT,
+                            unlockNextUpgradesAfterTimes: 1,
+                            type: UpgradeType.BAT_ADD_BOMBS,
                             nextUpgrades: [
                                 {
                                     name: t('game.upgrades.stickyBat.name'),

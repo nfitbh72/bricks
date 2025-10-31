@@ -8,6 +8,7 @@ export interface InputCallbacks {
   onKeyPress?: (key: string) => void;
   onMouseMove?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
+  onRightClick?: (x: number, y: number) => void;
 }
 
 export class InputManager {
@@ -77,7 +78,7 @@ export class InputManager {
       }
     });
 
-    // Mouse click
+    // Mouse click (left button)
     this.canvas.addEventListener('click', (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -85,6 +86,18 @@ export class InputManager {
       
       if (this.callbacks.onClick) {
         this.callbacks.onClick(x, y);
+      }
+    });
+
+    // Mouse right-click
+    this.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault(); // Prevent context menu
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (this.callbacks.onRightClick) {
+        this.callbacks.onRightClick(x, y);
       }
     });
   }

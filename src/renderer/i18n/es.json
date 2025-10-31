@@ -105,9 +105,9 @@
         "name": "Vidas",
         "description": "Aumenta el número de vidas en 1"
       },
-      "slowerBall": {
-        "name": "Bola Más Lenta",
-        "description": "Reduce la aceleración de la bola en 25%"
+      "bombs": {
+        "name": "Bombas",
+        "description": "Clic derecho para disparar bombas que explotan al impacto"
       },
       "ballDamage": {
         "name": "Daño de Bola",

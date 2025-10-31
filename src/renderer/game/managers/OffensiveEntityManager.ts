@@ -15,8 +15,8 @@ import {
   EXPLODING_BRICK_DEBRIS_COUNT,
   EXPLODING_BRICK_DEBRIS_SPEED,
   SPLITTING_FRAGMENT_SPEED,
-  BOMB_EXPLOSION_RADIUS_X_MULTIPLIER,
-  BOMB_EXPLOSION_RADIUS_Y_MULTIPLIER,
+  BOMB_BRICK_EXPLOSION_RADIUS_X_MULTIPLIER,
+  BOMB_BRICK_EXPLOSION_RADIUS_Y_MULTIPLIER,
   BRICK_WIDTH,
   BRICK_HEIGHT
 } from '../../config/constants';
@@ -86,8 +86,8 @@ export class OffensiveEntityManager {
         
         const bricksToDamage: Brick[] = [];
         // Ellipse radii - wider horizontally to hit adjacent bricks, narrower vertically to limit chain reactions
-        const radiusX = BRICK_WIDTH * BOMB_EXPLOSION_RADIUS_X_MULTIPLIER;
-        const radiusY = BRICK_HEIGHT * BOMB_EXPLOSION_RADIUS_Y_MULTIPLIER;
+        const radiusX = BRICK_WIDTH * BOMB_BRICK_EXPLOSION_RADIUS_X_MULTIPLIER;
+        const radiusY = BRICK_HEIGHT * BOMB_BRICK_EXPLOSION_RADIUS_Y_MULTIPLIER;
         
         for (const otherBrick of allBricks) {
           if (otherBrick === brick || otherBrick.isDestroyed() || otherBrick.isIndestructible()) {

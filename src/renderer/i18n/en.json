@@ -105,9 +105,9 @@
         "name": "Lives",
         "description": "Increase the number of lives by 1"
       },
-      "slowerBall": {
-        "name": "Slower Ball",
-        "description": "Reduce ball acceleration by 25%"
+      "bombs": {
+        "name": "Bombs",
+        "description": "Right-click to shoot bombs that explode on impact"
       },
       "ballDamage": {
         "name": "Ball Damage",

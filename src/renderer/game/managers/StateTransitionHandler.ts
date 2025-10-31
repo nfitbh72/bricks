@@ -292,9 +292,5 @@ export class StateTransitionHandler {
     // Apply ball upgrades
     const ballProps = this.context.gameUpgrades.applyBallUpgrades();
     this.context.ball.setDamage(ballProps.damage);
-    
-    // Apply ball acceleration multiplier
-    const accelerationMultiplier = this.context.gameUpgrades.getBallAccelerationMultiplier();
-    this.context.ball.setAccelerationMultiplier(accelerationMultiplier);
   }
 }

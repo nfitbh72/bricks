@@ -96,11 +96,10 @@ export class GameUpgrades {
   }
 
   /**
-   * Get ball acceleration multiplier (reduced by upgrade)
+   * Check if bombs are unlocked
    */
-  getBallAccelerationMultiplier(): number {
-    const level = this.getUpgradeLevel(UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT);
-    return 1 - (level * 0.25); // Reduce by 25% per level
+  hasBombs(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BAT_ADD_BOMBS) > 0;
   }
 
   /**

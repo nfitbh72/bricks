@@ -105,9 +105,9 @@
         "name": "Mạng",
         "description": "Tăng số mạng 1"
       },
-      "slowerBall": {
-        "name": "Bóng Chậm Hơn",
-        "description": "Giảm gia tốc bóng 25%"
+      "bombs": {
+        "name": "Bom",
+        "description": "Nhấp chuột phải để bắn bom nổ khi va chạm"
       },
       "ballDamage": {
         "name": "Sát Thương Bóng",

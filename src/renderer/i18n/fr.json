@@ -105,9 +105,9 @@
         "name": "Vies",
         "description": "Augmente le nombre de vies de 1"
       },
-      "slowerBall": {
-        "name": "Balle Plus Lente",
-        "description": "Réduit l'accélération de la balle de 25%"
+      "bombs": {
+        "name": "Bombes",
+        "description": "Clic droit pour tirer des bombes qui explosent à l'impact"
       },
       "ballDamage": {
         "name": "Dégâts de Balle",

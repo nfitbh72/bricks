@@ -105,9 +105,9 @@
         "name": "Leben",
         "description": "Erhöht die Anzahl der Leben um 1"
       },
-      "slowerBall": {
-        "name": "Langsamerer Ball",
-        "description": "Reduziert Ballbeschleunigung um 25%"
+      "bombs": {
+        "name": "Bomben",
+        "description": "Rechtsklick zum Schießen von Bomben, die bei Aufprall explodieren"
       },
       "ballDamage": {
         "name": "Ballschaden",

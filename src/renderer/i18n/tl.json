@@ -105,9 +105,9 @@
         "name": "Mga Buhay",
         "description": "Dagdagan ang bilang ng buhay ng 1"
       },
-      "slowerBall": {
-        "name": "Mas Mabagal na Bola",
-        "description": "Bawasan ang acceleration ng bola ng 25%"
+      "bombs": {
+        "name": "Mga Bomba",
+        "description": "Right-click para magbaril ng mga bomba na sumasabog sa impact"
       },
       "ballDamage": {
         "name": "Pinsala ng Bola",

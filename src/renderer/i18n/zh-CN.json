@@ -105,9 +105,9 @@
         "name": "生命",
         "description": "增加生命数量1"
       },
-      "slowerBall": {
-        "name": "减速球",
-        "description": "减少球加速度25%"
+      "bombs": {
+        "name": "炸弹",
+        "description": "右键发射炸弹，碰撞时爆炸"
       },
       "ballDamage": {
         "name": "球伤害",
