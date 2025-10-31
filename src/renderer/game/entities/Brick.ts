@@ -7,6 +7,7 @@ import { BrickType } from '../core/types';
 import { 
   BRICK_WIDTH, 
   BRICK_HEIGHT, 
+  BRICK_CORNER_RADIUS,
   BRICK_GLOW_BLUR,
   BRICK_COLOR_NORMAL,
   BRICK_COLOR_HEALTHY,
@@ -285,7 +286,7 @@ export class Brick {
     gradient.addColorStop(1, this.darkenColor(color, 30));
 
     // Draw brick with gradient and rounded corners
-    const cornerRadius = 3; // Small radius for subtle rounding
+    const cornerRadius = BRICK_CORNER_RADIUS;
     ctx.fillStyle = gradient;
     ctx.globalAlpha = opacity;
     
@@ -420,7 +421,7 @@ export class Brick {
     gradient.addColorStop(1, this.darkenColor(color, 30));
 
     // Draw brick with gradient and rounded corners
-    const cornerRadius = 3;
+    const cornerRadius = BRICK_CORNER_RADIUS;
     ctx.fillStyle = gradient;
     
     // Draw rounded rectangle
