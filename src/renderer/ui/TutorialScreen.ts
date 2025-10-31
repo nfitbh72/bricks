@@ -5,7 +5,7 @@
 import { Screen } from './Screen';
 import { Button } from './Button';
 import { t } from '../i18n/LanguageManager';
-import { FONT_TITLE_LARGE, FONT_TITLE_SMALL, GLOW_LARGE, COLOR_CYAN, COLOR_GREEN } from '../config/constants';
+import { FONT_TITLE_LARGE, FONT_TITLE_SMALL, GLOW_LARGE, COLOR_CYAN, COLOR_GREEN, COLOR_ORANGE } from '../config/constants';
 
 export class TutorialScreen extends Screen {
   private onClose: () => void;
@@ -101,9 +101,14 @@ export class TutorialScreen extends Screen {
     
     const line1 = t('ui.screens.tutorial.line1');
     const line2 = t('ui.screens.tutorial.line2');
+    const line3 = t('ui.screens.tutorial.line3');
     
-    this.ctx.fillText(line1, centerX, centerY - 10);
-    this.ctx.fillText(line2, centerX, centerY + 30);
+    this.ctx.fillText(line1, centerX, centerY - 30);
+    this.ctx.fillText(line2, centerX, centerY + 10);
+    
+    // Draw warning line in red/orange
+    this.ctx.fillStyle = COLOR_ORANGE;
+    this.ctx.fillText(line3, centerX, centerY + 50);
 
     this.ctx.restore();
 

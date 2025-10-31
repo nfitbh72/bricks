@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "CÁCH CHƠI",
         "line1": "Phá hủy tất cả gạch để hoàn thành màn chơi.",
-        "line2": "Quả bóng sẽ nảy ở các góc khác nhau tùy thuộc vào phần vợt bạn đánh trúng."
+        "line2": "Quả bóng sẽ nảy ở các góc khác nhau tùy thuộc vào phần vợt bạn đánh trúng.",
+        "line3": "CẢNH BÁO! Một số viên gạch tấn công và sẽ làm nhỏ vợt!"
       }
     },
     "options": {

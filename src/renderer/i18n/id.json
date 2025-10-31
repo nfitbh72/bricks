@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "CARA BERMAIN",
         "line1": "Hancurkan semua bata untuk menyelesaikan level.",
-        "line2": "Bola akan memantul pada sudut yang berbeda tergantung pada bagian pemukul yang Anda pukul."
+        "line2": "Bola akan memantul pada sudut yang berbeda tergantung pada bagian pemukul yang Anda pukul.",
+        "line3": "PERINGATAN! Beberapa batu bata ofensif dan akan mengecilkan bat!"
       }
     },
     "options": {

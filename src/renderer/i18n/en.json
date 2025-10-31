@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "HOW TO PLAY",
         "line1": "Clear all bricks to clear the level.",
-        "line2": "The ball will bounce at different angles depending on which part of the bat you hit with."
+        "line2": "The ball will bounce at different angles depending on which part of the bat you hit with.",
+        "line3": "WARNING! Some bricks are offensive and will shrink the bat!"
       }
     },
     "options": {

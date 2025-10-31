@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "COMMENT JOUER",
         "line1": "Détruisez toutes les briques pour terminer le niveau.",
-        "line2": "La balle rebondira à différents angles selon la partie de la raquette que vous frappez."
+        "line2": "La balle rebondira à différents angles selon la partie de la raquette que vous frappez.",
+        "line3": "ATTENTION! Certaines briques sont offensives et rétréciront la raquette!"
       }
     },
     "options": {

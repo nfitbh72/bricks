@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "WIE MAN SPIELT",
         "line1": "Zerstöre alle Steine, um das Level zu schaffen.",
-        "line2": "Der Ball prallt in verschiedenen Winkeln ab, je nachdem, welchen Teil des Schlägers du triffst."
+        "line2": "Der Ball prallt in verschiedenen Winkeln ab, je nachdem, welchen Teil des Schlägers du triffst.",
+        "line3": "WARNUNG! Einige Steine sind offensiv und verkleinern den Schläger!"
       }
     },
     "options": {

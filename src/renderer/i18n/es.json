@@ -18,7 +18,8 @@
       "tutorial": {
         "title": "CÓMO JUGAR",
         "line1": "Destruye todos los ladrillos para completar el nivel.",
-        "line2": "La bola rebotará en diferentes ángulos dependiendo de qué parte de la paleta golpees."
+        "line2": "La bola rebotará en diferentes ángulos dependiendo de qué parte de la paleta golpees.",
+        "line3": "¡ADVERTENCIA! ¡Algunos ladrillos son ofensivos y encogerán el bate!"
       }
     },
     "options": {
