@@ -361,19 +361,20 @@ export class Game {
         if (!this.level) return;
         
         const remainingBricks = this.level.getRemainingBricks();
+        const remainingDestructibleBricks = this.level.getRemainingDestructibleBricks();
         this.statusBar.setBrickCounts(
           remainingBricks,
           this.level.getTotalBricks()
         );
         
-        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
+        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}, Remaining destructible: ${remainingDestructibleBricks}`);
         
         // Note: Offensive entity spawning is now handled by brick's onDestroy callback
         // This ensures all damage sources (ball, laser, bomb chains) trigger effects
         
-        // Create particles (more for final brick)
-        const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
-        const particleLifetime = remainingBricks === 0 ? 300 : (isCritical ? 200 : 150);
+        // Create particles (more for final destructible brick)
+        const particleCount = remainingDestructibleBricks === 0 ? 30 : (isCritical ? 20 : 10);
+        const particleLifetime = remainingDestructibleBricks === 0 ? 300 : (isCritical ? 200 : 150);
         const particleColor = isCritical ? '#ffff00' : brick.getColor();
         this.effectsManager.createParticles(x, y, particleCount, particleColor, particleLifetime);
         

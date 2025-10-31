@@ -58,7 +58,7 @@ export class SlowMotionManager {
   }
 
   /**
-   * Check if slow-motion should be triggered (1 brick left, ball approaching)
+   * Check if slow-motion should be triggered (1 destructible brick left, ball approaching)
    * If triggered, activates slow-motion and visual effects
    */
   checkAndTrigger(
@@ -69,21 +69,21 @@ export class SlowMotionManager {
     canvasWidth: number,
     canvasHeight: number
   ): void {
-    // Only trigger if not already in slow-motion and exactly 1 brick remains
-    if (!level || this.isSlowMotion || level.getRemainingBricks() !== 1) {
+    // Only trigger if not already in slow-motion and exactly 1 destructible brick remains
+    if (!level || this.isSlowMotion || level.getRemainingDestructibleBricks() !== 1) {
       return;
     }
 
     if (this.predictBallWillHitBrick(level, ball, statusBar, canvasWidth)) {
-      console.log('🎬 SLOW-MOTION ACTIVATED! Ball approaching final brick!');
+      console.log('🎬 SLOW-MOTION ACTIVATED! Ball approaching final destructible brick!');
       this.isSlowMotion = true;
       this.slowMotionTimer = 0;
       
-      // Calculate target focus point (midpoint between ball and final brick)
+      // Calculate target focus point (midpoint between ball and final destructible brick)
       const ballPos = ball.getPosition();
-      const bricks = level.getActiveBricks();
-      if (bricks.length === 1) {
-        const brickBounds = bricks[0].getBounds();
+      const destructibleBricks = level.getBricks().filter(b => !b.isIndestructible() && !b.isDestroyed());
+      if (destructibleBricks.length === 1) {
+        const brickBounds = destructibleBricks[0].getBounds();
         const brickCenterX = brickBounds.x + brickBounds.width / 2;
         const brickCenterY = brickBounds.y + brickBounds.height / 2;
         
@@ -117,11 +117,11 @@ export class SlowMotionManager {
     const ballVel = ball.getVelocity();
     const ballRadius = ball.getRadius();
     
-    // Get the final brick
-    const bricks = level.getActiveBricks();
-    if (bricks.length !== 1) return false;
+    // Get the final destructible brick
+    const destructibleBricks = level.getBricks().filter(b => !b.isIndestructible() && !b.isDestroyed());
+    if (destructibleBricks.length !== 1) return false;
     
-    const finalBrick = bricks[0];
+    const finalBrick = destructibleBricks[0];
     const brickBounds = finalBrick.getBounds();
     
     // Calculate distance from ball to brick

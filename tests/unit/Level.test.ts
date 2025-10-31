@@ -261,6 +261,62 @@ describe('Level Class', () => {
     });
   });
 
+  describe('getRemainingDestructibleBricks', () => {
+    it('should return count of destructible bricks only', () => {
+      const configWithIndestructible: LevelConfig = {
+        id: 1,
+        name: 'Test Level',
+        bricks: [
+          { col: 0, row: 0, type: BrickType.NORMAL },
+          { col: 1, row: 0, type: BrickType.INDESTRUCTIBLE },
+          { col: 2, row: 0, type: BrickType.NORMAL },
+        ],
+      };
+      const level = new Level(configWithIndestructible);
+      expect(level.getRemainingDestructibleBricks()).toBe(2);
+    });
+
+    it('should exclude destroyed destructible bricks', () => {
+      const configWithIndestructible: LevelConfig = {
+        id: 1,
+        name: 'Test Level',
+        bricks: [
+          { col: 0, row: 0, type: BrickType.NORMAL },
+          { col: 1, row: 0, type: BrickType.INDESTRUCTIBLE },
+          { col: 2, row: 0, type: BrickType.NORMAL },
+        ],
+      };
+      const level = new Level(configWithIndestructible);
+      const bricks = level.getBricks();
+      bricks[0].takeDamage(10); // Destroy first NORMAL brick
+      expect(level.getRemainingDestructibleBricks()).toBe(1);
+    });
+
+    it('should return 0 when all destructible bricks destroyed', () => {
+      const configWithIndestructible: LevelConfig = {
+        id: 1,
+        name: 'Test Level',
+        bricks: [
+          { col: 0, row: 0, type: BrickType.NORMAL },
+          { col: 1, row: 0, type: BrickType.INDESTRUCTIBLE },
+          { col: 2, row: 0, type: BrickType.NORMAL },
+        ],
+      };
+      const level = new Level(configWithIndestructible);
+      const bricks = level.getBricks();
+      bricks[0].takeDamage(10); // Destroy first NORMAL brick
+      bricks[2].takeDamage(10); // Destroy second NORMAL brick
+      expect(level.getRemainingDestructibleBricks()).toBe(0);
+      // But total remaining should still be 1 (the indestructible brick)
+      expect(level.getRemainingBricks()).toBe(1);
+    });
+
+    it('should match getRemainingBricks when no indestructible bricks', () => {
+      const level = new Level(testConfig);
+      expect(level.getRemainingDestructibleBricks()).toBe(level.getRemainingBricks());
+    });
+  });
+
   describe('getTotalBricks', () => {
     it('should return total brick count', () => {
       const level = new Level(testConfig);

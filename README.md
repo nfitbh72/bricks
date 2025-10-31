@@ -2,6 +2,8 @@
 
 Dystopian brick-breaking game built with Electron + TypeScript + Canvas.
 
+All code written using Windsurf + Claude Sonnet 4.5
+
 ## 🚀 Quick Start
 
 ```bash
