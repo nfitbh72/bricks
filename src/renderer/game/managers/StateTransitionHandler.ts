@@ -78,8 +78,8 @@ export class StateTransitionHandler {
     // Mark that we're in dev upgrade mode
     this.context.setIsDevUpgradeMode(true);
     
-    // Start at level 1, just like normal mode
-    this.context.setCurrentLevelId(1);
+    // Start at level 0 so that handleUpgradeComplete increments to level 1
+    this.context.setCurrentLevelId(0);
     this.context.setTotalBricksDestroyed(0);
     
     // Capture a dark background for the upgrade screen
