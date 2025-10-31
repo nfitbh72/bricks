@@ -84,6 +84,17 @@ export const BOMB_BRICK_DAMAGE_MULTIPLIER = 3; // Bomb brick damage = ball damag
 // Critical hit constants
 export const CRITICAL_HIT_DAMAGE_MULTIPLIER = 2; // Double damage on critical hits
 
+// Screen shake constants
+export const SCREEN_SHAKE_BAT_DAMAGE_INTENSITY = 2; // Pixels
+export const SCREEN_SHAKE_BAT_DAMAGE_DURATION = 0.15; // Seconds
+export const SCREEN_SHAKE_BACK_WALL_INTENSITY = 3; // Pixels
+export const SCREEN_SHAKE_BACK_WALL_DURATION = 0.2; // Seconds
+export const SCREEN_SHAKE_BOMB_BRICK_INTENSITY = 5; // Pixels
+export const SCREEN_SHAKE_BOMB_BRICK_DURATION = 0.3; // Seconds
+
+// Bat damage constants
+export const BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT = 10; // Percentage of bat width removed
+
 // Particle constants
 export const PARTICLE_MIN_SIZE = 2;
 export const PARTICLE_MAX_SIZE = 5;

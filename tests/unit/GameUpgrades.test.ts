@@ -189,33 +189,17 @@ describe('GameUpgrades', () => {
     });
   });
 
-  describe('ball acceleration reduction', () => {
-    it('should return 1.0 multiplier with no upgrade', () => {
-      expect(gameUpgrades.getBallAccelerationMultiplier()).toBe(1.0);
+  describe('bombs', () => {
+    it('should return false for hasBombs with no upgrade', () => {
+      expect(gameUpgrades.hasBombs()).toBe(false);
     });
 
-    it('should reduce acceleration by 25% at level 1', () => {
+    it('should return true for hasBombs with upgrade', () => {
       const upgrades = new Map<string, number>();
-      upgrades.set(UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT, 1);
+      upgrades.set(UpgradeType.BAT_ADD_BOMBS, 1);
       gameUpgrades.setUpgradeLevels(upgrades);
 
-      expect(gameUpgrades.getBallAccelerationMultiplier()).toBe(0.75);
-    });
-
-    it('should reduce acceleration by 50% at level 2', () => {
-      const upgrades = new Map<string, number>();
-      upgrades.set(UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT, 2);
-      gameUpgrades.setUpgradeLevels(upgrades);
-
-      expect(gameUpgrades.getBallAccelerationMultiplier()).toBe(0.5);
-    });
-
-    it('should reduce acceleration by 75% at level 3', () => {
-      const upgrades = new Map<string, number>();
-      upgrades.set(UpgradeType.BALL_ACCELERATION_REDUCE_25_PERCENT, 3);
-      gameUpgrades.setUpgradeLevels(upgrades);
-
-      expect(gameUpgrades.getBallAccelerationMultiplier()).toBe(0.25);
+      expect(gameUpgrades.hasBombs()).toBe(true);
     });
   });
 

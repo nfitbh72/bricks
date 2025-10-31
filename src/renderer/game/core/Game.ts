@@ -27,7 +27,14 @@ import {
   BAT_HEIGHT, 
   BAT_SPEED,
   BALL_RADIUS,
-  BALL_SPEED
+  BALL_SPEED,
+  SCREEN_SHAKE_BAT_DAMAGE_INTENSITY,
+  SCREEN_SHAKE_BAT_DAMAGE_DURATION,
+  SCREEN_SHAKE_BACK_WALL_INTENSITY,
+  SCREEN_SHAKE_BACK_WALL_DURATION,
+  SCREEN_SHAKE_BOMB_BRICK_INTENSITY,
+  SCREEN_SHAKE_BOMB_BRICK_DURATION,
+  BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT
 } from '../../config/constants';
 
 export class Game {
@@ -395,7 +402,7 @@ export class Game {
       },
       onBatDamaged: (_damagePercent: number) => {
         // Visual feedback for bat damage
-        this.effectsManager.triggerScreenShake(2, 0.15);
+        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BAT_DAMAGE_INTENSITY, SCREEN_SHAKE_BAT_DAMAGE_DURATION);
         
         // Check if bat is destroyed
         if (this.bat.isDestroyed()) {
@@ -441,19 +448,6 @@ export class Game {
     this.stateTransitionHandler.updateContext(this.getTransitionContext());
     this.stateTransitionHandler.handleStartGame();
     // Note: No sync needed - handler uses async transition callback with setters
-  }
-
-  /**
-   * Sync state back from transition context after handler modifies it
-   */
-  private syncFromTransitionContext(): void {
-    const context = this.stateTransitionHandler['context'];
-    this.bat = context.bat;
-    this.ball = context.ball;
-    this.gameState = context.gameState;
-    this.currentLevelId = context.currentLevelId;
-    this.totalBricksDestroyed = context.totalBricksDestroyed;
-    this.isDevUpgradeMode = context.isDevUpgradeMode;
   }
 
   /**
@@ -804,7 +798,7 @@ export class Game {
         this.playerHealth--;
         this.statusBar.setPlayerHealth(this.playerHealth);
         // Trigger screen shake on back wall hit
-        this.effectsManager.triggerScreenShake(3, 0.2); // 3px intensity, 0.2s duration
+        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BACK_WALL_INTENSITY, SCREEN_SHAKE_BACK_WALL_DURATION);
       }
     }
 
@@ -1037,10 +1031,10 @@ export class Game {
       if (brickBounds && this.checkRectCollision(brickBounds, batBounds)) {
         thrownBrick.deactivate();
         
-        // Damage bat (shrink it by 10%)
-        this.bat.takeDamage(10);
+        // Damage bat
+        this.bat.takeDamage(BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT);
         
-        this.effectsManager.triggerScreenShake(5, 0.3);
+        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BOMB_BRICK_INTENSITY, SCREEN_SHAKE_BOMB_BRICK_DURATION);
         this.effectsManager.createParticles(
           brickBounds.x + brickBounds.width / 2,
           brickBounds.y + brickBounds.height / 2,
