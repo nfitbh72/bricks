@@ -99,7 +99,7 @@ export const DAMAGE_NUMBER_GLOW_BLUR = 10;
 export const BALL_GLOW_BLUR = 20;
 export const BALL_TAIL_GLOW_BLUR = 15;
 export const BAT_GLOW_BLUR = 15;
-export const BRICK_GLOW_BLUR = 25; // Increased for shinier appearance
+export const BRICK_GLOW_BLUR = 50; // Increased for shinier appearance
 export const BACKGROUND_IMAGE_OPACITY = 0.3;
 
 // Audio constants

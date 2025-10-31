@@ -223,14 +223,14 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.loadLevel).toHaveBeenCalled();
     });
 
-    it('should exit dev mode and load current level (not increment)', () => {
+    it('should keep dev mode and load current level (not increment)', () => {
       mockContext.isDevUpgradeMode = true;
       mockContext.currentLevelId = 1;
       
       handler.updateContext(mockContext);
       handler.handleUpgradeComplete();
       
-      expect(mockContext.isDevUpgradeMode).toBe(false);
+      expect(mockContext.isDevUpgradeMode).toBe(true); // Dev mode should persist
       expect(mockContext.currentLevelId).toBe(1); // Should stay at 1 in dev mode
     });
   });
@@ -243,13 +243,13 @@ describe('StateTransitionHandler', () => {
       expect(mockContext.loadLevel).toHaveBeenCalled();
     });
 
-    it('should exit dev upgrade mode', () => {
+    it('should keep dev upgrade mode', () => {
       mockContext.isDevUpgradeMode = true;
       
       handler.updateContext(mockContext);
       handler.handleStartLevel(2);
       
-      expect(mockContext.isDevUpgradeMode).toBe(false);
+      expect(mockContext.isDevUpgradeMode).toBe(true); // Dev mode should persist
     });
 
     it('should reset totalBricksDestroyed', () => {

@@ -54,6 +54,9 @@ export class StateTransitionHandler {
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
       
+      // Ensure dev mode is off for normal gameplay
+      this.context.setIsDevUpgradeMode(false);
+      
       const levelConfig = getLevel(1);
       if (!levelConfig) {
         throw new Error('Level 1 not found');
@@ -102,6 +105,10 @@ export class StateTransitionHandler {
       // Reset upgrades when restarting
       this.context.gameUpgrades.reset();
       this.context.screenManager.upgradeTreeScreen.reset();
+      
+      // Exit dev mode when returning to intro
+      this.context.setIsDevUpgradeMode(false);
+      
       this.context.setGameState(GameState.INTRO);
     }, 1); // Pass level 1 when restarting
   }
@@ -154,7 +161,7 @@ export class StateTransitionHandler {
     const levelIdToLoad = wasDevMode ? this.context.currentLevelId : this.context.currentLevelId + 1;
     
     this.context.startTransition(() => {
-      this.context.setIsDevUpgradeMode(false);
+      // Don't reset isDevUpgradeMode - it should persist throughout the dev session
       this.context.setCurrentLevelId(levelIdToLoad);
       const levelConfig = getLevel(levelIdToLoad);
       
@@ -172,8 +179,7 @@ export class StateTransitionHandler {
     this.applyUpgrades();
     
     this.context.startTransition(() => {
-      // Exit dev upgrade mode
-      this.context.setIsDevUpgradeMode(false);
+      // Don't reset isDevUpgradeMode - it should persist throughout the dev session
       
       // Set the level and reset stats
       this.context.setCurrentLevelId(levelId);
