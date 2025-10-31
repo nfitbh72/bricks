@@ -71,6 +71,7 @@ export const LASER_DAMAGE_MULTIPLIER = 0.1; // Laser damage = ball damage * 0.1
 export const BOMB_SPEED_MULTIPLIER = 2.5; // Bomb speed = ball speed * 2.5
 export const BOMB_DAMAGE_MULTIPLIER = 2.0; // Bomb damage = ball damage * 2.0
 export const BOMB_EXPLOSION_RADIUS = 60; // Explosion radius in pixels
+export const BOMB_COOLDOWN_MS = 1000; // Cooldown between bombs in milliseconds (1 second)
 
 // Explosion constants (for ball explosions)
 export const EXPLOSION_RADIUS_MULTIPLIER = 1.4; // Explosion radius = brick width * 1.5

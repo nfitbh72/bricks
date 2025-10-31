@@ -12,14 +12,14 @@ import {
   LASER_DAMAGE_MULTIPLIER,
   BOMB_SPEED_MULTIPLIER,
   BOMB_DAMAGE_MULTIPLIER,
-  BOMB_EXPLOSION_RADIUS
+  BOMB_EXPLOSION_RADIUS,
+  BOMB_COOLDOWN_MS
 } from '../../config/constants';
 
 export class WeaponManager {
   private lasers: Laser[] = [];
   private bombs: Bomb[] = [];
   private lastBombTime: number = 0;
-  private bombCooldown: number = 1000; // 1 second cooldown in milliseconds
 
   /**
    * Shoot lasers from all bat turrets (if shooter upgrade is unlocked)
@@ -39,7 +39,15 @@ export class WeaponManager {
     const ballSpeed = ball.getSpeed();
     const laserSpeed = ballSpeed * LASER_SPEED_MULTIPLIER;
     const ballDamage = ball.getDamage();
-    const laserDamage = ballDamage * LASER_DAMAGE_MULTIPLIER;
+    let laserDamage = ballDamage * LASER_DAMAGE_MULTIPLIER;
+
+    // Check for critical hit
+    if (gameUpgrades.hasCriticalHits()) {
+      const critChance = gameUpgrades.getTotalCriticalHitChance();
+      if (Math.random() < critChance) {
+        laserDamage *= gameUpgrades.getCriticalHitDamageMultiplier();
+      }
+    }
 
     // Create a laser from each turret position
     for (const turretX of turretPositions) {
@@ -59,7 +67,7 @@ export class WeaponManager {
 
     // Check cooldown - only allow one bomb per second
     const currentTime = Date.now();
-    if (currentTime - this.lastBombTime < this.bombCooldown) {
+    if (currentTime - this.lastBombTime < BOMB_COOLDOWN_MS) {
       return; // Still on cooldown
     }
 
@@ -72,7 +80,15 @@ export class WeaponManager {
     const ballSpeed = ball.getSpeed();
     const bombSpeed = ballSpeed * BOMB_SPEED_MULTIPLIER;
     const ballDamage = ball.getDamage();
-    const bombDamage = ballDamage * BOMB_DAMAGE_MULTIPLIER;
+    let bombDamage = ballDamage * BOMB_DAMAGE_MULTIPLIER;
+
+    // Check for critical hit
+    if (gameUpgrades.hasCriticalHits()) {
+      const critChance = gameUpgrades.getTotalCriticalHitChance();
+      if (Math.random() < critChance) {
+        bombDamage *= gameUpgrades.getCriticalHitDamageMultiplier();
+      }
+    }
 
     // Create bomb
     const bomb = new Bomb(centerX, centerY, bombSpeed, bombDamage, BOMB_EXPLOSION_RADIUS);
