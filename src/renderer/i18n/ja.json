@@ -53,6 +53,20 @@
       "level6Name": "レベル6：ダイナマイト",
       "level7Name": "レベル7：ボス戦"
     },
+    "bricks": {
+      "offensive": {
+        "falling": "落下ブロック",
+        "exploding": "爆発ブロック",
+        "laser": "レーザーブロック",
+        "homing": "追尾ミサイルブロック",
+        "splitting": "分裂ブロック",
+        "warningFalling": "注意！ブロック落下！",
+        "warningExploding": "危険！ブロック爆発！",
+        "warningLaser": "警告！レーザー充電中！",
+        "warningHoming": "接近中！ミサイル追跡！",
+        "warningSplitting": "注意！破片が飛んでくる！"
+      }
+    },
     "upgrades": {
       "title": "アップグレードセンター",
       "pointsAvailable": "{count}ポイント使えます！",
