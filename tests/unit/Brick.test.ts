@@ -202,31 +202,33 @@ describe('Brick', () => {
       expect(typeof color2).toBe('string');
     });
 
-    it('should return neon color based on health modulo 16', () => {
-      const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      // HEALTHY has 3 health, so 3 % 16 = 3
-      expect(brick.getColor()).toBe('#ffff00'); // Index 3 is Yellow
+    it('should return fixed color based on brick type', () => {
+      const normalBrick = new Brick(createBrickConfig(0, 0, BrickType.NORMAL));
+      expect(normalBrick.getColor()).toBe('#00ffff'); // Cyan for NORMAL
+      
+      const healthyBrick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
+      expect(healthyBrick.getColor()).toBe('#00ff00'); // Green for HEALTHY
     });
 
-    it('should return different color when health changes', () => {
+    it('should maintain same color when health changes', () => {
       const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      const initialColor = brick.getColor(); // health = 3
+      const initialColor = brick.getColor(); // Green
       brick.takeDamage(1); // health = 2
       const newColor = brick.getColor();
-      expect(newColor).not.toBe(initialColor);
-      expect(newColor).toBe('#00ff00'); // Index 2 is Green
+      expect(newColor).toBe(initialColor); // Color stays the same (type-based, not health-based)
+      expect(newColor).toBe('#00ff00'); // Still green
     });
 
-    it('should cycle through neon colors for different health values', () => {
-      const brick = new Brick(createBrickConfig(0, 0, BrickType.NORMAL));
-      // NORMAL has 1 health, so 1 % 16 = 1
-      expect(brick.getColor()).toBe('#00ffff'); // Index 1 is Cyan
+    it('should return different colors for different brick types', () => {
+      const normalBrick = new Brick(createBrickConfig(0, 0, BrickType.NORMAL));
+      const healthyBrick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
+      expect(normalBrick.getColor()).not.toBe(healthyBrick.getColor());
     });
 
-    it('should return gray color when destroyed', () => {
+    it('should maintain type color even when destroyed', () => {
       const brick = new Brick(createBrickConfig(0, 0, BrickType.HEALTHY));
-      brick.takeDamage(3); // 0% health
-      expect(brick.getColor()).toBe('#666666');
+      brick.takeDamage(3); // Destroy it
+      expect(brick.getColor()).toBe('#00ff00'); // Still green (type color)
     });
 
     it('should maintain custom color regardless of health', () => {

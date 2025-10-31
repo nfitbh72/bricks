@@ -8,32 +8,20 @@ import {
   BRICK_WIDTH, 
   BRICK_HEIGHT, 
   BRICK_GLOW_BLUR,
+  BRICK_COLOR_NORMAL,
+  BRICK_COLOR_HEALTHY,
+  BRICK_COLOR_INDESTRUCTIBLE,
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER,
+  OFFENSIVE_BRICK_COLOR_HOMING,
+  OFFENSIVE_BRICK_COLOR_SPLITTING,
   OFFENSIVE_BRICK_COLOR_BOMB,
   OFFENSIVE_BRICK_COLOR_DYNAMITE,
+  BRICK_COLOR_BOSS,
   FONT_MONO_BRICK,
-  COLOR_MAGENTA,
-  COLOR_CYAN,
-  COLOR_GREEN,
-  COLOR_YELLOW,
-  COLOR_HOT_PINK,
-  COLOR_SKY_BLUE,
-  COLOR_LIME,
-  COLOR_ORANGE,
-  COLOR_RED_PINK,
-  COLOR_SPRING_GREEN,
-  COLOR_PURPLE,
-  COLOR_ROSE,
-  COLOR_LIGHT_BLUE,
-  COLOR_YELLOW_GREEN,
-  COLOR_RED_ORANGE,
-  COLOR_BRIGHT_GREEN,
-  COLOR_WHITE,
-  COLOR_TEXT_GRAY,
-  COLOR_METALLIC_GRAY,
   COLOR_BLACK,
+  COLOR_WHITE,
 } from '../../config/constants';
 import { gridToPixel } from '../../config/brickLayout';
 
@@ -76,28 +64,6 @@ export class Brick {
     [BrickType.BOSS_1]: 1,
   };
 
-  /**
-   * Neon color palette for bricks
-   * Colors are indexed by health % 16
-   */
-  private static readonly NEON_COLORS: string[] = [
-    COLOR_MAGENTA,        // Magenta
-    COLOR_CYAN,           // Cyan
-    COLOR_GREEN,          // Green
-    COLOR_YELLOW,         // Yellow
-    COLOR_HOT_PINK,       // Hot Pink
-    COLOR_SKY_BLUE,       // Sky Blue
-    COLOR_LIME,           // Lime
-    COLOR_ORANGE,         // Orange
-    COLOR_RED_PINK,       // Red-Pink
-    COLOR_SPRING_GREEN,   // Spring Green
-    COLOR_PURPLE,         // Purple
-    COLOR_ROSE,           // Rose
-    COLOR_LIGHT_BLUE,     // Light Blue
-    COLOR_YELLOW_GREEN,   // Yellow-Green
-    COLOR_RED_ORANGE,     // Red-Orange
-    COLOR_BRIGHT_GREEN,   // Bright Green
-  ];
 
   constructor(config: BrickConfig, baseHealth: number = 1) {
     // Convert grid coordinates to pixel coordinates
@@ -233,58 +199,41 @@ export class Brick {
   }
 
   /**
-   * Get brick color based on health percentage
+   * Get brick color based on type (fixed color per type, not health-based)
    */
   getColor(): string {
     // If custom color was provided, always use it
     if (this.customColor) {
       return this.customColor;
     }
-    // Offensive bricks have distinct warning colors
-    if (this.isOffensive()) {
-      return this.getOffensiveColor();
-    }
-    // Otherwise, use health-based color
-    return this.getColorByHealth();
-  }
-
-  /**
-   * Get color for offensive brick types
-   */
-  private getOffensiveColor(): string {
+    
+    // Return fixed color based on brick type
     switch (this.type) {
+      case BrickType.NORMAL:
+        return BRICK_COLOR_NORMAL;
+      case BrickType.HEALTHY:
+        return BRICK_COLOR_HEALTHY;
+      case BrickType.INDESTRUCTIBLE:
+        return BRICK_COLOR_INDESTRUCTIBLE;
       case BrickType.OFFENSIVE_FALLING:
         return OFFENSIVE_BRICK_COLOR_FALLING;
       case BrickType.OFFENSIVE_EXPLODING:
         return OFFENSIVE_BRICK_COLOR_EXPLODING;
       case BrickType.OFFENSIVE_LASER:
         return OFFENSIVE_BRICK_COLOR_LASER;
+      case BrickType.OFFENSIVE_HOMING:
+        return OFFENSIVE_BRICK_COLOR_HOMING;
+      case BrickType.OFFENSIVE_SPLITTING:
+        return OFFENSIVE_BRICK_COLOR_SPLITTING;
       case BrickType.OFFENSIVE_BOMB:
         return OFFENSIVE_BRICK_COLOR_BOMB;
       case BrickType.OFFENSIVE_DYNAMITE:
         return OFFENSIVE_BRICK_COLOR_DYNAMITE;
+      case BrickType.BOSS_1:
+        return BRICK_COLOR_BOSS;
       default:
         return COLOR_WHITE;
     }
-  }
-
-  /**
-   * Get color based on current health using neon palette
-   */
-  private getColorByHealth(): string {
-    if (this.health <= 0) {
-      return COLOR_TEXT_GRAY; // Gray - destroyed
-    }
-    
-    // Indestructible bricks have a special metallic gray color
-    if (this.isIndestructible()) {
-      return COLOR_METALLIC_GRAY; // Metallic gray
-    }
-    
-    // Use health modulo 16 to index into neon color palette
-    // Floor the health to handle fractional damage (e.g., from lasers)
-    const colorIndex = Math.round(this.health) % 16;
-    return Brick.NEON_COLORS[colorIndex];
   }
 
   /**
@@ -430,9 +379,9 @@ export class Brick {
 
   /**
    * Generate cache key for this brick's appearance
+   * Since color is now fixed per type, cache key is simpler
    */
   private getCacheKey(): string {
-    const color = this.getColor();
     let healthText: string;
     if (this.isIndestructible()) {
       healthText = 'I';
@@ -441,7 +390,7 @@ export class Brick {
     } else {
       healthText = this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1);
     }
-    return `${color}_${healthText}_${this.isIndestructible()}`;
+    return `${this.type}_${healthText}`;
   }
 
   /**

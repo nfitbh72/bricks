@@ -20,6 +20,8 @@ const {
   COLOR_ORANGE,
   COLOR_RED,
   COLOR_RED_ORANGE,
+  COLOR_METALLIC_GRAY,
+  COLOR_PURPLE,
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
@@ -158,6 +160,11 @@ export const SLOW_MOTION_DURATION = 2.0; // 2 seconds
 export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights from final brick
 export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
 
+// Brick type colors (fixed per type, not health-based)
+export const BRICK_COLOR_NORMAL = COLOR_CYAN;              // Cyan for normal bricks
+export const BRICK_COLOR_HEALTHY = COLOR_GREEN;            // Green for healthy bricks
+export const BRICK_COLOR_INDESTRUCTIBLE = COLOR_METALLIC_GRAY; // Gray for indestructible
+
 // Offensive brick constants
 export const OFFENSIVE_BRICK_COLOR_FALLING = COLOR_ORANGE; // Red-Orange warning color
 export const OFFENSIVE_BRICK_COLOR_EXPLODING = COLOR_RED; // Red warning color
@@ -166,6 +173,7 @@ export const OFFENSIVE_BRICK_COLOR_HOMING = COLOR_MAGENTA; // Magenta warning co
 export const OFFENSIVE_BRICK_COLOR_SPLITTING = COLOR_ORANGE; // Orange warning color
 export const OFFENSIVE_BRICK_COLOR_BOMB = COLOR_RED_ORANGE; // Red-Orange bomb warning color
 export const OFFENSIVE_BRICK_COLOR_DYNAMITE = COLOR_RED; // Red dynamite warning color
+export const BRICK_COLOR_BOSS = COLOR_PURPLE; // Purple for boss bricks
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared

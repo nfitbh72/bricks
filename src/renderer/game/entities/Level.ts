@@ -125,13 +125,6 @@ export class Level {
   }
 
   /**
-   * Get number of remaining destructible (non-destroyed, non-indestructible) bricks
-   */
-  getRemainingDestructibleBricks(): number {
-    return this.bricks.filter((brick) => !brick.isIndestructible() && !brick.isDestroyed()).length;
-  }
-
-  /**
    * Get total number of bricks in level
    */
   getTotalBricks(): number {
