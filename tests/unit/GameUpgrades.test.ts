@@ -410,6 +410,32 @@ describe('GameUpgrades', () => {
 
       expect(gameUpgrades.getBallExplosionDamageMultiplier()).toBe(0.4); // 10% base + 30% bonus
     });
+
+    it('should return 1.0 explosion radius multiplier with no radius upgrade', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionRadiusMultiplier()).toBe(1.0);
+    });
+
+    it('should increase explosion radius by 20% per level', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      upgrades.set(UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT, 1);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionRadiusMultiplier()).toBe(1.2); // 100% + 20%
+    });
+
+    it('should stack explosion radius bonuses up to 3 levels', () => {
+      const upgrades = new Map<string, number>();
+      upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
+      upgrades.set(UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT, 3);
+      gameUpgrades.setUpgradeLevels(upgrades);
+
+      expect(gameUpgrades.getBallExplosionRadiusMultiplier()).toBe(1.6); // 100% + 60%
+    });
   });
 
   describe('critical hits', () => {

@@ -139,6 +139,10 @@
         "name": "Explosiones+",
         "description": "Aumenta el daño de explosión en 10%"
       },
+      "explosionRadius": {
+        "name": "Radio de Explosión",
+        "description": "Aumenta el radio de explosión en 20%"
+      },
       "stickyBat": {
         "name": "Bate Pegajoso",
         "description": "Mantén Espacio para Bate Pegajoso"

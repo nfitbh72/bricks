@@ -519,7 +519,8 @@ export class CollisionManager {
   ): void {
     const explosionDamageMultiplier = gameUpgrades.getBallExplosionDamageMultiplier();
     const explosionDamage = baseDamage * explosionDamageMultiplier;
-    const explosionRadius = BRICK_WIDTH * EXPLOSION_RADIUS_MULTIPLIER;
+    const explosionRadiusMultiplier = gameUpgrades.getBallExplosionRadiusMultiplier();
+    const explosionRadius = BRICK_WIDTH * EXPLOSION_RADIUS_MULTIPLIER * explosionRadiusMultiplier;
     
     // Get impact point (center of the brick that was hit)
     const impactX = hitBrickBounds.x + hitBrickBounds.width / 2;

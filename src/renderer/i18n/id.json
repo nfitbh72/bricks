@@ -139,6 +139,10 @@
         "name": "Ledakan+",
         "description": "Tingkatkan kerusakan ledakan 10%"
       },
+      "explosionRadius": {
+        "name": "Radius Ledakan",
+        "description": "Tingkatkan radius ledakan 20%"
+      },
       "stickyBat": {
         "name": "Bat Lengket",
         "description": "Tahan Spasi untuk Bat Lengket"

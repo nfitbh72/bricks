@@ -196,6 +196,18 @@ export class GameUpgrades {
   }
 
   /**
+   * Get ball explosion radius multiplier
+   * Base multiplier is 1.0 (100%)
+   * Each upgrade level increases this by 20%
+   */
+  getBallExplosionRadiusMultiplier(): number {
+    if (!this.hasBallExplosions()) return 1.0;
+    
+    const radiusLevel = this.getUpgradeLevel(UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT);
+    return 1.0 + (radiusLevel * 0.2); // +20% per level
+  }
+
+  /**
    * Check if critical hits are unlocked
    */
   hasCriticalHits(): boolean {

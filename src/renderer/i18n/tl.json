@@ -139,6 +139,10 @@
         "name": "Mga Pagsabog+",
         "description": "Dagdagan ang pinsala ng pagsabog ng 10%"
       },
+      "explosionRadius": {
+        "name": "Radius ng Pagsabog",
+        "description": "Dagdagan ang radius ng pagsabog ng 20%"
+      },
       "stickyBat": {
         "name": "Malagkit na Bat",
         "description": "Pindutin ang Space para sa Malagkit na Bat"

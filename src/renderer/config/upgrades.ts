@@ -143,7 +143,17 @@ export function getUpgrades() : Upgrade[] {
                             previewNextUpgrades: 0,
                             unlockNextUpgradesAfterTimes: 1,
                             type: UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT,
-                            nextUpgrades: []
+                            nextUpgrades: [
+                                {
+                                    name: t('game.upgrades.explosionRadius.name'),
+                                    description: t('game.upgrades.explosionRadius.description'),
+                                    times: 3,
+                                    previewNextUpgrades: 0,
+                                    unlockNextUpgradesAfterTimes: 0,
+                                    type: UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT,
+                                    nextUpgrades: []
+                                },
+                            ]
                         },
                     ]
                 },

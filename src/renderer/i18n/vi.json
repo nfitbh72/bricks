@@ -139,6 +139,10 @@
         "name": "Nổ+",
         "description": "Tăng sát thương nổ 10%"
       },
+      "explosionRadius": {
+        "name": "Bán Kính Nổ",
+        "description": "Tăng bán kính nổ 20%"
+      },
       "stickyBat": {
         "name": "Vợt Dính",
         "description": "Giữ Phím Cách cho Vợt Dính"

@@ -139,6 +139,10 @@
         "name": "ระเบิด+",
         "description": "เพิ่มความเสียหายระเบิด 10%"
       },
+      "explosionRadius": {
+        "name": "รัศมีระเบิด",
+        "description": "เพิ่มรัศมีระเบิด 20%"
+      },
       "stickyBat": {
         "name": "ไม้ตีเหนียว",
         "description": "กดค้าง Space สำหรับไม้ตีเหนียว"

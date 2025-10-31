@@ -125,6 +125,10 @@
         "name": "爆発+",
         "description": "爆発ダメージを10%増加"
       },
+      "explosionRadius": {
+        "name": "爆発範囲",
+        "description": "爆発範囲を20%増加"
+      },
       "stickyBat": {
         "name": "粘着バット",
         "description": "スペースキー長押しで粘着バット"

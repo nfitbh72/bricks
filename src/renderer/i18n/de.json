@@ -139,6 +139,10 @@
         "name": "Explosionen+",
         "description": "Erhöht Explosionsschaden um 10%"
       },
+      "explosionRadius": {
+        "name": "Explosionsradius",
+        "description": "Erhöht Explosionsradius um 20%"
+      },
       "stickyBat": {
         "name": "Klebriger Schläger",
         "description": "Leertaste halten für klebrigen Schläger"

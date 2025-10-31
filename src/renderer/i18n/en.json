@@ -139,6 +139,10 @@
         "name": "Explosions+",
         "description": "Increase explosion damage by 10%"
       },
+      "explosionRadius": {
+        "name": "Explosion Radius",
+        "description": "Increase explosion radius by 20%"
+      },
       "stickyBat": {
         "name": "Sticky Bat",
         "description": "Hold Space for a Sticky Bat"
