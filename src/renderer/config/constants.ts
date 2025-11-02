@@ -243,7 +243,21 @@ export const DYNAMITE_EXPLOSION_DURATION = 0.5; // Explosion visual effect durat
 export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0
 
-// Boss constants
-export const BOSS_MOVE_SPEED = 250; // Pixels per second (increased from 150)
-export const BOSS_THROW_INTERVAL = 1.0; // Seconds between brick throws (decreased from 2.0)
-export const BOSS_THROWN_BRICK_SPEED = 500; // Pixels per second (increased from 300)
+// Boss1 constants
+export const BOSS1_HEALTH_MULTIPLIER = 6; // Boss1 health = base health * 6
+export const BOSS1_MOVE_SPEED = 250; // Boss1 movement speed in pixels per second
+export const BOSS1_THROW_INTERVAL = 1.0; // Seconds between brick throws
+export const BOSS1_THROWN_BRICK_SPEED = 500; // Speed of thrown bricks in pixels per second
+export const BOSS1_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
+
+// Boss2 (The Shielder) constants
+export const BOSS2_HEALTH_MULTIPLIER = 8; // Boss2 health = base health * 8 (more health due to shield)
+export const BOSS2_MOVE_SPEED = 70; // Boss2 movement speed in pixels per second (slower than Boss1)
+export const BOSS2_THROW_INTERVAL = 3; // Seconds between brick throws (less frequent than Boss1)
+export const BOSS2_THROWN_BRICK_SPEED = 160; // Speed of thrown bricks (slower than Boss1)
+export const BOSS2_SHIELD_RADIUS_MULTIPLIER = 1.5; // Shield radius = brick width * 1.5
+export const BOSS2_SHIELD_SEGMENTS = 6; // Number of shield segments
+export const BOSS2_SHIELD_GAP_RADIANS = Math.PI / 6; // Gap between segments (45 degrees)
+export const BOSS2_SHIELD_ROTATION_SPEED = Math.PI; // Radians per second
+export const BOSS2_SHIELD_THICKNESS = 24; // Shield arc thickness in pixels
+export const BOSS2_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights

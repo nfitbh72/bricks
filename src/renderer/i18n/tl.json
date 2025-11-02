@@ -53,7 +53,8 @@
       "level5Name": "Antas 5: Mga Bomba",
       "level6Name": "Antas 6: Dinamita",
       "level7Name": "Antas 7: Labanan ang Boss",
-      "level8Name": "Antas 8: Mandala ng Pag-atake"
+      "level8Name": "Level 8: Offensive Mandala",
+      "level9Name": "Boss Test: Ang Tagapagkalasag ng Pag-atake"
     },
     "bricks": {
       "offensive": {

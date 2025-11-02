@@ -1,13 +1,30 @@
 /**
- * Boss1 - The first boss that spawns arms, moves around, and throws bricks
+ * Boss2 - "The Shielder"
+ * Has a rotating shield that deflects the ball
+ * Throws bricks at the player
  */
 
 import { Brick } from '../Brick';
-import { BossArm } from './BossArm';
 import { ThrownBrick } from './ThrownBrick';
-import { BRICK_WIDTH, BRICK_HEIGHT, BOSS1_MOVE_SPEED, BOSS1_THROW_INTERVAL, BOSS1_THROWN_BRICK_SPEED } from '../../../config/constants';
+import { 
+  BRICK_WIDTH, 
+  BRICK_HEIGHT, 
+  BOSS2_MOVE_SPEED,
+  BOSS2_THROW_INTERVAL,
+  BOSS2_THROWN_BRICK_SPEED,
+  BOSS2_SHIELD_RADIUS_MULTIPLIER,
+  BOSS2_SHIELD_SEGMENTS,
+  BOSS2_SHIELD_GAP_RADIANS,
+  BOSS2_SHIELD_ROTATION_SPEED,
+  BOSS2_SHIELD_THICKNESS
+} from '../../../config/constants';
 
-export class Boss1 {
+interface ShieldSegment {
+  angle: number; // Angle in radians
+  active: boolean; // Whether this segment is active (not destroyed)
+}
+
+export class Boss2 {
   private x: number;
   private y: number;
   private health: number;
@@ -16,15 +33,14 @@ export class Boss1 {
   private readonly width: number = BRICK_WIDTH;
   private readonly height: number = BRICK_HEIGHT;
   private readonly color: string;
-  private arms: BossArm[] = [];
   private thrownBricks: ThrownBrick[] = [];
   private velocityX: number = 0;
   private velocityY: number = 0;
-  private readonly moveSpeed: number = BOSS1_MOVE_SPEED;
+  private readonly moveSpeed: number = BOSS2_MOVE_SPEED;
   private targetX: number;
   private targetY: number;
   private throwCooldown: number = 0;
-  private readonly throwInterval: number = BOSS1_THROW_INTERVAL;
+  private readonly throwInterval: number = BOSS2_THROW_INTERVAL;
   private availableBricks: Brick[] = [];
   private readonly minX: number;
   private readonly maxX: number;
@@ -32,6 +48,14 @@ export class Boss1 {
   private readonly maxY: number;
   private readonly canvasWidth: number;
   private readonly canvasHeight: number;
+  
+  // Shield properties
+  private shieldRotation: number = 0;
+  private readonly shieldRotationSpeed: number = BOSS2_SHIELD_ROTATION_SPEED;
+  private readonly shieldRadius: number = BRICK_WIDTH * BOSS2_SHIELD_RADIUS_MULTIPLIER;
+  private readonly shieldSegments: ShieldSegment[] = [];
+  private readonly numShieldSegments: number = BOSS2_SHIELD_SEGMENTS;
+  private readonly shieldGapSize: number = BOSS2_SHIELD_GAP_RADIANS;
 
   constructor(x: number, y: number, health: number, color: string, canvasWidth: number, canvasHeight: number) {
     this.x = x;
@@ -53,15 +77,18 @@ export class Boss1 {
     this.targetY = this.y;
     this.pickNewTarget();
 
-    // Spawn two arms
-    this.spawnArms();
+    // Initialize shield segments
+    this.initializeShield();
   }
 
-  private spawnArms(): void {
-    // Left arm
-    this.arms.push(new BossArm(this.x, this.y, -20, 5, this.color));
-    // Right arm
-    this.arms.push(new BossArm(this.x, this.y, this.width + 5, 5, this.color));
+  private initializeShield(): void {
+    const segmentAngle = (Math.PI * 2) / this.numShieldSegments;
+    for (let i = 0; i < this.numShieldSegments; i++) {
+      this.shieldSegments.push({
+        angle: i * segmentAngle,
+        active: true
+      });
+    }
   }
 
   private pickNewTarget(): void {
@@ -77,6 +104,12 @@ export class Boss1 {
 
   update(deltaTime: number, batX: number, batY: number): void {
     if (!this.active) return;
+
+    // Rotate shield
+    this.shieldRotation += this.shieldRotationSpeed * deltaTime;
+    if (this.shieldRotation > Math.PI * 2) {
+      this.shieldRotation -= Math.PI * 2;
+    }
 
     // Move towards target
     const dx = this.targetX - this.x;
@@ -96,11 +129,6 @@ export class Boss1 {
       // Clamp to boundaries
       this.x = Math.max(this.minX, Math.min(this.maxX, this.x));
       this.y = Math.max(this.minY, Math.min(this.maxY, this.y));
-    }
-
-    // Update arms
-    for (const arm of this.arms) {
-      arm.update(this.x, this.y, deltaTime);
     }
 
     // Update thrown bricks
@@ -144,25 +172,111 @@ export class Boss1 {
       this.y + this.height / 2,
       batX,
       batY,
-      BOSS1_THROWN_BRICK_SPEED,
+      BOSS2_THROWN_BRICK_SPEED,
       brickColor
     );
 
     this.thrownBricks.push(thrownBrick);
   }
 
+  /**
+   * Check if the ball collides with any shield arc
+   * Returns the shield segment angle if collision detected, null otherwise
+   */
+  checkShieldCollision(ballX: number, ballY: number, ballRadius: number): number | null {
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+    const dx = ballX - centerX;
+    const dy = ballY - centerY;
+    const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+    
+    // Check if ball is within the shield ring (radius ± thickness/2)
+    const innerRadius = this.shieldRadius - BOSS2_SHIELD_THICKNESS / 2;
+    const outerRadius = this.shieldRadius + BOSS2_SHIELD_THICKNESS / 2;
+    
+    if (distanceFromCenter < innerRadius - ballRadius || distanceFromCenter > outerRadius + ballRadius) {
+      return null; // Ball is not near the shield ring
+    }
+    
+    // Ball is in the shield ring area - check if it hits a segment
+    const angleToball = Math.atan2(dy, dx);
+    let normalizedAngle = angleToball;
+    while (normalizedAngle < 0) {
+      normalizedAngle += Math.PI * 2;
+    }
+    while (normalizedAngle >= Math.PI * 2) {
+      normalizedAngle -= Math.PI * 2;
+    }
+    
+    const segmentAngle = (Math.PI * 2) / this.numShieldSegments;
+    for (const segment of this.shieldSegments) {
+      if (!segment.active) continue;
+      
+      let currentAngle = segment.angle + this.shieldRotation;
+      while (currentAngle < 0) {
+        currentAngle += Math.PI * 2;
+      }
+      while (currentAngle >= Math.PI * 2) {
+        currentAngle -= Math.PI * 2;
+      }
+      
+      const segmentStart = currentAngle;
+      const segmentEnd = currentAngle + segmentAngle - this.shieldGapSize;
+      
+      let isInSegment = false;
+      if (segmentEnd > Math.PI * 2) {
+        const wrappedEnd = segmentEnd - Math.PI * 2;
+        if (normalizedAngle >= segmentStart || normalizedAngle <= wrappedEnd) {
+          isInSegment = true;
+        }
+      } else {
+        if (normalizedAngle >= segmentStart && normalizedAngle <= segmentEnd) {
+          isInSegment = true;
+        }
+      }
+      
+      if (isInSegment) {
+        // Return the middle angle of this segment for deflection
+        let segmentMiddle = currentAngle + (segmentAngle - this.shieldGapSize) / 2;
+        while (segmentMiddle >= Math.PI * 2) {
+          segmentMiddle -= Math.PI * 2;
+        }
+        return segmentMiddle;
+      }
+    }
+    
+    return null;
+  }
+
+
   render(ctx: CanvasRenderingContext2D): void {
     if (!this.active) return;
 
-    // Render arms first (behind boss)
-    for (const arm of this.arms) {
-      arm.render(ctx);
+    const centerX = this.x + this.width / 2;
+    const centerY = this.y + this.height / 2;
+
+    ctx.save();
+
+    // Render shield segments
+    const segmentAngle = (Math.PI * 2) / this.numShieldSegments;
+    for (const segment of this.shieldSegments) {
+      if (!segment.active) continue;
+
+      const currentAngle = segment.angle + this.shieldRotation;
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + segmentAngle - this.shieldGapSize;
+
+      // Draw shield arc
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, this.shieldRadius, startAngle, endAngle);
+      ctx.lineWidth = BOSS2_SHIELD_THICKNESS;
+      ctx.strokeStyle = '#00ccff';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#00ccff';
+      ctx.stroke();
     }
 
     // Render boss body
-    ctx.save();
-
-    // Draw glow effect
     ctx.shadowBlur = 15;
     ctx.shadowColor = this.color;
 
@@ -181,7 +295,7 @@ export class Boss1 {
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('BOSS', this.x + this.width / 2, this.y + this.height / 2);
+    ctx.fillText('BOSS', centerX, centerY);
 
     // Draw health bar above boss
     const healthBarWidth = this.width;

@@ -53,7 +53,8 @@
       "level5Name": "Level 5: Bomben weg",
       "level6Name": "Level 6: Dynamit",
       "level7Name": "Level 7: Boss-Kampf",
-      "level8Name": "Level 8: Offensives Mandala"
+      "level8Name": "Level 8: Offensives Mandala",
+      "level9Name": "Boss-Test: Der Schildträger"
     },
     "bricks": {
       "offensive": {

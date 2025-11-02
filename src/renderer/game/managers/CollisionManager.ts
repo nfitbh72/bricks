@@ -16,6 +16,7 @@ import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { DynamiteStick } from '../entities/offensive/DynamiteStick';
 import { Boss1 } from '../entities/offensive/Boss1';
+import { Boss2 } from '../entities/offensive/Boss2';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -644,15 +645,39 @@ export class CollisionManager {
    * Check boss-ball collisions
    */
   checkBossBallCollisions(
-    boss: Boss1,
+    boss: Boss1 | Boss2,
     ball: Ball,
     onBossDamaged: (damage: number, x: number, y: number) => void,
-    onBossDestroyed: (x: number, y: number) => void
+    onBossDestroyed: (x: number, y: number) => void,
+    onShieldBlocked?: (x: number, y: number) => void
   ): void {
     const ballBounds = ball.getBounds();
     const bossBounds = boss.getBounds();
     
     if (!ballBounds || !bossBounds) return;
+
+    // For Boss2, check shield arc collisions first (before body collision)
+    if (boss instanceof Boss2 && onShieldBlocked) {
+      const shieldAngle = boss.checkShieldCollision(ballBounds.x, ballBounds.y, ballBounds.radius);
+      if (shieldAngle !== null) {
+        // Shield arc hit - deflect the ball
+        const ballVelocity = ball.getVelocity();
+        const speed = Math.sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y);
+        
+        // Deflect ball perpendicular to the shield segment (outward)
+        const deflectAngle = shieldAngle + Math.PI / 2;
+        ball.setVelocity(
+          Math.cos(deflectAngle) * speed,
+          Math.sin(deflectAngle) * speed
+        );
+        
+        // Visual effects
+        const centerX = bossBounds.x + bossBounds.width / 2;
+        const centerY = bossBounds.y + bossBounds.height / 2;
+        onShieldBlocked(centerX, centerY);
+        return;
+      }
+    }
 
     // Convert ball circle to rect for collision
     const ballRect = {
@@ -663,6 +688,7 @@ export class CollisionManager {
     };
 
     if (this.checkRectCollision(ballRect, bossBounds)) {
+      // Boss body hit - apply damage
       const damage = ball.getDamage();
       boss.takeDamage(damage);
       ball.reverseY();
@@ -683,7 +709,7 @@ export class CollisionManager {
    * Check boss thrown brick-bat collisions
    */
   checkBossThrownBrickCollisions(
-    boss: Boss1,
+    boss: Boss1 | Boss2,
     bat: Bat,
     onThrownBrickHit: (x: number, y: number) => void
   ): void {

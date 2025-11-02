@@ -53,7 +53,8 @@
       "level5Name": "第5关：炸弹来袭",
       "level6Name": "第6关：炸药",
       "level7Name": "第7关：首领战",
-      "level8Name": "第8关：攻击曼达拉"
+      "level8Name": "第8关：攻击曼达拉",
+      "level9Name": "首领测试：盾牌守卫者"
     },
     "bricks": {
       "offensive": {

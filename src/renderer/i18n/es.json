@@ -53,7 +53,8 @@
       "level5Name": "Nivel 5: Bombas Fuera",
       "level6Name": "Nivel 6: Dinamita",
       "level7Name": "Nivel 7: Batalla de Jefe",
-      "level8Name": "Nivel 8: Mandala Ofensivo"
+      "level8Name": "Nivel 8: Mandala Ofensivo",
+      "level9Name": "Prueba de Jefe: El Escudero"
     },
     "bricks": {
       "offensive": {

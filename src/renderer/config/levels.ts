@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 8;
+export const TOTAL_LEVELS = 9;
 
 /**
  * Create Level 1 configuration
@@ -249,6 +249,30 @@ export function createLevel8(): LevelConfig {
 }
 
 /**
+ * Create Level 9 configuration
+ * Test level for Boss2 - just a single boss brick
+ */
+export function createLevel9(): LevelConfig {
+  const pattern = [
+    "NNNNNNNN",
+    "........",
+    "...2....",
+    "........",
+    "........",
+    "........",
+    "........",
+    "........"
+  ];
+  
+  return {
+    id: 9,
+    name: t('game.levels.level9Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 5,
+  };
+}
+
+/**
  * Get level by ID
  */
 export function getLevel(id: number): LevelConfig | undefined {
@@ -269,6 +293,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel7();
     case 8:
       return createLevel8();
+    case 9:
+      return createLevel9();
     default:
       return undefined;
   }

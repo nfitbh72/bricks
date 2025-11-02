@@ -53,7 +53,8 @@
       "level5Name": "Level 5: Bombs Away",
       "level6Name": "Level 6: Dynamite",
       "level7Name": "Level 7: Boss Battle",
-      "level8Name": "Level 8: Offensive Mandala"
+      "level8Name": "Offensive Spiral",
+      "level9Name": "Boss Test: The Shielder"
     },
     "bricks": {
       "offensive": {

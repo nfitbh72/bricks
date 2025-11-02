@@ -53,7 +53,8 @@
       "level5Name": "レベル5：爆弾投下",
       "level6Name": "レベル6：ダイナマイト",
       "level7Name": "レベル7：ボス戦",
-      "level8Name": "レベル8：攻撃的なマンダラ"
+      "level8Name": "レベル8：攻撃的なマンダラ",
+      "level9Name": "ボステスト：シールダー"
     },
     "bricks": {
       "offensive": {

@@ -8,6 +8,7 @@ import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
 import { Boss1 } from '../entities/offensive/Boss1';
+import { Boss2 } from '../entities/offensive/Boss2';
 import { GameState, LevelConfig, BrickType } from '../core/types';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { AudioManager } from '../managers/AudioManager';
@@ -33,7 +34,11 @@ import {
   SCREEN_SHAKE_BACK_WALL_INTENSITY,
   SCREEN_SHAKE_BACK_WALL_DURATION,
   SCREEN_SHAKE_BOMB_BRICK_INTENSITY,
-  SCREEN_SHAKE_BOMB_BRICK_DURATION
+  SCREEN_SHAKE_BOMB_BRICK_DURATION,
+  BOSS1_HEALTH_MULTIPLIER,
+  BOSS1_SPAWN_OFFSET_Y,
+  BOSS2_HEALTH_MULTIPLIER,
+  BOSS2_SPAWN_OFFSET_Y
 } from '../../config/constants';
 
 export class Game {
@@ -81,7 +86,7 @@ export class Game {
   }> = [];
 
   // Boss
-  private boss: Boss1 | null = null;
+  private boss: Boss1 | Boss2 | null = null;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -268,8 +273,9 @@ export class Game {
     const bricks = this.level.getBricks();
     for (const brick of bricks) {
       brick.setOnDestroyCallback((destroyedBrick, info) => {
-        // Check if this is a BOSS_1 brick - activate boss instead of destroying
-        if (destroyedBrick.getType() === BrickType.BOSS_1 && !this.boss) {
+        // Check if this is a boss brick - activate boss instead of destroying
+        const brickType = destroyedBrick.getType();
+        if ((brickType === BrickType.BOSS_1 || brickType === BrickType.BOSS_2) && !this.boss) {
           this.activateBoss(destroyedBrick, info);
           return;
         }
@@ -313,7 +319,7 @@ export class Game {
   }
 
   /**
-   * Activate the boss when BOSS_1 brick is hit
+   * Activate the boss when BOSS_1 or BOSS_2 brick is hit
    */
   private activateBoss(brick: Brick, info: { centerX: number; centerY: number }): void {
     if (!this.level) return;
@@ -321,19 +327,47 @@ export class Game {
     // Restore brick health (prevent destruction)
     brick.restore();
 
-    // Calculate boss health: 6 * base health
+    // Determine which boss type to spawn based on brick type
+    const brickType = brick.getType();
     const baseHealth = this.level.getConfig().baseHealth || 1;
-    const bossHealth = 6 * baseHealth;
-
-    // Create boss at brick position
-    this.boss = new Boss1(
-      info.centerX - brick.getWidth() / 2,
-      info.centerY - brick.getHeight() / 2,
-      bossHealth,
-      brick.getColor(),
-      this.canvas.width,
-      this.canvas.height
-    );
+    
+    // Calculate boss health and spawn offset based on boss type
+    let bossHealth: number;
+    let spawnOffsetY: number;
+    
+    if (brickType === BrickType.BOSS_2) {
+      bossHealth = baseHealth * BOSS2_HEALTH_MULTIPLIER;
+      spawnOffsetY = brick.getHeight() * BOSS2_SPAWN_OFFSET_Y;
+    } else {
+      bossHealth = baseHealth * BOSS1_HEALTH_MULTIPLIER;
+      spawnOffsetY = brick.getHeight() * BOSS1_SPAWN_OFFSET_Y;
+    }
+    
+    // Spawn boss slightly above the brick position to avoid immediate ball collision
+    const bossX = info.centerX - brick.getWidth() / 2;
+    const bossY = info.centerY - brick.getHeight() / 2 + spawnOffsetY;
+    
+    // Create boss at safe position
+    if (brickType === BrickType.BOSS_2) {
+      this.boss = new Boss2(
+        bossX,
+        bossY,
+        bossHealth,
+        brick.getColor(),
+        this.canvas.width,
+        this.canvas.height
+      );
+    } else {
+      // Default to Boss1
+      this.boss = new Boss1(
+        bossX,
+        bossY,
+        bossHealth,
+        brick.getColor(),
+        this.canvas.width,
+        this.canvas.height
+      );
+    }
 
     // Give boss access to remaining bricks (excluding indestructible and the boss brick itself)
     const availableBricks = this.level.getBricks().filter(b => 
@@ -980,6 +1014,10 @@ export class Game {
         (x, y) => {
           // Boss destroyed - create big explosion
           this.effectsManager.createParticles(x, y, 50, '#ff0000', 300);
+        },
+        (x, y) => {
+          // Shield blocked - create cyan particles
+          this.effectsManager.createParticles(x, y, 5, '#00ccff', 80);
         }
       );
 

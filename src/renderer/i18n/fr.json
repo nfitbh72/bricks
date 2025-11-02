@@ -53,7 +53,8 @@
       "level5Name": "Niveau 5: Bombardement",
       "level6Name": "Niveau 6: Dynamite",
       "level7Name": "Niveau 7: Combat de Boss",
-      "level8Name": "Niveau 8: Mandala Offensif"
+      "level8Name": "Niveau 8: Mandala Offensif",
+      "level9Name": "Test de Boss: Le Bouclier"
     },
     "bricks": {
       "offensive": {
