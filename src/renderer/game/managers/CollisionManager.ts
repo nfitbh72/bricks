@@ -660,20 +660,28 @@ export class CollisionManager {
     if (boss instanceof Boss2 && onShieldBlocked) {
       const shieldAngle = boss.checkShieldCollision(ballBounds.x, ballBounds.y, ballBounds.radius);
       if (shieldAngle !== null) {
-        // Shield arc hit - deflect the ball
+        // Shield arc hit - reflect the ball velocity across the radial normal
         const ballVelocity = ball.getVelocity();
-        const speed = Math.sqrt(ballVelocity.x * ballVelocity.x + ballVelocity.y * ballVelocity.y);
         
-        // Deflect ball perpendicular to the shield segment (outward)
-        const deflectAngle = shieldAngle + Math.PI / 2;
-        ball.setVelocity(
-          Math.cos(deflectAngle) * speed,
-          Math.sin(deflectAngle) * speed
-        );
-        
-        // Visual effects
+        // Calculate radial direction (normal to the shield surface)
         const centerX = bossBounds.x + bossBounds.width / 2;
         const centerY = bossBounds.y + bossBounds.height / 2;
+        const dx = ballBounds.x - centerX;
+        const dy = ballBounds.y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Normalize the radial vector (surface normal pointing outward)
+        const normalX = dx / distance;
+        const normalY = dy / distance;
+        
+        // Reflect velocity: v' = v - 2(v·n)n
+        const dotProduct = ballVelocity.x * normalX + ballVelocity.y * normalY;
+        const newVx = ballVelocity.x - 2 * dotProduct * normalX;
+        const newVy = ballVelocity.y - 2 * dotProduct * normalY;
+        
+        ball.setVelocity(newVx, newVy);
+        
+        // Visual effects
         onShieldBlocked(centerX, centerY);
         return;
       }

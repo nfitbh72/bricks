@@ -7,7 +7,7 @@ Just some notes about future features so that I don't forget
 - [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
 - [X] Make the leaderboards permanent, explain where you are going to store the data
 - [X] There is special animation when the last brick of the level is destroyed, make this the last *destructible* brick that dies, not necessarily the last brick in the level
-- [] thinking of a fairly major update to differentiate different bricks.  write a plan to change all bricks to use 2 colours in a checkerboard patterns.  one of the colours used for health, and the other for brick type
+- [X] update brick colours
 - [X] check coverage of non-ui components, recommend useful tests that can be added
 - [X] Add base health to each level in the config
 - [X] Indestructible bricks

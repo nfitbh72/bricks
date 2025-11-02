@@ -251,13 +251,13 @@ export const BOSS1_THROWN_BRICK_SPEED = 500; // Speed of thrown bricks in pixels
 export const BOSS1_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
 
 // Boss2 (The Shielder) constants
-export const BOSS2_HEALTH_MULTIPLIER = 8; // Boss2 health = base health * 8 (more health due to shield)
+export const BOSS2_HEALTH_MULTIPLIER = 4; // Boss2 health = base health * 8 (more health due to shield)
 export const BOSS2_MOVE_SPEED = 70; // Boss2 movement speed in pixels per second (slower than Boss1)
 export const BOSS2_THROW_INTERVAL = 3; // Seconds between brick throws (less frequent than Boss1)
 export const BOSS2_THROWN_BRICK_SPEED = 160; // Speed of thrown bricks (slower than Boss1)
 export const BOSS2_SHIELD_RADIUS_MULTIPLIER = 1.5; // Shield radius = brick width * 1.5
-export const BOSS2_SHIELD_SEGMENTS = 6; // Number of shield segments
-export const BOSS2_SHIELD_GAP_RADIANS = Math.PI / 6; // Gap between segments (45 degrees)
-export const BOSS2_SHIELD_ROTATION_SPEED = Math.PI; // Radians per second
+export const BOSS2_SHIELD_SEGMENTS = 4; // Number of shield segments
+export const BOSS2_SHIELD_GAP_RADIANS = Math.PI / 3; // Gap between segments (45 degrees)
+export const BOSS2_SHIELD_ROTATION_SPEED = Math.PI / 1.5; // Radians per second
 export const BOSS2_SHIELD_THICKNESS = 24; // Shield arc thickness in pixels
 export const BOSS2_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
