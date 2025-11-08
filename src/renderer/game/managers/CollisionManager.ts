@@ -15,7 +15,7 @@ import { BrickLaser } from '../entities/offensive/BrickLaser';
 import { HomingMissile } from '../entities/offensive/HomingMissile';
 import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { DynamiteStick } from '../entities/offensive/DynamiteStick';
-import { Boss1 } from '../entities/offensive/Boss1';
+import { BaseBoss } from '../entities/offensive/BaseBoss';
 import { Boss2 } from '../entities/offensive/Boss2';
 import { checkCircleRectCollision } from '../core/utils';
 import {
@@ -645,7 +645,7 @@ export class CollisionManager {
    * Check boss-ball collisions
    */
   checkBossBallCollisions(
-    boss: Boss1 | Boss2,
+    boss: BaseBoss,
     ball: Ball,
     onBossDamaged: (damage: number, x: number, y: number) => void,
     onBossDestroyed: (x: number, y: number) => void,
@@ -717,7 +717,7 @@ export class CollisionManager {
    * Check boss thrown brick-bat collisions
    */
   checkBossThrownBrickCollisions(
-    boss: Boss1 | Boss2,
+    boss: BaseBoss,
     bat: Bat,
     onThrownBrickHit: (x: number, y: number) => void
   ): void {

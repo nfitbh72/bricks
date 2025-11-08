@@ -7,6 +7,7 @@ import { Bat } from '../entities/Bat';
 import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
 import { StatusBar } from '../ui/StatusBar';
+import { BaseBoss } from '../entities/offensive/BaseBoss';
 import { Boss1 } from '../entities/offensive/Boss1';
 import { Boss2 } from '../entities/offensive/Boss2';
 import { GameState, LevelConfig, BrickType } from '../core/types';
@@ -86,7 +87,7 @@ export class Game {
   }> = [];
 
   // Boss
-  private boss: Boss1 | Boss2 | null = null;
+  private boss: BaseBoss | null = null;
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
