@@ -59,6 +59,7 @@ export enum BrickType {
   OFFENSIVE_DYNAMITE = 'OFFENSIVE_DYNAMITE',
   BOSS_1 = 'BOSS_1',
   BOSS_2 = 'BOSS_2',
+  BOSS_3 = 'BOSS_3',
 }
 
 /**

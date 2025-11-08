@@ -25,11 +25,11 @@ const {
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
-export const BRICK_WIDTH = 120;
-export const BRICK_HEIGHT = 25;
-export const BRICK_SPACING = 1;
-export const BRICK_LAYOUT_TOP_MARGIN = 200;
-export const BRICK_CORNER_RADIUS = 7; // Corner radius for rounded edges
+export const BRICK_WIDTH = 120; //pixels
+export const BRICK_HEIGHT = 25; //pixels
+export const BRICK_SPACING = 1; //pixels between bricks
+export const BRICK_LAYOUT_TOP_MARGIN = 200; //pixels above all bricks
+export const BRICK_CORNER_RADIUS = 7; // Corner radius in pixels for rounded edges
 
 // Letter pattern constants
 export const LETTER_BRICK_COLS = 5; // Each letter is 5 bricks wide
@@ -37,55 +37,55 @@ export const LETTER_BRICK_ROWS = 5; // Each letter is 5 bricks tall
 export const LETTER_SPACING = 10;   // Space between letters (in pixels)
 
 // Ball constants
-export const BALL_RADIUS = 6;
-export const BALL_SPEED = 300;
-export const BALL_BASE_DAMAGE = 1;
-export const BALL_SPEED_INCREASE_PER_SECOND = 2.5;
+export const BALL_RADIUS = 6; // pixels
+export const BALL_SPEED = 300; // pixels per second
+export const BALL_BASE_DAMAGE = 1; // damage per hit
+export const BALL_SPEED_INCREASE_PER_SECOND = 2.5; // pixels per second per second
 export const BALL_BOUNCE_MAX_ANGLE = 60; // Maximum deflection angle in degrees when hitting bat
 
 // Ball visual effects
-export const BALL_TAIL_BASE_LENGTH = 60;
-export const BALL_TAIL_SEGMENTS = 8;
+export const BALL_TAIL_BASE_LENGTH = 60; // pixels
+export const BALL_TAIL_SEGMENTS = 8; // segments of tail
 export const BALL_TAIL_MAX_SPEED_MULTIPLIER = 3; // Tail length scales up to 3x at high speeds
 
 // Bat constants
 export const BAT_WIDTH = 120; // 50% larger than 195 (previously 30% wider than original 150)
-export const BAT_HEIGHT = 15;
-export const BAT_SPEED = 300;
+export const BAT_HEIGHT = 15; // pixels
+export const BAT_SPEED = 300; // pixels per second
 
 // Bat turret constants (relative to bat height)
-export const BAT_TURRET_WIDTH_MULTIPLIER = 0.7; // Reduced by ~33% from 1.05
-export const BAT_TURRET_HEIGHT_MULTIPLIER = 0.62; // Reduced by ~33% from 0.93
-export const BAT_TURRET_BARREL_WIDTH_MULTIPLIER = 0.19; // Reduced by ~33% from 0.28
-export const BAT_TURRET_BARREL_HEIGHT_MULTIPLIER = 0.47; // Reduced by ~33% from 0.7
-export const BAT_TURRET_TIP_WIDTH_MULTIPLIER = 0.6; // Multiplier of barrel width
-export const BAT_TURRET_TIP_HEIGHT_MULTIPLIER = 0.15; // Reduced by ~33% from 0.23
+export const BAT_TURRET_WIDTH_MULTIPLIER = 0.7; // Multiplier of bat height
+export const BAT_TURRET_HEIGHT_MULTIPLIER = 0.62; // Multiplier of bat height
+export const BAT_TURRET_BARREL_WIDTH_MULTIPLIER = 0.19; // Multiplier of bat height
+export const BAT_TURRET_BARREL_HEIGHT_MULTIPLIER = 0.47; // Multiplier of bat height
+export const BAT_TURRET_TIP_WIDTH_MULTIPLIER = 0.6; // Multiplier of bat height
+export const BAT_TURRET_TIP_HEIGHT_MULTIPLIER = 0.15; // Multiplier of bat height
 
 // Laser constants
-export const LASER_WIDTH = 4;
-export const LASER_HEIGHT = 10;
-export const LASER_SPEED_MULTIPLIER = 3; // Laser speed = ball speed * 3
-export const LASER_DAMAGE_MULTIPLIER = 0.1; // Laser damage = ball damage * 0.1
+export const LASER_WIDTH = 4; // pixels
+export const LASER_HEIGHT = 10; // pixels
+export const LASER_SPEED_MULTIPLIER = 3; // Multiplier of ball speed
+export const LASER_DAMAGE_MULTIPLIER = 0.1; // Multiplier of ball damage
 
 // Bomb constants (bat weapon)
-export const BOMB_SPEED_MULTIPLIER = 2.5; // Bomb speed = ball speed * 2.5
-export const BOMB_DAMAGE_MULTIPLIER = 2.0; // Bomb damage = ball damage * 2.0
-export const BOMB_EXPLOSION_RADIUS = 60; // Explosion radius in pixels
+export const BOMB_SPEED_MULTIPLIER = 2.5; // Multiplier of ball speed
+export const BOMB_DAMAGE_MULTIPLIER = 2.0; // Multiplier of ball damage
+export const BOMB_EXPLOSION_RADIUS = 60; // pixels
 export const BOMB_COOLDOWN_MS = 1000; // Cooldown between bombs in milliseconds (1 second)
 
 // Explosion constants (for ball explosions)
-export const EXPLOSION_RADIUS_MULTIPLIER = 1.4; // Explosion radius = brick width * 1.5
+export const EXPLOSION_RADIUS_MULTIPLIER = 1.4; // Multiplier of brick width
 
 // Bomb brick explosion constants (ellipse shape)
-export const BOMB_BRICK_EXPLOSION_RADIUS_X_MULTIPLIER = 1.5; // Horizontal radius = brick width * 1.5
-export const BOMB_BRICK_EXPLOSION_RADIUS_Y_MULTIPLIER = 0.75; // Vertical radius = brick height * 0.75 (narrower)
-export const BOMB_BRICK_DAMAGE_MULTIPLIER = 3; // Bomb brick damage = ball damage * 3
+export const BOMB_BRICK_EXPLOSION_RADIUS_X_MULTIPLIER = 1.5; // Multiplier of brick width
+export const BOMB_BRICK_EXPLOSION_RADIUS_Y_MULTIPLIER = 0.75; // Multiplier of brick height
+export const BOMB_BRICK_DAMAGE_MULTIPLIER = 3; // Multiplier of ball damage
 
 // Critical hit constants
-export const CRITICAL_HIT_DAMAGE_MULTIPLIER = 2; // Double damage on critical hits
+export const CRITICAL_HIT_DAMAGE_MULTIPLIER = 2; // Multiplier of ball damage
 
 // Screen shake constants
-export const SCREEN_SHAKE_BAT_DAMAGE_INTENSITY = 2; // Pixels
+export const SCREEN_SHAKE_BAT_DAMAGE_INTENSITY = 2; // pixels
 export const SCREEN_SHAKE_BAT_DAMAGE_DURATION = 0.15; // Seconds
 export const SCREEN_SHAKE_BACK_WALL_INTENSITY = 3; // Pixels
 export const SCREEN_SHAKE_BACK_WALL_DURATION = 0.2; // Seconds
@@ -96,12 +96,12 @@ export const SCREEN_SHAKE_BOMB_BRICK_DURATION = 0.3; // Seconds
 export const BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT = 10; // Percentage of bat width removed
 
 // Particle constants
-export const PARTICLE_MIN_SIZE = 2;
-export const PARTICLE_MAX_SIZE = 5;
-export const PARTICLE_DEFAULT_SPEED = 100;
+export const PARTICLE_MIN_SIZE = 2; // pixels
+export const PARTICLE_MAX_SIZE = 5; // pixels
+export const PARTICLE_DEFAULT_SPEED = 100; // pixels per second
 export const PARTICLE_SPEED_VARIATION_MIN = 0.5; // Minimum speed multiplier
 export const PARTICLE_SPEED_VARIATION_MAX = 0.5; // Maximum speed multiplier (added to min)
-export const PARTICLE_GRAVITY = 200;
+export const PARTICLE_GRAVITY = 200; // pixels per second per second
 export const PARTICLE_FADE_RATE = 2; // Fade over 0.5 seconds (1 / 0.5 = 2)
 export const PARTICLE_GLOW_BLUR = 10;
 
@@ -110,23 +110,23 @@ export const DAMAGE_NUMBER_LIFETIME = 1000; // 1 second in milliseconds
 export const DAMAGE_NUMBER_FADE_DURATION = 300; // Last 300ms fade out
 export const DAMAGE_NUMBER_FLOAT_SPEED = 0.5; // Pixels per frame
 // Font size constants moved to fontStyles.ts and re-exported above
-export const DAMAGE_NUMBER_GLOW_BLUR = 10;
+export const DAMAGE_NUMBER_GLOW_BLUR = 10; // pixels
 
 // Visual effect constants (glow/shadow)
-export const BALL_GLOW_BLUR = 20;
-export const BALL_TAIL_GLOW_BLUR = 15;
-export const BAT_GLOW_BLUR = 15;
-export const BRICK_GLOW_BLUR = 50; // Increased for shinier appearance
-export const BACKGROUND_IMAGE_OPACITY = 0.3;
+export const BALL_GLOW_BLUR = 20; // pixels
+export const BALL_TAIL_GLOW_BLUR = 15; // pixels
+export const BAT_GLOW_BLUR = 15; // pixels
+export const BRICK_GLOW_BLUR = 150; // Increased for shinier appearance
+export const BACKGROUND_IMAGE_OPACITY = 0.3; // 0 to 1
 
 // Audio constants
-export const AUDIO_MUSIC_BASE_VOLUME = 0.2;
-export const AUDIO_BRICK_HIT_BASE_VOLUME = 0.3;
-export const AUDIO_BRICK_DAMAGE_BASE_VOLUME = 0.35;
-export const AUDIO_BRICK_EXPLODE_BASE_VOLUME = 0.4;
-export const AUDIO_BAT_DAMAGE_BASE_VOLUME = 0.35;
-export const AUDIO_DEFAULT_MUSIC_VOLUME = 1.0;
-export const AUDIO_DEFAULT_SFX_VOLUME = 1.0;
+export const AUDIO_MUSIC_BASE_VOLUME = 0.2; // 0 to 1
+export const AUDIO_BRICK_HIT_BASE_VOLUME = 0.3; // 0 to 1
+export const AUDIO_BRICK_DAMAGE_BASE_VOLUME = 0.35; // 0 to 1
+export const AUDIO_BRICK_EXPLODE_BASE_VOLUME = 0.4; // 0 to 1
+export const AUDIO_BAT_DAMAGE_BASE_VOLUME = 0.35; // 0 to 1
+export const AUDIO_DEFAULT_MUSIC_VOLUME = 1.0; // 0 to 1
+export const AUDIO_DEFAULT_SFX_VOLUME = 1.0; // 0 to 1
 
 // Audio file paths
 export const AUDIO_PATH_BRICK_HIT = './assets/sounds/ding.mp3';
@@ -138,11 +138,11 @@ export const AUDIO_PATH_BACKGROUND_MUSIC = './assets/sounds/lulu-swing-giulio-fa
 // StatusBar constants
 export const STATUSBAR_BACKGROUND_COLOR = COLOR_BLACK;
 export const STATUSBAR_BORDER_COLOR = COLOR_GREEN;
-export const STATUSBAR_BORDER_WIDTH = 1;
-export const STATUSBAR_BORDER_GLOW = 5;
+export const STATUSBAR_BORDER_WIDTH = 1; // pixels
+export const STATUSBAR_BORDER_GLOW = 5; // pixels
 // Font constants moved to fontStyles.ts and re-exported above
-export const STATUSBAR_HEARTS_PADDING = 15;
-export const STATUSBAR_ITEM_OFFSET = 200; // Offset from center for timer and brick count
+export const STATUSBAR_HEARTS_PADDING = 15; // pixels
+export const STATUSBAR_ITEM_OFFSET = 200; // pixels Offset from center for timer and brick count
 
 // StatusBar colors
 export const STATUSBAR_COLOR_HEARTS = COLOR_MAGENTA; // Magenta
@@ -153,28 +153,28 @@ export const STATUSBAR_COLOR_TITLE = COLOR_GREEN; // Green
 // Button constants
 export const BUTTON_COLOR_NORMAL = COLOR_MAGENTA; // Magenta
 export const BUTTON_COLOR_HOVERED = COLOR_CYAN; // Cyan
-export const BUTTON_GLOW_NORMAL = 15;
-export const BUTTON_GLOW_HOVERED = 30;
-export const BUTTON_BORDER_WIDTH = 3;
+export const BUTTON_GLOW_NORMAL = 15; // pixels
+export const BUTTON_GLOW_HOVERED = 30; // pixels
+export const BUTTON_BORDER_WIDTH = 3; // pixels
 // Font constants moved to fontStyles.ts and re-exported above
 
 // Piercing visual constants
-export const PIERCING_WARNING_DURATION = 0.5; // Last 0.5 seconds flash warning
-export const PIERCING_FLASH_INTERVAL = 0.1; // Flash every 0.1 seconds
+export const PIERCING_WARNING_DURATION = 0.5; // seconds Last 0.5 seconds flash warning
+export const PIERCING_FLASH_INTERVAL = 0.1; // seconds Flash every 0.1 seconds
 
 // Game constants
-export const PLAYER_STARTING_HEALTH = 1;
+export const PLAYER_STARTING_HEALTH = 1; // starting health
 
 // Sticky ball constants
 export const STICKY_BALL_LAUNCH_ANGLE = -60; // 30 degrees right of vertical (negative = upward)
-export const STICKY_BALL_INDICATOR_LENGTH = 50; // Length of launch direction indicator
-export const STICKY_BALL_INDICATOR_WIDTH = 3; // Width of indicator line
+export const STICKY_BALL_INDICATOR_LENGTH = 50; // pixels Length of launch direction indicator
+export const STICKY_BALL_INDICATOR_WIDTH = 3; // pixels Width of indicator line
 export const STICKY_BALL_INDICATOR_COLOR = COLOR_GREEN; // Green indicator
-export const STICKY_BALL_INDICATOR_GLOW = 15; // Glow effect for indicator
+export const STICKY_BALL_INDICATOR_GLOW = 15; // pixels Glow effect for indicator
 
 // Slow-motion effect constants
 export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
-export const SLOW_MOTION_DURATION = 2.0; // 2 seconds
+export const SLOW_MOTION_DURATION = 2.0; // seconds
 export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights from final brick
 export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
 
@@ -194,70 +194,82 @@ export const OFFENSIVE_BRICK_COLOR_DYNAMITE = COLOR_RED; // Red dynamite warning
 export const BRICK_COLOR_BOSS = COLOR_PURPLE; // Purple for boss bricks
 
 // Falling brick constants
-export const FALLING_BRICK_GRAVITY = 400; // Pixels per second squared
+export const FALLING_BRICK_GRAVITY = 400; // pixels per second squared
 export const FALLING_BRICK_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 
 // Exploding brick constants
 export const EXPLODING_BRICK_DEBRIS_COUNT = 8; // 8 directions
-export const EXPLODING_BRICK_DEBRIS_SPEED = 300; // Pixels per second
+export const EXPLODING_BRICK_DEBRIS_SPEED = 300; // pixels per second
 export const EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const EXPLODING_BRICK_DEBRIS_SIZE = 8; // Debris particle size
 
 // Laser brick constants
-export const LASER_BRICK_FIRE_DELAY = 0.5; // Seconds before laser fires
-export const LASER_BRICK_LASER_WIDTH = 6; // Laser beam width
-export const LASER_BRICK_LASER_SPEED = 600; // Pixels per second
+export const LASER_BRICK_FIRE_DELAY = 0.5; // seconds before laser fires
+export const LASER_BRICK_LASER_WIDTH = 6; // pixels Laser beam width
+export const LASER_BRICK_LASER_SPEED = 600; // pixels per second
 export const LASER_BRICK_LASER_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const LASER_BRICK_WARNING_COLOR = COLOR_YELLOW; // Yellow warning flash
 
 // Homing missile constants
-export const HOMING_MISSILE_INITIAL_SPEED = 250; // Pixels per second
+export const HOMING_MISSILE_INITIAL_SPEED = 250; // pixels per second
 export const HOMING_MISSILE_MAX_SPEED = 400; // Maximum speed after acceleration
-export const HOMING_MISSILE_ACCELERATION = 100; // Pixels per second squared
-export const HOMING_MISSILE_TURN_RATE = 3.0; // Radians per second
+export const HOMING_MISSILE_ACCELERATION = 100; // pixels per second squared
+export const HOMING_MISSILE_TURN_RATE = 2.5; // Radians per second
 export const HOMING_MISSILE_SIZE = 18; // Missile size (width/height) - 50% larger than 12
 export const HOMING_MISSILE_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const HOMING_MISSILE_PULSE_SPEED = 3.0; // Glow pulse frequency
 export const HOMING_MISSILE_COLOR = COLOR_MAGENTA; // Bright purple/magenta
-export const HOMING_MISSILE_MAX_LIFETIME = 7.0; // Maximum lifetime in seconds
+export const HOMING_MISSILE_MAX_LIFETIME = 6.0; // Maximum lifetime in seconds
 
 // Splitting brick constants
 export const SPLITTING_FRAGMENT_COUNT = 4; // 4 diagonal directions
-export const SPLITTING_FRAGMENT_SPEED = 350; // Pixels per second
-export const SPLITTING_FRAGMENT_SIZE = 16; // Fragment size (larger than debris)
+export const SPLITTING_FRAGMENT_SPEED = 350; // pixels per second
+export const SPLITTING_FRAGMENT_SIZE = 32; // Fragment size (larger than debris)
 export const SPLITTING_FRAGMENT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const SPLITTING_FRAGMENT_FALL_DISTANCE = 100; // Distance before falling vertically
-export const SPLITTING_FRAGMENT_SHAKE_DURATION = 0.5; // Shake duration in seconds
-export const SPLITTING_FRAGMENT_SHAKE_INTENSITY = 3; // Shake intensity in pixels
+export const SPLITTING_FRAGMENT_SHAKE_DURATION = 0.5; // seconds Shake duration in seconds
+export const SPLITTING_FRAGMENT_SHAKE_INTENSITY = 3; // pixels Shake intensity in pixels
 export const SPLITTING_FRAGMENT_GRAVITY = 500; // Gravity when falling (25% faster than 400)
 
 // Dynamite stick constants
 export const DYNAMITE_STICK_GRAVITY = 400; // UNUSED - kept for potential future use
-export const DYNAMITE_STICK_FUSE_TIME = 3.0; // Seconds before explosion
-export const DYNAMITE_STICK_FLASH_INTERVAL = 0.15; // Flash every 0.15 seconds
-export const DYNAMITE_STICK_DRIFT_SPEED = 30; // Slow drift speed in pixels per second
+export const DYNAMITE_STICK_FUSE_TIME = 3.0; // seconds before explosion
+export const DYNAMITE_STICK_FLASH_INTERVAL = 0.15; // seconds Flash every 0.15 seconds
+export const DYNAMITE_STICK_DRIFT_SPEED = 30; // pixels per second Slow drift speed in pixels per second
 export const DYNAMITE_STICK_WIDTH = 12; // Narrower than brick
 export const DYNAMITE_STICK_HEIGHT = 30; // Taller than brick (stick shape)
 export const DYNAMITE_EXPLOSION_RADIUS = 120; // Large circular explosion radius
-export const DYNAMITE_EXPLOSION_DURATION = 0.5; // Explosion visual effect duration in seconds
+export const DYNAMITE_EXPLOSION_DURATION = 0.5; // seconds Explosion visual effect duration in seconds
 export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0
 
 // Boss1 constants
 export const BOSS1_HEALTH_MULTIPLIER = 6; // Boss1 health = base health * 6
-export const BOSS1_MOVE_SPEED = 250; // Boss1 movement speed in pixels per second
-export const BOSS1_THROW_INTERVAL = 1.0; // Seconds between brick throws
-export const BOSS1_THROWN_BRICK_SPEED = 500; // Speed of thrown bricks in pixels per second
+export const BOSS1_MOVE_SPEED = 250; // pixels per second Boss1 movement speed in pixels per second
+export const BOSS1_THROW_INTERVAL = 1.0; // seconds Seconds between brick throws
+export const BOSS1_THROWN_BRICK_SPEED = 600; // pixels per second Speed of thrown bricks in pixels per second
 export const BOSS1_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
 
 // Boss2 (The Shielder) constants
 export const BOSS2_HEALTH_MULTIPLIER = 4; // Boss2 health = base health * 8 (more health due to shield)
-export const BOSS2_MOVE_SPEED = 70; // Boss2 movement speed in pixels per second (slower than Boss1)
-export const BOSS2_THROW_INTERVAL = 3; // Seconds between brick throws (less frequent than Boss1)
-export const BOSS2_THROWN_BRICK_SPEED = 160; // Speed of thrown bricks (slower than Boss1)
+export const BOSS2_MOVE_SPEED = 70; // pixels per second Boss2 movement speed in pixels per second (slower than Boss1)
+export const BOSS2_THROW_INTERVAL = 3; // seconds Seconds between brick throws (less frequent than Boss1)
+export const BOSS2_THROWN_BRICK_SPEED = 600; // pixels per second Speed of thrown bricks (slower than Boss1)
 export const BOSS2_SHIELD_RADIUS_MULTIPLIER = 1.5; // Shield radius = brick width * 1.5
-export const BOSS2_SHIELD_SEGMENTS = 4; // Number of shield segments
+export const BOSS2_SHIELD_SEGMENTS = 3; // Number of shield segments
 export const BOSS2_SHIELD_GAP_RADIANS = Math.PI / 3; // Gap between segments (45 degrees)
-export const BOSS2_SHIELD_ROTATION_SPEED = Math.PI / 1.5; // Radians per second
-export const BOSS2_SHIELD_THICKNESS = 24; // Shield arc thickness in pixels
+export const BOSS2_SHIELD_ROTATION_SPEED = Math.PI / 1.3; // Radians per second
+export const BOSS2_SHIELD_THICKNESS = 24; // pixels Shield arc thickness in pixels
 export const BOSS2_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
+
+// Boss3 (The Splitter) constants
+export const BOSS3_HEALTH_MULTIPLIER = 5; // Boss3 health = base health * 5
+export const BOSS3_MOVE_SPEED = 180; // pixels per second Boss3 movement speed
+export const BOSS3_THROW_INTERVAL = 2.0; // seconds Seconds between fragment throws
+export const BOSS3_THROWN_BRICK_SPEED = 500; // pixels per second Speed of thrown fragments
+export const BOSS3_SPAWN_OFFSET_Y = -2; // Spawn offset in brick heights
+export const BOSS3_SPLIT_THRESHOLD = 0.5; // Split when health drops below 50%
+export const BOSS3_SPLIT_COUNT = 2; // Number of copies to split into
+export const BOSS3_COPY_HEALTH_MULTIPLIER = 0.4; // Each copy has 40% of original max health
+export const BOSS3_COPY_SPEED_MULTIPLIER = 1.5; // Copies move 50% faster
+export const BOSS3_COPY_SIZE_MULTIPLIER = 0.75; // Copies are 75% of original size

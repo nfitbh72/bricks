@@ -10,6 +10,7 @@ import { StatusBar } from '../ui/StatusBar';
 import { BaseBoss } from '../entities/offensive/BaseBoss';
 import { Boss1 } from '../entities/offensive/Boss1';
 import { Boss2 } from '../entities/offensive/Boss2';
+import { Boss3 } from '../entities/offensive/Boss3';
 import { GameState, LevelConfig, BrickType } from '../core/types';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { AudioManager } from '../managers/AudioManager';
@@ -39,7 +40,9 @@ import {
   BOSS1_HEALTH_MULTIPLIER,
   BOSS1_SPAWN_OFFSET_Y,
   BOSS2_HEALTH_MULTIPLIER,
-  BOSS2_SPAWN_OFFSET_Y
+  BOSS2_SPAWN_OFFSET_Y,
+  BOSS3_HEALTH_MULTIPLIER,
+  BOSS3_SPAWN_OFFSET_Y
 } from '../../config/constants';
 
 export class Game {
@@ -86,8 +89,9 @@ export class Game {
     delay: number;
   }> = [];
 
-  // Boss
+  // Boss (can be array for Boss3 split copies)
   private boss: BaseBoss | null = null;
+  private bossCopies: BaseBoss[] = [];
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -276,7 +280,7 @@ export class Game {
       brick.setOnDestroyCallback((destroyedBrick, info) => {
         // Check if this is a boss brick - activate boss instead of destroying
         const brickType = destroyedBrick.getType();
-        if ((brickType === BrickType.BOSS_1 || brickType === BrickType.BOSS_2) && !this.boss) {
+        if ((brickType === BrickType.BOSS_1 || brickType === BrickType.BOSS_2 || brickType === BrickType.BOSS_3) && !this.boss) {
           this.activateBoss(destroyedBrick, info);
           return;
         }
@@ -320,7 +324,7 @@ export class Game {
   }
 
   /**
-   * Activate the boss when BOSS_1 or BOSS_2 brick is hit
+   * Activate the boss when BOSS_1, BOSS_2, or BOSS_3 brick is hit
    */
   private activateBoss(brick: Brick, info: { centerX: number; centerY: number }): void {
     if (!this.level) return;
@@ -339,6 +343,9 @@ export class Game {
     if (brickType === BrickType.BOSS_2) {
       bossHealth = baseHealth * BOSS2_HEALTH_MULTIPLIER;
       spawnOffsetY = brick.getHeight() * BOSS2_SPAWN_OFFSET_Y;
+    } else if (brickType === BrickType.BOSS_3) {
+      bossHealth = baseHealth * BOSS3_HEALTH_MULTIPLIER;
+      spawnOffsetY = brick.getHeight() * BOSS3_SPAWN_OFFSET_Y;
     } else {
       bossHealth = baseHealth * BOSS1_HEALTH_MULTIPLIER;
       spawnOffsetY = brick.getHeight() * BOSS1_SPAWN_OFFSET_Y;
@@ -351,6 +358,15 @@ export class Game {
     // Create boss at safe position
     if (brickType === BrickType.BOSS_2) {
       this.boss = new Boss2(
+        bossX,
+        bossY,
+        bossHealth,
+        brick.getColor(),
+        this.canvas.width,
+        this.canvas.height
+      );
+    } else if (brickType === BrickType.BOSS_3) {
+      this.boss = new Boss3(
         bossX,
         bossY,
         bossHealth,
@@ -810,7 +826,35 @@ export class Game {
     // Update boss if active (use effective deltaTime for slow-mo)
     if (this.boss && this.boss.isActive()) {
       this.boss.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+      
+      // Check if Boss3 should split
+      if (this.boss instanceof Boss3 && this.boss.shouldSplit()) {
+        const copies = this.boss.createSplitCopies();
+        this.bossCopies = copies;
+        this.boss.markAsSplit();
+        
+        // Create split effect
+        const bounds = this.boss.getBounds();
+        if (bounds) {
+          this.effectsManager.createParticles(
+            bounds.x + bounds.width / 2,
+            bounds.y + bounds.height / 2,
+            60,
+            '#cc00ff',
+            400
+          );
+        }
+      }
     }
+    
+    // Update boss copies
+    for (const copy of this.bossCopies) {
+      if (copy.isActive()) {
+        copy.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+      }
+    }
+    // Remove destroyed copies
+    this.bossCopies = this.bossCopies.filter(c => c.isActive());
 
     // Update collision manager (use effective deltaTime for slow-mo)
     this.collisionManager.update(effectiveDeltaTime, this.ball);
@@ -853,8 +897,10 @@ export class Game {
 
     // Check level completion with delay for animations
     // Level is complete when all destructible bricks are destroyed AND boss is destroyed (if it exists)
+    // For Boss3, all copies must also be destroyed
     const bossDefeated = !this.boss || this.boss.isDestroyed();
-    if (this.level && this.level.isComplete() && bossDefeated && this.gameState === GameState.PLAYING) {
+    const allCopiesDefeated = this.bossCopies.length === 0 || this.bossCopies.every(c => c.isDestroyed());
+    if (this.level && this.level.isComplete() && bossDefeated && allCopiesDefeated && this.gameState === GameState.PLAYING) {
       this.levelCompleteTimer += deltaTime * 1000; // Convert to ms
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
         this.gameState = GameState.LEVEL_COMPLETE;
@@ -1033,6 +1079,32 @@ export class Game {
         }
       );
     }
+    
+    // Boss copy collisions (for Boss3 split copies)
+    for (const copy of this.bossCopies) {
+      if (copy.isActive()) {
+        this.collisionManager.checkBossBallCollisions(
+          copy,
+          this.ball,
+          (damage, x, y) => {
+            this.effectsManager.createParticles(x, y, 8, '#cc00ff', 100);
+            this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+          },
+          (x, y) => {
+            this.effectsManager.createParticles(x, y, 30, '#cc00ff', 200);
+          }
+        );
+        
+        this.collisionManager.checkBossThrownBrickCollisions(
+          copy,
+          this.bat,
+          (x, y) => {
+            this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BOMB_BRICK_INTENSITY, SCREEN_SHAKE_BOMB_BRICK_DURATION);
+            this.effectsManager.createParticles(x, y, 15, '#cc00ff', 150);
+          }
+        );
+      }
+    }
   }
 
   /**
@@ -1073,6 +1145,13 @@ export class Game {
     // Render boss if active
     if (this.boss && this.boss.isActive()) {
       this.boss.render(this.ctx);
+    }
+    
+    // Render boss copies
+    for (const copy of this.bossCopies) {
+      if (copy.isActive()) {
+        copy.render(this.ctx);
+      }
     }
   }
 

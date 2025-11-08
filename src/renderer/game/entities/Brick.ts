@@ -64,6 +64,7 @@ export class Brick {
     [BrickType.OFFENSIVE_DYNAMITE]: 1,
     [BrickType.BOSS_1]: 1,
     [BrickType.BOSS_2]: 1,
+    [BrickType.BOSS_3]: 1,
   };
 
 
@@ -235,6 +236,8 @@ export class Brick {
         return BRICK_COLOR_BOSS;
       case BrickType.BOSS_2:
         return '#00ccff'; // Cyan color for Boss2 (The Shielder)
+      case BrickType.BOSS_3:
+        return '#cc00ff'; // Purple/magenta color for Boss3 (The Splitter)
       default:
         return COLOR_WHITE;
     }
@@ -348,7 +351,7 @@ export class Brick {
       
       // Display "BOSS" for boss bricks, otherwise display health
       let displayText: string;
-      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2) {
+      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
         displayText = 'BOSS';
       } else {
         // Display health rounded to 1 decimal place if fractional, otherwise as integer
@@ -393,7 +396,7 @@ export class Brick {
     let healthText: string;
     if (this.isIndestructible()) {
       healthText = 'I';
-    } else if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2) {
+    } else if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
       healthText = 'BOSS';
     } else {
       healthText = this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1);
@@ -487,7 +490,7 @@ export class Brick {
       
       // Display "BOSS" for boss bricks, otherwise display health
       let displayText: string;
-      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2) {
+      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
         displayText = 'BOSS';
       } else {
         displayText = this.health % 1 === 0 

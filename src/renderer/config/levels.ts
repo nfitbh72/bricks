@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 9;
+export const TOTAL_LEVELS = 10;
 
 /**
  * Create Level 1 configuration
@@ -273,6 +273,30 @@ export function createLevel9(): LevelConfig {
 }
 
 /**
+ * Create Level 10 configuration
+ * Test level for Boss3 (The Splitter) - just a single boss brick
+ */
+export function createLevel10(): LevelConfig {
+  const pattern = [
+    "NNNNNNNN",
+    "........",
+    "...3....",
+    "........",
+    "........",
+    "........",
+    "........",
+    "........"
+  ];
+  
+  return {
+    id: 10,
+    name: t('game.levels.level10Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 5,
+  };
+}
+
+/**
  * Get level by ID
  */
 export function getLevel(id: number): LevelConfig | undefined {
@@ -295,6 +319,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel8();
     case 9:
       return createLevel9();
+    case 10:
+      return createLevel10();
     default:
       return undefined;
   }

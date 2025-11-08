@@ -54,7 +54,8 @@
       "level6Name": "Level 6: Dynamite",
       "level7Name": "Level 7: Boss Battle",
       "level8Name": "Offensive Spiral",
-      "level9Name": "Boss Test: The Shielder"
+      "level9Name": "Boss Test: The Shielder",
+      "level10Name": "Boss Test: The Splitter"
     },
     "bricks": {
       "offensive": {
