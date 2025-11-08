@@ -483,8 +483,8 @@ describe('SplittingFragment', () => {
     });
 
     it('should include buffer zone', () => {
-      // Fragment size is the buffer - need to be beyond canvas + size
-      const farOffFragment = new SplittingFragment(820, 100, 0, 0, '#ff0000');
+      // Fragment size is 32 - need to be beyond canvas + size (800 + 32 = 832)
+      const farOffFragment = new SplittingFragment(833, 100, 0, 0, '#ff0000');
       
       expect(farOffFragment.isOffScreen(800, 600)).toBe(true);
     });

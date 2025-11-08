@@ -11,6 +11,7 @@ Just some notes about future features so that I don't forget
 - [X] check coverage of non-ui components, recommend useful tests that can be added
 - [X] Add base health to each level in the config
 - [X] Indestructible bricks
+- [] space out the bosses every 3 levels
 - [] Add many maps
 - [X] Test coverage
 - [X] Integration tests

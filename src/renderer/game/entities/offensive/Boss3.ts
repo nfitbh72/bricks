@@ -125,6 +125,7 @@ export class Boss3 extends BaseBoss {
 
   /**
    * Throw splitting fragments in a pattern
+   * Fragments spawn at least BRICK_WIDTH away from boss center
    */
   private throwSplittingFragments(batX: number, batY: number): void {
     const centerX = this.x + (this.width * this.copyScale) / 2;
@@ -139,9 +140,14 @@ export class Boss3 extends BaseBoss {
       const velocityX = Math.cos(angle) * this.thrownBrickSpeed;
       const velocityY = Math.sin(angle) * this.thrownBrickSpeed;
       
+      // Spawn fragment at least BRICK_WIDTH away from boss center
+      const spawnDistance = BRICK_WIDTH;
+      const spawnX = centerX + Math.cos(angle) * spawnDistance;
+      const spawnY = centerY + Math.sin(angle) * spawnDistance;
+      
       const fragment = new SplittingFragment(
-        centerX,
-        centerY,
+        spawnX,
+        spawnY,
         velocityX,
         velocityY,
         this.color
