@@ -46,16 +46,18 @@
       "level1": "第1关：有效设计",
       "level2": "第2关：打招呼",
       "level3": "第3关：骷髅岛",
-      "level1Name": "第1关：一",
-      "level2Name": "第2关：碎片四处飞散",
-      "level3Name": "第3关：小心激光和破碎的坠落砖块！",
-      "level4Name": "第4关：我们称之为荷马",
-      "level5Name": "第5关：炸弹来袭",
-      "level6Name": "第6关：炸药",
-      "level7Name": "第7关：首领战",
-      "level8Name": "第8关：攻击曼达拉",
-      "level9Name": "首领测试：盾牌守卫者",
-      "level10Name": "首领测试：分裂者"
+      "level1Name": "第1关：初步",
+      "level2Name": "第2关：碎片瀑布",
+      "level3Name": "第3关：激光网格",
+      "level4Name": "第4关：首领 - 投掷者",
+      "level5Name": "第5关：爆炸棋盘",
+      "level6Name": "第6关：分裂螺旋",
+      "level7Name": "第7关：导弹迷宫",
+      "level8Name": "第8关：首领 - 盾牌守卫者",
+      "level9Name": "第9关：炸药十字",
+      "level10Name": "第10关：攻击混乱",
+      "level11Name": "第11关：爆炸钻石",
+      "level12Name": "第12关：最终首领 - 分裂者"
     },
     "bricks": {
       "offensive": {

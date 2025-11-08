@@ -46,16 +46,18 @@
       "level1": "レベル1：効果的なデザイン",
       "level2": "レベル2：挨拶",
       "level3": "レベル3：スカル島",
-      "level1Name": "レベル1：一",
-      "level2Name": "レベル2：全方向に破片",
-      "level3Name": "レベル3：レーザーと砕ける落下ブロックに注意！",
-      "level4Name": "レベル4：ホーマーと呼ぶ",
-      "level5Name": "レベル5：爆弾投下",
-      "level6Name": "レベル6：ダイナマイト",
-      "level7Name": "レベル7：ボス戦",
-      "level8Name": "レベル8：攻撃的なマンダラ",
-      "level9Name": "ボステスト：シールダー",
-      "level10Name": "ボステスト：スプリッター"
+      "level1Name": "レベル1：最初の一歩",
+      "level2Name": "レベル2：破片の滝",
+      "level3Name": "レベル3：レーザー格子",
+      "level4Name": "レベル4：ボス - 投げ手",
+      "level5Name": "レベル5：爆発チェス盤",
+      "level6Name": "レベル6：分裂螺旋",
+      "level7Name": "レベル7：追尾ミサイル迷路",
+      "level8Name": "レベル8：ボス - 盾持ち",
+      "level9Name": "レベル9：ダイナマイト十字",
+      "level10Name": "レベル10：攻撃の混沌",
+      "level11Name": "レベル11：爆発ダイヤモンド",
+      "level12Name": "レベル12：最終ボス - 分裂者"
     },
     "bricks": {
       "offensive": {

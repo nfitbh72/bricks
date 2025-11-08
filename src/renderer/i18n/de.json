@@ -46,16 +46,18 @@
       "level1": "Level 1: Effektives Design",
       "level2": "Level 2: Sagt Hallo",
       "level3": "Level 3: Schädelinsel",
-      "level1Name": "Level 1: Eins",
-      "level2Name": "Level 2: Trümmer in alle Richtungen",
-      "level3Name": "Level 3: Vorsicht vor Lasern und zerbrechenden fallenden Ziegeln!",
-      "level4Name": "Level 4: Wir nennen es Homer",
-      "level5Name": "Level 5: Bomben weg",
-      "level6Name": "Level 6: Dynamit",
-      "level7Name": "Level 7: Boss-Kampf",
-      "level8Name": "Level 8: Offensives Mandala",
-      "level9Name": "Boss-Test: Der Schildträger",
-      "level10Name": "Boss-Test: Der Spalter"
+      "level1Name": "Level 1: Erste Schritte",
+      "level2Name": "Level 2: Trümmerkaskade",
+      "level3Name": "Level 3: Laser-Gitter",
+      "level4Name": "Level 4: Boss - Der Werfer",
+      "level5Name": "Level 5: Explosives Schachbrett",
+      "level6Name": "Level 6: Spaltende Spirale",
+      "level7Name": "Level 7: Lenkraketen-Labyrinth",
+      "level8Name": "Level 8: Boss - Der Schildträger",
+      "level9Name": "Level 9: Dynamit-Kreuz",
+      "level10Name": "Level 10: Offensives Chaos",
+      "level11Name": "Level 11: Explosiver Diamant",
+      "level12Name": "Level 12: Endboss - Der Spalter"
     },
     "bricks": {
       "offensive": {

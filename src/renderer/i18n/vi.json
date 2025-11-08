@@ -46,16 +46,18 @@
       "level1": "Màn 1: Thiết Kế Hiệu Quả",
       "level2": "Màn 2: Chào Hỏi",
       "level3": "Màn 3: Đảo Đầu Lâu",
-      "level1Name": "Màn 1: Một",
-      "level2Name": "Màn 2: Mảnh vỡ bay khắp nơi",
-      "level3Name": "Màn 3: Cẩn thận với laser và gạch rơi vỡ vụn!",
-      "level4Name": "Màn 4: Chúng tôi gọi nó là Homer",
-      "level5Name": "Màn 5: Bom Nổ",
-      "level6Name": "Màn 6: Thuốc Nổ",
-      "level7Name": "Màn 7: Trận Đánh Boss",
-      "level8Name": "Cấp độ 8: Mandala Tấn công",
-      "level9Name": "Kiểm tra Boss: Người Giữ Khiên",
-      "level10Name": "Kiểm tra Boss: Kẻ Chia Tách"
+      "level1Name": "Màn 1: Bước Đầu",
+      "level2Name": "Màn 2: Thác Mảnh Vỡ",
+      "level3Name": "Màn 3: Lưới Laser",
+      "level4Name": "Màn 4: Boss - Kẻ Ném",
+      "level5Name": "Màn 5: Bàn Cờ Nổ",
+      "level6Name": "Màn 6: Xoắn Ốc Chia Tách",
+      "level7Name": "Màn 7: Mê Cung Tên Lửa",
+      "level8Name": "Màn 8: Boss - Người Giữ Khiên",
+      "level9Name": "Màn 9: Thập Tự Thuốc Nổ",
+      "level10Name": "Màn 10: Hỗn Loạn Tấn Công",
+      "level11Name": "Màn 11: Kim Cương Nổ",
+      "level12Name": "Màn 12: Boss Cuối - Kẻ Chia Tách"
     },
     "bricks": {
       "offensive": {

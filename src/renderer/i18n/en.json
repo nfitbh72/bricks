@@ -46,16 +46,18 @@
       "level1": "Level 1: Effective Design",
       "level2": "Level 2: Says Hi",
       "level3": "Level 3: Skull Island",
-      "level1Name": "Level 1: One",
-      "level2Name": "Level 2: Debris in all directions",
-      "level3Name": "Level 3: Beware of lasers and shattering falling bricks!",
-      "level4Name": "Level 4: We call it Homer",
-      "level5Name": "Level 5: Bombs Away",
-      "level6Name": "Level 6: Dynamite",
-      "level7Name": "Level 7: Boss Battle",
-      "level8Name": "Offensive Spiral",
-      "level9Name": "Boss Test: The Shielder",
-      "level10Name": "Boss Test: The Splitter"
+      "level1Name": "Level 1: First Steps",
+      "level2Name": "Level 2: Debris Cascade",
+      "level3Name": "Level 3: Laser Grid",
+      "level4Name": "Level 4: Boss - The Thrower",
+      "level5Name": "Level 5: Explosive Checkerboard",
+      "level6Name": "Level 6: Splitting Spiral",
+      "level7Name": "Level 7: Homing Missile Maze",
+      "level8Name": "Level 8: Boss - The Shielder",
+      "level9Name": "Level 9: Dynamite Cross",
+      "level10Name": "Level 10: Offensive Chaos",
+      "level11Name": "Level 11: Explosive Diamond",
+      "level12Name": "Level 12: Final Boss - The Splitter"
     },
     "bricks": {
       "offensive": {

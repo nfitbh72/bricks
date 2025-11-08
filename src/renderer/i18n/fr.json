@@ -46,16 +46,18 @@
       "level1": "Niveau 1: Design Efficace",
       "level2": "Niveau 2: Dit Bonjour",
       "level3": "Niveau 3: Île du Crâne",
-      "level1Name": "Niveau 1: Un",
-      "level2Name": "Niveau 2: Débris dans toutes les directions",
-      "level3Name": "Niveau 3: Attention aux lasers et aux briques qui tombent et se brisent!",
-      "level4Name": "Niveau 4: On l'appelle Homer",
-      "level5Name": "Niveau 5: Bombardement",
-      "level6Name": "Niveau 6: Dynamite",
-      "level7Name": "Niveau 7: Combat de Boss",
-      "level8Name": "Niveau 8: Mandala Offensif",
-      "level9Name": "Test de Boss: Le Bouclier",
-      "level10Name": "Test de Boss: Le Diviseur"
+      "level1Name": "Niveau 1: Premiers Pas",
+      "level2Name": "Niveau 2: Cascade de Débris",
+      "level3Name": "Niveau 3: Grille Laser",
+      "level4Name": "Niveau 4: Boss - Le Lanceur",
+      "level5Name": "Niveau 5: Échiquier Explosif",
+      "level6Name": "Niveau 6: Spirale Divisante",
+      "level7Name": "Niveau 7: Labyrinthe de Missiles",
+      "level8Name": "Niveau 8: Boss - Le Bouclier",
+      "level9Name": "Niveau 9: Croix de Dynamite",
+      "level10Name": "Niveau 10: Chaos Offensif",
+      "level11Name": "Niveau 11: Diamant Explosif",
+      "level12Name": "Niveau 12: Boss Final - Le Diviseur"
     },
     "bricks": {
       "offensive": {

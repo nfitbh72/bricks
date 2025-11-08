@@ -46,16 +46,18 @@
       "level1": "Antas 1: Epektibong Disenyo",
       "level2": "Antas 2: Pagbati",
       "level3": "Antas 3: Isla ng Bungo",
-      "level1Name": "Antas 1: Isa",
-      "level2Name": "Antas 2: Mga guho sa lahat ng direksyon",
-      "level3Name": "Antas 3: Mag-ingat sa mga laser at mga nahuhulog na laryo na nadudurog!",
-      "level4Name": "Antas 4: Tinatawag namin itong Homer",
-      "level5Name": "Antas 5: Mga Bomba",
-      "level6Name": "Antas 6: Dinamita",
-      "level7Name": "Antas 7: Labanan ang Boss",
-      "level8Name": "Level 8: Offensive Mandala",
-      "level9Name": "Boss Test: Ang Tagapagkalasag ng Pag-atake",
-      "level10Name": "Boss Test: Ang Tagapaghati"
+      "level1Name": "Antas 1: Unang Hakbang",
+      "level2Name": "Antas 2: Tulo ng Guho",
+      "level3Name": "Antas 3: Grid ng Laser",
+      "level4Name": "Antas 4: Boss - Ang Tagahagis",
+      "level5Name": "Antas 5: Sumabog na Dama",
+      "level6Name": "Antas 6: Spiral na Naghahati",
+      "level7Name": "Antas 7: Labyrinth ng Misil",
+      "level8Name": "Antas 8: Boss - Ang Tagapagkalasag",
+      "level9Name": "Antas 9: Krus ng Dinamita",
+      "level10Name": "Antas 10: Kaguluhan ng Pag-atake",
+      "level11Name": "Antas 11: Sumabog na Diamante",
+      "level12Name": "Antas 12: Huling Boss - Ang Tagapaghati"
     },
     "bricks": {
       "offensive": {

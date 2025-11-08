@@ -46,16 +46,18 @@
       "level1": "Level 1: Desain Efektif",
       "level2": "Level 2: Menyapa",
       "level3": "Level 3: Pulau Tengkorak",
-      "level1Name": "Level 1: Satu",
-      "level2Name": "Level 2: Puing ke segala arah",
-      "level3Name": "Level 3: Hati-hati dengan laser dan bata jatuh yang pecah!",
-      "level4Name": "Level 4: Kami menyebutnya Homer",
-      "level5Name": "Level 5: Bom Meledak",
-      "level6Name": "Level 6: Dinamit",
-      "level7Name": "Level 7: Pertarungan Bos",
-      "level8Name": "Level 8: Mandala Ofensif",
-      "level9Name": "Tes Bos: Perisai",
-      "level10Name": "Tes Bos: Pembelah"
+      "level1Name": "Level 1: Langkah Pertama",
+      "level2Name": "Level 2: Puing Berjatuhan",
+      "level3Name": "Level 3: Kisi Laser",
+      "level4Name": "Level 4: Bos - Pelempar",
+      "level5Name": "Level 5: Papan Catur Meledak",
+      "level6Name": "Level 6: Spiral Pembelah",
+      "level7Name": "Level 7: Labirin Rudal",
+      "level8Name": "Level 8: Bos - Perisai",
+      "level9Name": "Level 9: Salib Dinamit",
+      "level10Name": "Level 10: Kekacauan Ofensif",
+      "level11Name": "Level 11: Berlian Meledak",
+      "level12Name": "Level 12: Bos Akhir - Pembelah"
     },
     "bricks": {
       "offensive": {

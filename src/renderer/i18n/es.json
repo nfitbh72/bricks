@@ -46,16 +46,18 @@
       "level1": "Nivel 1: Diseño Efectivo",
       "level2": "Nivel 2: Dice Hola",
       "level3": "Nivel 3: Isla Calavera",
-      "level1Name": "Nivel 1: Uno",
-      "level2Name": "Nivel 2: Escombros en todas direcciones",
-      "level3Name": "Nivel 3: ¡Cuidado con los láseres y los ladrillos que caen y se rompen!",
-      "level4Name": "Nivel 4: Lo llamamos Homer",
-      "level5Name": "Nivel 5: Bombas Fuera",
-      "level6Name": "Nivel 6: Dinamita",
-      "level7Name": "Nivel 7: Batalla de Jefe",
-      "level8Name": "Nivel 8: Mandala Ofensivo",
-      "level9Name": "Prueba de Jefe: El Escudero",
-      "level10Name": "Prueba de Jefe: El Divisor"
+      "level1Name": "Nivel 1: Primeros Pasos",
+      "level2Name": "Nivel 2: Cascada de Escombros",
+      "level3Name": "Nivel 3: Rejilla Láser",
+      "level4Name": "Nivel 4: Jefe - El Lanzador",
+      "level5Name": "Nivel 5: Tablero Explosivo",
+      "level6Name": "Nivel 6: Espiral Divisora",
+      "level7Name": "Nivel 7: Laberinto de Misiles",
+      "level8Name": "Nivel 8: Jefe - El Escudero",
+      "level9Name": "Nivel 9: Cruz de Dinamita",
+      "level10Name": "Nivel 10: Caos Ofensivo",
+      "level11Name": "Nivel 11: Diamante Explosivo",
+      "level12Name": "Nivel 12: Jefe Final - El Divisor"
     },
     "bricks": {
       "offensive": {
