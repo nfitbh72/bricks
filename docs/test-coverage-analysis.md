@@ -2,48 +2,61 @@
 
 ## Current Coverage Summary
 
-**Last Updated**: October 31, 2025  
-**Overall Coverage**: 48.74% statements | 37.11% branches | 53.18% functions | 48.78% lines
+**Last Updated**: November 8, 2025  
+**Overall Coverage**: 49.01% statements | 36.5% branches | 51.15% functions | 49.15% lines
 
 Based on the latest test coverage report, here's the breakdown of non-UI component coverage:
 
 ### Excellent Coverage (>95% coverage) ✅
-- ✅ **InputManager** (100%): Keyboard and mouse input handling - **NEWLY TESTED**
-- ✅ **Leaderboard** (100%): Persistence and scoring logic - **NEWLY TESTED**
-- ✅ **GameUpgrades** (100%): Upgrade system logic
-- ✅ **WeaponManager** (100%): Weapon management
+- ✅ **SplittingFragment** (100%): Fragment physics - **NEWLY TESTED**
+- ✅ **HomingMissile** (100%): Homing projectile - **NEWLY TESTED**
+- ✅ **InputManager** (100%): Keyboard and mouse input handling
+- ✅ **Leaderboard** (100%): Persistence and scoring logic
+- ✅ **FallingBrick** (100%): Falling brick mechanics
+- ✅ **DamageNumber** (100%): Damage display
+- ✅ **ParticleSystem** (93.33%): Particle effects
 - ✅ **Level** (97.67%): Level management
-- ✅ **StateTransitionHandler** (95.74%): State transitions
+- ✅ **GameUpgrades** (96.47%): Upgrade system logic
+- ✅ **StateTransitionHandler** (95.6%): State transitions
 - ✅ **Laser** (95.23%): Laser weapon
 
 ### Well-Tested Components (80-95% coverage) ✅
-- ✅ **Config files** (93.5%): brickLayout, colorStyles, constants, fontStyles
+- ✅ **Config files** (88.91%): brickLayout, colorStyles, constants, fontStyles
 - ✅ **Core utils** (87.27%): Utility functions
 - ✅ **AudioManager** (86.04%): Audio playback and management
-- ✅ **CollisionManager** (82.65%): Collision detection and physics - **NEWLY TESTED**
 - ✅ **LanguageManager** (80.48%): Internationalization
 
 ### Moderately Tested Components (40-80% coverage) ⚠️
 - ⚠️ **DynamiteStick** (75%): Dynamite mechanics
-- ⚠️ **levels.ts** (73.52%): Level configuration functions
 - ⚠️ **Bat** (68.46%): Player paddle
 - ⚠️ **OffensiveEntityManager** (64.48%): Entity management
 - ⚠️ **SlowMotionManager** (63.75%): Slow motion mechanics
-- ⚠️ **Brick** (60.09%): Brick entities
-- ⚠️ **Ball** (59.34%): Core gameplay entity
+- ⚠️ **CollisionManager** (60.51%): Collision detection and physics
+- ⚠️ **Ball** (58.79%): Core gameplay entity
+- ⚠️ **Brick** (57.33%): Brick entities
 - ⚠️ **Debris** (56.25%): Debris particles
+- ⚠️ **levels.ts** (55.55%): Level configuration functions
+- ⚠️ **WeaponManager** (55.55%): Weapon management
 - ⚠️ **BrickLaser** (54.9%): Brick laser mechanics
 - ⚠️ **EffectsManager** (49.18%): Visual effects partially tested
 
 ### Poorly Tested Components (<40% coverage) ❌
-- ❌ **SplittingFragment** (25.37%): Fragment physics
-- ❌ **HomingMissile** (17.94%): Homing projectile
+
+**Boss Entities (Critical Gap)**:
+- ❌ **Boss1** (14.28%): First boss mechanics
+- ❌ **Boss2** (3.4%): Shield boss mechanics  
+- ❌ **Boss3** (3.66%): Splitting boss mechanics
+- ❌ **BaseBoss** (3.12%): Base boss class
+- ❌ **BossArm** (4.16%): Boss component
+- ❌ **ThrownBrick** (2.63%): Boss projectile
+
+**Manager Classes**:
 - ❌ **ScreenManager** (11%): Screen management
 - ❌ **RenderManager** (7.27%): Rendering orchestration
-- ❌ **Game.ts** (5.09%): Main game orchestration
-- ❌ **BossArm** (4.16%): Boss component
-- ❌ **Boss1** (3.6%): Boss entity logic
-- ❌ **ThrownBrick** (2.63%): Thrown projectile
+- ❌ **Game.ts** (5.11%): Main game orchestration
+
+**Weapon Systems**:
+- ❌ **Bomb** (2.22%): Bomb weapon mechanics
 
 ### UI Components (Not Priority) 🔵
 - 🔵 **OptionsScreen** (64.88%): Options menu
@@ -53,6 +66,39 @@ Based on the latest test coverage report, here's the breakdown of non-UI compone
 ---
 
 ## Recent Test Additions ✅
+
+### Completed Tests (November 8, 2025)
+
+#### ✅ HomingMissile Tests - COMPLETED
+**File**: `tests/unit/HomingMissile.test.ts`  
+**Coverage**: 100% (up from 17.94%)  
+**Tests Added**: 47 tests
+
+**Test Coverage**:
+- ✅ Initialization and configuration
+- ✅ Tracking and homing behavior
+- ✅ Velocity and acceleration mechanics
+- ✅ Turn rate limiting
+- ✅ Lifetime management
+- ✅ Trail particle rendering
+- ✅ Color pulsing effects
+- ✅ Off-screen detection
+- ✅ Bounds calculation
+
+#### ✅ SplittingFragment Tests - COMPLETED
+**File**: `tests/unit/SplittingFragment.test.ts`  
+**Coverage**: 100% (up from 25.37%)  
+**Tests Added**: 64 tests
+
+**Test Coverage**:
+- ✅ Multi-phase physics (moving, shaking, falling)
+- ✅ Phase transitions
+- ✅ Gravity and velocity mechanics
+- ✅ Rotation behavior
+- ✅ Shake effects
+- ✅ Off-screen detection with buffer
+- ✅ Bounds calculation
+- ✅ Rendering with rotation and glow
 
 ### Completed Priority 1 Tests (October 31, 2025)
 
@@ -106,87 +152,14 @@ Based on the latest test coverage report, here's the breakdown of non-UI compone
 
 ## Recommended Tests to Add
 
-### Priority 1: Offensive Entities (High Impact)
+### Priority 1: Boss Mechanics (CRITICAL - Major Gap)
 
-#### 1. HomingMissile Tests
-**File**: `tests/unit/HomingMissile.test.ts`
+The boss system is the most undertested critical game mechanic. With 3 bosses at levels 4, 8, and 12, these are essential gameplay features.
 
-**Why**: Complex tracking logic untested (2.56% coverage).
-
-**Recommended tests**:
-```typescript
-describe('HomingMissile', () => {
-  describe('update', () => {
-    - should accelerate up to max speed
-    - should track target position
-    - should turn toward target with limited turn rate
-    - should normalize angle differences correctly
-    - should update velocity based on angle
-    - should increment lifetime
-    - should deactivate after max lifetime
-  });
-
-  describe('render', () => {
-    - should draw missile with glow effect
-    - should draw trail particles
-    - should pulse color based on timer
-  });
-
-  describe('getBounds', () => {
-    - should return circular bounds
-    - should return null when inactive
-  });
-
-  describe('deactivate', () => {
-    - should set active to false
-  });
-});
-```
-
-#### 2. SplittingFragment Tests
-**File**: `tests/unit/SplittingFragment.test.ts`
-
-**Why**: Multi-phase physics untested (2.98% coverage).
-
-**Recommended tests**:
-```typescript
-describe('SplittingFragment', () => {
-  describe('update', () => {
-    - should move with initial velocity
-    - should rotate based on rotation speed
-    - should switch to shaking after fall distance
-    - should stop velocity during shake
-    - should shake for correct duration
-    - should start falling after shake
-    - should apply gravity during fall
-    - should deactivate when off screen
-  });
-
-  describe('phase transitions', () => {
-    - should transition from moving to shaking
-    - should transition from shaking to falling
-    - should maintain position during shake
-  });
-
-  describe('render', () => {
-    - should draw fragment with rotation
-    - should apply shake offset during shake phase
-    - should draw with glow effect
-  });
-
-  describe('getBounds', () => {
-    - should return square bounds
-    - should return null when inactive
-  });
-});
-```
-
-### Priority 2: Boss Mechanics (Medium Impact)
-
-#### 3. Boss1 Tests
+#### 1. Boss1 Tests (The Thrower - Level 4)
 **File**: `tests/unit/Boss1.test.ts`
 
-**Why**: Boss mechanics completely untested (3.6% coverage).
+**Why**: First boss mechanics completely untested (14.28% coverage).
 
 **Recommended tests**:
 ```typescript
@@ -230,10 +203,148 @@ describe('Boss1', () => {
 });
 ```
 
-#### 4. ThrownBrick Tests
+#### 2. Boss2 Tests (The Shielder - Level 8)
+**File**: `tests/unit/Boss2.test.ts`
+
+**Why**: Shield boss mechanics completely untested (3.4% coverage).
+
+**Recommended tests**:
+```typescript
+describe('Boss2', () => {
+  describe('initialization', () => {
+    - should initialize with shield active
+    - should set shield health
+    - should create shield visual
+  });
+
+  describe('shield mechanics', () => {
+    - should block damage when shield is active
+    - should reduce shield health on hit
+    - should deactivate shield when health depleted
+    - should regenerate shield after cooldown
+    - should render shield with correct opacity
+  });
+
+  describe('movement', () => {
+    - should move horizontally
+    - should stay within boundaries
+    - should change direction at edges
+  });
+
+  describe('projectile throwing', () => {
+    - should throw bricks toward bat
+    - should respect throw cooldown
+    - should update thrown bricks
+  });
+
+  describe('takeDamage', () => {
+    - should damage shield first if active
+    - should damage boss when shield down
+    - should trigger callbacks appropriately
+  });
+
+  describe('render', () => {
+    - should render boss body
+    - should render shield when active
+    - should render health bar
+    - should render thrown bricks
+  });
+});
+```
+
+#### 3. Boss3 Tests (The Splitter - Level 12)
+**File**: `tests/unit/Boss3.test.ts`
+
+**Why**: Final boss mechanics completely untested (3.66% coverage).
+
+**Recommended tests**:
+```typescript
+describe('Boss3', () => {
+  describe('initialization', () => {
+    - should initialize with correct health
+    - should set movement speed
+    - should initialize as non-copy
+  });
+
+  describe('splitting mechanics', () => {
+    - should split when health below threshold
+    - should create correct number of copies
+    - should create smaller copies
+    - should create faster copies
+    - should not split if already split
+    - should not split if is a copy
+    - should position copies with spacing
+  });
+
+  describe('fragment throwing', () => {
+    - should throw splitting fragments
+    - should throw in spread pattern
+    - should spawn fragments at BRICK_WIDTH distance
+    - should respect throw cooldown
+    - should update fragments
+  });
+
+  describe('movement', () => {
+    - should move horizontally
+    - should move faster if is copy
+    - should stay within boundaries
+  });
+
+  describe('render', () => {
+    - should render with scale for copies
+    - should render cracks when damaged
+    - should render "BOSS" or "COPY" text
+    - should render fragments
+    - should render health bar
+  });
+});
+```
+
+#### 4. BaseBoss Tests
+**File**: `tests/unit/BaseBoss.test.ts`
+
+**Why**: Base boss class untested (3.12% coverage).
+
+**Recommended tests**:
+```typescript
+describe('BaseBoss', () => {
+  describe('initialization', () => {
+    - should set position and dimensions
+    - should set health and max health
+    - should initialize as active
+  });
+
+  describe('health management', () => {
+    - should take damage correctly
+    - should trigger onDamage callback
+    - should deactivate when health reaches zero
+    - should trigger onDestroyed callback
+  });
+
+  describe('movement', () => {
+    - should update position
+    - should respect canvas boundaries
+  });
+
+  describe('thrown bricks', () => {
+    - should manage thrown brick list
+    - should update thrown bricks
+    - should remove inactive bricks
+    - should filter available bricks
+  });
+
+  describe('render', () => {
+    - should render health bar
+    - should render health bar with correct percentage
+    - should render thrown bricks
+  });
+});
+```
+
+#### 5. ThrownBrick Tests
 **File**: `tests/unit/ThrownBrick.test.ts`
 
-**Why**: Projectile physics untested (2.63% coverage).
+**Why**: Boss projectile physics untested (2.63% coverage).
 
 **Recommended tests**:
 ```typescript
@@ -263,10 +374,10 @@ describe('ThrownBrick', () => {
 });
 ```
 
-#### 5. BossArm Tests
+#### 6. BossArm Tests
 **File**: `tests/unit/BossArm.test.ts`
 
-**Why**: Boss component untested (4.16% coverage).
+**Why**: Boss1 arm component untested (4.16% coverage).
 
 **Recommended tests**:
 ```typescript
@@ -292,9 +403,179 @@ describe('BossArm', () => {
 });
 ```
 
-### Priority 3: Manager Classes (Low Priority - Rendering)
+### Priority 2: Weapon Systems (High Impact)
 
-#### 6. RenderManager Tests
+#### 7. Bomb Tests
+**File**: `tests/unit/Bomb.test.ts`
+
+**Why**: Bomb weapon completely untested (2.22% coverage).
+
+**Recommended tests**:
+```typescript
+describe('Bomb', () => {
+  describe('initialization', () => {
+    - should set initial position
+    - should set velocity toward target
+    - should initialize as active
+  });
+
+  describe('update', () => {
+    - should move based on velocity
+    - should apply gravity
+    - should rotate over time
+    - should increment lifetime
+    - should deactivate after max lifetime
+  });
+
+  describe('explosion', () => {
+    - should explode on command
+    - should set exploded state
+    - should trigger onExplode callback
+    - should deactivate after explosion
+  });
+
+  describe('render', () => {
+    - should draw bomb with rotation
+    - should draw fuse spark
+    - should apply glow effect
+    - should pulse color based on lifetime
+  });
+
+  describe('getBounds', () => {
+    - should return circular bounds
+    - should return null when inactive
+  });
+
+  describe('isOffScreen', () => {
+    - should detect off-screen position
+    - should include buffer zone
+  });
+});
+```
+
+### Priority 3: Enhanced Coverage for Core Entities
+
+#### 8. Enhanced Ball Tests
+**File**: Extend `tests/unit/Ball.test.ts`
+
+**Why**: Ball is only 58.79% covered. Missing advanced mechanics.
+
+**Additional tests needed**:
+```typescript
+describe('Ball - Enhanced Coverage', () => {
+  describe('bounceOffBat advanced', () => {
+    - should calculate spin based on bat movement
+    - should apply maximum angle limit
+    - should increase speed with power upgrades
+    - should cap at maximum speed
+    - should handle bat moving away from ball
+  });
+
+  describe('bounceOffBrick advanced', () => {
+    - should handle corner collisions
+    - should apply correct normal vector
+    - should maintain minimum speed
+    - should handle multiple simultaneous collisions
+  });
+
+  describe('piercing mechanics', () => {
+    - should pass through bricks when piercing
+    - should render piercing visual effect
+    - should flash when piercing about to expire
+    - should revert to normal after piercing expires
+  });
+
+  describe('sticky ball', () => {
+    - should stick to bat on contact
+    - should maintain relative position to bat
+    - should launch with correct angle
+  });
+
+  describe('speed management', () => {
+    - should enforce minimum speed
+    - should enforce maximum speed
+    - should handle speed upgrades
+  });
+});
+```
+
+#### 9. Enhanced Brick Tests
+**File**: Extend `tests/unit/Brick.test.ts`
+
+**Why**: Brick is only 57.33% covered. Missing offensive spawn logic.
+
+**Additional tests needed**:
+```typescript
+describe('Brick - Enhanced Coverage', () => {
+  describe('offensive brick spawning', () => {
+    - should spawn falling brick on destruction
+    - should spawn homing missile on destruction
+    - should spawn splitting fragments on destruction
+    - should spawn brick laser on destruction
+    - should spawn dynamite on destruction
+    - should spawn bomb on destruction
+    - should call onOffensiveSpawn callback
+  });
+
+  describe('boss brick', () => {
+    - should spawn boss entity on destruction
+    - should pass boss type to callback
+    - should render with special styling
+  });
+
+  describe('explosion chain reactions', () => {
+    - should calculate explosion radius
+    - should damage nearby bricks
+    - should trigger chain explosions
+    - should handle multiple simultaneous explosions
+  });
+
+  describe('visual effects', () => {
+    - should render cracks when damaged
+    - should pulse when low health
+    - should render glow for offensive types
+  });
+});
+```
+
+#### 10. Enhanced CollisionManager Tests
+**File**: Extend `tests/unit/CollisionManager.test.ts`
+
+**Why**: CollisionManager is only 60.51% covered. Missing boss collision logic.
+
+**Additional tests needed**:
+```typescript
+describe('CollisionManager - Boss Collisions', () => {
+  describe('ball-boss collisions', () => {
+    - should detect ball hitting boss
+    - should apply correct bounce angle
+    - should damage boss on hit
+    - should trigger boss damage callback
+    - should handle boss with shield
+  });
+
+  describe('thrown brick-bat collisions', () => {
+    - should detect thrown brick hitting bat
+    - should damage bat
+    - should deactivate thrown brick
+  });
+
+  describe('splitting fragment-bat collisions', () => {
+    - should detect fragment hitting bat
+    - should damage bat by percentage
+    - should deactivate fragment
+  });
+
+  describe('boss arm collisions', () => {
+    - should detect ball hitting boss arm
+    - should bounce ball off arm
+  });
+});
+```
+
+### Priority 4: Manager Classes (Lower Priority - Rendering)
+
+#### 11. RenderManager Tests
 **File**: `tests/unit/RenderManager.test.ts`
 
 **Why**: Rendering orchestration untested (7.27% coverage). Can use mock canvas.
@@ -514,34 +795,49 @@ Consider adding performance tests for:
 | Priority | Tests to Add | Estimated Time | Impact |
 |----------|-------------|----------------|--------|
 | ~~P1 - Critical Logic~~ | ~~3 test files~~ | ~~8-12 hours~~ | ~~High~~ **COMPLETED** |
-| P1 - Offensive Entities | 2 test files | 4-6 hours | High |
-| P2 - Boss Mechanics | 3 test files | 6-9 hours | Medium |
-| P3 - Managers (Rendering) | 2 test files | 4-6 hours | Low |
-| P4 - Config & Extensions | 3 test files | 4-6 hours | Low |
-| **Remaining** | **10 test files** | **18-27 hours** | - |
-| **Completed** | **3 test files** | **~10 hours** | **High** |
+| ~~P1 - Offensive Entities~~ | ~~2 test files~~ | ~~4-6 hours~~ | ~~High~~ **COMPLETED** |
+| **P1 - Boss Mechanics** | **6 test files** | **12-18 hours** | **CRITICAL** |
+| P2 - Weapon Systems | 1 test file | 2-3 hours | High |
+| P3 - Enhanced Core Entities | 3 test extensions | 6-9 hours | Medium |
+| P4 - Managers (Rendering) | 2 test files | 4-6 hours | Low |
+| **Remaining** | **12 test files/extensions** | **24-36 hours** | - |
+| **Completed** | **5 test files** | **~16 hours** | **High** |
 
 ---
 
-## Next Steps
+## Next Steps - CRITICAL PRIORITY: Boss Testing
 
+### Immediate Priority (Next 2-3 weeks)
 1. ~~Start with **CollisionManager** tests (highest impact)~~ ✅ **COMPLETED**
 2. ~~Add **InputManager** tests (critical for gameplay)~~ ✅ **COMPLETED**
 3. ~~Add **Leaderboard** tests (important for persistence)~~ ✅ **COMPLETED**
-4. **Next**: Add **HomingMissile** tests (complex tracking logic)
-5. Add **SplittingFragment** tests (multi-phase physics)
-6. Add **Boss1** and related tests (boss mechanics)
-7. Consider manager tests (RenderManager, ScreenManager) if needed
-8. Extend existing entity tests for edge cases
+4. ~~Add **HomingMissile** tests (complex tracking logic)~~ ✅ **COMPLETED**
+5. ~~Add **SplittingFragment** tests (multi-phase physics)~~ ✅ **COMPLETED**
+6. **CRITICAL NEXT**: Add **Boss1, Boss2, Boss3** tests (core gameplay features at levels 4, 8, 12)
+7. Add **BaseBoss** tests (shared boss functionality)
+8. Add **ThrownBrick** and **BossArm** tests (boss components)
+9. Add **Bomb** tests (weapon system)
+10. Extend **Ball**, **Brick**, **CollisionManager** for boss interactions
+
+### Why Boss Testing is Critical
+- Bosses appear at levels 4, 8, and 12 (3 out of 12 levels)
+- Boss mechanics are completely untested (<15% coverage)
+- Boss battles are major gameplay milestones
+- Boss bugs would severely impact player experience
+- Complex mechanics: splitting, shields, projectiles, arms
 
 ## Impact Summary
 
-**Tests Added**: 107 new tests across 3 files  
-**Coverage Improvement**: 
-- CollisionManager: 1.53% → 82.65% (+81.12%)
+**Tests Added**: 218 new tests across 5 files  
+**Coverage Improvements**: 
+- HomingMissile: 17.94% → 100% (+82.06%)
+- SplittingFragment: 25.37% → 100% (+74.63%)
+- CollisionManager: 1.53% → 60.51% (+58.98%)
 - InputManager: 1.96% → 100% (+98.04%)
 - Leaderboard: 6.17% → 100% (+93.83%)
 
-**Overall Project Coverage**: 48.74% (up from ~40% before these tests)
+**Overall Project Coverage**: 49.15% (up from ~40% initially)
 
-The three most critical game logic components are now well-tested, significantly improving the reliability of core gameplay mechanics.
+**Key Achievement**: All offensive entity mechanics (missiles, fragments, falling bricks) are now fully tested, providing confidence in the game's offensive brick system.
+
+**Remaining Gap**: Boss system remains the largest untested critical component, representing a significant risk for the game's core progression system.
