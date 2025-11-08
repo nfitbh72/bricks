@@ -25,7 +25,7 @@ const {
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
-export const BRICK_WIDTH = 120; // 30% wider than original 80
+export const BRICK_WIDTH = 120;
 export const BRICK_HEIGHT = 25;
 export const BRICK_SPACING = 1;
 export const BRICK_LAYOUT_TOP_MARGIN = 200;
@@ -40,11 +40,11 @@ export const LETTER_SPACING = 10;   // Space between letters (in pixels)
 export const BALL_RADIUS = 6;
 export const BALL_SPEED = 300;
 export const BALL_BASE_DAMAGE = 1;
-export const BALL_SPEED_INCREASE_PER_SECOND = 2.5; // 300 per minute = 5 per second
+export const BALL_SPEED_INCREASE_PER_SECOND = 2.5;
 export const BALL_BOUNCE_MAX_ANGLE = 60; // Maximum deflection angle in degrees when hitting bat
 
 // Ball visual effects
-export const BALL_TAIL_BASE_LENGTH = 30;
+export const BALL_TAIL_BASE_LENGTH = 60;
 export const BALL_TAIL_SEGMENTS = 8;
 export const BALL_TAIL_MAX_SPEED_MULTIPLIER = 3; // Tail length scales up to 3x at high speeds
 
