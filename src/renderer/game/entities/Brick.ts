@@ -88,7 +88,9 @@ export class Brick {
    */
   takeDamage(amount: number): BrickDestructionInfo {
     const wasDestroyed = this.isDestroyed();
-    this.health -= amount;
+    // Ensure damage is non-negative
+    const damage = Math.max(0, amount);
+    this.health -= damage;
     if (this.health < 0) {
       this.health = 0;
     }
