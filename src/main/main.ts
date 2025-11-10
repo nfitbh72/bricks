@@ -1,8 +1,12 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import { SteamManager } from './steam/SteamManager';
+import { AchievementManager } from './steam/AchievementManager';
+import { setupSteamIPC } from './steam/SteamIPC';
 
 let mainWindow: BrowserWindow | null = null;
+let achievementManager: AchievementManager | null = null;
 
 // Leaderboard data file path
 const getLeaderboardPath = (): string => {
@@ -71,6 +75,23 @@ ipcMain.handle('save-leaderboards', async (_event, data) => {
 });
 
 app.whenReady().then(() => {
+  // Initialize Steam (gracefully fails if Steam not available)
+  const steamManager = SteamManager.getInstance();
+  const steamInitialized = steamManager.initialize();
+  
+  if (steamInitialized) {
+    console.log('✅ Steam integration active');
+    
+    // Initialize achievement system
+    achievementManager = new AchievementManager();
+    achievementManager.initialize();
+  } else {
+    console.log('🎮 Running in offline mode (Steam not available)');
+  }
+  
+  // Setup Steam IPC handlers
+  setupSteamIPC();
+  
   createWindow();
 
   app.on('activate', () => {
@@ -84,4 +105,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  // Shutdown Steam API
+  SteamManager.getInstance().shutdown();
 });
