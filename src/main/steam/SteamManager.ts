@@ -74,12 +74,14 @@ export class SteamManager {
       this.steamAvailable = true;
 
       // Get player info
-      try {
-        const steamIdObj = this.steamworks!.localplayer.getSteamId();
-        this.steamId = steamIdObj.steamId;
-        this.playerName = this.steamworks!.localplayer.getName();
-      } catch (error) {
-        console.warn('Could not get Steam player info:', error);
+      if (this.steamworks) {
+        try {
+          const steamIdObj = this.steamworks.localplayer.getSteamId();
+          this.steamId = steamIdObj.steamId;
+          this.playerName = this.steamworks.localplayer.getName();
+        } catch (error) {
+          console.warn('Could not get Steam player info:', error);
+        }
       }
 
       // Start callback processing

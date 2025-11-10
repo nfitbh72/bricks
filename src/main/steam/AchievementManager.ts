@@ -117,7 +117,7 @@ export class AchievementManager {
 
     try {
       return client.achievement.isActivated(achievementId);
-    } catch (error) {
+    } catch {
       return this.unlockedAchievements.has(achievementId);
     }
   }
@@ -142,8 +142,8 @@ export class AchievementManager {
         console.log(`🧹 Achievement cleared: ${achievementId}`);
       }
       return success;
-    } catch (error) {
-      console.error(`Failed to clear achievement ${achievementId}:`, error);
+    } catch {
+      console.error(`Failed to clear achievement ${achievementId}`);
       return false;
     }
   }

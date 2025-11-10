@@ -7,8 +7,8 @@ declare global {
   interface Window {
     electronAPI: {
       quitApp: () => void;
-      loadLeaderboards: () => Promise<any>;
-      saveLeaderboards: (data: any) => Promise<{ success: boolean; error?: string }>;
+      loadLeaderboards: () => Promise<Record<string, unknown>>;
+      saveLeaderboards: (data: Record<string, unknown>) => Promise<{ success: boolean; error?: string }>;
       // Steam API
       steam: {
         isAvailable: () => Promise<boolean>;
@@ -101,8 +101,8 @@ export class SteamAPI {
   async unlockAchievement(achievementId: string): Promise<boolean> {
     try {
       return await window.electronAPI.steam.unlockAchievement(achievementId);
-    } catch (error) {
-      console.error('Failed to unlock achievement:', error);
+    } catch {
+      console.error('Failed to unlock achievement');
       return false;
     }
   }
@@ -113,7 +113,7 @@ export class SteamAPI {
   async isAchievementUnlocked(achievementId: string): Promise<boolean> {
     try {
       return await window.electronAPI.steam.isAchievementUnlocked(achievementId);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -124,7 +124,7 @@ export class SteamAPI {
   async getUnlockedAchievements(): Promise<string[]> {
     try {
       return await window.electronAPI.steam.getUnlockedAchievements();
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -135,7 +135,7 @@ export class SteamAPI {
   async clearAchievement(achievementId: string): Promise<boolean> {
     try {
       return await window.electronAPI.steam.clearAchievement(achievementId);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
