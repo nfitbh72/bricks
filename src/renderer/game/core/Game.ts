@@ -23,6 +23,7 @@ import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
+import { AchievementTracker } from '../managers/AchievementTracker';
 import { 
   PLAYER_STARTING_HEALTH, 
   BOMB_BRICK_DAMAGE_MULTIPLIER, 
@@ -70,6 +71,15 @@ export class Game {
   private slowMotionManager: SlowMotionManager;
   private stateTransitionHandler: StateTransitionHandler;
   private renderManager: RenderManager;
+  private achievementTracker: AchievementTracker;
+  private levelStartProgress: {
+    totalBricksDestroyed: number;
+    totalBossesDefeated: number;
+    totalDamageDealt: number;
+    levelsCompleted: number;
+    upgradesActivated: number;
+    bossTypesDefeated: number;
+  } | null = null;
 
 
   // Game stats
@@ -95,6 +105,9 @@ export class Game {
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
+
+  // Achievements unlocked during the current level run
+  private achievementsUnlockedThisRun: Set<string> = new Set();
 
 
   constructor(canvas: HTMLCanvasElement) {
@@ -136,14 +149,17 @@ export class Game {
       onQuit: () => this.handleQuit(),
       onDevUpgrades: () => this.handleDevUpgrades(),
       onOpenOptions: () => this.handleOpenOptions(),
+      onOpenAchievements: () => this.handleOpenAchievements(),
       onRestart: () => this.handleRestart(),
       onLevelCompleteTransition: () => this.handleLevelCompleteTransition(),
       onUpgradeComplete: () => this.handleUpgradeComplete(),
+      onUpgradeActivated: (upgradeType: string) => this.handleUpgradeActivated(upgradeType),
       onStartLevel: (levelId: number) => this.handleStartLevel(levelId),
       onResume: () => this.handleResume(),
       onQuitFromPause: () => this.handleQuitFromPause(),
       onCloseOptions: () => this.handleCloseOptions(),
       onCloseTutorial: () => this.handleCloseTutorial(),
+      onCloseAchievements: () => this.handleCloseAchievements(),
     });
     
     // Set volume change callback for real-time updates
@@ -190,11 +206,21 @@ export class Game {
     // Initialize render manager
     this.renderManager = new RenderManager(canvas, this.ctx);
 
+    // Initialize achievement tracker
+    this.achievementTracker = new AchievementTracker();
+    
+    // Expose for debugging (remove in production)
+    (window as unknown as Record<string, unknown>).achievementTracker = this.achievementTracker;
+    (window as unknown as Record<string, unknown>).resetAchievements = () => this.achievementTracker.resetProgress();
+
     // Apply saved options
     this.applyOptions();
 
     // Load background image
     this.loadBackgroundImage();
+    
+    // Set achievement tracker in screen manager for progress display
+    this.screenManager.setAchievementTracker(this.achievementTracker);
   }
 
   /**
@@ -421,6 +447,13 @@ export class Game {
       },
       onBrickDestroyed: (brick, x, y, isCritical) => {
         this.totalBricksDestroyed++;
+        
+        // Track brick destruction for achievements
+        const damage = brick.getMaxHealth(); // Get the damage value of this brick
+        this.achievementTracker.onBrickDestroyed(damage).catch(error => {
+          console.warn('Achievement tracker error:', error);
+        });
+        
         if (!this.level) return;
         
         const remainingBricks = this.level.getRemainingBricks();
@@ -451,6 +484,9 @@ export class Game {
         }
       },
       onBatDamaged: (_damagePercent: number) => {
+        // Track bat damage for achievements
+        this.achievementTracker.onBatDamaged();
+        
         // Visual feedback for bat damage
         this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BAT_DAMAGE_INTENSITY, SCREEN_SHAKE_BAT_DAMAGE_DURATION);
         
@@ -539,6 +575,15 @@ export class Game {
   }
 
   /**
+   * Handle upgrade activation for achievements
+   */
+  private handleUpgradeActivated(upgradeType: string): void {
+    this.achievementTracker.onUpgradeActivated(upgradeType).catch(error => {
+      console.warn('Achievement tracker error:', error);
+    });
+  }
+
+  /**
    * Handle start level from dev upgrades (dev mode)
    */
   private handleStartLevel(levelId: number): void {
@@ -609,6 +654,22 @@ export class Game {
   }
 
   /**
+   * Handle opening achievements screen from intro
+   */
+  private handleOpenAchievements(): void {
+    // Refresh data asynchronously; don't block UI
+    void this.screenManager.achievementsScreen.refreshData();
+    this.gameState = GameState.ACHIEVEMENTS;
+  }
+
+  /**
+   * Handle closing achievements screen
+   */
+  private handleCloseAchievements(): void {
+    this.gameState = GameState.INTRO;
+  }
+
+  /**
    * Apply options to game
    */
   private applyOptions(): void {
@@ -659,6 +720,29 @@ export class Game {
     
     // Reset level timer
     this.levelTime = 0;
+
+    // Reset per-level achievement tracking
+    this.achievementsUnlockedThisRun.clear();
+    this.achievementTracker.clearThisRun();
+    
+    // Capture progress snapshot at level start
+    const currentProgress = this.achievementTracker.getProgress();
+    this.levelStartProgress = {
+      totalBricksDestroyed: currentProgress.totalBricksDestroyed,
+      totalBossesDefeated: currentProgress.totalBossesDefeated,
+      totalDamageDealt: currentProgress.totalDamageDealt,
+      levelsCompleted: currentProgress.levelsCompleted.length,
+      upgradesActivated: currentProgress.upgradesActivated.length,
+      bossTypesDefeated: currentProgress.bossTypesDefeated.length,
+    };
+    
+    // Initialize achievement tracking for this level
+    const hasBoss = this.level.getBricks().some(brick => 
+      brick.getType() === BrickType.BOSS_1 || 
+      brick.getType() === BrickType.BOSS_2 || 
+      brick.getType() === BrickType.BOSS_3
+    );
+    this.achievementTracker.onLevelStart(levelConfig.id, this.playerHealth, hasBoss);
     
     // Calculate bomb damage using multiplier constant
     this.bombDamage = this.ball.getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
@@ -903,12 +987,62 @@ export class Game {
     if (this.level && this.level.isComplete() && bossDefeated && allCopiesDefeated && this.gameState === GameState.PLAYING) {
       this.levelCompleteTimer += deltaTime * 1000; // Convert to ms
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
+        // Call achievement tracker for level completion (fire and forget)
+        this.achievementTracker.onLevelComplete(
+          this.level.getId(),
+          this.levelTime,
+          this.playerHealth
+        ).catch(error => {
+          console.warn('Achievement tracker error:', error);
+        });
+        
+        // Calculate which cumulative achievements had progress changes
+        const achievementsWithProgressChange: string[] = [];
+        if (this.levelStartProgress) {
+          const endProgress = this.achievementTracker.getProgress();
+          
+          // Check each cumulative achievement for progress changes
+          if (endProgress.totalBricksDestroyed > this.levelStartProgress.totalBricksDestroyed) {
+            achievementsWithProgressChange.push('BRICK_SMASHER');
+          }
+          if (endProgress.totalBossesDefeated > this.levelStartProgress.totalBossesDefeated) {
+            achievementsWithProgressChange.push('BOSS_SMASHER');
+          }
+          if (endProgress.totalDamageDealt > this.levelStartProgress.totalDamageDealt) {
+            achievementsWithProgressChange.push('DAMAGE_DEALER');
+          }
+          if (endProgress.levelsCompleted.length > this.levelStartProgress.levelsCompleted) {
+            achievementsWithProgressChange.push('FIRST_LEVEL', 'HALFWAY_THERE', 'LEVEL_MASTER');
+          }
+          if (endProgress.upgradesActivated.length > this.levelStartProgress.upgradesActivated) {
+            achievementsWithProgressChange.push('UPGRADE_MASTER');
+          }
+          if (endProgress.bossTypesDefeated.length > this.levelStartProgress.bossTypesDefeated) {
+            achievementsWithProgressChange.push('ALL_BOSSES');
+          }
+        }
+        
         this.gameState = GameState.LEVEL_COMPLETE;
         // Use level.getId() to ensure we show the level that was just completed
-        this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime, this.isDevUpgradeMode);
+        this.screenManager.levelCompleteScreen.setLevel(
+          this.level.getId(),
+          this.levelTime,
+          this.isDevUpgradeMode,
+          this.achievementTracker.getAchievementsThisRun(),
+          this.achievementTracker,
+          achievementsWithProgressChange
+        );
         this.levelCompleteTimer = 0;
       }
     }
+  }
+
+  /**
+   * Record that an achievement was unlocked during this level run
+   * (Game systems can call this after a successful unlock via steamAPI)
+   */
+  private recordAchievementUnlocked(id: string): void {
+    this.achievementsUnlockedThisRun.add(id);
   }
 
   /**
@@ -1061,6 +1195,23 @@ export class Game {
         (x, y) => {
           // Boss destroyed - create big explosion
           this.effectsManager.createParticles(x, y, 50, '#ff0000', 300);
+          
+          // Track boss defeat for achievements
+          if (this.boss) {
+            let bossType: string;
+            if (this.boss instanceof Boss1) {
+              bossType = 'BOSS_1';
+            } else if (this.boss instanceof Boss2) {
+              bossType = 'BOSS_2';
+            } else if (this.boss instanceof Boss3) {
+              bossType = 'BOSS_3';
+            } else {
+              bossType = 'UNKNOWN';
+            }
+            this.achievementTracker.onBossDefeated(bossType).catch(error => {
+              console.warn('Achievement tracker error:', error);
+            });
+          }
         },
         (x, y) => {
           // Shield blocked - create cyan particles
@@ -1092,6 +1243,21 @@ export class Game {
           },
           (x, y) => {
             this.effectsManager.createParticles(x, y, 30, '#cc00ff', 200);
+            
+            // Track boss copy defeat for achievements
+            let bossType: string;
+            if (copy instanceof Boss1) {
+              bossType = 'BOSS_1';
+            } else if (copy instanceof Boss2) {
+              bossType = 'BOSS_2';
+            } else if (copy instanceof Boss3) {
+              bossType = 'BOSS_3';
+            } else {
+              bossType = 'UNKNOWN';
+            }
+            this.achievementTracker.onBossDefeated(bossType).catch(error => {
+              console.warn('Achievement tracker error:', error);
+            });
           }
         );
         

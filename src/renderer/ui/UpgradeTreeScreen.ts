@@ -64,7 +64,8 @@ export class UpgradeTreeScreen extends Screen {
     canvas: HTMLCanvasElement,
     onContinue: () => void,
     onStartLevel: (levelId: number) => void,
-    upgrades: Upgrade[]
+    upgrades: Upgrade[],
+    private onUpgradeActivated: (upgradeType: string) => void
   ) {
     super(canvas);
     this.onContinue = onContinue;
@@ -561,6 +562,9 @@ export class UpgradeTreeScreen extends Screen {
     // Perform upgrade
     this.state.availablePoints--;
     node.currentLevel++;
+    
+    // Track upgrade activation for achievements
+    this.onUpgradeActivated(node.upgrade.type);
     
     // Play upgrade sound immediately
     this.playUpgradeSound();

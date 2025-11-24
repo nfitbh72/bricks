@@ -41,6 +41,7 @@ export enum GameState {
   UPGRADE = 'UPGRADE',
   GAME_OVER = 'GAME_OVER',
   OPTIONS = 'OPTIONS',
+  ACHIEVEMENTS = 'ACHIEVEMENTS',
 }
 
 /**

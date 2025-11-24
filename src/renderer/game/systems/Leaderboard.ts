@@ -17,126 +17,75 @@ export class Leaderboard {
   private static readonly DEFAULT_TIMES = [300, 360, 420, 480]; // 5m, 6m, 7m, 8m
   
   private static cachedData: { [levelId: number]: LeaderboardEntry[] } = {};
-  private static isLoaded = false;
+  private static isLoading = false;
 
   /**
-   * Load leaderboards from persistent storage
+   * Load leaderboards from disk
    */
   static async load(): Promise<void> {
-    if (this.isLoaded) {
-      console.log('[Leaderboard] Already loaded, skipping');
+    if (this.isLoading) {
       return;
     }
-    
-    console.log('[Leaderboard] Starting load...');
-    
+
+    this.isLoading = true;
+
     try {
-      // Check if electron API is available
-      if (!window.electron) {
-        console.warn('[Leaderboard] Electron API not available, using fake leaderboards only');
-        this.isLoaded = true;
-        return;
-      }
-      
-      console.log('[Leaderboard] Calling window.electron.loadLeaderboards()...');
       const data = await window.electron.loadLeaderboards();
-      console.log('[Leaderboard] Loaded data from disk:', JSON.stringify(data, null, 2));
       
-      if (!data) {
-        console.log('[Leaderboard] No data returned, starting fresh');
-        this.isLoaded = true;
-        return;
-      }
-      
-      // Convert string keys to numbers and filter out player entries
-      this.cachedData = {};
-      for (const [levelIdStr, entries] of Object.entries(data)) {
-        const levelId = parseInt(levelIdStr, 10);
-        const entriesArray = entries as LeaderboardEntry[];
-        
-        // Only cache if there are actual entries, otherwise we'll generate fake ones later
-        if (entriesArray.length > 0) {
-          // Remove isPlayer flag from persisted data
-          this.cachedData[levelId] = entriesArray.map(e => ({ ...e, isPlayer: false }));
-          console.log(`[Leaderboard] Cached ${this.cachedData[levelId].length} entries for level ${levelId}`);
-        } else {
-          console.log(`[Leaderboard] Skipping empty array for level ${levelId}, will generate fake data`);
+      if (data) {
+        // Cache the data for each level
+        for (const [levelId, entries] of Object.entries(data)) {
+          const levelIdNum = parseInt(levelId);
+          if (entries.length > 0) {
+            this.cachedData[levelIdNum] = entries;
+          }
         }
       }
-      this.isLoaded = true;
-      console.log('[Leaderboard] Load complete. Cache:', this.cachedData);
     } catch (error) {
-      console.error('[Leaderboard] Failed to load leaderboards:', error);
-      this.isLoaded = true; // Mark as loaded even on error to prevent retry loops
+      console.error('Failed to load leaderboards:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   /**
-   * Save leaderboards to persistent storage
+   * Save leaderboards to disk
    */
   static async save(): Promise<void> {
     try {
-      // Convert to plain object for JSON serialization
-      const dataToSave: { [key: string]: LeaderboardEntry[] } = {};
-      for (const [levelId, entries] of Object.entries(this.cachedData)) {
-        // Save all entries, but remove the isPlayer flag (it's only for display)
-        const entriesToSave = entries.map(e => ({
-          name: e.name,
-          time: e.time,
-          isPlayer: false // Always save as false, isPlayer is only for temporary display
-        }));
-        
-        // Only save if there are actual entries (don't save empty arrays)
-        if (entriesToSave.length > 0) {
-          dataToSave[levelId] = entriesToSave;
-        }
-      }
-      console.log('[Leaderboard] Saving to disk:', JSON.stringify(dataToSave, null, 2));
-      await window.electron?.saveLeaderboards(dataToSave);
+      await window.electron.saveLeaderboards(this.cachedData);
     } catch (error) {
-      console.error('[Leaderboard] Failed to save leaderboards:', error);
+      console.error('Failed to save leaderboards:', error);
     }
   }
 
   /**
-   * Get leaderboard for a level (loads from cache or generates fake data)
+   * Get leaderboard for a specific level
    */
-  static async getLeaderboard(levelId: number): Promise<LeaderboardEntry[]> {
-    console.log(`[Leaderboard] Getting leaderboard for level ${levelId}`);
-    
-    // Ensure data is loaded
-    await this.load();
-    
+  static getLeaderboard(levelId: number): LeaderboardEntry[] {
     // Return cached data if available
     if (this.cachedData[levelId]) {
-      console.log(`[Leaderboard] Returning cached data for level ${levelId}:`, this.cachedData[levelId]);
-      return [...this.cachedData[levelId]]; // Return copy to prevent mutation
+      return this.cachedData[levelId];
     }
-    
-    // Generate fake leaderboard if no data exists and cache it
-    console.log(`[Leaderboard] No cached data for level ${levelId}, generating fake leaderboard`);
+
+    // Generate fake leaderboard if no data available
     const fakeLeaderboard = this.generateFakeLeaderboard(levelId);
     this.cachedData[levelId] = fakeLeaderboard;
-    console.log(`[Leaderboard] Generated fake leaderboard for level ${levelId}:`, fakeLeaderboard);
-    return [...fakeLeaderboard];
+    return fakeLeaderboard;
   }
 
   /**
    * Update leaderboard for a level and save to storage
    */
   static async updateLeaderboard(levelId: number, entries: LeaderboardEntry[]): Promise<void> {
-    console.log(`[Leaderboard] Updating leaderboard for level ${levelId}:`, entries);
-    
     // Ensure data is loaded
     await this.load();
     
     // Update cache
     this.cachedData[levelId] = entries;
-    console.log(`[Leaderboard] Cache updated for level ${levelId}`);
     
     // Save to persistent storage
     await this.save();
-    console.log(`[Leaderboard] Saved to disk`);
   }
 
   /**

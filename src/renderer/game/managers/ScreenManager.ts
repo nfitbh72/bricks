@@ -10,22 +10,27 @@ import { PauseScreen } from '../../ui/PauseScreen';
 import { UpgradeTreeScreen } from '../../ui/UpgradeTreeScreen';
 import { OptionsScreen } from '../../ui/OptionsScreen';
 import { TutorialScreen } from '../../ui/TutorialScreen';
+import { AchievementsScreen } from '../../ui/AchievementsScreen';
 import { GameState } from '../core/types';
 import { getUpgrades } from '../../config/upgrades';
+import { AchievementTracker } from './AchievementTracker';
 
 export interface ScreenCallbacks {
   onStartGame: () => void;
   onQuit: () => void;
   onDevUpgrades: () => void;
   onOpenOptions: () => void;
+  onOpenAchievements: () => void;
   onRestart: () => void;
   onLevelCompleteTransition: () => void;
   onUpgradeComplete: () => void;
+  onUpgradeActivated: (upgradeType: string) => void;
   onStartLevel: (levelId: number) => void;
   onResume: () => void;
   onQuitFromPause: () => void;
   onCloseOptions: () => void;
   onCloseTutorial: () => void;
+  onCloseAchievements: () => void;
 }
 
 export class ScreenManager {
@@ -40,6 +45,7 @@ export class ScreenManager {
   public transitionScreen: TransitionScreen;
   public pauseScreen: PauseScreen;
   public optionsScreen: OptionsScreen;
+  public achievementsScreen: AchievementsScreen;
   
   private isTransitioning: boolean = false;
   private previousState: GameState | null = null;
@@ -53,7 +59,8 @@ export class ScreenManager {
       callbacks.onStartGame,
       callbacks.onQuit,
       callbacks.onDevUpgrades,
-      callbacks.onOpenOptions
+      callbacks.onOpenOptions,
+      callbacks.onOpenAchievements
     );
     
     this.tutorialScreen = new TutorialScreen(
@@ -76,7 +83,8 @@ export class ScreenManager {
       canvas,
       callbacks.onUpgradeComplete,
       callbacks.onStartLevel,
-      getUpgrades()
+      getUpgrades(),
+      callbacks.onUpgradeActivated
     );
     
     this.transitionScreen = new TransitionScreen(canvas);
@@ -92,6 +100,11 @@ export class ScreenManager {
       canvas,
       callbacks.onCloseOptions
     );
+
+    this.achievementsScreen = new AchievementsScreen(
+      canvas,
+      callbacks.onCloseAchievements
+    );
   }
 
   /**
@@ -101,6 +114,9 @@ export class ScreenManager {
     switch (currentState) {
       case GameState.INTRO:
         this.introScreen.handleMouseMove(x, y);
+        break;
+      case GameState.ACHIEVEMENTS:
+        this.achievementsScreen.handleMouseMove(x, y);
         break;
       case GameState.TUTORIAL:
         this.tutorialScreen.handleMouseMove(x, y);
@@ -128,6 +144,9 @@ export class ScreenManager {
       case GameState.INTRO:
         this.introScreen.handleClick(x, y);
         break;
+      case GameState.ACHIEVEMENTS:
+        this.achievementsScreen.handleClick(x, y);
+        break;
       case GameState.TUTORIAL:
         this.tutorialScreen.handleClick(x, y);
         break;
@@ -153,6 +172,9 @@ export class ScreenManager {
     switch (currentState) {
       case GameState.INTRO:
         this.introScreen.handleKeyPress(key);
+        break;
+      case GameState.ACHIEVEMENTS:
+        this.achievementsScreen.handleKeyPress(key);
         break;
       case GameState.TUTORIAL:
         this.tutorialScreen.handleKeyPress(key);
@@ -188,6 +210,9 @@ export class ScreenManager {
     switch (currentState) {
       case GameState.INTRO:
         this.introScreen.render();
+        break;
+      case GameState.ACHIEVEMENTS:
+        this.achievementsScreen.render();
         break;
       case GameState.TUTORIAL:
         // Render game in background
@@ -271,5 +296,20 @@ export class ScreenManager {
    */
   getPreviousState(): GameState | null {
     return this.previousState;
+  }
+
+  /**
+   * Set AchievementTracker for achievements screen progress tracking
+   */
+  setAchievementTracker(achievementTracker: AchievementTracker): void {
+    // Store the original callback
+    const originalCallback = this.achievementsScreen['onBack'];
+    
+    // Update the achievements screen with the tracker
+    this.achievementsScreen = new AchievementsScreen(
+      this.canvas,
+      originalCallback,
+      achievementTracker
+    );
   }
 }
