@@ -4,11 +4,11 @@ Just some notes about future features so that I don't forget
 
 ## Future Features
 
-- [] 0.0 brick health should destroy brick
-- [] Final boss spawned blocks do not damage bat (the thrown bricks do damage bat as expected)
-- [] Greyed out ball should reset to normal ball if it hits the edge or top of the screen
+- [X] 0.0 brick health should destroy brick
+- [X] Final boss spawned blocks do not damage bat (the thrown bricks do damage bat as expected)
+- [] Greyed out ball should reset to normal ball if it hits the edge or top of the screen (as well as the other current resets)
 - [] Quit buttons no longer work
-- [] achievements screen should implement a scroll pane
+- [X] achievements screen should implement a scroll pane
 - [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
 - [X] Make the leaderboards permanent, explain where you are going to store the data
 - [X] There is special animation when the last brick of the level is destroyed, make this the last *destructible* brick that dies, not necessarily the last brick in the level

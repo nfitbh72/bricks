@@ -1229,6 +1229,14 @@ export class Game {
           this.effectsManager.createParticles(x, y, 15, '#ff0000', 150);
         }
       );
+      
+      // Boss3 splitting fragment-Bat collision
+      if (this.boss instanceof Boss3) {
+        this.collisionManager.checkSplittingFragmentBatCollisions(
+          this.boss.getSplittingFragments(),
+          this.bat
+        );
+      }
     }
     
     // Boss copy collisions (for Boss3 split copies)
@@ -1269,6 +1277,14 @@ export class Game {
             this.effectsManager.createParticles(x, y, 15, '#cc00ff', 150);
           }
         );
+        
+        // Boss3 copy splitting fragment-Bat collision
+        if (copy instanceof Boss3) {
+          this.collisionManager.checkSplittingFragmentBatCollisions(
+            copy.getSplittingFragments(),
+            this.bat
+          );
+        }
       }
     }
   }
