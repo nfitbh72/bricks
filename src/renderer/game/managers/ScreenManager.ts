@@ -23,6 +23,7 @@ export interface ScreenCallbacks {
   onRestart: () => void;
   onLevelCompleteTransition: () => void;
   onUpgradeComplete: () => void;
+  onUpgradeActivated: (upgradeType: string) => void;
   onStartLevel: (levelId: number) => void;
   onResume: () => void;
   onQuitFromPause: () => void;
@@ -81,7 +82,8 @@ export class ScreenManager {
       canvas,
       callbacks.onUpgradeComplete,
       callbacks.onStartLevel,
-      getUpgrades()
+      getUpgrades(),
+      callbacks.onUpgradeActivated
     );
     
     this.transitionScreen = new TransitionScreen(canvas);

@@ -36,8 +36,6 @@ export class AchievementManager {
 
     if (!this.offlineMode) {
       this.loadSteamAchievements();
-    } else {
-      console.log('🏆 Achievement system running in OFFLINE mode');
     }
 
     this.setupIPC();
@@ -122,7 +120,6 @@ export class AchievementManager {
 
     if (this.offlineMode) {
       // Offline mode - track locally only
-      console.log(`🏆 [OFFLINE] Achievement unlocked: ${achievementId}`);
       this.unlockedAchievements.add(achievementId);
       this.saveOfflineAchievements();
       return true;

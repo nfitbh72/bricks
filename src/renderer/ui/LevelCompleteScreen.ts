@@ -9,6 +9,8 @@ import { t } from '../i18n/LanguageManager';
 import { FONT_TITLE_XLARGE, FONT_TITLE_MEDIUM, FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, GLOW_HUGE, GLOW_LARGE, GLOW_NORMAL, GLOW_MEDIUM, COLOR_BLACK, COLOR_GREEN, COLOR_CYAN, COLOR_YELLOW, COLOR_MAGENTA, COLOR_TEXT_GRAY } from '../config/constants';
 import { getAchievement } from '../config/achievements';
 
+import { AchievementTracker } from '../game/managers/AchievementTracker';
+
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
   private currentLevel: number = 1;
@@ -22,11 +24,12 @@ export class LevelCompleteScreen extends Screen {
   private showFlash: boolean = true;
   private isDevMode: boolean = false;
   private achievementsThisRun: string[] = [];
+  private achievementTracker: AchievementTracker | null = null; // Proper type instead of 'any'
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
     this.onContinue = onContinue;
-    this.createButtons();
+    // Don't create buttons yet - wait for setLevel to have achievement data
   }
 
   /**
@@ -70,13 +73,14 @@ export class LevelCompleteScreen extends Screen {
   /**
    * Set current level, time, and load its background image
    */
-  async setLevel(level: number, time: number = 0, isDevMode: boolean = false, achievementsThisRun: string[] = []): Promise<void> {
+  async setLevel(level: number, time: number = 0, isDevMode: boolean = false, achievementsThisRun: string[] = [], achievementTracker: AchievementTracker | null = null): Promise<void> {
     console.log(`[LevelCompleteScreen] setLevel called: level=${level}, time=${time}, isDevMode=${isDevMode}, achievements=${achievementsThisRun.join(',')}`);
     
     this.currentLevel = level;
     this.levelTime = time;
     this.isDevMode = isDevMode;
     this.achievementsThisRun = achievementsThisRun;
+    this.achievementTracker = achievementTracker; // Store the tracker
     this.loadBackgroundImage(level);
     
     // Load leaderboard from persistent storage
@@ -98,6 +102,10 @@ export class LevelCompleteScreen extends Screen {
       this.leaderboardEntries = Leaderboard.insertPlayer(time, this.playerName, this.leaderboardEntries);
       console.log(`[LevelCompleteScreen] Player inserted into leaderboard:`, this.leaderboardEntries);
     }
+
+    // Clear existing buttons and recreate with dynamic positioning
+    this.buttons = [];
+    this.createButtons();
   }
 
   /**
@@ -132,11 +140,19 @@ export class LevelCompleteScreen extends Screen {
     const buttonWidth = 200;
     const buttonHeight = 60;
 
-    // CONTINUE button - positioned below leaderboard
+    // Calculate dynamic button position
+    let achievementsHeight = 0;
+    if (this.achievementTracker && this.achievementsThisRun.length > 0) {
+      achievementsHeight = 30 + (this.achievementsThisRun.length * 30);
+    }
+    const leaderboardHeight = 40 + (5 * 40); // Header + 5 entries
+    const buttonY = this.canvas.height / 2 + 20 + achievementsHeight + leaderboardHeight + 20;
+
+    // CONTINUE button - positioned dynamically below content
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: this.canvas.height / 2 + 180, // Moved down to clear leaderboard
+        y: buttonY,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.continue'),
@@ -274,6 +290,14 @@ export class LevelCompleteScreen extends Screen {
         button.render(this.ctx);
       }
     } else {
+      // Calculate dynamic name entry position
+      let achievementsHeight = 0;
+      if (this.achievementTracker && this.achievementsThisRun.length > 0) {
+        achievementsHeight = 30 + (this.achievementsThisRun.length * 30);
+      }
+      const leaderboardHeight = 40 + (5 * 40);
+      const promptY = this.canvas.height / 2 + 20 + achievementsHeight + leaderboardHeight + 20;
+      
       // Show prompt for name entry
       this.ctx.font = FONT_TITLE_XSMALL;
       this.ctx.fillStyle = COLOR_MAGENTA;
@@ -283,7 +307,7 @@ export class LevelCompleteScreen extends Screen {
       this.ctx.fillText(
         t('ui.screens.enterYourName'),
         this.canvas.width / 2,
-        this.canvas.height / 2 + 180
+        promptY
       );
     }
   }
@@ -292,7 +316,14 @@ export class LevelCompleteScreen extends Screen {
    * Render the leaderboard
    */
   private renderLeaderboard(): void {
-    const startY = this.canvas.height / 2 + 20; // Increased gap from time
+    // Calculate start position based on achievements display
+    let achievementsHeight = 0;
+    if (this.achievementTracker && this.achievementsThisRun.length > 0) {
+      // Estimate achievements section height (heading + achievements)
+      achievementsHeight = 30 + (this.achievementsThisRun.length * 30); // Heading + each achievement
+    }
+    
+    const startY = this.canvas.height / 2 + 20 + achievementsHeight;
     const lineHeight = 40;
     
     this.ctx.font = FONT_TITLE_SMALL;

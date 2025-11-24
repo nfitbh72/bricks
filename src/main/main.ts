@@ -81,13 +81,13 @@ app.whenReady().then(() => {
   
   if (steamInitialized) {
     console.log('✅ Steam integration active');
-    
-    // Initialize achievement system
-    achievementManager = new AchievementManager();
-    achievementManager.initialize();
   } else {
     console.log('🎮 Running in offline mode (Steam not available)');
   }
+  
+  // Initialize achievement system (works in both online and offline mode)
+  achievementManager = new AchievementManager();
+  achievementManager.initialize();
   
   // Setup Steam IPC handlers
   setupSteamIPC();

@@ -101,8 +101,8 @@ export class SteamAPI {
   async unlockAchievement(achievementId: string): Promise<boolean> {
     try {
       return await window.electronAPI.steam.unlockAchievement(achievementId);
-    } catch {
-      console.error('Failed to unlock achievement');
+    } catch (error) {
+      console.error('Failed to unlock achievement:', error);
       return false;
     }
   }

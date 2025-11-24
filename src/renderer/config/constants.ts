@@ -164,6 +164,8 @@ export const PIERCING_FLASH_INTERVAL = 0.1; // seconds Flash every 0.1 seconds
 
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1; // starting health
+export const TOTAL_LEVELS = 12; // Total number of levels in the game
+export const TOTAL_BOSSES = 3; // Total number of boss types
 
 // Sticky ball constants
 export const STICKY_BALL_LAUNCH_ANGLE = -60; // 30 degrees right of vertical (negative = upward)
