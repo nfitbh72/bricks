@@ -26,10 +26,21 @@ export class AchievementsScreen extends Screen {
   private readonly panelWidth = 800;
   private readonly panelHeight = 600;
 
+  // Scrolling
+  private scrollOffset: number = 0;
+  private maxScrollOffset: number = 0;
+  private readonly rowHeight = 60;
+  private readonly visibleRows = 7; // Show 7 achievements at once
+  private isScrolling: boolean = false;
+  private scrollVelocity: number = 0;
+  private lastMouseY: number = 0;
+
   constructor(canvas: HTMLCanvasElement, onBack: () => void) {
     super(canvas);
     this.onBack = onBack;
+    this.calculateMaxScroll();
     this.createButtons();
+    this.setupMouseHandlers();
   }
 
   /**
@@ -39,6 +50,64 @@ export class AchievementsScreen extends Screen {
     await steamAPI.initialize();
     const unlocked = await steamAPI.getUnlockedAchievements();
     this.unlockedIds = new Set(unlocked);
+    this.calculateMaxScroll();
+  }
+
+  /**
+   * Calculate maximum scroll offset based on total achievements
+   */
+  private calculateMaxScroll(): void {
+    const totalRows = ACHIEVEMENTS.length;
+    const maxVisibleHeight = this.visibleRows * this.rowHeight;
+    const totalHeight = totalRows * this.rowHeight;
+    this.maxScrollOffset = Math.max(0, totalHeight - maxVisibleHeight);
+    
+    // Ensure current scroll is within bounds
+    this.scrollOffset = Math.min(this.scrollOffset, this.maxScrollOffset);
+  }
+
+  /**
+   * Setup mouse wheel and drag handlers for scrolling
+   */
+  private setupMouseHandlers(): void {
+    // Mouse wheel scrolling
+    this.canvas.addEventListener('wheel', (e: WheelEvent) => {
+      e.preventDefault();
+      const scrollSpeed = 20;
+      this.scrollOffset = Math.max(0, Math.min(this.maxScrollOffset, this.scrollOffset - e.deltaY * scrollSpeed / 100));
+    });
+
+    // Mouse drag scrolling
+    this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
+      const panel = this.getPanelBounds();
+      const listTop = panel.y + 110; // Match new list position
+      const listBottom = listTop + this.visibleRows * this.rowHeight;
+      
+      if (e.clientX >= panel.x && e.clientX <= panel.x + panel.width &&
+          e.clientY >= listTop && e.clientY <= listBottom) {
+        this.isScrolling = true;
+        this.lastMouseY = e.clientY;
+        this.canvas.style.cursor = 'grabbing';
+      }
+    });
+
+    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+      if (this.isScrolling) {
+        const deltaY = e.clientY - this.lastMouseY;
+        this.scrollOffset = Math.max(0, Math.min(this.maxScrollOffset, this.scrollOffset + deltaY));
+        this.lastMouseY = e.clientY;
+      }
+    });
+
+    this.canvas.addEventListener('mouseup', () => {
+      this.isScrolling = false;
+      this.canvas.style.cursor = 'default';
+    });
+
+    this.canvas.addEventListener('mouseleave', () => {
+      this.isScrolling = false;
+      this.canvas.style.cursor = 'default';
+    });
   }
 
   private createButtons(): void {
@@ -62,6 +131,46 @@ export class AchievementsScreen extends Screen {
   handleKeyPress(key: string): void {
     if (key === 'Escape' || key === 'Enter' || key === ' ') {
       this.onBack();
+    }
+    
+    // Keyboard scrolling
+    const scrollSpeed = 30;
+    switch (key) {
+      case 'ArrowUp':
+      case 'w':
+      case 'W':
+        this.scrollOffset = Math.max(0, this.scrollOffset - scrollSpeed);
+        break;
+      case 'ArrowDown':
+      case 's':
+      case 'S':
+        this.scrollOffset = Math.min(this.maxScrollOffset, this.scrollOffset + scrollSpeed);
+        break;
+      case 'Home':
+        this.scrollOffset = 0;
+        break;
+      case 'End':
+        this.scrollOffset = this.maxScrollOffset;
+        break;
+      case 'PageUp':
+        this.scrollOffset = Math.max(0, this.scrollOffset - this.visibleRows * this.rowHeight);
+        break;
+      case 'PageDown':
+        this.scrollOffset = Math.min(this.maxScrollOffset, this.scrollOffset + this.visibleRows * this.rowHeight);
+        break;
+    }
+  }
+
+  /**
+   * Update scrolling physics
+   */
+  update(deltaTime: number): void {
+    // Apply smooth scrolling deceleration
+    if (Math.abs(this.scrollVelocity) > 0.1) {
+      this.scrollVelocity *= 0.9;
+      this.scrollOffset = Math.max(0, Math.min(this.maxScrollOffset, this.scrollOffset + this.scrollVelocity * deltaTime * 60));
+    } else {
+      this.scrollVelocity = 0;
     }
   }
 
@@ -122,31 +231,133 @@ export class AchievementsScreen extends Screen {
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(panel.x + 6, panel.y + 6, panel.width - 12, panel.height - 12);
 
-    // Title
+    // Title with progress indicator
+    const unlockedCount = this.unlockedIds.size;
+    const totalCount = ACHIEVEMENTS.length;
+    const progressText = `ACHIEVEMENTS (${unlockedCount}/${totalCount})`;
+    
     this.ctx.fillStyle = COLOR_MAGENTA;
     this.ctx.font = FONT_TITLE_LARGE;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'top';
     this.ctx.shadowBlur = GLOW_MEDIUM;
     this.ctx.shadowColor = COLOR_MAGENTA;
-    this.ctx.fillText('ACHIEVEMENTS', panel.x + panel.width / 2, panel.y + 20);
+    this.ctx.fillText(progressText, panel.x + panel.width / 2, panel.y + 20);
+
+    // Progress bar below title
+    const barWidth = panel.width - 100;
+    const barHeight = 8;
+    const barX = panel.x + 50;
+    const barY = panel.y + 55;
+    const progress = totalCount > 0 ? unlockedCount / totalCount : 0;
+
+    // Bar background
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    // Bar fill
+    if (progress > 0) {
+      this.ctx.fillStyle = '#00ff66';
+      this.ctx.shadowBlur = 10;
+      this.ctx.shadowColor = '#00ff66';
+      this.ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+    }
 
     this.ctx.restore();
   }
 
   private drawAchievementsList(): void {
     const panel = this.getPanelBounds();
-    const listTop = panel.y + 90;
-    const rowHeight = 60;
-    const maxVisible = Math.min(ACHIEVEMENTS.length, 8);
+    const listTop = panel.y + 110; // Moved down to account for progress bar
+    const listHeight = this.visibleRows * this.rowHeight;
+    
+    // Sort achievements: completed first, then locked
+    const sortedAchievements = [...ACHIEVEMENTS].sort((a, b) => {
+      const aUnlocked = this.unlockedIds.has(a.id);
+      const bUnlocked = this.unlockedIds.has(b.id);
+      
+      // Completed achievements first
+      if (aUnlocked && !bUnlocked) return -1;
+      if (!aUnlocked && bUnlocked) return 1;
+      
+      // Within same status, maintain original order
+      return 0;
+    });
+    
+    // Create clipping region for scrollable area
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.rect(panel.x + 20, listTop, panel.width - 40, listHeight);
+    this.ctx.clip();
 
-    for (let i = 0; i < maxVisible; i++) {
-      const achievement = ACHIEVEMENTS[i];
-      const y = listTop + i * rowHeight;
+    // Draw achievements with scroll offset
+    const startIndex = Math.floor(this.scrollOffset / this.rowHeight);
+    const endIndex = Math.min(startIndex + this.visibleRows + 1, sortedAchievements.length);
+    const localOffset = this.scrollOffset % this.rowHeight;
+
+    for (let i = startIndex; i < endIndex; i++) {
+      const achievement = sortedAchievements[i];
+      const y = listTop + (i - startIndex) * this.rowHeight - localOffset;
       const isUnlocked = this.unlockedIds.has(achievement.id);
 
-      this.drawAchievementRow(panel.x + 20, y, panel.width - 40, rowHeight - 10, achievement.name, achievement.description, isUnlocked);
+      this.drawAchievementRow(panel.x + 20, y, panel.width - 40, this.rowHeight - 10, achievement.name, achievement.description, isUnlocked);
     }
+
+    this.ctx.restore();
+
+    // Draw scroll indicators if needed
+    if (this.maxScrollOffset > 0) {
+      this.drawScrollIndicators(panel.x, listTop, panel.width, listHeight);
+    }
+  }
+
+  /**
+   * Draw scroll indicators (scrollbar and arrows)
+   */
+  private drawScrollIndicators(panelX: number, listTop: number, panelWidth: number, listHeight: number): void {
+    this.ctx.save();
+
+    // Scrollbar track
+    const scrollbarWidth = 8;
+    const scrollbarX = panelX + panelWidth - 30;
+    const scrollbarHeight = listHeight - 20;
+    const scrollbarY = listTop + 10;
+
+    // Track background
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    this.ctx.fillRect(scrollbarX, scrollbarY, scrollbarWidth, scrollbarHeight);
+
+    // Scrollbar thumb - use total achievements count
+    const thumbHeight = Math.max(30, (listHeight / (ACHIEVEMENTS.length * this.rowHeight)) * scrollbarHeight);
+    const thumbY = scrollbarY + (this.scrollOffset / this.maxScrollOffset) * (scrollbarHeight - thumbHeight);
+    
+    this.ctx.fillStyle = 'rgba(0, 255, 255, 0.6)';
+    this.ctx.shadowBlur = 8;
+    this.ctx.shadowColor = COLOR_CYAN;
+    this.ctx.fillRect(scrollbarX, thumbY, scrollbarWidth, thumbHeight);
+
+    // Scroll arrows if there's more content
+    if (this.scrollOffset > 0) {
+      // Up arrow
+      this.ctx.fillStyle = COLOR_CYAN;
+      this.ctx.shadowBlur = GLOW_MEDIUM;
+      this.ctx.shadowColor = COLOR_CYAN;
+      this.ctx.font = '20px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('▲', panelX + panelWidth - 15, listTop - 5);
+    }
+
+    if (this.scrollOffset < this.maxScrollOffset) {
+      // Down arrow
+      this.ctx.fillStyle = COLOR_CYAN;
+      this.ctx.shadowBlur = GLOW_MEDIUM;
+      this.ctx.shadowColor = COLOR_CYAN;
+      this.ctx.font = '20px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('▼', panelX + panelWidth - 15, listTop + listHeight + 15);
+    }
+
+    this.ctx.restore();
   }
 
   private drawAchievementRow(

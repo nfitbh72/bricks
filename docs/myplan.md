@@ -4,6 +4,11 @@ Just some notes about future features so that I don't forget
 
 ## Future Features
 
+- [] 0.0 brick health should destroy brick
+- [] Final boss spawned blocks do not damage bat
+- [] Greyed out ball should reset to normal ball if it hits the edge or top of the screen
+- [] Quit buttons no longer work
+- [] achievements screen should implement a scroll pane
 - [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
 - [X] Make the leaderboards permanent, explain where you are going to store the data
 - [X] There is special animation when the last brick of the level is destroyed, make this the last *destructible* brick that dies, not necessarily the last brick in the level
@@ -11,7 +16,20 @@ Just some notes about future features so that I don't forget
 - [X] check coverage of non-ui components, recommend useful tests that can be added
 - [X] Add base health to each level in the config
 - [X] Indestructible bricks
-- [] space out the bosses every 3 levels
+- [X] space out the bosses every 3 levels
+- [] create more bosses
+    - [] Boss3: "The Splitter"
+        * Core mechanic: When damaged below 50% health, splits into 2-3 smaller copies
+        * Attacks: Each copy fires splitting fragments in different patterns
+        * Movement: Smaller copies move faster and more erratically
+        * Unique feature: Must destroy all copies to win; they can't regenerate
+        * Visual: Purple/magenta with a cracked appearance when splitting
+    - [] Boss4: "The Bomber"
+        * Core mechanic: Throws bombs at the bat
+        * Attacks: Throws bombs at the bat
+        * Movement: Fast movement
+        * Unique feature: Bombs explode on impact
+        * Visual: Orange with a firey appearance
 - [] Add many maps
 - [X] Test coverage
 - [X] Integration tests
