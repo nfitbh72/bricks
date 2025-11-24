@@ -13,6 +13,7 @@ import { TutorialScreen } from '../../ui/TutorialScreen';
 import { AchievementsScreen } from '../../ui/AchievementsScreen';
 import { GameState } from '../core/types';
 import { getUpgrades } from '../../config/upgrades';
+import { AchievementTracker } from './AchievementTracker';
 
 export interface ScreenCallbacks {
   onStartGame: () => void;
@@ -295,5 +296,20 @@ export class ScreenManager {
    */
   getPreviousState(): GameState | null {
     return this.previousState;
+  }
+
+  /**
+   * Set AchievementTracker for achievements screen progress tracking
+   */
+  setAchievementTracker(achievementTracker: AchievementTracker): void {
+    // Store the original callback
+    const originalCallback = this.achievementsScreen['onBack'];
+    
+    // Update the achievements screen with the tracker
+    this.achievementsScreen = new AchievementsScreen(
+      this.canvas,
+      originalCallback,
+      achievementTracker
+    );
   }
 }

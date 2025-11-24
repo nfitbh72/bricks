@@ -6,6 +6,7 @@ import { Screen } from './Screen';
 import { Button } from './Button';
 import { ACHIEVEMENTS } from '../config/achievements';
 import { steamAPI } from '../steam/steamAPI';
+import { AchievementTracker } from '../game/managers/AchievementTracker';
 import {
   COLOR_BLACK,
   COLOR_MAGENTA,
@@ -21,6 +22,7 @@ import {
 export class AchievementsScreen extends Screen {
   private onBack: () => void;
   private unlockedIds: Set<string> = new Set();
+  private achievementTracker: AchievementTracker | null = null;
 
   // Layout
   private readonly panelWidth = 800;
@@ -35,12 +37,43 @@ export class AchievementsScreen extends Screen {
   private scrollVelocity: number = 0;
   private lastMouseY: number = 0;
 
-  constructor(canvas: HTMLCanvasElement, onBack: () => void) {
+  constructor(canvas: HTMLCanvasElement, onBack: () => void, achievementTracker: AchievementTracker | null = null) {
     super(canvas);
     this.onBack = onBack;
+    this.achievementTracker = achievementTracker;
     this.calculateMaxScroll();
     this.createButtons();
     this.setupMouseHandlers();
+  }
+
+  /**
+   * Calculate progress for cumulative achievements
+   */
+  private getAchievementProgress(achievementId: string): { current: number; total: number; hasProgress: boolean } {
+    if (!this.achievementTracker) {
+      return { current: 0, total: 0, hasProgress: false };
+    }
+
+    const progress = this.achievementTracker.getProgress();
+    
+    switch (achievementId) {
+      case 'BRICK_SMASHER':
+        return { current: progress.totalBricksDestroyed, total: 1000, hasProgress: true };
+      case 'BOSS_SMASHER':
+        return { current: progress.totalBossesDefeated, total: 30, hasProgress: true };
+      case 'DAMAGE_DEALER':
+        return { current: progress.totalDamageDealt, total: 10000, hasProgress: true };
+      case 'UPGRADE_MASTER':
+        return { current: progress.upgradesActivated.length, total: 17, hasProgress: true };
+      case 'ALL_BOSSES':
+        return { current: progress.bossTypesDefeated.length, total: 3, hasProgress: true };
+      case 'HALFWAY_THERE':
+        return { current: progress.levelsCompleted.length, total: 5, hasProgress: true };
+      case 'LEVEL_MASTER':
+        return { current: progress.levelsCompleted.length, total: 12, hasProgress: true };
+      default:
+        return { current: 0, total: 0, hasProgress: false };
+    }
   }
 
   /**
@@ -300,7 +333,7 @@ export class AchievementsScreen extends Screen {
       const y = listTop + (i - startIndex) * this.rowHeight - localOffset;
       const isUnlocked = this.unlockedIds.has(achievement.id);
 
-      this.drawAchievementRow(panel.x + 20, y, panel.width - 40, this.rowHeight - 10, achievement.name, achievement.description, isUnlocked);
+      this.drawAchievementRow(panel.x + 20, y, panel.width - 40, this.rowHeight - 10, achievement.name, achievement.description, isUnlocked, achievement.id);
     }
 
     this.ctx.restore();
@@ -367,9 +400,14 @@ export class AchievementsScreen extends Screen {
     height: number,
     title: string,
     description: string,
-    unlocked: boolean
+    unlocked: boolean,
+    achievementId: string
   ): void {
     this.ctx.save();
+
+    // Get progress data
+    const progressData = this.getAchievementProgress(achievementId);
+    const showProgress = progressData.hasProgress && (unlocked || !this.isAchievementHidden(achievementId));
 
     // Card background
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
@@ -382,24 +420,55 @@ export class AchievementsScreen extends Screen {
     this.ctx.fill();
     this.ctx.stroke();
 
-    // Progress bar (locked = 0%, unlocked = 100%)
-    const progress = unlocked ? 1 : 0;
+    // Progress bar (only show for cumulative achievements that are unlocked or not hidden)
     const barWidth = width * 0.35;
     const barHeight = 10;
     const barX = x + width - barWidth - 50;
     const barY = y + height / 2 + 5;
 
-    // Bar background
-    this.ctx.shadowBlur = 0;
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-    this.ctx.fillRect(barX, barY, barWidth, barHeight);
+    if (showProgress) {
+      // Calculate progress percentage
+      const progressPercent = progressData.total > 0 ? progressData.current / progressData.total : 0;
+      
+      // Bar background
+      this.ctx.shadowBlur = 0;
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      this.ctx.fillRect(barX, barY, barWidth, barHeight);
 
-    // Bar fill
-    if (progress > 0) {
-      this.ctx.fillStyle = '#00ff66'; // Neon green for completion
-      this.ctx.shadowBlur = 10;
-      this.ctx.shadowColor = '#00ff66';
-      this.ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+      // Bar fill with color coding
+      if (progressPercent > 0) {
+        // Color based on progress: Red (0-33%), Yellow (34-66%), Green (67-99%), Bright Green (100%)
+        let fillColor = '#ff3333'; // Red
+        if (progressPercent >= 1) fillColor = '#00ff66'; // Bright green (completed)
+        else if (progressPercent >= 0.67) fillColor = '#00cc44'; // Green
+        else if (progressPercent >= 0.34) fillColor = '#ffaa00'; // Yellow
+        
+        this.ctx.fillStyle = fillColor;
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowColor = fillColor;
+        this.ctx.fillRect(barX, barY, barWidth * progressPercent, barHeight);
+      }
+
+      // Progress text (current/total format)
+      this.ctx.shadowBlur = 0;
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      this.ctx.font = '10px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(`${progressData.current}/${progressData.total}`, barX + barWidth / 2, barY + barHeight / 2);
+    } else {
+      // Simple locked/unlocked bar for non-cumulative achievements
+      const progress = unlocked ? 1 : 0;
+      this.ctx.shadowBlur = 0;
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+      if (progress > 0) {
+        this.ctx.fillStyle = '#00ff66'; // Neon green for completion
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowColor = '#00ff66';
+        this.ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+      }
     }
 
     // Title
@@ -442,6 +511,14 @@ export class AchievementsScreen extends Screen {
     }
 
     this.ctx.restore();
+  }
+
+  /**
+   * Check if achievement is hidden (for progress display purposes)
+   */
+  private isAchievementHidden(achievementId: string): boolean {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    return achievement?.hidden || false;
   }
 
   private roundRectPath(x: number, y: number, width: number, height: number, radius: number): void {

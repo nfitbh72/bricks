@@ -210,6 +210,9 @@ export class Game {
 
     // Load background image
     this.loadBackgroundImage();
+    
+    // Set achievement tracker in screen manager for progress display
+    this.screenManager.setAchievementTracker(this.achievementTracker);
   }
 
   /**
