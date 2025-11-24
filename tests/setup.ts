@@ -2,6 +2,14 @@
  * Jest setup file - runs before all tests
  */
 
+// Suppress console logs during tests to reduce noise
+global.console = {
+  ...console,
+  log: jest.fn(), // Mock console.log
+  warn: jest.fn(), // Mock console.warn
+  error: jest.fn(), // Keep console.error for actual errors (or mock it too)
+};
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),

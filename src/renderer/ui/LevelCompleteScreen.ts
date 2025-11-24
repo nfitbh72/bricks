@@ -7,8 +7,7 @@ import { Button } from './Button';
 import { Leaderboard, LeaderboardEntry } from '../game/systems/Leaderboard';
 import { t } from '../i18n/LanguageManager';
 import { FONT_TITLE_XLARGE, FONT_TITLE_MEDIUM, FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, GLOW_HUGE, GLOW_LARGE, GLOW_NORMAL, GLOW_MEDIUM, COLOR_BLACK, COLOR_GREEN, COLOR_CYAN, COLOR_YELLOW, COLOR_MAGENTA, COLOR_TEXT_GRAY } from '../config/constants';
-import { getAchievement } from '../config/achievements';
-
+import { ACHIEVEMENTS } from '../config/achievements';
 import { AchievementTracker } from '../game/managers/AchievementTracker';
 
 export class LevelCompleteScreen extends Screen {
@@ -25,6 +24,7 @@ export class LevelCompleteScreen extends Screen {
   private isDevMode: boolean = false;
   private achievementsThisRun: string[] = [];
   private achievementTracker: AchievementTracker | null = null; // Proper type instead of 'any'
+  private achievementsWithProgressChange: string[] = []; // Cumulative achievements that had progress changes
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
@@ -36,9 +36,97 @@ export class LevelCompleteScreen extends Screen {
    * Render a summary of achievements progressed during this level
    */
   private renderAchievementsSummary(): void {
+    if (!this.achievementTracker) return;
+    
     const centerX = this.canvas.width / 2;
-    const startY = this.canvas.height / 2 - 10;
-    const lineHeight = 30;
+    const startY = this.canvas.height / 2 - 30; // Move up
+    const lineHeight = 25; // Reduce line height
+
+    // Get progress data
+    const progress = this.achievementTracker.getProgress();
+    const achievementsWithProgress: Array<{achievement: typeof ACHIEVEMENTS[0], progress: number, unlocked: boolean}> = [];
+
+    // Calculate progress for each achievement (same logic as AchievementsScreen)
+    for (const achievement of ACHIEVEMENTS) {
+      if (achievement.hidden) continue;
+      
+      let progressPercent = 0;
+      let unlocked = false;
+
+      switch (achievement.id) {
+        case 'FIRST_LEVEL':
+          progressPercent = progress.levelsCompleted.includes(1) ? 100 : 0;
+          unlocked = progressPercent === 100;
+          break;
+        case 'HALFWAY_THERE':
+          progressPercent = Math.min(100, (progress.levelsCompleted.length / 5) * 100);
+          unlocked = progress.levelsCompleted.length >= 5;
+          break;
+        case 'LEVEL_MASTER':
+          progressPercent = Math.min(100, (progress.levelsCompleted.length / 12) * 100);
+          unlocked = progress.levelsCompleted.length >= 12;
+          break;
+        case 'BRICK_SMASHER':
+          progressPercent = Math.min(100, (progress.totalBricksDestroyed / 1000) * 100);
+          unlocked = progress.totalBricksDestroyed >= 1000;
+          break;
+        case 'BOSS_SMASHER':
+          progressPercent = Math.min(100, (progress.totalBossesDefeated / 30) * 100);
+          unlocked = progress.totalBossesDefeated >= 30;
+          break;
+        case 'UPGRADE_MASTER':
+          progressPercent = Math.min(100, (progress.upgradesActivated.length / 17) * 100);
+          unlocked = progress.upgradesActivated.length >= 17;
+          break;
+        case 'ALL_BOSSES':
+          progressPercent = Math.min(100, (progress.bossTypesDefeated.length / 3) * 100);
+          unlocked = progress.bossTypesDefeated.length >= 3;
+          break;
+        case 'DAMAGE_DEALER':
+          progressPercent = Math.min(100, (progress.totalDamageDealt / 10000) * 100);
+          unlocked = progress.totalDamageDealt >= 10000;
+          break;
+        case 'PERFECT_LEVEL':
+        case 'SPEED_RUN':
+        case 'NO_DAMAGE':
+        case 'SECRET_LEVEL':
+          if (this.achievementsThisRun.includes(achievement.id)) {
+            progressPercent = 100;
+            unlocked = true;
+          }
+          break;
+        default:
+          if (this.achievementsThisRun.includes(achievement.id)) {
+            progressPercent = 100;
+            unlocked = true;
+          }
+      }
+
+      // Show cumulative achievements only if: progress > 0 AND progress changed this level
+      // OR if unlocked this run (instant achievements)
+      const isCumulativeAchievement = ['FIRST_LEVEL', 'HALFWAY_THERE', 'LEVEL_MASTER', 'BRICK_SMASHER', 'BOSS_SMASHER', 'UPGRADE_MASTER', 'ALL_BOSSES', 'DAMAGE_DEALER'].includes(achievement.id);
+      const hadProgressChange = this.achievementsWithProgressChange.includes(achievement.id);
+      
+      if (isCumulativeAchievement) {
+        // Only show if progress > 0 AND had progress change during this level
+        if (progressPercent > 0 && hadProgressChange) {
+          achievementsWithProgress.push({ achievement, progress: progressPercent, unlocked });
+        }
+      } else {
+        // Show instant achievements if unlocked this run
+        if (unlocked || this.achievementsThisRun.includes(achievement.id)) {
+          achievementsWithProgress.push({ achievement, progress: progressPercent, unlocked });
+        }
+      }
+    }
+
+    if (achievementsWithProgress.length === 0) return;
+
+    // Sort: unlocked first, then by progress descending
+    achievementsWithProgress.sort((a, b) => {
+      if (a.unlocked !== b.unlocked) return b.unlocked ? 1 : -1;
+      return b.progress - a.progress;
+    });
 
     // Heading
     this.ctx.font = FONT_TITLE_SMALL;
@@ -46,34 +134,80 @@ export class LevelCompleteScreen extends Screen {
     this.ctx.shadowColor = COLOR_CYAN;
     this.ctx.shadowBlur = GLOW_MEDIUM;
     this.ctx.textAlign = 'center';
-    this.ctx.fillText('Achievements this run', centerX, startY);
+    this.ctx.fillText('Achievements Progress', centerX, startY);
 
     // Entries
     this.ctx.font = FONT_TITLE_XSMALL;
     this.ctx.textAlign = 'left';
 
-    this.achievementsThisRun.forEach((id, index) => {
-      const achievement = getAchievement(id);
+    achievementsWithProgress.forEach((item, index) => {
+      const { achievement, progress, unlocked } = item;
       const y = startY + (index + 1) * lineHeight;
-      const name = achievement ? achievement.name : id;
 
-      // Neon green tick + name
-      this.ctx.fillStyle = COLOR_GREEN;
-      this.ctx.shadowColor = COLOR_GREEN;
-      this.ctx.shadowBlur = GLOW_NORMAL;
-      this.ctx.fillText('✓', centerX - 140, y);
+      // Status icon
+      const icon = unlocked ? '✓' : progress > 0 ? '⏳' : '○';
+      const iconColor = unlocked ? COLOR_GREEN : progress > 0 ? COLOR_YELLOW : COLOR_TEXT_GRAY;
+      
+      this.ctx.fillStyle = iconColor;
+      this.ctx.shadowColor = iconColor;
+      this.ctx.shadowBlur = unlocked ? GLOW_NORMAL : GLOW_NORMAL;
+      this.ctx.fillText(icon, centerX - 140, y);
 
-      this.ctx.fillStyle = COLOR_TEXT_GRAY;
-      this.ctx.shadowColor = COLOR_TEXT_GRAY;
-      this.ctx.shadowBlur = GLOW_NORMAL;
-      this.ctx.fillText(name, centerX - 110, y);
+      // Achievement name
+      this.ctx.fillStyle = unlocked ? COLOR_GREEN : COLOR_TEXT_GRAY;
+      this.ctx.shadowColor = unlocked ? COLOR_GREEN : 'transparent';
+      this.ctx.fillText(achievement.name, centerX - 120, y);
+
+      // Progress bar for cumulative achievements
+      if (progress > 0 && !unlocked) {
+        const barWidth = 100;
+        const barHeight = 8;
+        const barX = centerX + 20;
+        const barY = y - 6;
+
+        // Bar background
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.shadowBlur = 0;
+        this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+        // Bar fill
+        const fillColor = progress >= 67 ? '#00ff66' : progress >= 34 ? '#ffaa00' : '#ff3333';
+        this.ctx.fillStyle = fillColor;
+        this.ctx.shadowBlur = 5;
+        this.ctx.shadowColor = fillColor;
+        this.ctx.fillRect(barX, barY, barWidth * progress / 100, barHeight);
+
+        // Progress text
+        this.ctx.shadowBlur = 0;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.font = '9px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`${Math.round(progress)}%`, barX + barWidth / 2, barY + barHeight / 2 + 3);
+        
+        // Reset font for next iteration
+        this.ctx.font = FONT_TITLE_XSMALL;
+        this.ctx.textAlign = 'left';
+      } else if (unlocked) {
+        // Completed text
+        this.ctx.fillStyle = COLOR_GREEN;
+        this.ctx.shadowColor = COLOR_GREEN;
+        this.ctx.shadowBlur = GLOW_NORMAL;
+        this.ctx.fillText('COMPLETED', centerX + 20, y);
+      }
     });
   }
 
   /**
    * Set current level, time, and load its background image
    */
-  async setLevel(level: number, time: number = 0, isDevMode: boolean = false, achievementsThisRun: string[] = [], achievementTracker: AchievementTracker | null = null): Promise<void> {
+  async setLevel(
+    level: number, 
+    time: number = 0, 
+    isDevMode: boolean = false, 
+    achievementsThisRun: string[] = [], 
+    achievementTracker: AchievementTracker | null = null,
+    achievementsWithProgressChange: string[] = []
+  ): Promise<void> {
     console.log(`[LevelCompleteScreen] setLevel called: level=${level}, time=${time}, isDevMode=${isDevMode}, achievements=${achievementsThisRun.join(',')}`);
     
     this.currentLevel = level;
@@ -81,6 +215,7 @@ export class LevelCompleteScreen extends Screen {
     this.isDevMode = isDevMode;
     this.achievementsThisRun = achievementsThisRun;
     this.achievementTracker = achievementTracker; // Store the tracker
+    this.achievementsWithProgressChange = achievementsWithProgressChange; // Store progress changes
     this.loadBackgroundImage(level);
     
     // Load leaderboard from persistent storage
@@ -142,11 +277,50 @@ export class LevelCompleteScreen extends Screen {
 
     // Calculate dynamic button position
     let achievementsHeight = 0;
-    if (this.achievementTracker && this.achievementsThisRun.length > 0) {
-      achievementsHeight = 30 + (this.achievementsThisRun.length * 30);
+    if (this.achievementTracker) {
+      // Calculate how many achievements will be shown
+      const progress = this.achievementTracker.getProgress();
+      let achievementsToShow = 0;
+      
+      for (const achievement of ACHIEVEMENTS) {
+        if (achievement.hidden) continue;
+        
+        let progressPercent = 0;
+        switch (achievement.id) {
+          case 'FIRST_LEVEL':
+            progressPercent = progress.levelsCompleted.includes(1) ? 100 : 0;
+            break;
+          case 'HALFWAY_THERE':
+            progressPercent = Math.min(100, (progress.levelsCompleted.length / 5) * 100);
+            break;
+          case 'LEVEL_MASTER':
+            progressPercent = Math.min(100, (progress.levelsCompleted.length / 12) * 100);
+            break;
+          case 'BRICK_SMASHER':
+            progressPercent = Math.min(100, (progress.totalBricksDestroyed / 1000) * 100);
+            break;
+          case 'BOSS_SMASHER':
+            progressPercent = Math.min(100, (progress.totalBossesDefeated / 30) * 100);
+            break;
+          case 'UPGRADE_MASTER':
+            progressPercent = Math.min(100, (progress.upgradesActivated.length / 17) * 100);
+            break;
+          case 'ALL_BOSSES':
+            progressPercent = Math.min(100, (progress.bossTypesDefeated.length / 3) * 100);
+            break;
+          default:
+            if (this.achievementsThisRun.includes(achievement.id)) {
+              progressPercent = 100;
+            }
+        }
+        
+        if (progressPercent > 0) achievementsToShow++;
+      }
+      
+      achievementsHeight = 25 + (achievementsToShow * 25); // Heading + each achievement (reduced)
     }
-    const leaderboardHeight = 40 + (5 * 40); // Header + 5 entries
-    const buttonY = this.canvas.height / 2 + 20 + achievementsHeight + leaderboardHeight + 20;
+    const leaderboardHeight = 35 + (5 * 35); // Header + 5 entries (reduced)
+    const buttonY = this.canvas.height / 2 - 10 + achievementsHeight + leaderboardHeight + 10; // Move up
 
     // CONTINUE button - positioned dynamically below content
     this.buttons.push(
@@ -274,8 +448,8 @@ export class LevelCompleteScreen extends Screen {
       this.canvas.height / 2 - 70
     );
 
-    // Draw achievements earned/progressed this run (if any)
-    if (this.achievementsThisRun.length > 0) {
+    // Draw achievements progress (if tracker is available)
+    if (this.achievementTracker) {
       this.renderAchievementsSummary();
     }
 
@@ -292,11 +466,66 @@ export class LevelCompleteScreen extends Screen {
     } else {
       // Calculate dynamic name entry position
       let achievementsHeight = 0;
-      if (this.achievementTracker && this.achievementsThisRun.length > 0) {
-        achievementsHeight = 30 + (this.achievementsThisRun.length * 30);
+      if (this.achievementTracker) {
+        // Calculate how many achievements will be shown (same logic as above)
+        const progress = this.achievementTracker.getProgress();
+        let achievementsToShow = 0;
+        
+        for (const achievement of ACHIEVEMENTS) {
+          if (achievement.hidden) continue;
+          
+          let progressPercent = 0;
+          switch (achievement.id) {
+            case 'FIRST_LEVEL':
+              progressPercent = progress.levelsCompleted.includes(1) ? 100 : 0;
+              break;
+            case 'HALFWAY_THERE':
+              progressPercent = Math.min(100, (progress.levelsCompleted.length / 5) * 100);
+              break;
+            case 'LEVEL_MASTER':
+              progressPercent = Math.min(100, (progress.levelsCompleted.length / 12) * 100);
+              break;
+            case 'BRICK_SMASHER':
+              progressPercent = Math.min(100, (progress.totalBricksDestroyed / 1000) * 100);
+              break;
+            case 'BOSS_SMASHER':
+              progressPercent = Math.min(100, (progress.totalBossesDefeated / 30) * 100);
+              break;
+            case 'UPGRADE_MASTER':
+              progressPercent = Math.min(100, (progress.upgradesActivated.length / 17) * 100);
+              break;
+            case 'ALL_BOSSES':
+              progressPercent = Math.min(100, (progress.bossTypesDefeated.length / 3) * 100);
+              break;
+            case 'DAMAGE_DEALER':
+              progressPercent = Math.min(100, (progress.totalDamageDealt / 10000) * 100);
+              break;
+            default:
+              if (this.achievementsThisRun.includes(achievement.id)) {
+                progressPercent = 100;
+              }
+          }
+          
+          // Count cumulative achievements only if: progress > 0 AND had progress change
+          // OR instant achievements if unlocked this run
+          const isCumulativeAchievement = ['FIRST_LEVEL', 'HALFWAY_THERE', 'LEVEL_MASTER', 'BRICK_SMASHER', 'BOSS_SMASHER', 'UPGRADE_MASTER', 'ALL_BOSSES', 'DAMAGE_DEALER'].includes(achievement.id);
+          const hadProgressChange = this.achievementsWithProgressChange.includes(achievement.id);
+          
+          if (isCumulativeAchievement) {
+            if (progressPercent > 0 && hadProgressChange) {
+              achievementsToShow++;
+            }
+          } else {
+            if (progressPercent > 0 || this.achievementsThisRun.includes(achievement.id)) {
+              achievementsToShow++;
+            }
+          }
+        }
+        
+        achievementsHeight = 25 + (achievementsToShow * 25); // Use reduced spacing
       }
-      const leaderboardHeight = 40 + (5 * 40);
-      const promptY = this.canvas.height / 2 + 20 + achievementsHeight + leaderboardHeight + 20;
+      const leaderboardHeight = 35 + (5 * 35); // Use reduced spacing
+      const promptY = this.canvas.height / 2 - 20 + achievementsHeight + leaderboardHeight + 10; // Move up
       
       // Show prompt for name entry
       this.ctx.font = FONT_TITLE_XSMALL;
@@ -318,9 +547,47 @@ export class LevelCompleteScreen extends Screen {
   private renderLeaderboard(): void {
     // Calculate start position based on achievements display
     let achievementsHeight = 0;
-    if (this.achievementTracker && this.achievementsThisRun.length > 0) {
-      // Estimate achievements section height (heading + achievements)
-      achievementsHeight = 30 + (this.achievementsThisRun.length * 30); // Heading + each achievement
+    if (this.achievementTracker) {
+      // Calculate how many achievements will be shown (same logic as createButtons)
+      const progress = this.achievementTracker.getProgress();
+      let achievementsToShow = 0;
+      
+      for (const achievement of ACHIEVEMENTS) {
+        if (achievement.hidden) continue;
+        
+        let progressPercent = 0;
+        switch (achievement.id) {
+          case 'FIRST_LEVEL':
+            progressPercent = progress.levelsCompleted.includes(1) ? 100 : 0;
+            break;
+          case 'HALFWAY_THERE':
+            progressPercent = Math.min(100, (progress.levelsCompleted.length / 5) * 100);
+            break;
+          case 'LEVEL_MASTER':
+            progressPercent = Math.min(100, (progress.levelsCompleted.length / 12) * 100);
+            break;
+          case 'BRICK_SMASHER':
+            progressPercent = Math.min(100, (progress.totalBricksDestroyed / 1000) * 100);
+            break;
+          case 'BOSS_SMASHER':
+            progressPercent = Math.min(100, (progress.totalBossesDefeated / 30) * 100);
+            break;
+          case 'UPGRADE_MASTER':
+            progressPercent = Math.min(100, (progress.upgradesActivated.length / 17) * 100);
+            break;
+          case 'ALL_BOSSES':
+            progressPercent = Math.min(100, (progress.bossTypesDefeated.length / 3) * 100);
+            break;
+          default:
+            if (this.achievementsThisRun.includes(achievement.id)) {
+              progressPercent = 100;
+            }
+        }
+        
+        if (progressPercent > 0) achievementsToShow++;
+      }
+      
+      achievementsHeight = 30 + (achievementsToShow * 30);
     }
     
     const startY = this.canvas.height / 2 + 20 + achievementsHeight;

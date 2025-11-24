@@ -72,6 +72,14 @@ export class Game {
   private stateTransitionHandler: StateTransitionHandler;
   private renderManager: RenderManager;
   private achievementTracker: AchievementTracker;
+  private levelStartProgress: {
+    totalBricksDestroyed: number;
+    totalBossesDefeated: number;
+    totalDamageDealt: number;
+    levelsCompleted: number;
+    upgradesActivated: number;
+    bossTypesDefeated: number;
+  } | null = null;
 
 
   // Game stats
@@ -717,6 +725,17 @@ export class Game {
     this.achievementsUnlockedThisRun.clear();
     this.achievementTracker.clearThisRun();
     
+    // Capture progress snapshot at level start
+    const currentProgress = this.achievementTracker.getProgress();
+    this.levelStartProgress = {
+      totalBricksDestroyed: currentProgress.totalBricksDestroyed,
+      totalBossesDefeated: currentProgress.totalBossesDefeated,
+      totalDamageDealt: currentProgress.totalDamageDealt,
+      levelsCompleted: currentProgress.levelsCompleted.length,
+      upgradesActivated: currentProgress.upgradesActivated.length,
+      bossTypesDefeated: currentProgress.bossTypesDefeated.length,
+    };
+    
     // Initialize achievement tracking for this level
     const hasBoss = this.level.getBricks().some(brick => 
       brick.getType() === BrickType.BOSS_1 || 
@@ -977,6 +996,32 @@ export class Game {
           console.warn('Achievement tracker error:', error);
         });
         
+        // Calculate which cumulative achievements had progress changes
+        const achievementsWithProgressChange: string[] = [];
+        if (this.levelStartProgress) {
+          const endProgress = this.achievementTracker.getProgress();
+          
+          // Check each cumulative achievement for progress changes
+          if (endProgress.totalBricksDestroyed > this.levelStartProgress.totalBricksDestroyed) {
+            achievementsWithProgressChange.push('BRICK_SMASHER');
+          }
+          if (endProgress.totalBossesDefeated > this.levelStartProgress.totalBossesDefeated) {
+            achievementsWithProgressChange.push('BOSS_SMASHER');
+          }
+          if (endProgress.totalDamageDealt > this.levelStartProgress.totalDamageDealt) {
+            achievementsWithProgressChange.push('DAMAGE_DEALER');
+          }
+          if (endProgress.levelsCompleted.length > this.levelStartProgress.levelsCompleted) {
+            achievementsWithProgressChange.push('FIRST_LEVEL', 'HALFWAY_THERE', 'LEVEL_MASTER');
+          }
+          if (endProgress.upgradesActivated.length > this.levelStartProgress.upgradesActivated) {
+            achievementsWithProgressChange.push('UPGRADE_MASTER');
+          }
+          if (endProgress.bossTypesDefeated.length > this.levelStartProgress.bossTypesDefeated) {
+            achievementsWithProgressChange.push('ALL_BOSSES');
+          }
+        }
+        
         this.gameState = GameState.LEVEL_COMPLETE;
         // Use level.getId() to ensure we show the level that was just completed
         this.screenManager.levelCompleteScreen.setLevel(
@@ -984,7 +1029,8 @@ export class Game {
           this.levelTime,
           this.isDevUpgradeMode,
           this.achievementTracker.getAchievementsThisRun(),
-          this.achievementTracker
+          this.achievementTracker,
+          achievementsWithProgressChange
         );
         this.levelCompleteTimer = 0;
       }
