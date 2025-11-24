@@ -2,7 +2,9 @@
  * Achievement Manager - Handles Steam achievements with offline fallback
  */
 
-import { ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
+import fs from 'fs';
+import path from 'path';
 import { SteamManager } from './SteamManager';
 
 export interface Achievement {
@@ -16,9 +18,11 @@ export class AchievementManager {
   private steamManager: SteamManager;
   private unlockedAchievements: Set<string> = new Set();
   private offlineMode: boolean = true;
+  private storagePath: string;
 
   constructor() {
     this.steamManager = SteamManager.getInstance();
+    this.storagePath = this.getStoragePath();
   }
 
   /**
@@ -27,11 +31,13 @@ export class AchievementManager {
   initialize(): void {
     this.offlineMode = !this.steamManager.isAvailable();
     
+    // Always load local achievements first so they persist across runs
+    this.loadOfflineAchievements();
+
     if (!this.offlineMode) {
       this.loadSteamAchievements();
     } else {
       console.log('🏆 Achievement system running in OFFLINE mode');
-      this.loadOfflineAchievements();
     }
 
     this.setupIPC();
@@ -47,7 +53,7 @@ export class AchievementManager {
     try {
       // In a real implementation, you'd query all achievement IDs
       // For now, we'll just track what gets unlocked
-      console.log('✅ Steam achievements loaded');
+      console.log('✅ Steam achievements loaded (online mode)');
     } catch (error) {
       console.error('Failed to load Steam achievements:', error);
     }
@@ -58,12 +64,50 @@ export class AchievementManager {
    */
   private loadOfflineAchievements(): void {
     try {
-      // Load from local storage or file
-      // For now, start with empty set
-      console.log('📝 Offline achievements initialized');
+      if (!fs.existsSync(this.storagePath)) {
+        console.log('📝 No existing achievement save found - starting fresh');
+        return;
+      }
+
+      const raw = fs.readFileSync(this.storagePath, 'utf-8');
+      const parsed = JSON.parse(raw) as { unlocked: string[] };
+      if (Array.isArray(parsed.unlocked)) {
+        this.unlockedAchievements = new Set(parsed.unlocked);
+        console.log(`📝 Loaded ${this.unlockedAchievements.size} achievements from local storage`);
+      } else {
+        console.warn('Offline achievements file malformed - starting fresh');
+      }
     } catch (error) {
       console.error('Failed to load offline achievements:', error);
     }
+  }
+
+  /**
+   * Save current achievements to local JSON file
+   */
+  private saveOfflineAchievements(): void {
+    try {
+      const dir = path.dirname(this.storagePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      const data = {
+        unlocked: Array.from(this.unlockedAchievements),
+      };
+
+      fs.writeFileSync(this.storagePath, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (error) {
+      console.error('Failed to save offline achievements:', error);
+    }
+  }
+
+  /**
+   * Get the path to the local achievements JSON file
+   */
+  private getStoragePath(): string {
+    const userData = app.getPath('userData');
+    return path.join(userData, 'achievements.json');
   }
 
   /**
@@ -77,13 +121,14 @@ export class AchievementManager {
     }
 
     if (this.offlineMode) {
-      // Offline mode - just track locally
+      // Offline mode - track locally only
       console.log(`🏆 [OFFLINE] Achievement unlocked: ${achievementId}`);
       this.unlockedAchievements.add(achievementId);
+      this.saveOfflineAchievements();
       return true;
     }
 
-    // Online mode - unlock via Steam
+    // Online mode - unlock via Steam, but still mirror locally
     const client = this.steamManager.getClient();
     if (!client) {
       console.warn('Steam client not available');
@@ -95,6 +140,7 @@ export class AchievementManager {
       if (success) {
         console.log(`🏆 Achievement unlocked: ${achievementId}`);
         this.unlockedAchievements.add(achievementId);
+        this.saveOfflineAchievements();
         return true;
       }
       return false;
@@ -129,6 +175,7 @@ export class AchievementManager {
     if (this.offlineMode) {
       this.unlockedAchievements.delete(achievementId);
       console.log(`🧹 [OFFLINE] Achievement cleared: ${achievementId}`);
+      this.saveOfflineAchievements();
       return true;
     }
 
@@ -140,6 +187,7 @@ export class AchievementManager {
       if (success) {
         this.unlockedAchievements.delete(achievementId);
         console.log(`🧹 Achievement cleared: ${achievementId}`);
+        this.saveOfflineAchievements();
       }
       return success;
     } catch {

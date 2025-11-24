@@ -11,6 +11,7 @@ export class IntroScreen extends Screen {
   private onStart: () => void;
   private onQuit: () => void;
   private onOptions: () => void;
+  private onAchievements: () => void;
   // @TODO: Remove dev upgrades callback before production
   private onDevUpgrades: () => void;
 
@@ -18,11 +19,19 @@ export class IntroScreen extends Screen {
   private readonly TOTAL_CONTENT_HEIGHT = 630;
   private readonly CONTENT_VERTICAL_POSITION = 0.45; // 45% from top
 
-  constructor(canvas: HTMLCanvasElement, onStart: () => void, onQuit: () => void, onDevUpgrades: () => void, onOptions: () => void) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    onStart: () => void,
+    onQuit: () => void,
+    onDevUpgrades: () => void,
+    onOptions: () => void,
+    onAchievements: () => void
+  ) {
     super(canvas);
     this.onStart = onStart;
     this.onQuit = onQuit;
     this.onOptions = onOptions;
+    this.onAchievements = onAchievements;
     // @TODO: Remove dev upgrades callback before production
     this.onDevUpgrades = onDevUpgrades;
     this.createButtons();
@@ -65,11 +74,23 @@ export class IntroScreen extends Screen {
       })
     );
 
-    // OPTIONS button
+    // ACHIEVEMENTS button
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
         y: baseY + 310,
+        width: buttonWidth,
+        height: buttonHeight,
+        text: 'ACHIEVEMENTS',
+        onClick: () => this.onAchievements(),
+      })
+    );
+
+    // OPTIONS button
+    this.buttons.push(
+      new Button({
+        x: centerX - buttonWidth / 2,
+        y: baseY + 390,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.options'),
@@ -81,7 +102,7 @@ export class IntroScreen extends Screen {
     this.buttons.push(
       new Button({
         x: centerX - buttonWidth / 2,
-        y: baseY + 390,
+        y: baseY + 470,
         width: buttonWidth,
         height: buttonHeight,
         text: t('ui.buttons.quit'),
@@ -103,11 +124,11 @@ export class IntroScreen extends Screen {
    * Refresh translations when language changes
    */
   refreshTranslations(): void {
-    // Update button texts (button 1 is DEV UPGRADES, not translated)
-    if (this.buttons.length >= 4) {
+    // Update button texts (button 1 is DEV UPGRADES, button 2 is ACHIEVEMENTS, both not translated)
+    if (this.buttons.length >= 5) {
       this.buttons[0].setText(t('ui.buttons.startGame'));
-      this.buttons[2].setText(t('ui.buttons.options'));
-      this.buttons[3].setText(t('ui.buttons.quit'));
+      this.buttons[3].setText(t('ui.buttons.options'));
+      this.buttons[4].setText(t('ui.buttons.quit'));
     }
   }
 

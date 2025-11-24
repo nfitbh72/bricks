@@ -7,6 +7,7 @@ import { Button } from './Button';
 import { Leaderboard, LeaderboardEntry } from '../game/systems/Leaderboard';
 import { t } from '../i18n/LanguageManager';
 import { FONT_TITLE_XLARGE, FONT_TITLE_MEDIUM, FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, GLOW_HUGE, GLOW_LARGE, GLOW_NORMAL, GLOW_MEDIUM, COLOR_BLACK, COLOR_GREEN, COLOR_CYAN, COLOR_YELLOW, COLOR_MAGENTA, COLOR_TEXT_GRAY } from '../config/constants';
+import { getAchievement } from '../config/achievements';
 
 export class LevelCompleteScreen extends Screen {
   private onContinue: () => void;
@@ -20,6 +21,7 @@ export class LevelCompleteScreen extends Screen {
   private flashTimer: number = 0;
   private showFlash: boolean = true;
   private isDevMode: boolean = false;
+  private achievementsThisRun: string[] = [];
 
   constructor(canvas: HTMLCanvasElement, onContinue: () => void) {
     super(canvas);
@@ -28,14 +30,53 @@ export class LevelCompleteScreen extends Screen {
   }
 
   /**
+   * Render a summary of achievements progressed during this level
+   */
+  private renderAchievementsSummary(): void {
+    const centerX = this.canvas.width / 2;
+    const startY = this.canvas.height / 2 - 10;
+    const lineHeight = 30;
+
+    // Heading
+    this.ctx.font = FONT_TITLE_SMALL;
+    this.ctx.fillStyle = COLOR_CYAN;
+    this.ctx.shadowColor = COLOR_CYAN;
+    this.ctx.shadowBlur = GLOW_MEDIUM;
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('Achievements this run', centerX, startY);
+
+    // Entries
+    this.ctx.font = FONT_TITLE_XSMALL;
+    this.ctx.textAlign = 'left';
+
+    this.achievementsThisRun.forEach((id, index) => {
+      const achievement = getAchievement(id);
+      const y = startY + (index + 1) * lineHeight;
+      const name = achievement ? achievement.name : id;
+
+      // Neon green tick + name
+      this.ctx.fillStyle = COLOR_GREEN;
+      this.ctx.shadowColor = COLOR_GREEN;
+      this.ctx.shadowBlur = GLOW_NORMAL;
+      this.ctx.fillText('✓', centerX - 140, y);
+
+      this.ctx.fillStyle = COLOR_TEXT_GRAY;
+      this.ctx.shadowColor = COLOR_TEXT_GRAY;
+      this.ctx.shadowBlur = GLOW_NORMAL;
+      this.ctx.fillText(name, centerX - 110, y);
+    });
+  }
+
+  /**
    * Set current level, time, and load its background image
    */
-  async setLevel(level: number, time: number = 0, isDevMode: boolean = false): Promise<void> {
-    console.log(`[LevelCompleteScreen] setLevel called: level=${level}, time=${time}, isDevMode=${isDevMode}`);
+  async setLevel(level: number, time: number = 0, isDevMode: boolean = false, achievementsThisRun: string[] = []): Promise<void> {
+    console.log(`[LevelCompleteScreen] setLevel called: level=${level}, time=${time}, isDevMode=${isDevMode}, achievements=${achievementsThisRun.join(',')}`);
     
     this.currentLevel = level;
     this.levelTime = time;
     this.isDevMode = isDevMode;
+    this.achievementsThisRun = achievementsThisRun;
     this.loadBackgroundImage(level);
     
     // Load leaderboard from persistent storage
@@ -216,6 +257,11 @@ export class LevelCompleteScreen extends Screen {
       this.canvas.width / 2,
       this.canvas.height / 2 - 70
     );
+
+    // Draw achievements earned/progressed this run (if any)
+    if (this.achievementsThisRun.length > 0) {
+      this.renderAchievementsSummary();
+    }
 
     // Draw leaderboard
     this.renderLeaderboard();

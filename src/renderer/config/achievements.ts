@@ -28,6 +28,31 @@ export const ACHIEVEMENTS: Achievement[] = [
     description: 'Complete all levels',
   },
 
+  // Progress Achievements
+  {
+    id: 'UPGRADE_MASTER',
+    name: 'Upgrade Seeker',
+    description: 'Activate all upgrades'
+  },
+
+  {
+    id: 'BRICK_SMASHER',
+    name: 'Brick Destroyer',
+    description: 'Destroy 1000 bricks'
+  },
+
+  {
+    id: 'BOSS_SMASHER',
+    name: 'Boss Smasher',
+    description: 'Destroy 30 bosses'
+  },
+
+  {
+    id: 'DAMAGE_DEALER',
+    name: 'Damage Dealer',
+    description: 'Deal 10000 damage to bricks'
+  },
+
   // Boss achievements
   {
     id: 'DEFEAT_BOSS_1',
@@ -59,7 +84,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'SPEED_RUN',
     name: 'Speed Demon',
-    description: 'Complete a level in under 60 seconds',
+    description: 'Complete a level in under 10 seconds',
   },
   {
     id: 'NO_DAMAGE',

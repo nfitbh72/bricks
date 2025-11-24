@@ -96,6 +96,9 @@ export class Game {
   // Upgrades
   private gameUpgrades: GameUpgrades;
 
+  // Achievements unlocked during the current level run
+  private achievementsUnlockedThisRun: Set<string> = new Set();
+
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -136,6 +139,7 @@ export class Game {
       onQuit: () => this.handleQuit(),
       onDevUpgrades: () => this.handleDevUpgrades(),
       onOpenOptions: () => this.handleOpenOptions(),
+      onOpenAchievements: () => this.handleOpenAchievements(),
       onRestart: () => this.handleRestart(),
       onLevelCompleteTransition: () => this.handleLevelCompleteTransition(),
       onUpgradeComplete: () => this.handleUpgradeComplete(),
@@ -144,6 +148,7 @@ export class Game {
       onQuitFromPause: () => this.handleQuitFromPause(),
       onCloseOptions: () => this.handleCloseOptions(),
       onCloseTutorial: () => this.handleCloseTutorial(),
+      onCloseAchievements: () => this.handleCloseAchievements(),
     });
     
     // Set volume change callback for real-time updates
@@ -609,6 +614,22 @@ export class Game {
   }
 
   /**
+   * Handle opening achievements screen from intro
+   */
+  private handleOpenAchievements(): void {
+    // Refresh data asynchronously; don't block UI
+    void this.screenManager.achievementsScreen.refreshData();
+    this.gameState = GameState.ACHIEVEMENTS;
+  }
+
+  /**
+   * Handle closing achievements screen
+   */
+  private handleCloseAchievements(): void {
+    this.gameState = GameState.INTRO;
+  }
+
+  /**
    * Apply options to game
    */
   private applyOptions(): void {
@@ -659,6 +680,9 @@ export class Game {
     
     // Reset level timer
     this.levelTime = 0;
+
+    // Reset per-level achievement tracking
+    this.achievementsUnlockedThisRun.clear();
     
     // Calculate bomb damage using multiplier constant
     this.bombDamage = this.ball.getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
@@ -905,10 +929,23 @@ export class Game {
       if (this.levelCompleteTimer >= this.levelCompleteDelay) {
         this.gameState = GameState.LEVEL_COMPLETE;
         // Use level.getId() to ensure we show the level that was just completed
-        this.screenManager.levelCompleteScreen.setLevel(this.level.getId(), this.levelTime, this.isDevUpgradeMode);
+        this.screenManager.levelCompleteScreen.setLevel(
+          this.level.getId(),
+          this.levelTime,
+          this.isDevUpgradeMode,
+          Array.from(this.achievementsUnlockedThisRun)
+        );
         this.levelCompleteTimer = 0;
       }
     }
+  }
+
+  /**
+   * Record that an achievement was unlocked during this level run
+   * (Game systems can call this after a successful unlock via steamAPI)
+   */
+  private recordAchievementUnlocked(id: string): void {
+    this.achievementsUnlockedThisRun.add(id);
   }
 
   /**
