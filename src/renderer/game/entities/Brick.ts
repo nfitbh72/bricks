@@ -91,7 +91,8 @@ export class Brick {
     // Ensure damage is non-negative
     const damage = Math.max(0, amount);
     this.health -= damage;
-    if (this.health < 0) {
+    // Handle floating point precision - if health is very close to zero, set it to zero
+    if (this.health < 0.05) {
       this.health = 0;
     }
     const justDestroyed = !wasDestroyed && this.isDestroyed();
