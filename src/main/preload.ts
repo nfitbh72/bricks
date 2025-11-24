@@ -4,7 +4,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
   // App controls
-  quitApp: () => ipcRenderer.send('quit-app'),
+  quit: () => ipcRenderer.send('quit-app'),
   
   // Leaderboards
   loadLeaderboards: () => ipcRenderer.invoke('load-leaderboards'),
