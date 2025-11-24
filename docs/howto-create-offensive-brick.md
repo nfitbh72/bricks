@@ -66,22 +66,25 @@ export const OFFENSIVE_BRICK_COLOR_YOUR_TYPE = '#FF00FF';
 
 **File:** `/src/renderer/game/entities/Brick.ts`
 
+Add your new color constant to the imports and add a case in the `getColor()` method:
+
 ```typescript
 import { 
   OFFENSIVE_BRICK_COLOR_FALLING,
   OFFENSIVE_BRICK_COLOR_EXPLODING,
   OFFENSIVE_BRICK_COLOR_LASER,
+  OFFENSIVE_BRICK_COLOR_HOMING,
+  OFFENSIVE_BRICK_COLOR_SPLITTING,
+  OFFENSIVE_BRICK_COLOR_BOMB,
+  OFFENSIVE_BRICK_COLOR_DYNAMITE,
   OFFENSIVE_BRICK_COLOR_YOUR_TYPE,  // Import
 } from '../../config/constants';
 
-private getOffensiveColor(): string {
+// In the getColor() method, add your case:
+getColor(): string {
+  // ... existing code ...
   switch (this.type) {
-    case BrickType.OFFENSIVE_FALLING:
-      return OFFENSIVE_BRICK_COLOR_FALLING;
-    case BrickType.OFFENSIVE_EXPLODING:
-      return OFFENSIVE_BRICK_COLOR_EXPLODING;
-    case BrickType.OFFENSIVE_LASER:
-      return OFFENSIVE_BRICK_COLOR_LASER;
+    // ... existing cases ...
     case BrickType.OFFENSIVE_YOUR_NEW_TYPE:
       return OFFENSIVE_BRICK_COLOR_YOUR_TYPE;  // Add case
     default:
@@ -236,51 +239,62 @@ export class OffensiveEntityManager {
 ```typescript
 spawnOffensiveEntity(
   brick: Brick,
-  canvasWidth: number,
-  canvasHeight: number,
-  currentBallSpeed: number
-): void {
-  if (!brick.isOffensive()) return;
-
+  x: number,
+  y: number,
+  batCenterX: number,
+  allBricks?: Brick[]
+): Brick[] | null {
   const brickType = brick.getType();
-  const position = brick.getPosition();
   const color = brick.getColor();
+  const brickBounds = brick.getBounds();
 
   switch (brickType) {
     case BrickType.OFFENSIVE_FALLING:
-      this.fallingBricks.push(new FallingBrick(position.x, position.y, color));
-      break;
+      this.fallingBricks.push(new FallingBrick(brickBounds.x, brickBounds.y, color));
+      return null;
 
     case BrickType.OFFENSIVE_EXPLODING:
-      this.spawnDebris(position.x, position.y, color);
-      break;
+      // Create debris in 8 directions
+      const angleStep = (Math.PI * 2) / EXPLODING_BRICK_DEBRIS_COUNT;
+      for (let i = 0; i < EXPLODING_BRICK_DEBRIS_COUNT; i++) {
+        const angle = angleStep * i;
+        const velocityX = Math.cos(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
+        const velocityY = Math.sin(angle) * EXPLODING_BRICK_DEBRIS_SPEED;
+        this.debris.push(new Debris(x, y, velocityX, velocityY, color));
+      }
+      return null;
 
     case BrickType.OFFENSIVE_LASER:
-      this.brickLasers.push(new BrickLaser(position.x, position.y, color, currentBallSpeed));
-      break;
+      this.brickLasers.push(new BrickLaser(x, y, batCenterX, color));
+      return null;
 
     case BrickType.OFFENSIVE_YOUR_NEW_TYPE:
       // Add your spawn logic
-      this.yourNewEntities.push(new YourNewEntity(position.x, position.y, color));
-      break;
+      this.yourNewEntities.push(new YourNewEntity(x, y, color));
+      return null;
   }
 }
 ```
 
+**Note:** The method returns `Brick[] | null`. Return `null` for most offensive types, or return an array of bricks to damage (like `OFFENSIVE_BOMB` does for area damage).
+
 ### 4.4 Add Update Logic
 
 ```typescript
-update(deltaTime: number, canvasWidth: number, canvasHeight: number): void {
+update(deltaTime: number, canvasWidth: number, canvasHeight: number, batCenterX: number, batCenterY: number): void {
   // Update falling bricks
-  this.fallingBricks.forEach(brick => brick.update(deltaTime));
-  this.fallingBricks = this.fallingBricks.filter(
-    brick => brick.isActive() && !brick.isOffScreen(canvasHeight)
-  );
+  for (const fallingBrick of this.fallingBricks) {
+    fallingBrick.update(deltaTime);
+  }
 
   // ... other updates ...
 
-  // Update your new entities
-  this.yourNewEntities.forEach(entity => entity.update(deltaTime));
+  // Update your new entities (pass bat position if needed for homing behavior)
+  for (const entity of this.yourNewEntities) {
+    entity.update(deltaTime); // or entity.update(deltaTime, batCenterX, batCenterY) if homing
+  }
+
+  // Remove inactive or off-screen entities
   this.yourNewEntities = this.yourNewEntities.filter(
     entity => entity.isActive() && !entity.isOffScreen(canvasWidth, canvasHeight)
   );
@@ -566,7 +580,10 @@ update(deltaTime: number): void {
 See existing implementations:
 - **FallingBrick** - Simple gravity-based falling
 - **BrickLaser** - Charging delay then downward movement
-- **Debris** - Multiple particles with random velocities
+- **Debris** - Multiple particles with random velocities (exploding brick)
+- **HomingMissile** - Tracks bat position with acceleration and turning
+- **SplittingFragment** - Diagonal movement then vertical falling
+- **DynamiteStick** - Timed fuse with explosion radius damage
 
 ---
 
