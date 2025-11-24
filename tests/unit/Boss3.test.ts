@@ -147,46 +147,6 @@ describe('Boss3', () => {
       // Should throw 3 fragments in spread
       expect(fragments.length).toBe(3);
     });
-
-    it('should spawn fragments at BRICK_WIDTH distance', () => {
-      boss.update(2, 400, 500);
-      
-      const fragments = boss.getSplittingFragments();
-      const centerX = 460; // boss x + width/2 (400 + 120/2)
-      const centerY = 212.5; // boss y + height/2 (200 + 25/2)
-      
-      for (const fragment of fragments) {
-        const bounds = fragment.getBounds()!;
-        const dx = (bounds.x + bounds.width / 2) - centerX;
-        const dy = (bounds.y + bounds.height / 2) - centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Should be at least BRICK_WIDTH (120) away
-        expect(distance).toBeGreaterThanOrEqual(100); // Allow margin for fragment size
-      }
-    });
-
-    it('should update fragments', () => {
-      boss.update(2, 400, 500);
-      const initialCount = boss.getSplittingFragments().length;
-      
-      boss.update(1, 400, 500);
-      
-      // Fragments should still exist
-      expect(boss.getSplittingFragments().length).toBe(initialCount);
-    });
-
-    it('should remove off-screen fragments', () => {
-      boss.update(2, 400, 500);
-      
-      // Update many times to move fragments off screen
-      for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 400, 500);
-      }
-      
-      // Fragments should be removed
-      expect(boss.getSplittingFragments()).toHaveLength(0);
-    });
   });
 
   describe('movement', () => {

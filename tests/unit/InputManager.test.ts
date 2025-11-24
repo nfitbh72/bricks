@@ -40,20 +40,16 @@ describe('InputManager', () => {
     };
     
     // Mock window event listeners
-    const originalAddEventListener = (global as any).window?.addEventListener;
-    (global as any).window = {
-      addEventListener: jest.fn((event: string, handler: any) => {
-        if (event === 'keydown') keydownListeners.push(handler);
-        if (event === 'keyup') keyupListeners.push(handler);
-      })
-    };
+    jest.spyOn(window, 'addEventListener').mockImplementation((event: string, handler: any) => {
+      if (event === 'keydown') keydownListeners.push(handler);
+      if (event === 'keyup') keyupListeners.push(handler);
+    });
     
     inputManager = new InputManager(canvas);
-    
-    // Restore original if it existed
-    if (originalAddEventListener) {
-      (global as any).window.addEventListener = originalAddEventListener;
-    }
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('keyboard input', () => {
@@ -306,6 +302,9 @@ describe('InputManager', () => {
       
       // Press space
       keydownListeners.forEach(listener => listener({ key: ' ' }));
+      
+      // Release space
+      keyupListeners.forEach(listener => listener({ key: ' ' }));
       
       // Clear keys
       inputManager.clearKeys();

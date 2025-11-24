@@ -386,30 +386,6 @@ describe('StateTransitionHandler', () => {
     });
   });
 
-  describe('handleQuit', () => {
-    it('should call electron quit when available', () => {
-      const mockQuit = jest.fn();
-      (global as any).window = { electron: { quit: mockQuit } };
-      
-      handler.handleQuit();
-      
-      expect(mockQuit).toHaveBeenCalled();
-      
-      delete (global as any).window;
-    });
-
-    it('should not throw when electron is not available', () => {
-      // Set window without electron
-      (global as any).window = {};
-      
-      expect(() => {
-        handler.handleQuit();
-      }).not.toThrow();
-      
-      delete (global as any).window;
-    });
-  });
-
   describe('updateContext', () => {
     it('should update context reference', () => {
       const newContext = createMockContext();

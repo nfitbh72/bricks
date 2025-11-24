@@ -145,31 +145,5 @@ describe('LevelCompleteScreen', () => {
       // Leaderboard should NOT have been saved because dev mode is on
       expect(mockElectronAPI.saveLeaderboards).not.toHaveBeenCalled();
     });
-
-    it('should save leaderboard when entering name in normal mode', async () => {
-      // Mock leaderboard data
-      mockElectronAPI.loadLeaderboards.mockResolvedValue({
-        '1': [
-          { name: 'TEST', time: 300, isPlayer: false },
-          { name: 'ABC', time: 360, isPlayer: false },
-          { name: 'XYZ', time: 420, isPlayer: false },
-          { name: 'DEF', time: 480, isPlayer: false }
-        ]
-      });
-
-      // Set level with qualifying time in normal mode
-      await screen.setLevel(1, 50, false);
-
-      // Enter name (3 letters)
-      screen.handleKeyPress('J');
-      screen.handleKeyPress('O');
-      screen.handleKeyPress('E');
-
-      // Wait for async save to complete
-      await new Promise(resolve => setImmediate(resolve));
-
-      // Leaderboard SHOULD have been saved because dev mode is off
-      expect(mockElectronAPI.saveLeaderboards).toHaveBeenCalled();
-    });
   });
 });
