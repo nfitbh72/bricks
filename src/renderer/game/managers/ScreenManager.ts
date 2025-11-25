@@ -14,6 +14,7 @@ import { AchievementsScreen } from '../../ui/AchievementsScreen';
 import { GameState } from '../core/types';
 import { getUpgrades } from '../../config/upgrades';
 import { AchievementTracker } from './AchievementTracker';
+import { GameUpgrades } from '../systems/GameUpgrades';
 
 export interface ScreenCallbacks {
   onStartGame: () => void;
@@ -310,6 +311,33 @@ export class ScreenManager {
       this.canvas,
       originalCallback,
       achievementTracker
+    );
+  }
+
+  /**
+   * Set GameUpgrades for upgrade tree screen stats display
+   */
+  setGameUpgrades(gameUpgrades: GameUpgrades): void {
+    // Recreate the upgrade tree screen with GameUpgrades
+    const callbacks = {
+      onUpgradeComplete: this.upgradeTreeScreen['onContinue'],
+      onStartLevel: this.upgradeTreeScreen['onStartLevel'],
+      onUpgradeActivated: this.upgradeTreeScreen['onUpgradeActivated']
+    };
+    
+    // Get current upgrade levels from the existing screen
+    const currentLevels = this.upgradeTreeScreen.getUpgradeLevels();
+    
+    // Initialize GameUpgrades with current levels
+    gameUpgrades.setUpgradeLevels(currentLevels);
+    
+    this.upgradeTreeScreen = new UpgradeTreeScreen(
+      this.canvas,
+      callbacks.onUpgradeComplete,
+      callbacks.onStartLevel,
+      getUpgrades(),
+      callbacks.onUpgradeActivated,
+      gameUpgrades
     );
   }
 }

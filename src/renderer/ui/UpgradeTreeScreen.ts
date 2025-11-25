@@ -10,6 +10,7 @@ import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
 import { TOTAL_LEVELS } from '../config/levels';
 import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_TITLE_TINY, FONT_TITLE_MICRO, GLOW_LARGE } from '../config/constants';
+import { GameUpgrades } from '../game/systems/GameUpgrades';
 
 /**
  * Animation types for upgrade nodes
@@ -59,13 +60,16 @@ export class UpgradeTreeScreen extends Screen {
   private readonly NODE_HEIGHT = 100;
   private readonly NODE_SPACING = 250; // Distance from parent to child
   private readonly HEADER_HEIGHT = 80;
+  private readonly STATS_PANEL_WIDTH = 280;
+  private readonly STATS_PANEL_PADDING = 20;
 
   constructor(
     canvas: HTMLCanvasElement,
     onContinue: () => void,
     onStartLevel: (levelId: number) => void,
     upgrades: Upgrade[],
-    private onUpgradeActivated: (upgradeType: string) => void
+    private onUpgradeActivated: (upgradeType: string) => void,
+    private gameUpgrades?: GameUpgrades
   ) {
     super(canvas);
     this.onContinue = onContinue;
@@ -135,6 +139,11 @@ export class UpgradeTreeScreen extends Screen {
     
     // Reset points
     this.state.availablePoints = 0;
+    
+    // Update GameUpgrades with empty levels
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(new Map());
+    }
   }
 
   /**
@@ -187,6 +196,11 @@ export class UpgradeTreeScreen extends Screen {
     
     for (const rootNode of this.state.rootNodes) {
       restoreLevels(rootNode);
+    }
+    
+    // Update GameUpgrades with restored levels
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
     }
     
     // Recalculate layout
@@ -460,6 +474,11 @@ export class UpgradeTreeScreen extends Screen {
     // Unlock all root nodes and their children
     this.state.rootNodes.forEach(root => unlockNode(root));
 
+    // Update GameUpgrades with new levels for stats panel
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
+    }
+
     // Play sound
     try {
       this.upgradeSound.currentTime = 0;
@@ -568,6 +587,11 @@ export class UpgradeTreeScreen extends Screen {
     // Perform upgrade
     this.state.availablePoints--;
     node.currentLevel++;
+    
+    // Update GameUpgrades with new levels for stats panel
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
+    }
     
     // Track upgrade activation for achievements
     this.onUpgradeActivated(node.upgrade.type);
@@ -762,6 +786,11 @@ export class UpgradeTreeScreen extends Screen {
     // Render header
     this.renderHeader();
     
+    // Render stats panel
+    if (this.gameUpgrades) {
+      this.renderStatsPanel();
+    }
+    
     // Render all nodes and connections
     this.renderTree();
     
@@ -832,6 +861,60 @@ export class UpgradeTreeScreen extends Screen {
       this.canvas.width / 2,
       this.HEADER_HEIGHT / 2
     );
+    
+    this.ctx.restore();
+  }
+
+  /**
+   * Render stats panel on the left side
+   */
+  private renderStatsPanel(): void {
+    if (!this.gameUpgrades) return;
+
+    this.ctx.save();
+    
+    const panelX = this.STATS_PANEL_PADDING;
+    const panelY = this.HEADER_HEIGHT + this.STATS_PANEL_PADDING;
+    const panelWidth = this.STATS_PANEL_WIDTH;
+    
+    // Panel background
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.fillRect(panelX, panelY, panelWidth, this.canvas.height - panelY - this.STATS_PANEL_PADDING);
+    
+    // Panel border
+    this.ctx.strokeStyle = '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.shadowBlur = 5;
+    this.ctx.shadowColor = '#00ffff';
+    this.ctx.strokeRect(panelX, panelY, panelWidth, this.canvas.height - panelY - this.STATS_PANEL_PADDING);
+    
+    // Title
+    this.ctx.fillStyle = '#00ffff';
+    this.ctx.font = FONT_TITLE_SMALL;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
+    this.ctx.shadowBlur = 10;
+    this.ctx.fillText('CURRENT STATS', panelX + 15, panelY + 15);
+    
+    // Get all stats from GameUpgrades (all calculation logic is there)
+    const stats = this.gameUpgrades.getDisplayStats();
+    
+    // Render stats
+    this.ctx.font = FONT_TITLE_TINY;
+    this.ctx.shadowBlur = 0;
+    let yOffset = panelY + 55;
+    const lineHeight = 24;
+    
+    for (const stat of stats) {
+      this.ctx.fillStyle = stat.active ? '#00ffff' : '#666666';
+      this.ctx.fillText(stat.label, panelX + 15, yOffset);
+      
+      this.ctx.textAlign = 'right';
+      this.ctx.fillText(stat.value, panelX + panelWidth - 15, yOffset);
+      this.ctx.textAlign = 'left';
+      
+      yOffset += lineHeight;
+    }
     
     this.ctx.restore();
   }

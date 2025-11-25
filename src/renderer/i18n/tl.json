@@ -157,6 +157,10 @@
       "stickyBat": {
         "name": "Malagkit na Bat",
         "description": "Pindutin ang Space para sa Malagkit na Bat"
+      },
+      "superStats": {
+        "name": "Super Stats",
+        "description": "Pagbutihin ang lahat ng stats ng bola"
       }
     }
   }

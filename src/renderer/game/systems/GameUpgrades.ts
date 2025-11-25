@@ -4,7 +4,21 @@
  */
 
 import { UpgradeType } from '../core/types';
-import { BALL_BASE_DAMAGE } from '../../config/constants';
+import { 
+  BALL_BASE_DAMAGE, 
+  BRICK_WIDTH, 
+  EXPLOSION_RADIUS_MULTIPLIER,
+  LASER_DAMAGE_MULTIPLIER
+} from '../../config/constants';
+
+/**
+ * Display stat for the UI
+ */
+export interface DisplayStat {
+  label: string;
+  value: string;
+  active: boolean;
+}
 
 export class GameUpgrades {
   private upgradeLevels: Map<string, number> = new Map();
@@ -282,6 +296,81 @@ export class GameUpgrades {
     });
     
     return summary;
+  }
+
+  /**
+   * Get all stats formatted for display in the UI
+   * Returns an array of stats with labels, values, and active state
+   */
+  getDisplayStats(): DisplayStat[] {
+    const stats: DisplayStat[] = [];
+    
+    // Ball Damage - starts at 1, increments by 1 per level
+    const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1);
+    const ballDamage = BALL_BASE_DAMAGE + damageLevel;
+    stats.push({ 
+      label: 'Ball Damage', 
+      value: `${ballDamage}`, 
+      active: damageLevel > 0 
+    });
+    
+    // Bat Width - show in pixels
+    const batWidthLevel = this.getUpgradeLevel(UpgradeType.BAT_WIDTH_INCREASE_10_PERCENT);
+    const batWidth = this.baseBatWidth * (1 + batWidthLevel * 0.1);
+    stats.push({ 
+      label: 'Bat Width', 
+      value: `${Math.round(batWidth)}px`, 
+      active: batWidthLevel > 0 
+    });
+    
+    // Critical Hits
+    const hasCrits = this.hasCriticalHits();
+    const critChance = hasCrits ? (this.getTotalCriticalHitChance() * 100).toFixed(0) : '0';
+    const critDamage = hasCrits ? (this.getCriticalHitDamageMultiplier() * 100).toFixed(0) : '0';
+    stats.push({ label: 'Crit Chance', value: `${critChance}%`, active: hasCrits });
+    stats.push({ label: 'Crit Damage', value: `${critDamage}%`, active: hasCrits });
+    
+    // Piercing
+    const hasPiercing = this.hasBallPiercing();
+    const piercingChance = hasPiercing ? (this.getBallPiercingChance() * 100).toFixed(0) : '0';
+    const piercingDuration = hasPiercing ? this.getPiercingDuration() : 0;
+    stats.push({ label: 'Piercing Chance', value: `${piercingChance}%`, active: hasPiercing });
+    stats.push({ label: 'Piercing Duration', value: `${piercingDuration}s`, active: hasPiercing && piercingDuration > 0 });
+    
+    // Explosions
+    const hasExplosions = this.hasBallExplosions();
+    const explosionDamage = hasExplosions ? (this.getBallExplosionDamageMultiplier() * 100).toFixed(0) : '0';
+    const explosionRadiusMultiplier = hasExplosions ? this.getBallExplosionRadiusMultiplier() : 1.0;
+    const explosionRadius = Math.round(BRICK_WIDTH * EXPLOSION_RADIUS_MULTIPLIER * explosionRadiusMultiplier);
+    stats.push({ label: 'Explosion Damage', value: `${explosionDamage}%`, active: hasExplosions });
+    stats.push({ label: 'Explosion Radius', value: `${explosionRadius}px`, active: hasExplosions });
+    
+    // Bat Shooter - show actual damage values
+    const hasShooter = this.hasBatShooter();
+    const shooterDamageMultiplier = hasShooter ? this.getBatShooterDamage() : 0;
+    const laserDamage = hasShooter ? Math.round(ballDamage * LASER_DAMAGE_MULTIPLIER * shooterDamageMultiplier * 10) / 10 : 0;
+    const shooterCount = hasShooter ? this.getTotalShooterCount() : 0;
+    stats.push({ label: 'Laser Damage', value: `${laserDamage}`, active: hasShooter });
+    stats.push({ label: 'Laser Count', value: `${shooterCount}`, active: hasShooter });
+    
+    // Sticky Bat - show tick when enabled
+    const hasSticky = this.hasStickyBat();
+    stats.push({ label: 'Sticky Bat', value: hasSticky ? '✓' : '—', active: hasSticky });
+    
+    // Bombs - show tick when enabled
+    const hasBombs = this.hasBombs();
+    stats.push({ label: 'Bombs', value: hasBombs ? '✓' : '—', active: hasBombs });
+    
+    // Lives - show total lives (base 1 + bonus)
+    const healthBonus = this.getHealthBonus();
+    const totalLives = 1 + healthBonus; // Player starts with 1 life
+    stats.push({ 
+      label: 'Lives', 
+      value: `${totalLives}`, 
+      active: healthBonus > 0 
+    });
+    
+    return stats;
   }
 
   /**

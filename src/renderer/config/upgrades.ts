@@ -154,8 +154,8 @@ export function getUpgrades() : Upgrade[] {
 
         // === SUPER STATS (requires all three terminal upgrades maxed) ===
         {
-            name: 'SUPER STATS',
-            description: 'Improve all ball stats',
+            name: t('game.upgrades.superStats.name'),
+            description: t('game.upgrades.superStats.description'),
             times: 10,
             type: UpgradeType.BALL_SUPER_STATS,
             prerequisites: [

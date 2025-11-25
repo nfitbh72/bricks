@@ -226,6 +226,9 @@ export class Game {
     
     // Set achievement tracker in screen manager for progress display
     this.screenManager.setAchievementTracker(this.achievementTracker);
+    
+    // Set game upgrades in screen manager for stats display
+    this.screenManager.setGameUpgrades(this.gameUpgrades);
   }
 
   /**

@@ -157,6 +157,10 @@
       "stickyBat": {
         "name": "ไม้ตีเหนียว",
         "description": "กดค้าง Space สำหรับไม้ตีเหนียว"
+      },
+      "superStats": {
+        "name": "สถิติสุดยอด",
+        "description": "เพิ่มสถิติลูกบอลทั้งหมด"
       }
     }
   }

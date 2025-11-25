@@ -157,6 +157,10 @@
       "stickyBat": {
         "name": "粘性球拍",
         "description": "按住空格键启用粘性球拍"
+      },
+      "superStats": {
+        "name": "超级属性",
+        "description": "提升所有球的属性"
       }
     }
   }

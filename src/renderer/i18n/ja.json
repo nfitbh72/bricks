@@ -157,6 +157,10 @@
       "stickyBat": {
         "name": "粘着バット",
         "description": "スペースキー長押しで粘着バット"
+      },
+      "superStats": {
+        "name": "スーパー能力",
+        "description": "すべてのボール能力を向上"
       }
     }
   }

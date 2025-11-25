@@ -157,6 +157,10 @@
       "stickyBat": {
         "name": "Klebriger Schläger",
         "description": "Leertaste halten für klebrigen Schläger"
+      },
+      "superStats": {
+        "name": "Super-Statistiken",
+        "description": "Verbessert alle Ball-Statistiken"
       }
     }
   }
