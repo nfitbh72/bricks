@@ -315,6 +315,50 @@ export class UpgradeTreeScreen extends Screen {
         this.positionNodeWithChildren(node, x, topY, 0);
       });
     }
+    
+    // Second pass: adjust positions for nodes with multiple prerequisites
+    // Position them in the middle of all their parent nodes
+    this.centerNodesWithMultiplePrerequisites();
+  }
+  
+  /**
+   * Center nodes that have multiple prerequisites between all their parent nodes
+   */
+  private centerNodesWithMultiplePrerequisites(): void {
+    const nodeMap = new Map<UpgradeType, UpgradeNode>();
+    
+    // Build a map of all nodes
+    const collectNodes = (node: UpgradeNode) => {
+      nodeMap.set(node.upgrade.type, node);
+      for (const child of node.children) {
+        collectNodes(child);
+      }
+    };
+    
+    for (const root of this.state.rootNodes) {
+      collectNodes(root);
+    }
+    
+    // Find and reposition nodes with multiple prerequisites
+    for (const node of nodeMap.values()) {
+      const prereqs = node.upgrade.prerequisites;
+      if (prereqs && prereqs.length > 1) {
+        // Get all parent nodes
+        const parentNodes = prereqs
+          .map(p => nodeMap.get(p.type))
+          .filter(p => p !== undefined) as UpgradeNode[];
+        
+        if (parentNodes.length > 1) {
+          // Calculate average position of all parents
+          const avgX = parentNodes.reduce((sum, p) => sum + p.position.x, 0) / parentNodes.length;
+          const avgY = parentNodes.reduce((sum, p) => sum + p.position.y, 0) / parentNodes.length;
+          
+          // Position this node below the average position
+          node.position.x = avgX;
+          node.position.y = avgY + this.NODE_SPACING;
+        }
+      }
+    }
   }
 
   /**
