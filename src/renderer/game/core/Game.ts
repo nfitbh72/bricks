@@ -46,8 +46,9 @@ import {
   BOSS3_SPAWN_OFFSET_Y,
   MULTIBALL_MIN_ANGLE,
   MULTIBALL_MAX_ANGLE,
-  MULTIBALL_SPAWN_COUNT,
-  MULTIBALL_DESPAWN_PARTICLE_COUNT
+  MULTIBALL_BRICK_SPAWN_COUNT,
+  MULTIBALL_DESPAWN_PARTICLE_COUNT,
+  MAX_BALLS_ON_SCREEN
 } from '../../config/constants';
 
 export class Game {
@@ -325,7 +326,7 @@ export class Game {
         // Handle multi-ball brick - spawn additional balls
         if (brickType === BrickType.OFFENSIVE_MULTIBALL && this.balls.length > 0) {
           // Use first ball as source for cloning
-          this.spawnAdditionalBalls(this.balls[0], MULTIBALL_SPAWN_COUNT);
+          this.spawnAdditionalBalls(this.balls[0], MULTIBALL_BRICK_SPAWN_COUNT);
         }
         
         // Spawn offensive entities based on brick type (falling bricks, lasers, missiles, etc.)
@@ -462,7 +463,7 @@ export class Game {
           }
         }
       },
-      onBrickDestroyed: (brick, x, y, isCritical) => {
+      onBrickDestroyed: (brick, x, y, isCritical, ball) => {
         this.totalBricksDestroyed++;
         
         // Track brick destruction for achievements
@@ -472,11 +473,13 @@ export class Game {
         });
         
         // Multi-ball upgrade - chance to spawn additional balls on brick destruction
+        // Use the ball that destroyed the brick (if available), otherwise fall back to first ball
         if (this.gameUpgrades.hasMultiBall() && this.balls.length > 0) {
           const multiBallChance = this.gameUpgrades.getMultiBallChance();
           if (Math.random() < multiBallChance) {
             const multiBallCount = this.gameUpgrades.getMultiBallCount();
-            this.spawnAdditionalBalls(this.balls[0], multiBallCount);
+            const sourceBall = ball || this.balls[0];
+            this.spawnAdditionalBalls(sourceBall, multiBallCount);
           }
         }
         
@@ -1466,9 +1469,15 @@ export class Game {
 
   /**
    * Spawn additional balls from a source ball (for multi-ball brick)
+   * Respects MAX_BALLS_ON_SCREEN cap
    */
   private spawnAdditionalBalls(sourceBall: Ball, count: number): void {
     for (let i = 0; i < count; i++) {
+      // Check if we've hit the ball cap
+      if (this.balls.length >= MAX_BALLS_ON_SCREEN) {
+        break;
+      }
+      
       const newBall = sourceBall.clone();
       // Random angle in upward range (avoid downward angles)
       const randomAngle = MULTIBALL_MIN_ANGLE + Math.random() * (MULTIBALL_MAX_ANGLE - MULTIBALL_MIN_ANGLE);

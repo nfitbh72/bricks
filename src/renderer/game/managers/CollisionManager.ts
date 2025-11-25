@@ -33,7 +33,7 @@ import {
 
 export interface CollisionCallbacks {
   onBrickHit?: (brick: Brick, damage: number, isCritical: boolean) => void;
-  onBrickDestroyed?: (brick: Brick, x: number, y: number, isCritical: boolean) => void;
+  onBrickDestroyed?: (brick: Brick, x: number, y: number, isCritical: boolean, ball?: Ball) => void;
   onExplosionDamage?: (brick: Brick, damage: number, x: number, y: number) => void;
   onBatDamaged?: (damagePercent: number) => void;
 }
@@ -163,7 +163,7 @@ export class CollisionManager {
           // Track destroyed bricks and create particles
           if (destructionInfo.justDestroyed) {
             if (this.callbacks.onBrickDestroyed) {
-              this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, isCritical);
+              this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, isCritical, ball);
             }
           }
           

@@ -8,7 +8,10 @@ import {
   BALL_BASE_DAMAGE, 
   BRICK_WIDTH, 
   EXPLOSION_RADIUS_MULTIPLIER,
-  LASER_DAMAGE_MULTIPLIER
+  LASER_DAMAGE_MULTIPLIER,
+  MULTIBALL_UPGRADE_CHANCE_PER_LEVEL,
+  MULTIBALL_UPGRADE_BALL_EVERY_N_LEVELS,
+  MULTIBALL_UPGRADE_BASE_BALLS
 } from '../../config/constants';
 
 /**
@@ -293,27 +296,29 @@ export class GameUpgrades {
 
   /**
    * Get multi-ball trigger chance (0 to 1)
-   * Base chance is 10%, increases by 10% per level
-   * Level 1 = 10%, Level 10 = 100%
+   * Uses MULTIBALL_UPGRADE_CHANCE_PER_LEVEL from constants (2% per level)
+   * Level 1 = 2%, Level 10 = 20%
    */
   getMultiBallChance(): number {
     const level = this.getUpgradeLevel(UpgradeType.BALL_ADD_MULTIBALL);
     if (level === 0) return 0;
     
-    const chance = level * 0.1; // 10% per level
+    const chance = level * MULTIBALL_UPGRADE_CHANCE_PER_LEVEL;
     return Math.min(chance, 1.0); // Cap at 100%
   }
 
   /**
    * Get number of balls to spawn when multi-ball triggers
-   * Starts at 2 balls, increases by 1 per level
-   * Level 1 = 2 balls, Level 10 = 11 balls
+   * Uses MULTIBALL_UPGRADE_BASE_BALLS and MULTIBALL_UPGRADE_BALL_EVERY_N_LEVELS from constants
+   * Starts at 2 balls, increases by 1 every 2 levels
+   * Level 1-2 = 2 balls, Level 3-4 = 3 balls, ..., Level 9-10 = 6 balls
    */
   getMultiBallCount(): number {
     const level = this.getUpgradeLevel(UpgradeType.BALL_ADD_MULTIBALL);
     if (level === 0) return 0;
     
-    return 2 + (level - 1); // Level 1 = 2, Level 2 = 3, ..., Level 10 = 11
+    const additionalBalls = Math.floor((level - 1) / MULTIBALL_UPGRADE_BALL_EVERY_N_LEVELS);
+    return MULTIBALL_UPGRADE_BASE_BALLS + additionalBalls;
   }
 
   /**
