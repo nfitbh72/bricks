@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 12;
+export const TOTAL_LEVELS = 13;
 
 /**
  * Create Level 1 configuration
@@ -281,6 +281,34 @@ export function createLevel12(): LevelConfig {
 }
 
 /**
+ * Create Level 13 configuration
+ * Multi-Ball Test Level
+ */
+export function createLevel13(): LevelConfig {
+  const pattern = [
+    "HHHHHHHH",
+    "HHHHHHHH",
+    "HHHHHHHH",
+    "HHHHHHHH",
+    "HHHHHHHH",
+    "HHHHHHHH",
+    "NNNNNNNN",
+    "N.OOOO.N",
+    "N.O..O.N",
+    "N.O..O.N",
+    "N.OOOO.N",
+    "NNNNNNNN"
+  ];
+  
+  return {
+    id: 13,
+    name: t('game.levels.level13Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 2,
+  };
+}
+
+/**
  * Get level by ID
  */
 export function getLevel(id: number): LevelConfig | undefined {
@@ -309,6 +337,8 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel11();
     case 12:
       return createLevel12();
+    case 13:
+      return createLevel13();
     default:
       return undefined;
   }

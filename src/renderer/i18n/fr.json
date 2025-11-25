@@ -57,7 +57,8 @@
       "level9Name": "Niveau 9: Croix de Dynamite",
       "level10Name": "Niveau 10: Chaos Offensif",
       "level11Name": "Niveau 11: Diamant Explosif",
-      "level12Name": "Niveau 12: Boss Final - Le Diviseur"
+      "level12Name": "Niveau 12: Boss Final - Le Diviseur",
+      "level13Name": "Niveau 13: Test Multi-Balles"
     },
     "bricks": {
       "offensive": {

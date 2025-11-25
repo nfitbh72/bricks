@@ -181,20 +181,20 @@ describe('Achievement System Integration', () => {
     });
 
     it('should track level completion and unlock LEVEL_MASTER at threshold', async () => {
-      // Track progress towards LEVEL_MASTER (12 levels)
-      for (let i = 1; i <= 11; i++) {
+      // Track progress towards LEVEL_MASTER (13 levels)
+      for (let i = 1; i <= 12; i++) {
         await tracker.onLevelComplete(i, 100, 3);
       }
 
       let progress = tracker.getProgress();
-      expect(progress.levelsCompleted).toHaveLength(11);
+      expect(progress.levelsCompleted).toHaveLength(12);
       expect(mockElectronAPI.unlockAchievement).not.toHaveBeenCalledWith('LEVEL_MASTER');
 
       // Final level that should unlock the achievement
-      await tracker.onLevelComplete(12, 100, 3);
+      await tracker.onLevelComplete(13, 100, 3);
 
       progress = tracker.getProgress();
-      expect(progress.levelsCompleted).toHaveLength(12);
+      expect(progress.levelsCompleted).toHaveLength(13);
       
       // Should trigger achievement unlock
       expect(mockElectronAPI.unlockAchievement).toHaveBeenCalledWith('LEVEL_MASTER');

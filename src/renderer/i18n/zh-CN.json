@@ -57,7 +57,8 @@
       "level9Name": "第9关：炸药十字",
       "level10Name": "第10关：攻击混乱",
       "level11Name": "第11关：爆炸钻石",
-      "level12Name": "第12关：最终首领 - 分裂者"
+      "level12Name": "第12关：最终首领 - 分裂者",
+      "level13Name": "第13关：多球测试"
     },
     "bricks": {
       "offensive": {

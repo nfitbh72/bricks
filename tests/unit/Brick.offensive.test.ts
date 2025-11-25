@@ -4,12 +4,7 @@
 
 import { Brick } from '../../src/renderer/game/entities/Brick';
 import { BrickType } from '../../src/renderer/game/core/types';
-import {
-  OFFENSIVE_BRICK_COLOR_FALLING,
-  OFFENSIVE_BRICK_COLOR_EXPLODING,
-  OFFENSIVE_BRICK_COLOR_LASER,
-  OFFENSIVE_BRICK_COLOR_DYNAMITE,
-} from '../../src/renderer/config/constants';
+import { getBrickColorByType } from '../../src/renderer/config/brickLayout';
 
 describe('Brick - Offensive Types', () => {
   describe('BrickType enum', () => {
@@ -92,22 +87,22 @@ describe('Brick - Offensive Types', () => {
   describe('getColor - offensive bricks', () => {
     it('should return distinct color for OFFENSIVE_FALLING', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_FALLING }, 1);
-      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_FALLING);
+      expect(brick.getColor()).toBe(getBrickColorByType(BrickType.OFFENSIVE_FALLING));
     });
 
     it('should return distinct color for OFFENSIVE_EXPLODING', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_EXPLODING }, 1);
-      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_EXPLODING);
+      expect(brick.getColor()).toBe(getBrickColorByType(BrickType.OFFENSIVE_EXPLODING));
     });
 
     it('should return distinct color for OFFENSIVE_LASER', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_LASER }, 1);
-      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_LASER);
+      expect(brick.getColor()).toBe(getBrickColorByType(BrickType.OFFENSIVE_LASER));
     });
 
     it('should return distinct color for OFFENSIVE_DYNAMITE', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_DYNAMITE }, 1);
-      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_DYNAMITE);
+      expect(brick.getColor()).toBe(getBrickColorByType(BrickType.OFFENSIVE_DYNAMITE));
     });
 
     it('should use custom color if provided', () => {
