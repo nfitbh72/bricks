@@ -17,11 +17,6 @@ const {
   COLOR_MAGENTA,
   COLOR_YELLOW,
   COLOR_CYAN,
-  COLOR_ORANGE,
-  COLOR_RED,
-  COLOR_RED_ORANGE,
-  COLOR_METALLIC_GRAY,
-  COLOR_PURPLE,
 } = ColorStyles;
 
 // Brick dimensions (fixed size for all bricks)
@@ -159,12 +154,13 @@ export const BUTTON_BORDER_WIDTH = 3; // pixels
 // Font constants moved to fontStyles.ts and re-exported above
 
 // Piercing visual constants
+export const PIERCING_BALL_COLOR = '#7fff00'; // Lime green color for piercing ball
 export const PIERCING_WARNING_DURATION = 0.5; // seconds Last 0.5 seconds flash warning
 export const PIERCING_FLASH_INTERVAL = 0.1; // seconds Flash every 0.1 seconds
 
 // Game constants
 export const PLAYER_STARTING_HEALTH = 1; // starting health
-export const TOTAL_LEVELS = 12; // Total number of levels in the game
+export const TOTAL_LEVELS = 13; // Total number of levels in the game
 export const TOTAL_BOSSES = 3; // Total number of boss types
 
 // Sticky ball constants
@@ -179,21 +175,6 @@ export const SLOW_MOTION_FACTOR = 0.15; // 15% speed
 export const SLOW_MOTION_DURATION = 2.0; // seconds
 export const SLOW_MOTION_TRIGGER_DISTANCE = 3; // Trigger at 2 brick heights from final brick
 export const SLOW_MOTION_ZOOM_SCALE = 3; // Zoom to 150% (1.5x magnification)
-
-// Brick type colors (fixed per type, not health-based)
-export const BRICK_COLOR_NORMAL = COLOR_CYAN;              // Cyan for normal bricks
-export const BRICK_COLOR_HEALTHY = COLOR_GREEN;            // Green for healthy bricks
-export const BRICK_COLOR_INDESTRUCTIBLE = COLOR_METALLIC_GRAY; // Gray for indestructible
-
-// Offensive brick constants
-export const OFFENSIVE_BRICK_COLOR_FALLING = COLOR_ORANGE; // Red-Orange warning color
-export const OFFENSIVE_BRICK_COLOR_EXPLODING = COLOR_RED; // Red warning color
-export const OFFENSIVE_BRICK_COLOR_LASER = COLOR_YELLOW; // Yellow warning color
-export const OFFENSIVE_BRICK_COLOR_HOMING = COLOR_MAGENTA; // Magenta warning color
-export const OFFENSIVE_BRICK_COLOR_SPLITTING = COLOR_ORANGE; // Orange warning color
-export const OFFENSIVE_BRICK_COLOR_BOMB = COLOR_RED_ORANGE; // Red-Orange bomb warning color
-export const OFFENSIVE_BRICK_COLOR_DYNAMITE = COLOR_RED; // Red dynamite warning color
-export const BRICK_COLOR_BOSS = COLOR_PURPLE; // Purple for boss bricks
 
 // Falling brick constants
 export const FALLING_BRICK_GRAVITY = 400; // pixels per second squared
@@ -244,6 +225,12 @@ export const DYNAMITE_EXPLOSION_RADIUS = 120; // Large circular explosion radius
 export const DYNAMITE_EXPLOSION_DURATION = 0.5; // seconds Explosion visual effect duration in seconds
 export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to remove
 export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0
+
+// Multi-ball brick constants
+export const MULTIBALL_SPAWN_COUNT = 2; // Number of extra balls to spawn
+export const MULTIBALL_MIN_ANGLE = -150; // Degrees (upward-left)
+export const MULTIBALL_MAX_ANGLE = -30;  // Degrees (upward-right)
+export const MULTIBALL_DESPAWN_PARTICLE_COUNT = 8; // Particles when ball despawns
 
 // Boss1 constants
 export const BOSS1_HEALTH_MULTIPLIER = 6; // Boss1 health = base health * 6

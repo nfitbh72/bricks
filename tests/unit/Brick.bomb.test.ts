@@ -4,7 +4,7 @@
 
 import { Brick } from '../../src/renderer/game/entities/Brick';
 import { BrickType } from '../../src/renderer/game/core/types';
-import { OFFENSIVE_BRICK_COLOR_BOMB } from '../../src/renderer/config/constants';
+import { getBrickColorByType } from '../../src/renderer/config/brickLayout';
 
 describe('Brick - OFFENSIVE_BOMB Type', () => {
   describe('BrickType enum', () => {
@@ -30,7 +30,7 @@ describe('Brick - OFFENSIVE_BOMB Type', () => {
   describe('getColor - OFFENSIVE_BOMB', () => {
     it('should return distinct color for OFFENSIVE_BOMB', () => {
       const brick = new Brick({ col: 0, row: 0, type: BrickType.OFFENSIVE_BOMB }, 1);
-      expect(brick.getColor()).toBe(OFFENSIVE_BRICK_COLOR_BOMB);
+      expect(brick.getColor()).toBe(getBrickColorByType(BrickType.OFFENSIVE_BOMB));
     });
 
     it('should use custom color if provided', () => {

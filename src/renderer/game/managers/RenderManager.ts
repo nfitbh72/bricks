@@ -53,7 +53,7 @@ export class RenderManager {
   renderGameplay(
     level: Level | null,
     bat: Bat,
-    ball: Ball,
+    balls: Ball[],
     statusBar: StatusBar,
     effectsManager: EffectsManager,
     weaponManager: WeaponManager,
@@ -85,8 +85,10 @@ export class RenderManager {
     // Render bat
     bat.render(this.ctx);
 
-    // Render ball
-    ball.render(this.ctx);
+    // Render all balls
+    for (const ball of balls) {
+      ball.render(this.ctx);
+    }
 
     // Render weapons (lasers)
     weaponManager.render(this.ctx);
@@ -99,8 +101,8 @@ export class RenderManager {
 
     this.ctx.restore();
 
-    // Render launch instruction if ball is sticky
-    if (ball.getIsSticky()) {
+    // Render launch instruction if primary ball is sticky
+    if (balls.length > 0 && balls[0].getIsSticky()) {
       this.renderLaunchInstruction();
     }
 

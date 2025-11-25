@@ -9,22 +9,10 @@ import {
   BRICK_HEIGHT, 
   BRICK_CORNER_RADIUS,
   BRICK_GLOW_BLUR,
-  BRICK_COLOR_NORMAL,
-  BRICK_COLOR_HEALTHY,
-  BRICK_COLOR_INDESTRUCTIBLE,
-  OFFENSIVE_BRICK_COLOR_FALLING,
-  OFFENSIVE_BRICK_COLOR_EXPLODING,
-  OFFENSIVE_BRICK_COLOR_LASER,
-  OFFENSIVE_BRICK_COLOR_HOMING,
-  OFFENSIVE_BRICK_COLOR_SPLITTING,
-  OFFENSIVE_BRICK_COLOR_BOMB,
-  OFFENSIVE_BRICK_COLOR_DYNAMITE,
-  BRICK_COLOR_BOSS,
   FONT_MONO_BRICK,
   COLOR_BLACK,
-  COLOR_WHITE,
 } from '../../config/constants';
-import { gridToPixel } from '../../config/brickLayout';
+import { gridToPixel, getBrickColorByType } from '../../config/brickLayout';
 
 export interface BrickDestructionInfo {
   wasDestroyed: boolean;
@@ -62,6 +50,7 @@ export class Brick {
     [BrickType.OFFENSIVE_SPLITTING]: 1,
     [BrickType.OFFENSIVE_BOMB]: 1,
     [BrickType.OFFENSIVE_DYNAMITE]: 1,
+    [BrickType.OFFENSIVE_MULTIBALL]: 1,
     [BrickType.BOSS_1]: 1,
     [BrickType.BOSS_2]: 1,
     [BrickType.BOSS_3]: 1,
@@ -139,7 +128,8 @@ export class Brick {
       this.type === BrickType.OFFENSIVE_HOMING ||
       this.type === BrickType.OFFENSIVE_SPLITTING ||
       this.type === BrickType.OFFENSIVE_BOMB ||
-      this.type === BrickType.OFFENSIVE_DYNAMITE
+      this.type === BrickType.OFFENSIVE_DYNAMITE ||
+      this.type === BrickType.OFFENSIVE_MULTIBALL
     );
   }
 
@@ -213,37 +203,8 @@ export class Brick {
       return this.customColor;
     }
     
-    // Return fixed color based on brick type
-    switch (this.type) {
-      case BrickType.NORMAL:
-        return BRICK_COLOR_NORMAL;
-      case BrickType.HEALTHY:
-        return BRICK_COLOR_HEALTHY;
-      case BrickType.INDESTRUCTIBLE:
-        return BRICK_COLOR_INDESTRUCTIBLE;
-      case BrickType.OFFENSIVE_FALLING:
-        return OFFENSIVE_BRICK_COLOR_FALLING;
-      case BrickType.OFFENSIVE_EXPLODING:
-        return OFFENSIVE_BRICK_COLOR_EXPLODING;
-      case BrickType.OFFENSIVE_LASER:
-        return OFFENSIVE_BRICK_COLOR_LASER;
-      case BrickType.OFFENSIVE_HOMING:
-        return OFFENSIVE_BRICK_COLOR_HOMING;
-      case BrickType.OFFENSIVE_SPLITTING:
-        return OFFENSIVE_BRICK_COLOR_SPLITTING;
-      case BrickType.OFFENSIVE_BOMB:
-        return OFFENSIVE_BRICK_COLOR_BOMB;
-      case BrickType.OFFENSIVE_DYNAMITE:
-        return OFFENSIVE_BRICK_COLOR_DYNAMITE;
-      case BrickType.BOSS_1:
-        return BRICK_COLOR_BOSS;
-      case BrickType.BOSS_2:
-        return '#00ccff'; // Cyan color for Boss2 (The Shielder)
-      case BrickType.BOSS_3:
-        return '#cc00ff'; // Purple/magenta color for Boss3 (The Splitter)
-      default:
-        return COLOR_WHITE;
-    }
+    // Use centralized brick color configuration
+    return getBrickColorByType(this.type);
   }
 
   /**

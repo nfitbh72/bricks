@@ -3,25 +3,55 @@
  * Helper functions for positioning bricks in levels
  */
 
-import { BRICK_WIDTH, BRICK_HEIGHT, BRICK_SPACING, LETTER_SPACING, BRICK_LAYOUT_TOP_MARGIN } from './constants';
+import {
+  BRICK_WIDTH,
+  BRICK_HEIGHT,
+  BRICK_SPACING,
+  LETTER_SPACING,
+  BRICK_LAYOUT_TOP_MARGIN,
+  COLOR_CYAN,
+  COLOR_GREEN,
+  COLOR_METALLIC_GRAY,
+  COLOR_ORANGE,
+  COLOR_RED,
+  COLOR_YELLOW,
+  COLOR_MAGENTA,
+  COLOR_RED_ORANGE,
+  COLOR_PURPLE,
+  COLOR_HOT_PINK,
+  COLOR_YELLOW_GREEN,
+} from './constants';
 import { BrickConfig, BrickType } from '../game/core/types';
+
+/**
+ * Brick configuration mapping pattern characters to types and colors
+ */
+interface BrickCharConfig {
+  type: BrickType;
+  color: string;
+  description: string;
+}
+
+const BRICK_CHAR_MAP: Record<string, BrickCharConfig> = {
+  'N': { type: BrickType.NORMAL, color: COLOR_CYAN, description: 'Normal brick' },
+  'H': { type: BrickType.HEALTHY, color: COLOR_GREEN, description: 'Healthy brick (3 health)' },
+  'I': { type: BrickType.INDESTRUCTIBLE, color: COLOR_METALLIC_GRAY, description: 'Indestructible brick' },
+  'F': { type: BrickType.OFFENSIVE_FALLING, color: COLOR_YELLOW_GREEN, description: 'Falling brick' },
+  'E': { type: BrickType.OFFENSIVE_EXPLODING, color: COLOR_RED, description: 'Exploding brick' },
+  'L': { type: BrickType.OFFENSIVE_LASER, color: COLOR_YELLOW, description: 'Laser brick' },
+  'M': { type: BrickType.OFFENSIVE_HOMING, color: COLOR_MAGENTA, description: 'Homing missile brick' },
+  'S': { type: BrickType.OFFENSIVE_SPLITTING, color: COLOR_ORANGE, description: 'Splitting brick' },
+  'B': { type: BrickType.OFFENSIVE_BOMB, color: COLOR_RED_ORANGE, description: 'Bomb brick' },
+  'D': { type: BrickType.OFFENSIVE_DYNAMITE, color: COLOR_RED, description: 'Dynamite brick' },
+  'O': { type: BrickType.OFFENSIVE_MULTIBALL, color: COLOR_HOT_PINK, description: 'Multi-ball brick' },
+  '1': { type: BrickType.BOSS_1, color: COLOR_PURPLE, description: 'Boss 1 - The Thrower' },
+  '2': { type: BrickType.BOSS_2, color: '#00ccff', description: 'Boss 2 - The Shielder' },
+  '3': { type: BrickType.BOSS_3, color: '#cc00ff', description: 'Boss 3 - The Splitter' },
+};
 
 /**
  * Create bricks from a visual pattern
  * ' ' = empty space
- * 'N' = NORMAL brick (1 health)
- * 'H' = HEALTHY brick (3 health)
- * 'I' = INDESTRUCTIBLE brick (infinite health)
- * 'F' = OFFENSIVE_FALLING brick (falls when destroyed)
- * 'E' = OFFENSIVE_EXPLODING brick (explodes into debris)
- * 'L' = OFFENSIVE_LASER brick (shoots laser at bat)
- * 'M' = OFFENSIVE_HOMING brick (spawns homing missile)
- * 'S' = OFFENSIVE_SPLITTING brick (splits into 4 diagonal fragments)
- * 'B' = OFFENSIVE_BOMB brick (damages surrounding bricks in 1-brick radius)
- * 'D' = OFFENSIVE_DYNAMITE brick (stays in place, flashes, and explodes after 3 seconds)
- * '1' = BOSS_1 brick (boss brick with special mechanics)
- * '2' = BOSS_2 brick (boss brick with rotating shield)
- * '3' = BOSS_3 brick (boss brick that splits into copies)
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
@@ -30,43 +60,50 @@ export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
     const line = pattern[row];
     for (let col = 0; col < line.length; col++) {
       const char = line[col];
+      const config = BRICK_CHAR_MAP[char];
       
-      let type: BrickType | null = null;
-      if (char === 'N') {
-        type = BrickType.NORMAL;
-      } else if (char === 'H') {
-        type = BrickType.HEALTHY;
-      } else if (char === 'I') {
-        type = BrickType.INDESTRUCTIBLE;
-      } else if (char === 'F') {
-        type = BrickType.OFFENSIVE_FALLING;
-      } else if (char === 'E') {
-        type = BrickType.OFFENSIVE_EXPLODING;
-      } else if (char === 'L') {
-        type = BrickType.OFFENSIVE_LASER;
-      } else if (char === 'M') {
-        type = BrickType.OFFENSIVE_HOMING;
-      } else if (char === 'S') {
-        type = BrickType.OFFENSIVE_SPLITTING;
-      } else if (char === 'B') {
-        type = BrickType.OFFENSIVE_BOMB;
-      } else if (char === 'D') {
-        type = BrickType.OFFENSIVE_DYNAMITE;
-      } else if (char === '1') {
-        type = BrickType.BOSS_1;
-      } else if (char === '2') {
-        type = BrickType.BOSS_2;
-      } else if (char === '3') {
-        type = BrickType.BOSS_3;
-      }
-      
-      if (type !== null) {
-        bricks.push({ col, row, type });
+      if (config !== undefined) {
+        bricks.push({ col, row, type: config.type });
       }
     }
   }
   
   return bricks;
+}
+
+/**
+ * Get brick color by pattern character
+ */
+export function getBrickColorByChar(char: string): string | undefined {
+  return BRICK_CHAR_MAP[char]?.color;
+}
+
+/**
+ * Get brick type by pattern character
+ */
+export function getBrickTypeByChar(char: string): BrickType | undefined {
+  return BRICK_CHAR_MAP[char]?.type;
+}
+
+/**
+ * Get all brick pattern characters with their configurations
+ */
+export function getAllBrickConfigs(): Record<string, BrickCharConfig> {
+  return { ...BRICK_CHAR_MAP };
+}
+
+/**
+ * Get brick color by brick type
+ */
+export function getBrickColorByType(type: BrickType): string {
+  // Find the config entry that matches this type
+  for (const config of Object.values(BRICK_CHAR_MAP)) {
+    if (config.type === type) {
+      return config.color;
+    }
+  }
+  // Fallback to white if type not found
+  return '#ffffff';
 }
 
 /**

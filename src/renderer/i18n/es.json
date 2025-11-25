@@ -57,7 +57,8 @@
       "level9Name": "Nivel 9: Cruz de Dinamita",
       "level10Name": "Nivel 10: Caos Ofensivo",
       "level11Name": "Nivel 11: Diamante Explosivo",
-      "level12Name": "Nivel 12: Jefe Final - El Divisor"
+      "level12Name": "Nivel 12: Jefe Final - El Divisor",
+      "level13Name": "Nivel 13: Prueba Multi-Bola"
     },
     "bricks": {
       "offensive": {

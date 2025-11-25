@@ -4,9 +4,14 @@ Just some notes about future features so that I don't forget
 
 ## Future Features
 
+- [] new special bricks
+    - [] Multi-ball
+    - [] 15 second piercing
+    - [] make explosive brick much more damaging and wider
+- [] multi-lasers that hit the same brick should show damage per laser - this is about moving the damage above the block to a horizontal position where the damage was taken
 - [X] 0.0 brick health should destroy brick
 - [X] Final boss spawned blocks do not damage bat (the thrown bricks do damage bat as expected)
-- [] Greyed out ball should reset to normal ball if it hits the edge or top of the screen (as well as the other current resets)
+- [?] Greyed out ball should reset to normal ball if it hits the edge or top of the screen (as well as the other current resets)
 - [] Quit buttons no longer work
 - [X] achievements screen should implement a scroll pane
 - [X] Add a tutorial screen on level 1 start with gameplay instructions and OK button
@@ -18,7 +23,7 @@ Just some notes about future features so that I don't forget
 - [X] Indestructible bricks
 - [X] space out the bosses every 3 levels
 - [] create more bosses
-    - [] Boss3: "The Splitter"
+    - [X] Boss3: "The Splitter"
         * Core mechanic: When damaged below 50% health, splits into 2-3 smaller copies
         * Attacks: Each copy fires splitting fragments in different patterns
         * Movement: Smaller copies move faster and more erratically

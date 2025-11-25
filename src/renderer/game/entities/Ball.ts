@@ -14,6 +14,7 @@ import {
   BALL_TAIL_SEGMENTS,
   BALL_TAIL_MAX_SPEED_MULTIPLIER,
   BALL_TAIL_GLOW_BLUR,
+  PIERCING_BALL_COLOR,
   PIERCING_WARNING_DURATION,
   PIERCING_FLASH_INTERVAL,
   COLOR_CYAN,
@@ -97,7 +98,7 @@ export class Ball {
         const flashCycle = Math.floor(this.piercingTimeRemaining / PIERCING_FLASH_INTERVAL) % 2;
         color = flashCycle === 0 ? COLOR_WHITE : COLOR_RED;
       } else {
-        color = COLOR_RED; // Neon red when piercing
+        color = PIERCING_BALL_COLOR; // Lime green when piercing
       }
     }
 
@@ -216,6 +217,44 @@ export class Ball {
       x: Math.cos(radians) * this.currentSpeed,
       y: Math.sin(radians) * this.currentSpeed,
     };
+  }
+
+  /**
+   * Set velocity from angle and speed (for multi-ball spawning)
+   */
+  setVelocityFromAngle(angle: number, speed: number): void {
+    const radians = (angle * Math.PI) / 180;
+    this.velocity = {
+      x: Math.cos(radians) * speed,
+      y: Math.sin(radians) * speed,
+    };
+  }
+
+  /**
+   * Clone this ball with all its properties (for multi-ball)
+   */
+  clone(): Ball {
+    const clonedBall = new Ball(
+      this.position.x,
+      this.position.y,
+      this.radius,
+      this.initialSpeed
+    );
+    
+    // Copy all state
+    clonedBall.velocity = { ...this.velocity };
+    clonedBall.currentSpeed = this.currentSpeed;
+    clonedBall.damage = this.damage;
+    clonedBall.elapsedTime = this.elapsedTime;
+    clonedBall.accelerationMultiplier = this.accelerationMultiplier;
+    clonedBall.isGrey = this.isGrey;
+    clonedBall.isPiercing = this.isPiercing;
+    clonedBall.piercingTimeRemaining = this.piercingTimeRemaining;
+    // Don't copy sticky state - new balls should be free
+    clonedBall.isSticky = false;
+    clonedBall.isInitialSticky = false;
+    
+    return clonedBall;
   }
 
   /**

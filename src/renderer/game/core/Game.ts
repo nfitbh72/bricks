@@ -43,13 +43,17 @@ import {
   BOSS2_HEALTH_MULTIPLIER,
   BOSS2_SPAWN_OFFSET_Y,
   BOSS3_HEALTH_MULTIPLIER,
-  BOSS3_SPAWN_OFFSET_Y
+  BOSS3_SPAWN_OFFSET_Y,
+  MULTIBALL_MIN_ANGLE,
+  MULTIBALL_MAX_ANGLE,
+  MULTIBALL_SPAWN_COUNT,
+  MULTIBALL_DESPAWN_PARTICLE_COUNT
 } from '../../config/constants';
 
 export class Game {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private ball: Ball;
+  private balls: Ball[] = [];
   private bat: Bat;
   private level: Level | null = null;
   private statusBar: StatusBar;
@@ -135,7 +139,8 @@ export class Game {
     this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, BAT_SPEED);
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
     
-    this.ball = new Ball(centerX, ballY, ballRadius, ballSpeed);
+    const initialBall = new Ball(centerX, ballY, ballRadius, ballSpeed);
+    this.balls = [initialBall];
 
     // Initialize status bar
     this.statusBar = new StatusBar(canvas.width, canvas.height);
@@ -249,10 +254,11 @@ export class Game {
           // 1. Ball is in initial sticky state (level start), OR
           // 2. Ball is sticky but sticky bat upgrade is not active
           // Otherwise shoot laser if ball is not sticky
-          if (this.ball.getIsSticky() && (this.ball.getIsInitialSticky() || !this.gameUpgrades.hasStickyBat())) {
-            this.ball.launchFromSticky();
-          } else if (!this.ball.getIsSticky()) {
-            this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+          const primaryBall = this.getPrimaryBall();
+          if (primaryBall.getIsSticky() && (primaryBall.getIsInitialSticky() || !this.gameUpgrades.hasStickyBat())) {
+            primaryBall.launchFromSticky();
+          } else if (!primaryBall.getIsSticky()) {
+            this.weaponManager.shootLaser(this.bat, primaryBall, this.gameUpgrades);
           }
         }
       },
@@ -278,17 +284,19 @@ export class Game {
         // This prevents tutorial/dialog dismissal from also launching the ball
         if (stateBeforeClick === GameState.PLAYING) {
           // Launch ball if sticky, otherwise shoot laser
-          if (this.ball.getIsSticky()) {
-            this.ball.launchFromSticky();
+          const primaryBall = this.getPrimaryBall();
+          if (primaryBall.getIsSticky()) {
+            primaryBall.launchFromSticky();
           } else {
-            this.weaponManager.shootLaser(this.bat, this.ball, this.gameUpgrades);
+            this.weaponManager.shootLaser(this.bat, primaryBall, this.gameUpgrades);
           }
         }
       },
       onRightClick: (_x: number, _y: number) => {
         // Only shoot bombs during active gameplay
-        if (this.gameState === GameState.PLAYING && !this.ball.getIsSticky()) {
-          this.weaponManager.shootBomb(this.bat, this.ball, this.gameUpgrades);
+        const primaryBall = this.getPrimaryBall();
+        if (this.gameState === GameState.PLAYING && !primaryBall.getIsSticky()) {
+          this.weaponManager.shootBomb(this.bat, primaryBall, this.gameUpgrades);
         }
       },
     });
@@ -311,6 +319,12 @@ export class Game {
           return;
         }
 
+        // Handle multi-ball brick - spawn additional balls
+        if (brickType === BrickType.OFFENSIVE_MULTIBALL && this.balls.length > 0) {
+          // Use first ball as source for cloning
+          this.spawnAdditionalBalls(this.balls[0], MULTIBALL_SPAWN_COUNT);
+        }
+        
         // Spawn offensive entities based on brick type (falling bricks, lasers, missiles, etc.)
         const batCenterX = this.bat.getCenterX();
         const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
@@ -509,7 +523,7 @@ export class Game {
       canvas: this.canvas,
       ctx: this.ctx,
       bat: this.bat,
-      ball: this.ball,
+      ball: this.getPrimaryBall(),
       gameUpgrades: this.gameUpgrades,
       screenManager: this.screenManager,
       audioManager: this.audioManager,
@@ -745,7 +759,7 @@ export class Game {
     this.achievementTracker.onLevelStart(levelConfig.id, this.playerHealth, hasBoss);
     
     // Calculate bomb damage using multiplier constant
-    this.bombDamage = this.ball.getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
+    this.bombDamage = this.getPrimaryBall().getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
     
     // Reset slow-motion state
     this.slowMotionManager.reset();
@@ -781,12 +795,18 @@ export class Game {
     this.inputManager.setMousePosition(centerX, batY + batHeight / 2);
     
     this.bat.setPosition(centerX - batWidth / 2, batY); // Center bat
-    this.ball.reset();
-    this.ball.setPosition(centerX, ballY);
+    
+    // Reset all balls to single ball at start position
+    const primaryBall = this.getPrimaryBall();
+    primaryBall.reset();
+    primaryBall.setPosition(centerX, ballY);
+    
+    // Remove any extra balls from previous level
+    this.balls = [primaryBall];
     
     // Make ball sticky at level start - position on top of bat
-    const ballRadius = this.ball.getRadius();
-    this.ball.setSticky(true, 0, -ballRadius, true); // true = initial sticky
+    const ballRadius = primaryBall.getRadius();
+    primaryBall.setSticky(true, 0, -ballRadius, true); // true = initial sticky
   }
 
   /**
@@ -860,8 +880,9 @@ export class Game {
       return; // Pause updates when not playing or paused
     }
 
-    // Update level timer only if ball is not sticky (use real deltaTime)
-    if (!this.ball.getIsSticky()) {
+    // Update level timer only if primary ball is not sticky (use real deltaTime)
+    const primaryBall = this.getPrimaryBall();
+    if (!primaryBall.getIsSticky()) {
       this.levelTime += deltaTime;
       this.statusBar.setLevelTime(this.levelTime);
     }
@@ -872,14 +893,14 @@ export class Game {
     // Handle input (use effective deltaTime for movement)
     this.handleInput(effectiveDeltaTime);
 
-    // Update sticky ball position to follow bat
-    if (this.ball.getIsSticky()) {
-      this.ball.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
+    // Update sticky ball position to follow bat (only primary ball can be sticky)
+    if (primaryBall.getIsSticky()) {
+      primaryBall.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
       
       // If sticky bat upgrade is active AND this is not the initial sticky state,
       // launch when Space is released
-      if (this.gameUpgrades.hasStickyBat() && !this.ball.getIsInitialSticky() && !this.inputManager.isSpaceHeld()) {
-        this.ball.launchFromSticky();
+      if (this.gameUpgrades.hasStickyBat() && !primaryBall.getIsInitialSticky() && !this.inputManager.isSpaceHeld()) {
+        primaryBall.launchFromSticky();
       }
     }
 
@@ -890,9 +911,11 @@ export class Game {
       this.bat.setTurretCount(this.gameUpgrades.getTotalShooterCount());
     }
 
-    // Update ball only if not sticky (use effective deltaTime for slow-mo)
-    if (!this.ball.getIsSticky()) {
-      this.ball.update(effectiveDeltaTime);
+    // Update all balls (use effective deltaTime for slow-mo)
+    for (const ball of this.balls) {
+      if (!ball.getIsSticky()) {
+        ball.update(effectiveDeltaTime);
+      }
     }
 
     // Update weapons (use effective deltaTime for slow-mo)
@@ -940,42 +963,68 @@ export class Game {
     // Remove destroyed copies
     this.bossCopies = this.bossCopies.filter(c => c.isActive());
 
-    // Update collision manager (use effective deltaTime for slow-mo)
-    this.collisionManager.update(effectiveDeltaTime, this.ball);
+    // Update collision manager for all balls (use effective deltaTime for slow-mo)
+    for (const ball of this.balls) {
+      this.collisionManager.update(effectiveDeltaTime, ball);
+    }
 
     // Update visual effects (use effective deltaTime for slow-mo)
     this.effectsManager.update(effectiveDeltaTime);
 
-    // Check wall collisions only if ball is not sticky (bottom boundary is status bar top)
-    if (!this.ball.getIsSticky()) {
-      const statusBarTop = this.statusBar.getY();
-      const hitBackWall = this.ball.checkWallCollisions(
-        0,
-        this.canvas.width,
-        0,
-        statusBarTop
-      );
+    // Check wall collisions for all balls (bottom boundary is status bar top)
+    const statusBarTop = this.statusBar.getY();
+    const ballsToRemove: Ball[] = [];
+    
+    for (const ball of this.balls) {
+      if (!ball.getIsSticky()) {
+        const hitBackWall = ball.checkWallCollisions(
+          0,
+          this.canvas.width,
+          0,
+          statusBarTop
+        );
 
-      if (hitBackWall) {
-        this.playerHealth--;
-        this.statusBar.setPlayerHealth(this.playerHealth);
-        // Trigger screen shake on back wall hit
-        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BACK_WALL_INTENSITY, SCREEN_SHAKE_BACK_WALL_DURATION);
+        if (hitBackWall) {
+          // Multi-ball logic: if more than one ball, despawn this ball
+          if (this.balls.length > 1) {
+            ballsToRemove.push(ball);
+            // Spawn particles for visual feedback
+            const ballPos = ball.getPosition();
+            this.effectsManager.createParticles(
+              ballPos.x,
+              ballPos.y,
+              MULTIBALL_DESPAWN_PARTICLE_COUNT,
+              ball.getIsGrey() ? '#808080' : '#00ffff',
+              150
+            );
+          } else {
+            // Last ball: lose health and trigger screen shake
+            this.playerHealth--;
+            this.statusBar.setPlayerHealth(this.playerHealth);
+            this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BACK_WALL_INTENSITY, SCREEN_SHAKE_BACK_WALL_DURATION);
+          }
+        }
       }
     }
+    
+    // Remove balls that hit bottom (when multiple balls exist)
+    if (ballsToRemove.length > 0) {
+      this.balls = this.balls.filter(ball => !ballsToRemove.includes(ball));
+    }
 
-    // Check if we should trigger slow-motion (1 brick left, ball approaching)
+    // Check if we should trigger slow-motion (1 brick left, any ball approaching)
+    // Use primary ball for slow-motion check
     this.slowMotionManager.checkAndTrigger(
       this.level,
-      this.ball,
+      primaryBall,
       this.statusBar,
       this.effectsManager,
       this.canvas.width,
       this.canvas.height
     );
 
-    // Check collisions only if ball is not sticky
-    if (!this.ball.getIsSticky()) {
+    // Check collisions for all balls
+    if (!primaryBall.getIsSticky()) {
       this.checkCollisions();
     }
 
@@ -1100,13 +1149,14 @@ export class Game {
     // Get keyboard movement input
     const movement = this.inputManager.getMovementInput();
     
-    // If ball is sticky, left/right arrows adjust launch angle (works in both mouse and keyboard mode)
-    if (this.ball.getIsSticky()) {
+    // If primary ball is sticky, left/right arrows adjust launch angle (works in both mouse and keyboard mode)
+    const primaryBall = this.getPrimaryBall();
+    if (primaryBall.getIsSticky()) {
       if (movement.left) {
-        this.ball.adjustLaunchAngle(-2); // Adjust left (more negative angle)
+        primaryBall.adjustLaunchAngle(-2); // Adjust left (more negative angle)
       }
       if (movement.right) {
-        this.ball.adjustLaunchAngle(2); // Adjust right (less negative angle)
+        primaryBall.adjustLaunchAngle(2); // Adjust right (less negative angle)
       }
     }
     
@@ -1116,8 +1166,8 @@ export class Game {
       this.bat.setMousePosition(mousePos.x, mousePos.y);
     } else {
       // Keyboard control (WASD + Arrow keys)
-      // Only move bat if ball is not sticky
-      if (!this.ball.getIsSticky()) {
+      // Only move bat if primary ball is not sticky
+      if (!primaryBall.getIsSticky()) {
         if (movement.left) {
           this.bat.moveLeft(deltaTime);
         }
@@ -1141,26 +1191,29 @@ export class Game {
   private checkCollisions(): void {
     if (!this.level) return;
 
-    // Ball-Bat collision
-    // If sticky bat is unlocked and Space is held, make ball sticky on contact
-    if (this.gameUpgrades.hasStickyBat() && this.inputManager.isSpaceHeld() && !this.ball.getIsSticky()) {
-      const ballBounds = this.ball.getBounds();
+    // Ball-Bat collision for all balls
+    // Only primary ball can become sticky
+    const primaryBall = this.getPrimaryBall();
+    if (this.gameUpgrades.hasStickyBat() && this.inputManager.isSpaceHeld() && !primaryBall.getIsSticky()) {
+      const ballBounds = primaryBall.getBounds();
       const batBounds = this.bat.getBounds();
-      const ballRadius = this.ball.getRadius();
+      const ballRadius = primaryBall.getRadius();
       
-      // Check if ball is touching bat
+      // Check if primary ball is touching bat
       if (ballBounds.y + ballRadius >= batBounds.y &&
           ballBounds.x + ballRadius >= batBounds.x &&
           ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
-        // Make ball sticky on top of bat (not initial, so uses hold/release behavior)
-        this.ball.setSticky(true, 0, -ballRadius, false);
+        // Make primary ball sticky on top of bat (not initial, so uses hold/release behavior)
+        primaryBall.setSticky(true, 0, -ballRadius, false);
       }
     }
     
-    this.collisionManager.checkBallBatCollision(this.ball, this.bat);
-
-    // Ball-Brick collisions
-    this.collisionManager.checkBallBrickCollisions(this.ball, this.level, this.gameUpgrades);
+    // Check collisions for all balls
+    for (const ball of this.balls) {
+      this.collisionManager.checkBallBatCollision(ball, this.bat);
+      // Ball-Brick collisions
+      this.collisionManager.checkBallBrickCollisions(ball, this.level, this.gameUpgrades);
+    }
 
     // Laser-Brick collisions
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
@@ -1178,15 +1231,16 @@ export class Game {
       this.offensiveEntityManager.getDynamiteSticks(),
       this.bat,
       this.level.getActiveBricks(),
-      this.ball.getDamage()
+      primaryBall.getDamage()
     );
 
     // Boss collisions
     if (this.boss && this.boss.isActive()) {
-      // Ball-Boss collision
-      this.collisionManager.checkBossBallCollisions(
-        this.boss,
-        this.ball,
+      // Ball-Boss collision for all balls
+      for (const ball of this.balls) {
+        this.collisionManager.checkBossBallCollisions(
+          this.boss,
+          ball,
         (damage, x, y) => {
           // Create particles and damage number
           this.effectsManager.createParticles(x, y, 8, '#ff0000', 100);
@@ -1218,6 +1272,7 @@ export class Game {
           this.effectsManager.createParticles(x, y, 5, '#00ccff', 80);
         }
       );
+      }
 
       // Thrown brick-Bat collision
       this.collisionManager.checkBossThrownBrickCollisions(
@@ -1242,32 +1297,35 @@ export class Game {
     // Boss copy collisions (for Boss3 split copies)
     for (const copy of this.bossCopies) {
       if (copy.isActive()) {
-        this.collisionManager.checkBossBallCollisions(
-          copy,
-          this.ball,
-          (damage, x, y) => {
-            this.effectsManager.createParticles(x, y, 8, '#cc00ff', 100);
-            this.effectsManager.addDamageNumber(x, y - 5, damage, false);
-          },
-          (x, y) => {
-            this.effectsManager.createParticles(x, y, 30, '#cc00ff', 200);
-            
-            // Track boss copy defeat for achievements
-            let bossType: string;
-            if (copy instanceof Boss1) {
-              bossType = 'BOSS_1';
-            } else if (copy instanceof Boss2) {
-              bossType = 'BOSS_2';
-            } else if (copy instanceof Boss3) {
-              bossType = 'BOSS_3';
-            } else {
-              bossType = 'UNKNOWN';
+        // Check collisions with all balls
+        for (const ball of this.balls) {
+          this.collisionManager.checkBossBallCollisions(
+            copy,
+            ball,
+            (damage, x, y) => {
+              this.effectsManager.createParticles(x, y, 8, '#cc00ff', 100);
+              this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+            },
+            (x, y) => {
+              this.effectsManager.createParticles(x, y, 30, '#cc00ff', 200);
+              
+              // Track boss copy defeat for achievements
+              let bossType: string;
+              if (copy instanceof Boss1) {
+                bossType = 'BOSS_1';
+              } else if (copy instanceof Boss2) {
+                bossType = 'BOSS_2';
+              } else if (copy instanceof Boss3) {
+                bossType = 'BOSS_3';
+              } else {
+                bossType = 'UNKNOWN';
+              }
+              this.achievementTracker.onBossDefeated(bossType).catch(error => {
+                console.warn('Achievement tracker error:', error);
+              });
             }
-            this.achievementTracker.onBossDefeated(bossType).catch(error => {
-              console.warn('Achievement tracker error:', error);
-            });
-          }
-        );
+          );
+        }
         
         this.collisionManager.checkBossThrownBrickCollisions(
           copy,
@@ -1315,7 +1373,7 @@ export class Game {
     this.renderManager.renderGameplay(
       this.level,
       this.bat,
-      this.ball,
+      this.balls,
       this.statusBar,
       this.effectsManager,
       this.weaponManager,
@@ -1353,10 +1411,17 @@ export class Game {
   }
 
   /**
-   * Get ball reference (for testing)
+   * Get balls reference (for testing)
+   */
+  getBalls(): Ball[] {
+    return this.balls;
+  }
+  
+  /**
+   * Get primary ball reference (for testing)
    */
   getBall(): Ball {
-    return this.ball;
+    return this.getPrimaryBall();
   }
 
   /**
@@ -1378,5 +1443,25 @@ export class Game {
    */
   setGameState(state: GameState): void {
     this.gameState = state;
+  }
+
+  /**
+   * Get primary ball (first ball, used for sticky ball logic and weapon targeting)
+   */
+  private getPrimaryBall(): Ball {
+    return this.balls[0];
+  }
+
+  /**
+   * Spawn additional balls from a source ball (for multi-ball brick)
+   */
+  private spawnAdditionalBalls(sourceBall: Ball, count: number): void {
+    for (let i = 0; i < count; i++) {
+      const newBall = sourceBall.clone();
+      // Random angle in upward range (avoid downward angles)
+      const randomAngle = MULTIBALL_MIN_ANGLE + Math.random() * (MULTIBALL_MAX_ANGLE - MULTIBALL_MIN_ANGLE);
+      newBall.setVelocityFromAngle(randomAngle, sourceBall.getSpeed());
+      this.balls.push(newBall);
+    }
   }
 }

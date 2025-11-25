@@ -57,7 +57,8 @@
       "level9Name": "レベル9：ダイナマイト十字",
       "level10Name": "レベル10：攻撃の混沌",
       "level11Name": "レベル11：爆発ダイヤモンド",
-      "level12Name": "レベル12：最終ボス - 分裂者"
+      "level12Name": "レベル12：最終ボス - 分裂者",
+      "level13Name": "レベル13：マルチボールテスト"
     },
     "bricks": {
       "offensive": {
