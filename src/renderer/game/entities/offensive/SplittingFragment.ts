@@ -13,8 +13,9 @@ import {
   COLOR_BLACK,
   COLOR_WHITE,
 } from '../../../config/constants';
+import { IEntity, Bounds } from '../../core/IEntity';
 
-export class SplittingFragment {
+export class SplittingFragment implements IEntity {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly size: number = SPLITTING_FRAGMENT_SIZE;
@@ -63,7 +64,7 @@ export class SplittingFragment {
     // Handle shaking phase
     if (this.isShaking) {
       this.shakeTimer += deltaTime;
-      
+
       if (this.shakeTimer >= SPLITTING_FRAGMENT_SHAKE_DURATION) {
         // End shake, start falling
         this.isShaking = false;
@@ -138,7 +139,8 @@ export class SplittingFragment {
   /**
    * Get fragment bounds for collision detection
    */
-  getBounds(): { x: number; y: number; width: number; height: number } {
+  getBounds(): Bounds | null {
+    if (!this.active) return null;
     return {
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

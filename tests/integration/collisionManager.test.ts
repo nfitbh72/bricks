@@ -7,9 +7,12 @@ import { CollisionManager } from '../../src/renderer/game/managers/CollisionMana
 import { Ball } from '../../src/renderer/game/entities/Ball';
 import { Bat } from '../../src/renderer/game/entities/Bat';
 import { Level } from '../../src/renderer/game/entities/Level';
+import { LevelFactory } from '../../src/renderer/game/factories/LevelFactory';
 import { Laser } from '../../src/renderer/game/weapons/Laser';
 import { GameUpgrades } from '../../src/renderer/game/systems/GameUpgrades';
 import { LevelConfig, BrickType, UpgradeType } from '../../src/renderer/game/core/types';
+import { GameContext } from '../../src/renderer/game/core/GameContext';
+import { GameEvents } from '../../src/renderer/game/core/EventManager';
 
 describe('CollisionManager Integration', () => {
   let collisionManager: CollisionManager;
@@ -17,8 +20,13 @@ describe('CollisionManager Integration', () => {
   let bat: Bat;
   let gameUpgrades: GameUpgrades;
 
+  let context: GameContext;
+  let emitSpy: jest.SpyInstance;
+
   beforeEach(() => {
-    collisionManager = new CollisionManager();
+    context = new GameContext();
+    emitSpy = jest.spyOn(context.eventManager, 'emit');
+    collisionManager = new CollisionManager(context);
     ball = new Ball(400, 300, 10, 300);
     bat = new Bat(350, 500, 100, 10, 300);
     gameUpgrades = new GameUpgrades();
@@ -84,13 +92,10 @@ describe('CollisionManager Integration', () => {
         ],
         baseHealth: 1,
       };
-      level = new Level(levelConfig, 800);
+      level = LevelFactory.createLevel(levelConfig, 800);
     });
 
     it('should damage normal brick on collision', () => {
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
-
       const bricks = level.getActiveBricks();
       const normalBrick = bricks.find(b => !b.isIndestructible() && b.getMaxHealth() === 1);
       expect(normalBrick).toBeDefined();
@@ -102,14 +107,11 @@ describe('CollisionManager Integration', () => {
 
         collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
-        expect(onBrickHit).toHaveBeenCalled();
+        expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
       }
     });
 
     it('should destroy brick when health reaches zero', () => {
-      const onBrickDestroyed = jest.fn();
-      collisionManager.setCallbacks({ onBrickDestroyed });
-
       const bricks = level.getActiveBricks();
       const normalBrick = bricks.find(b => !b.isIndestructible() && b.getMaxHealth() === 1);
 
@@ -120,16 +122,12 @@ describe('CollisionManager Integration', () => {
 
         collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
-        expect(onBrickDestroyed).toHaveBeenCalled();
+        expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
         expect(normalBrick.isDestroyed()).toBe(true);
       }
     });
 
     it('should not destroy indestructible bricks', () => {
-      const onBrickHit = jest.fn();
-      const onBrickDestroyed = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit, onBrickDestroyed });
-
       const bricks = level.getActiveBricks();
       const indestructibleBrick = bricks.find(b => b.isIndestructible());
       expect(indestructibleBrick).toBeDefined();
@@ -144,8 +142,12 @@ describe('CollisionManager Integration', () => {
 
         expect(indestructibleBrick.getHealth()).toBe(initialHealth);
         expect(indestructibleBrick.isDestroyed()).toBe(false);
-        expect(onBrickHit).toHaveBeenCalledWith(indestructibleBrick, 0, false); // Called for sound, but 0 damage
-        expect(onBrickDestroyed).not.toHaveBeenCalled();
+        expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.objectContaining({
+          brick: indestructibleBrick,
+          damage: 0,
+          isCritical: false
+        }));
+        expect(emitSpy).not.toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
       }
     });
 
@@ -154,9 +156,6 @@ describe('CollisionManager Integration', () => {
       upgrades.set(UpgradeType.BALL_ADD_CRITICAL_HITS, 1);
       gameUpgrades.setUpgradeLevels(upgrades);
 
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
-
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
       const bounds = brick.getBounds();
@@ -164,15 +163,16 @@ describe('CollisionManager Integration', () => {
       // Try multiple times to get a critical hit (10% chance)
       let gotCritical = false;
       for (let i = 0; i < 100 && !gotCritical; i++) {
-        onBrickHit.mockClear();
+        emitSpy.mockClear();
         brick.setHealth(10);
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 
         collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
-        if (onBrickHit.mock.calls.length > 0) {
-          const isCritical = onBrickHit.mock.calls[0][2];
-          if (isCritical) {
+        const calls = emitSpy.mock.calls.filter(call => call[0] === GameEvents.BRICK_HIT);
+        if (calls.length > 0) {
+          const data = calls[0][1];
+          if (data.isCritical) {
             gotCritical = true;
           }
         }
@@ -187,9 +187,6 @@ describe('CollisionManager Integration', () => {
       upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
       gameUpgrades.setUpgradeLevels(upgrades);
 
-      const onExplosionDamage = jest.fn();
-      collisionManager.setCallbacks({ onExplosionDamage });
-
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
       const bounds = brick.getBounds();
@@ -198,16 +195,13 @@ describe('CollisionManager Integration', () => {
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should trigger explosion damage to nearby bricks
-      expect(onExplosionDamage).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith('explosion_damage', expect.anything());
     });
 
     it('should not trigger explosions when hitting indestructible bricks', () => {
       const upgrades = new Map<string, number>();
       upgrades.set(UpgradeType.BALL_EXPLOSIONS, 1);
       gameUpgrades.setUpgradeLevels(upgrades);
-
-      const onExplosionDamage = jest.fn();
-      collisionManager.setCallbacks({ onExplosionDamage });
 
       const bricks = level.getActiveBricks();
       const indestructibleBrick = bricks.find(b => b.isIndestructible());
@@ -220,7 +214,7 @@ describe('CollisionManager Integration', () => {
         collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         // Should NOT trigger explosion damage for indestructible bricks
-        expect(onExplosionDamage).not.toHaveBeenCalled();
+        expect(emitSpy).not.toHaveBeenCalledWith('explosion_damage', expect.anything());
       }
     });
 
@@ -228,9 +222,6 @@ describe('CollisionManager Integration', () => {
       const upgrades = new Map<string, number>();
       upgrades.set(UpgradeType.BALL_ADD_PIERCING, 1);
       gameUpgrades.setUpgradeLevels(upgrades);
-
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
 
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
@@ -240,7 +231,7 @@ describe('CollisionManager Integration', () => {
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should hit brick (piercing allows hitting multiple)
-      expect(onBrickHit).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
     });
   });
 
@@ -258,14 +249,11 @@ describe('CollisionManager Integration', () => {
         ],
         baseHealth: 1,
       };
-      level = new Level(levelConfig, 800);
+      level = LevelFactory.createLevel(levelConfig, 800);
       lasers = [];
     });
 
     it('should damage brick when laser hits', () => {
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
-
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
       const bounds = brick.getBounds();
@@ -280,7 +268,7 @@ describe('CollisionManager Integration', () => {
 
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
-      expect(onBrickHit).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
     });
 
     it('should deactivate laser after hitting brick', () => {
@@ -304,9 +292,6 @@ describe('CollisionManager Integration', () => {
     });
 
     it('should destroy brick when laser damage is sufficient', () => {
-      const onBrickDestroyed = jest.fn();
-      collisionManager.setCallbacks({ onBrickDestroyed });
-
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
       const bounds = brick.getBounds();
@@ -321,14 +306,11 @@ describe('CollisionManager Integration', () => {
 
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
-      expect(onBrickDestroyed).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
       expect(brick.isDestroyed()).toBe(true);
     });
 
     it('should handle multiple lasers hitting different bricks', () => {
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
-
       const bricks = level.getActiveBricks();
 
       // Create laser for each brick
@@ -345,13 +327,12 @@ describe('CollisionManager Integration', () => {
 
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
-      expect(onBrickHit).toHaveBeenCalledTimes(bricks.length);
+      // Check that BRICK_HIT was emitted for each brick
+      const hitEvents = emitSpy.mock.calls.filter(call => call[0] === GameEvents.BRICK_HIT);
+      expect(hitEvents.length).toBe(bricks.length);
     });
 
     it('should not check inactive lasers', () => {
-      const onBrickHit = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit });
-
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
       const bounds = brick.getBounds();
@@ -367,35 +348,11 @@ describe('CollisionManager Integration', () => {
 
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
-      expect(onBrickHit).not.toHaveBeenCalled();
+      expect(emitSpy).not.toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
     });
   });
 
-  describe('Callback System', () => {
-    it('should accept and store callbacks', () => {
-      const callbacks = {
-        onBrickHit: jest.fn(),
-        onBrickDestroyed: jest.fn(),
-        onExplosionDamage: jest.fn(),
-      };
 
-      expect(() => {
-        collisionManager.setCallbacks(callbacks);
-      }).not.toThrow();
-    });
-
-    it('should work with partial callbacks', () => {
-      expect(() => {
-        collisionManager.setCallbacks({ onBrickHit: jest.fn() });
-      }).not.toThrow();
-    });
-
-    it('should work with empty callbacks', () => {
-      expect(() => {
-        collisionManager.setCallbacks({});
-      }).not.toThrow();
-    });
-  });
 
   describe('Integration Scenarios', () => {
     it('should handle complete collision workflow', () => {
@@ -407,11 +364,7 @@ describe('CollisionManager Integration', () => {
         ],
         baseHealth: 1,
       };
-      const level = new Level(levelConfig, 800);
-
-      const onBrickHit = jest.fn();
-      const onBrickDestroyed = jest.fn();
-      collisionManager.setCallbacks({ onBrickHit, onBrickDestroyed });
+      const level = LevelFactory.createLevel(levelConfig, 800);
 
       const bricks = level.getActiveBricks();
       const brick = bricks[0];
@@ -423,8 +376,9 @@ describe('CollisionManager Integration', () => {
 
       // Hit should destroy brick (1 damage = 1 health with baseHealth 1)
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
-      expect(onBrickHit).toHaveBeenCalledTimes(1);
-      expect(onBrickDestroyed).toHaveBeenCalledTimes(1);
+
+      expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
+      expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
       expect(brick.isDestroyed()).toBe(true);
 
       // Verify brick is destroyed
@@ -442,7 +396,7 @@ describe('CollisionManager Integration', () => {
         ],
         baseHealth: 2,
       };
-      const level = new Level(levelConfig, 800);
+      const level = LevelFactory.createLevel(levelConfig, 800);
 
       const bricks = level.getActiveBricks();
       expect(bricks).toHaveLength(3);

@@ -4,8 +4,9 @@
  */
 
 import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../../../config/constants';
+import { IEntity, Bounds } from '../../core/IEntity';
 
-export class FallingBrick {
+export class FallingBrick implements IEntity {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly width: number = BRICK_WIDTH;
@@ -71,7 +72,7 @@ export class FallingBrick {
     // Draw brick with gradient and rounded corners
     const cornerRadius = 3;
     ctx.fillStyle = gradient;
-    
+
     ctx.beginPath();
     ctx.moveTo(cornerRadius, 0);
     ctx.lineTo(w - cornerRadius, 0);
@@ -95,7 +96,7 @@ export class FallingBrick {
     ctx.strokeStyle = this.lightenColor(this.color, 50);
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.6;
-    
+
     const innerPadding = 2;
     ctx.beginPath();
     ctx.moveTo(cornerRadius + innerPadding, innerPadding);
@@ -116,7 +117,8 @@ export class FallingBrick {
   /**
    * Get brick bounds for collision detection
    */
-  getBounds(): { x: number; y: number; width: number; height: number } {
+  getBounds(): Bounds | null {
+    if (!this.active) return null;
     return {
       x: this.position.x,
       y: this.position.y,

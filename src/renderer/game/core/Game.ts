@@ -6,12 +6,39 @@ import { Ball } from '../entities/Ball';
 import { Bat } from '../entities/Bat';
 import { Brick } from '../entities/Brick';
 import { Level } from '../entities/Level';
+import { LevelFactory } from '../factories/LevelFactory';
 import { StatusBar } from '../ui/StatusBar';
 import { BaseBoss } from '../entities/offensive/BaseBoss';
 import { Boss1 } from '../entities/offensive/Boss1';
 import { Boss2 } from '../entities/offensive/Boss2';
 import { Boss3 } from '../entities/offensive/Boss3';
+import { GameContext } from '../core/GameContext';
+import { GameEvents } from '../core/EventManager';
+
+interface BrickHitEvent {
+  brick: Brick;
+  damage: number;
+  isCritical: boolean;
+  x?: number;
+  y?: number;
+}
+
+interface BrickDestroyedEvent {
+  brick: Brick;
+  x: number;
+  y: number;
+  isCritical: boolean;
+  ball?: Ball;
+}
+
+interface ExplosionDamageEvent {
+  brick: Brick;
+  damage: number;
+  x: number;
+  y: number;
+}
 import { GameState, LevelConfig, BrickType } from '../core/types';
+import { GameLoop } from './GameLoop';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { AudioManager } from '../managers/AudioManager';
 import { InputManager } from '../managers/InputManager';
@@ -24,11 +51,11 @@ import { SlowMotionManager } from '../managers/SlowMotionManager';
 import { StateTransitionHandler, StateTransitionContext } from '../managers/StateTransitionHandler';
 import { RenderManager } from '../managers/RenderManager';
 import { AchievementTracker } from '../managers/AchievementTracker';
-import { 
-  PLAYER_STARTING_HEALTH, 
-  BOMB_BRICK_DAMAGE_MULTIPLIER, 
-  BAT_WIDTH, 
-  BAT_HEIGHT, 
+import {
+  PLAYER_STARTING_HEALTH,
+  BOMB_BRICK_DAMAGE_MULTIPLIER,
+  BAT_WIDTH,
+  BAT_HEIGHT,
   BAT_SPEED,
   BALL_RADIUS,
   BALL_SPEED,
@@ -54,16 +81,14 @@ import {
 export class Game {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private context: GameContext;
   private balls: Ball[] = [];
   private bat: Bat;
   private level: Level | null = null;
   private statusBar: StatusBar;
   private gameState: GameState = GameState.INTRO;
   private playerHealth: number = PLAYER_STARTING_HEALTH;
-  private animationFrameId: number | null = null;
-  private lastTime: number = 0;
-  private accumulator: number = 0;
-  private readonly fixedTimeStep: number = 1 / 60; // 60 FPS
+  private gameLoop: GameLoop;
 
   // Managers
   private audioManager: AudioManager;
@@ -128,18 +153,21 @@ export class Game {
     const batHeight = BAT_HEIGHT;
     const ballRadius = BALL_RADIUS;
     const ballSpeed = BALL_SPEED;
-    
+
+    // Initialize game context
+    this.context = new GameContext();
+
     // Initialize upgrade manager
     this.gameUpgrades = new GameUpgrades();
     this.gameUpgrades.setBaseValues(batWidth, batHeight, ballSpeed, ballRadius);
-    
+
     const centerX = canvas.width / 2;
     const batY = canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
-    
+
     this.bat = new Bat(centerX - batWidth / 2, batY, batWidth, batHeight, BAT_SPEED);
     this.bat.setBounds(0, canvas.width, 0, canvas.height);
-    
+
     const initialBall = new Ball(centerX, ballY, ballRadius, ballSpeed);
     this.balls = [initialBall];
 
@@ -167,7 +195,7 @@ export class Game {
       onCloseTutorial: () => this.handleCloseTutorial(),
       onCloseAchievements: () => this.handleCloseAchievements(),
     });
-    
+
     // Set volume change callback for real-time updates
     this.screenManager.optionsScreen.setVolumeChangeCallback((musicVolume: number, sfxVolume: number) => {
       this.audioManager.setMusicVolume(musicVolume);
@@ -194,8 +222,8 @@ export class Game {
     this.setupInputCallbacks();
 
     // Initialize collision manager
-    this.collisionManager = new CollisionManager();
-    this.setupCollisionCallbacks();
+    this.collisionManager = new CollisionManager(this.context);
+    this.setupEventListeners();
 
     // Initialize weapon manager
     this.weaponManager = new WeaponManager();
@@ -214,7 +242,7 @@ export class Game {
 
     // Initialize achievement tracker
     this.achievementTracker = new AchievementTracker();
-    
+
     // Expose for debugging (remove in production)
     (window as unknown as Record<string, unknown>).achievementTracker = this.achievementTracker;
     (window as unknown as Record<string, unknown>).resetAchievements = () => this.achievementTracker.resetProgress();
@@ -224,12 +252,18 @@ export class Game {
 
     // Load background image
     this.loadBackgroundImage();
-    
+
     // Set achievement tracker in screen manager for progress display
     this.screenManager.setAchievementTracker(this.achievementTracker);
-    
+
     // Set game upgrades in screen manager for stats display
     this.screenManager.setGameUpgrades(this.gameUpgrades);
+
+    // Initialize game loop
+    this.gameLoop = new GameLoop(
+      (dt) => this.update(dt),
+      () => this.render()
+    );
   }
 
   /**
@@ -271,7 +305,7 @@ export class Game {
       },
       onMouseMove: (x: number, y: number) => {
         this.screenManager.handleMouseMove(x, y, this.gameState);
-        
+
         if (this.gameState === GameState.PLAYING) {
           this.inputManager.setMouseControl(true);
           this.canvas.style.cursor = 'none';
@@ -281,9 +315,9 @@ export class Game {
         // Capture state BEFORE screen handlers run to prevent click-through
         // when dialogs/screens transition to PLAYING state
         const stateBeforeClick = this.gameState;
-        
+
         this.screenManager.handleClick(x, y, this.gameState);
-        
+
         // Only process game clicks if we were already in PLAYING state
         // This prevents tutorial/dialog dismissal from also launching the ball
         if (stateBeforeClick === GameState.PLAYING) {
@@ -312,7 +346,7 @@ export class Game {
    */
   private setupBrickDestructionCallbacks(): void {
     if (!this.level) return;
-    
+
     const bricks = this.level.getBricks();
     for (const brick of bricks) {
       brick.setOnDestroyCallback((destroyedBrick, info) => {
@@ -328,7 +362,7 @@ export class Game {
           // Use first ball as source for cloning
           this.spawnAdditionalBalls(this.balls[0], MULTIBALL_BRICK_SPAWN_COUNT);
         }
-        
+
         // Spawn offensive entities based on brick type (falling bricks, lasers, missiles, etc.)
         const batCenterX = this.bat.getCenterX();
         const bricksToDamage = this.offensiveEntityManager.spawnOffensiveEntity(
@@ -338,19 +372,19 @@ export class Game {
           batCenterX,
           this.level?.getBricks()
         );
-        
+
         // Handle bomb chain reactions - ONLY for bomb bricks
         // Bomb bricks damage adjacent bricks, which may trigger their own effects
         if (bricksToDamage && bricksToDamage.length > 0) {
           const totalDuration = 1.5; // Total time for all explosions
           const delayPerBrick = totalDuration / bricksToDamage.length;
-          
+
           for (let i = 0; i < bricksToDamage.length; i++) {
             const targetBrick = bricksToDamage[i];
             const targetBounds = targetBrick.getBounds();
             const targetX = targetBounds.x + targetBounds.width / 2;
             const targetY = targetBounds.y + targetBounds.height / 2;
-            
+
             // Queue this brick for delayed explosion damage
             this.delayedBombExplosions.push({
               brick: targetBrick,
@@ -359,7 +393,7 @@ export class Game {
               delay: i * delayPerBrick
             });
           }
-          
+
           // Extra particles for bomb explosion
           this.effectsManager.createParticles(info.centerX, info.centerY, 40, destroyedBrick.getColor(), 200);
         }
@@ -379,11 +413,11 @@ export class Game {
     // Determine which boss type to spawn based on brick type
     const brickType = brick.getType();
     const baseHealth = this.level.getConfig().baseHealth || 1;
-    
+
     // Calculate boss health and spawn offset based on boss type
     let bossHealth: number;
     let spawnOffsetY: number;
-    
+
     if (brickType === BrickType.BOSS_2) {
       bossHealth = baseHealth * BOSS2_HEALTH_MULTIPLIER;
       spawnOffsetY = brick.getHeight() * BOSS2_SPAWN_OFFSET_Y;
@@ -394,11 +428,11 @@ export class Game {
       bossHealth = baseHealth * BOSS1_HEALTH_MULTIPLIER;
       spawnOffsetY = brick.getHeight() * BOSS1_SPAWN_OFFSET_Y;
     }
-    
+
     // Spawn boss slightly above the brick position to avoid immediate ball collision
     const bossX = info.centerX - brick.getWidth() / 2;
     const bossY = info.centerY - brick.getHeight() / 2 + spawnOffsetY;
-    
+
     // Create boss at safe position
     if (brickType === BrickType.BOSS_2) {
       this.boss = new Boss2(
@@ -431,7 +465,7 @@ export class Game {
     }
 
     // Give boss access to remaining bricks (excluding indestructible and the boss brick itself)
-    const availableBricks = this.level.getBricks().filter(b => 
+    const availableBricks = this.level.getBricks().filter(b =>
       b !== brick && !b.isIndestructible() && !b.isDestroyed()
     );
     this.boss.setAvailableBricks(availableBricks);
@@ -441,92 +475,108 @@ export class Game {
   }
 
   /**
-   * Set up collision callbacks
+   * Set up event listeners
    */
-  private setupCollisionCallbacks(): void {
-    this.collisionManager.setCallbacks({
-      onBrickHit: (brick, damage, isCritical) => {
-        // Only show damage numbers for destructible bricks
-        if (!brick.isIndestructible()) {
-          const brickBounds = brick.getBounds();
-          const brickCenterX = brickBounds.x + brickBounds.width / 2;
-          const brickTopY = brickBounds.y - 5;
-          this.effectsManager.addDamageNumber(brickCenterX, brickTopY, damage, isCritical);
-        }
-        
-        if (!brick.isDestroyed()) {
-          // Play ding sound for indestructible bricks, regular damage sound for others
-          if (brick.isIndestructible()) {
-            this.audioManager.playIndestructibleBrickHit();
-          } else {
-            this.audioManager.playBrickDamage();
-          }
-        }
-      },
-      onBrickDestroyed: (brick, x, y, isCritical, ball) => {
-        this.totalBricksDestroyed++;
-        
-        // Track brick destruction for achievements
-        const damage = brick.getMaxHealth(); // Get the damage value of this brick
-        this.achievementTracker.onBrickDestroyed(damage).catch(error => {
-          console.warn('Achievement tracker error:', error);
-        });
-        
-        // Multi-ball upgrade - chance to spawn additional balls on brick destruction
-        // Use the ball that destroyed the brick (if available), otherwise fall back to first ball
-        if (this.gameUpgrades.hasMultiBall() && this.balls.length > 0) {
-          const multiBallChance = this.gameUpgrades.getMultiBallChance();
-          if (Math.random() < multiBallChance) {
-            const multiBallCount = this.gameUpgrades.getMultiBallCount();
-            const sourceBall = ball || this.balls[0];
-            this.spawnAdditionalBalls(sourceBall, multiBallCount);
-          }
-        }
-        
-        if (!this.level) return;
-        
-        const remainingBricks = this.level.getRemainingBricks();
-        this.statusBar.setBrickCounts(
-          remainingBricks,
-          this.level.getTotalBricks()
-        );
-        
-        console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
-        
-        // Note: Offensive entity spawning is now handled by brick's onDestroy callback
-        // This ensures all damage sources (ball, laser, bomb chains) trigger effects
-        
-        // Create particles (more for final brick)
-        const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
-        const particleLifetime = remainingBricks === 0 ? 300 : (isCritical ? 200 : 150);
-        const particleColor = isCritical ? '#ffff00' : brick.getColor();
-        this.effectsManager.createParticles(x, y, particleCount, particleColor, particleLifetime);
-        
-        // Play explosion sound
-        this.audioManager.playBrickExplode();
-      },
-      onExplosionDamage: (brick, damage, x, y) => {
-        this.effectsManager.addDamageNumber(x, y - 5, damage, false);
-        
-        if (brick.isDestroyed()) {
-          this.effectsManager.createParticles(x, y, 8, brick.getColor(), 120);
-        }
-      },
-      onBatDamaged: (_damagePercent: number) => {
-        // Track bat damage for achievements
-        this.achievementTracker.onBatDamaged();
-        
-        // Visual feedback for bat damage
-        this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BAT_DAMAGE_INTENSITY, SCREEN_SHAKE_BAT_DAMAGE_DURATION);
-        
-        // Check if bat is destroyed
-        if (this.bat.isDestroyed()) {
-          this.playerHealth = 0;
+  private setupEventListeners(): void {
+    // Brick Hit
+    this.context.eventManager.on<BrickHitEvent>(GameEvents.BRICK_HIT, (data) => {
+      const { brick, damage, isCritical, x } = data;
+
+      // Only show damage numbers for destructible bricks
+      if (!brick.isIndestructible()) {
+        const brickBounds = brick.getBounds();
+        const brickCenterX = brickBounds.x + brickBounds.width / 2;
+
+        // Use hitX if available, otherwise center
+        // Limit hitX to within brick bounds to ensure it's not floating too far off
+        let displayX = x !== undefined ? x : brickCenterX;
+
+        // Clamp displayX to be within the brick's horizontal bounds (plus a small margin)
+        displayX = Math.max(brickBounds.x, Math.min(brickBounds.x + brickBounds.width, displayX));
+
+        const brickTopY = brickBounds.y - 5;
+        this.effectsManager.addDamageNumber(displayX, brickTopY, damage, isCritical);
+      }
+
+      if (!brick.isDestroyed()) {
+        // Play ding sound for indestructible bricks, regular damage sound for others
+        if (brick.isIndestructible()) {
+          this.audioManager.playIndestructibleBrickHit();
         } else {
-          // Play bat damage sound when damaged but not destroyed
-          this.audioManager.playBatDamage();
+          this.audioManager.playBrickDamage();
         }
-      },
+      }
+    });
+
+    // Brick Destroyed
+    this.context.eventManager.on<BrickDestroyedEvent>(GameEvents.BRICK_DESTROYED, (data) => {
+      const { brick, x, y, isCritical, ball } = data;
+
+      this.totalBricksDestroyed++;
+
+      // Track brick destruction for achievements
+      const damage = brick.getMaxHealth(); // Get the damage value of this brick
+      this.achievementTracker.onBrickDestroyed(damage).catch(error => {
+        console.warn('Achievement tracker error:', error);
+      });
+
+      // Multi-ball upgrade - chance to spawn additional balls on brick destruction
+      // Use the ball that destroyed the brick (if available), otherwise fall back to first ball
+      if (this.gameUpgrades.hasMultiBall() && this.balls.length > 0) {
+        const multiBallChance = this.gameUpgrades.getMultiBallChance();
+        if (Math.random() < multiBallChance) {
+          const multiBallCount = this.gameUpgrades.getMultiBallCount();
+          const sourceBall = ball || this.balls[0];
+          this.spawnAdditionalBalls(sourceBall, multiBallCount);
+        }
+      }
+
+      if (!this.level) return;
+
+      const remainingBricks = this.level.getRemainingBricks();
+      this.statusBar.setBrickCounts(
+        remainingBricks,
+        this.level.getTotalBricks()
+      );
+
+      console.log(`Brick destroyed! Remaining bricks: ${remainingBricks}`);
+
+      // Create particles (more for final brick)
+      const particleCount = remainingBricks === 0 ? 30 : (isCritical ? 20 : 10);
+      const particleLifetime = remainingBricks === 0 ? 300 : (isCritical ? 200 : 150);
+      const particleColor = isCritical ? '#ffff00' : brick.getColor();
+      this.effectsManager.createParticles(x, y, particleCount, particleColor, particleLifetime);
+
+      // Play explosion sound
+      this.audioManager.playBrickExplode();
+    });
+
+    // Explosion Damage
+    this.context.eventManager.on<ExplosionDamageEvent>('explosion_damage', (data) => {
+      const { brick, damage, x, y } = data;
+      this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+
+      if (brick.isDestroyed()) {
+        this.effectsManager.createParticles(x, y, 8, brick.getColor(), 120);
+      }
+    });
+
+    // Bat Damaged
+    this.context.eventManager.on('bat_damaged', () => {
+
+      // Track bat damage for achievements
+      this.achievementTracker.onBatDamaged();
+
+      // Visual feedback for bat damage
+      this.effectsManager.triggerScreenShake(SCREEN_SHAKE_BAT_DAMAGE_INTENSITY, SCREEN_SHAKE_BAT_DAMAGE_DURATION);
+
+      // Check if bat is destroyed
+      if (this.bat.isDestroyed()) {
+        this.playerHealth = 0;
+      } else {
+        // Play bat damage sound when damaged but not destroyed
+        this.audioManager.playBatDamage();
+      }
     });
   }
 
@@ -703,10 +753,10 @@ export class Game {
    */
   private applyOptions(): void {
     const options = this.screenManager.optionsScreen.getOptions();
-    
+
     // Apply music volume
     this.audioManager.setMusicVolume(options.musicVolume);
-    
+
     // Apply SFX volume
     this.audioManager.setSFXVolume(options.sfxVolume);
   }
@@ -726,34 +776,34 @@ export class Game {
   loadLevel(levelConfig: LevelConfig): void {
     // Clear brick render cache when loading new level
     Brick.clearRenderCache();
-    
+
     // Create level with canvas width for centering
-    this.level = new Level(levelConfig, this.canvas.width);
-    
+    this.level = LevelFactory.createLevel(levelConfig, this.canvas.width);
+
     // Set up destruction callbacks for all bricks
     this.setupBrickDestructionCallbacks();
-    
+
     // Set player health: base + upgrade bonus
     const upgradeBonus = this.gameUpgrades.getHealthBonus();
     this.playerHealth = PLAYER_STARTING_HEALTH + upgradeBonus;
-    
+
     // Clear any active lasers and offensive entities
     this.weaponManager.clear();
     this.offensiveEntityManager.clear();
-    
+
     // Clear boss
     this.boss = null;
-    
+
     // Clear delayed bomb explosions
     this.delayedBombExplosions = [];
-    
+
     // Reset level timer
     this.levelTime = 0;
 
     // Reset per-level achievement tracking
     this.achievementsUnlockedThisRun.clear();
     this.achievementTracker.clearThisRun();
-    
+
     // Capture progress snapshot at level start
     const currentProgress = this.achievementTracker.getProgress();
     this.levelStartProgress = {
@@ -764,30 +814,30 @@ export class Game {
       upgradesActivated: currentProgress.upgradesActivated.length,
       bossTypesDefeated: currentProgress.bossTypesDefeated.length,
     };
-    
+
     // Initialize achievement tracking for this level
-    const hasBoss = this.level.getBricks().some(brick => 
-      brick.getType() === BrickType.BOSS_1 || 
-      brick.getType() === BrickType.BOSS_2 || 
+    const hasBoss = this.level.getBricks().some(brick =>
+      brick.getType() === BrickType.BOSS_1 ||
+      brick.getType() === BrickType.BOSS_2 ||
       brick.getType() === BrickType.BOSS_3
     );
     this.achievementTracker.onLevelStart(levelConfig.id, this.playerHealth, hasBoss);
-    
+
     // Calculate bomb damage using multiplier constant
     this.bombDamage = this.getPrimaryBall().getDamage() * BOMB_BRICK_DAMAGE_MULTIPLIER;
-    
+
     // Reset slow-motion state
     this.slowMotionManager.reset();
     this.effectsManager.resetSlowMotion();
-    
+
     // Reset level complete timer
     this.levelCompleteTimer = 0;
-    
+
     this.gameState = GameState.PLAYING;
-    
+
     // Load background image for this level
     this.loadBackgroundImage(levelConfig.id);
-    
+
     // Update status bar
     this.statusBar.setLevelTitle(levelConfig.name);
     this.statusBar.setPlayerHealth(this.playerHealth);
@@ -795,30 +845,30 @@ export class Game {
       this.level.getRemainingBricks(),
       this.level.getTotalBricks()
     );
-    
+
     // Reset bat width (remove damage from previous level, preserve upgrade size)
     this.bat.resetWidth();
-    
+
     // Reset ball and bat position
     const centerX = this.canvas.width / 2;
     const batY = this.canvas.height - 100; // Bat higher up
     const ballY = batY - 30; // Ball above the bat
     const batWidth = this.bat.getWidth();
     const batHeight = this.bat.getHeight();
-    
+
     // Move mouse pointer to bat spawn position (center of bat)
     this.inputManager.setMousePosition(centerX, batY + batHeight / 2);
-    
+
     this.bat.setPosition(centerX - batWidth / 2, batY); // Center bat
-    
+
     // Reset all balls to single ball at start position
     const primaryBall = this.getPrimaryBall();
     primaryBall.reset();
     primaryBall.setPosition(centerX, ballY);
-    
+
     // Remove any extra balls from previous level
     this.balls = [primaryBall];
-    
+
     // Make ball sticky at level start - position on top of bat
     const ballRadius = primaryBall.getRadius();
     primaryBall.setSticky(true, 0, -ballRadius, true); // true = initial sticky
@@ -828,40 +878,14 @@ export class Game {
    * Start the game loop
    */
   start(): void {
-    this.lastTime = performance.now();
-    this.gameLoop(this.lastTime);
+    this.gameLoop.start();
   }
 
   /**
    * Stop the game loop
    */
   stop(): void {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
-  }
-
-  /**
-   * Main game loop with fixed timestep
-   */
-  private gameLoop(currentTime: number): void {
-    this.animationFrameId = requestAnimationFrame((time) => this.gameLoop(time));
-
-    const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
-    this.lastTime = currentTime;
-
-    // Accumulate time
-    this.accumulator += deltaTime;
-
-    // Fixed timestep updates
-    while (this.accumulator >= this.fixedTimeStep) {
-      this.update(this.fixedTimeStep);
-      this.accumulator -= this.fixedTimeStep;
-    }
-
-    // Render
-    this.render();
+    this.gameLoop.stop();
   }
 
   /**
@@ -911,7 +935,7 @@ export class Game {
     // Update sticky ball position to follow bat (only primary ball can be sticky)
     if (primaryBall.getIsSticky()) {
       primaryBall.updateStickyPosition(this.bat.getCenterX(), this.bat.getPosition().y);
-      
+
       // If sticky bat upgrade is active AND this is not the initial sticky state,
       // launch when Space is released
       if (this.gameUpgrades.hasStickyBat() && !primaryBall.getIsInitialSticky() && !this.inputManager.isSpaceHeld()) {
@@ -948,13 +972,13 @@ export class Game {
     // Update boss if active (use effective deltaTime for slow-mo)
     if (this.boss && this.boss.isActive()) {
       this.boss.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
-      
+
       // Check if Boss3 should split
       if (this.boss instanceof Boss3 && this.boss.shouldSplit()) {
         const copies = this.boss.createSplitCopies();
         this.bossCopies = copies;
         this.boss.markAsSplit();
-        
+
         // Create split effect
         const bounds = this.boss.getBounds();
         if (bounds) {
@@ -968,7 +992,7 @@ export class Game {
         }
       }
     }
-    
+
     // Update boss copies
     for (const copy of this.bossCopies) {
       if (copy.isActive()) {
@@ -989,7 +1013,7 @@ export class Game {
     // Check wall collisions for all balls (bottom boundary is status bar top)
     const statusBarTop = this.statusBar.getY();
     const ballsToRemove: Ball[] = [];
-    
+
     for (const ball of this.balls) {
       if (!ball.getIsSticky()) {
         const hitBackWall = ball.checkWallCollisions(
@@ -1021,7 +1045,7 @@ export class Game {
         }
       }
     }
-    
+
     // Remove balls that hit bottom (when multiple balls exist)
     if (ballsToRemove.length > 0) {
       this.balls = this.balls.filter(ball => !ballsToRemove.includes(ball));
@@ -1059,12 +1083,12 @@ export class Game {
         ).catch(error => {
           console.warn('Achievement tracker error:', error);
         });
-        
+
         // Calculate which cumulative achievements had progress changes
         const achievementsWithProgressChange: string[] = [];
         if (this.levelStartProgress) {
           const endProgress = this.achievementTracker.getProgress();
-          
+
           // Check each cumulative achievement for progress changes
           if (endProgress.totalBricksDestroyed > this.levelStartProgress.totalBricksDestroyed) {
             achievementsWithProgressChange.push('BRICK_SMASHER');
@@ -1085,7 +1109,7 @@ export class Game {
             achievementsWithProgressChange.push('ALL_BOSSES');
           }
         }
-        
+
         this.gameState = GameState.LEVEL_COMPLETE;
         // Use level.getId() to ensure we show the level that was just completed
         this.screenManager.levelCompleteScreen.setLevel(
@@ -1117,29 +1141,29 @@ export class Game {
     for (let i = this.delayedBombExplosions.length - 1; i >= 0; i--) {
       const explosion = this.delayedBombExplosions[i];
       explosion.delay -= deltaTime;
-      
+
       // If delay has elapsed, trigger the explosion
       if (explosion.delay <= 0) {
         const targetBrick = explosion.brick;
-        
+
         // Skip if brick is already destroyed
         if (targetBrick.isDestroyed()) {
           this.delayedBombExplosions.splice(i, 1);
           continue;
         }
-        
+
         // Apply damage - brick's onDestroy callback will handle offensive entity spawning
         const destructionInfo = targetBrick.takeDamage(this.bombDamage);
         this.effectsManager.addDamageNumber(explosion.x, explosion.y - 5, this.bombDamage, false);
-        
+
         // If brick was just destroyed by bomb damage, create particles and update counts
         if (destructionInfo.justDestroyed) {
           this.effectsManager.createParticles(explosion.x, explosion.y, 8, targetBrick.getColor(), 120);
-          
+
           // Note: Offensive entity spawning and chain reactions are now handled by
           // the brick's onDestroy callback, ensuring consistent behavior regardless
           // of damage source (ball, laser, bomb, etc.)
-          
+
           // Update brick counts
           this.totalBricksDestroyed++;
           if (this.level) {
@@ -1150,7 +1174,7 @@ export class Game {
             );
           }
         }
-        
+
         // Remove this explosion from the queue
         this.delayedBombExplosions.splice(i, 1);
       }
@@ -1163,7 +1187,7 @@ export class Game {
   private handleInput(deltaTime: number): void {
     // Get keyboard movement input
     const movement = this.inputManager.getMovementInput();
-    
+
     // If primary ball is sticky, left/right arrows adjust launch angle (works in both mouse and keyboard mode)
     const primaryBall = this.getPrimaryBall();
     if (primaryBall.getIsSticky()) {
@@ -1174,7 +1198,7 @@ export class Game {
         primaryBall.adjustLaunchAngle(2); // Adjust right (less negative angle)
       }
     }
-    
+
     if (this.inputManager.isMouseControlEnabled()) {
       // Mouse control (2D)
       const mousePos = this.inputManager.getMousePosition();
@@ -1190,7 +1214,7 @@ export class Game {
           this.bat.moveRight(deltaTime);
         }
       }
-      
+
       if (movement.up) {
         this.bat.moveUp(deltaTime);
       }
@@ -1213,16 +1237,16 @@ export class Game {
       const ballBounds = primaryBall.getBounds();
       const batBounds = this.bat.getBounds();
       const ballRadius = primaryBall.getRadius();
-      
+
       // Check if primary ball is touching bat
       if (ballBounds.y + ballRadius >= batBounds.y &&
-          ballBounds.x + ballRadius >= batBounds.x &&
-          ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
+        ballBounds.x + ballRadius >= batBounds.x &&
+        ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
         // Make primary ball sticky on top of bat (not initial, so uses hold/release behavior)
         primaryBall.setSticky(true, 0, -ballRadius, false);
       }
     }
-    
+
     // Check collisions for all balls
     for (const ball of this.balls) {
       this.collisionManager.checkBallBatCollision(ball, this.bat);
@@ -1256,37 +1280,37 @@ export class Game {
         this.collisionManager.checkBossBallCollisions(
           this.boss,
           ball,
-        (damage, x, y) => {
-          // Create particles and damage number
-          this.effectsManager.createParticles(x, y, 8, '#ff0000', 100);
-          this.effectsManager.addDamageNumber(x, y - 5, damage, false);
-        },
-        (x, y) => {
-          // Boss destroyed - create big explosion
-          this.effectsManager.createParticles(x, y, 50, '#ff0000', 300);
-          
-          // Track boss defeat for achievements
-          if (this.boss) {
-            let bossType: string;
-            if (this.boss instanceof Boss1) {
-              bossType = 'BOSS_1';
-            } else if (this.boss instanceof Boss2) {
-              bossType = 'BOSS_2';
-            } else if (this.boss instanceof Boss3) {
-              bossType = 'BOSS_3';
-            } else {
-              bossType = 'UNKNOWN';
+          (damage, x, y) => {
+            // Create particles and damage number
+            this.effectsManager.createParticles(x, y, 8, '#ff0000', 100);
+            this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+          },
+          (x, y) => {
+            // Boss destroyed - create big explosion
+            this.effectsManager.createParticles(x, y, 50, '#ff0000', 300);
+
+            // Track boss defeat for achievements
+            if (this.boss) {
+              let bossType: string;
+              if (this.boss instanceof Boss1) {
+                bossType = 'BOSS_1';
+              } else if (this.boss instanceof Boss2) {
+                bossType = 'BOSS_2';
+              } else if (this.boss instanceof Boss3) {
+                bossType = 'BOSS_3';
+              } else {
+                bossType = 'UNKNOWN';
+              }
+              this.achievementTracker.onBossDefeated(bossType).catch(error => {
+                console.warn('Achievement tracker error:', error);
+              });
             }
-            this.achievementTracker.onBossDefeated(bossType).catch(error => {
-              console.warn('Achievement tracker error:', error);
-            });
+          },
+          (x, y) => {
+            // Shield blocked - create cyan particles
+            this.effectsManager.createParticles(x, y, 5, '#00ccff', 80);
           }
-        },
-        (x, y) => {
-          // Shield blocked - create cyan particles
-          this.effectsManager.createParticles(x, y, 5, '#00ccff', 80);
-        }
-      );
+        );
       }
 
       // Thrown brick-Bat collision
@@ -1299,7 +1323,7 @@ export class Game {
           this.effectsManager.createParticles(x, y, 15, '#ff0000', 150);
         }
       );
-      
+
       // Boss3 splitting fragment-Bat collision
       if (this.boss instanceof Boss3) {
         this.collisionManager.checkSplittingFragmentBatCollisions(
@@ -1308,7 +1332,7 @@ export class Game {
         );
       }
     }
-    
+
     // Boss copy collisions (for Boss3 split copies)
     for (const copy of this.bossCopies) {
       if (copy.isActive()) {
@@ -1323,7 +1347,7 @@ export class Game {
             },
             (x, y) => {
               this.effectsManager.createParticles(x, y, 30, '#cc00ff', 200);
-              
+
               // Track boss copy defeat for achievements
               let bossType: string;
               if (copy instanceof Boss1) {
@@ -1341,7 +1365,7 @@ export class Game {
             }
           );
         }
-        
+
         this.collisionManager.checkBossThrownBrickCollisions(
           copy,
           this.bat,
@@ -1350,7 +1374,7 @@ export class Game {
             this.effectsManager.createParticles(x, y, 15, '#cc00ff', 150);
           }
         );
-        
+
         // Boss3 copy splitting fragment-Bat collision
         if (copy instanceof Boss3) {
           this.collisionManager.checkSplittingFragmentBatCollisions(
@@ -1393,21 +1417,11 @@ export class Game {
       this.effectsManager,
       this.weaponManager,
       this.offensiveEntityManager,
+      this.boss,
+      this.bossCopies,
       options.showParticles,
       options.showDamageNumbers
     );
-
-    // Render boss if active
-    if (this.boss && this.boss.isActive()) {
-      this.boss.render(this.ctx);
-    }
-    
-    // Render boss copies
-    for (const copy of this.bossCopies) {
-      if (copy.isActive()) {
-        copy.render(this.ctx);
-      }
-    }
   }
 
 
@@ -1431,7 +1445,7 @@ export class Game {
   getBalls(): Ball[] {
     return this.balls;
   }
-  
+
   /**
    * Get primary ball reference (for testing)
    */
@@ -1477,7 +1491,7 @@ export class Game {
       if (this.balls.length >= MAX_BALLS_ON_SCREEN) {
         break;
       }
-      
+
       const newBall = sourceBall.clone();
       // Random angle in upward range (avoid downward angles)
       const randomAngle = MULTIBALL_MIN_ANGLE + Math.random() * (MULTIBALL_MAX_ANGLE - MULTIBALL_MIN_ANGLE);

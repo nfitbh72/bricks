@@ -3,6 +3,7 @@
  */
 
 import { Level } from '../../src/renderer/game/entities/Level';
+import { LevelFactory } from '../../src/renderer/game/factories/LevelFactory';
 import {
   getLevel,
   createLevel1,
@@ -172,25 +173,25 @@ describe('Level Class', () => {
 
   describe('constructor', () => {
     it('should create level from config', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level).toBeDefined();
     });
 
     it('should create correct number of bricks', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getBricks().length).toBe(3);
     });
   });
 
   describe('getBricks', () => {
     it('should return all bricks', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       expect(bricks.length).toBe(3);
     });
 
     it('should return bricks with correct health', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
       expect(bricks[1].getHealth()).toBe(3); // HEALTHY
@@ -200,19 +201,19 @@ describe('Level Class', () => {
 
   describe('getActiveBricks', () => {
     it('should return all bricks when none destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getActiveBricks().length).toBe(3);
     });
 
     it('should exclude destroyed bricks', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[0].takeDamage(1);
       expect(level.getActiveBricks().length).toBe(2);
     });
 
     it('should return empty array when all destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks.forEach((brick) => brick.takeDamage(10));
       expect(level.getActiveBricks().length).toBe(0);
@@ -221,19 +222,19 @@ describe('Level Class', () => {
 
   describe('isComplete', () => {
     it('should return false when bricks remain', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.isComplete()).toBe(false);
     });
 
     it('should return true when all bricks destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks.forEach((brick) => brick.takeDamage(10));
       expect(level.isComplete()).toBe(true);
     });
 
     it('should return false when some bricks destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[0].takeDamage(10);
       expect(level.isComplete()).toBe(false);
@@ -242,19 +243,19 @@ describe('Level Class', () => {
 
   describe('getRemainingBricks', () => {
     it('should return total count when none destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getRemainingBricks()).toBe(3);
     });
 
     it('should return correct count after destruction', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[0].takeDamage(10);
       expect(level.getRemainingBricks()).toBe(2);
     });
 
     it('should return 0 when all destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks.forEach((brick) => brick.takeDamage(10));
       expect(level.getRemainingBricks()).toBe(0);
@@ -263,12 +264,12 @@ describe('Level Class', () => {
 
   describe('getTotalBricks', () => {
     it('should return total brick count', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getTotalBricks()).toBe(3);
     });
 
     it('should not change after bricks destroyed', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[0].takeDamage(10);
       expect(level.getTotalBricks()).toBe(3);
@@ -277,14 +278,14 @@ describe('Level Class', () => {
 
   describe('getConfig', () => {
     it('should return level config', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const config = level.getConfig();
       expect(config.id).toBe(1);
       expect(config.name).toBe('Test Level');
     });
 
     it('should return a copy of config', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const config = level.getConfig();
       config.id = 999;
       expect(level.getId()).toBe(1);
@@ -293,14 +294,14 @@ describe('Level Class', () => {
 
   describe('getId', () => {
     it('should return level id', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getId()).toBe(1);
     });
   });
 
   describe('getName', () => {
     it('should return level name', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       expect(level.getName()).toBe('Test Level');
     });
   });
@@ -312,7 +313,7 @@ describe('Level Class', () => {
 
   describe('reset', () => {
     it('should restore all bricks', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks.forEach((brick) => brick.takeDamage(10));
       expect(level.isComplete()).toBe(true);
@@ -323,7 +324,7 @@ describe('Level Class', () => {
     });
 
     it('should restore brick health', () => {
-      const level = new Level(testConfig);
+      const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[1].takeDamage(1); // HEALTHY brick: 3 -> 2
       expect(bricks[1].getHealth()).toBe(2);
@@ -337,21 +338,21 @@ describe('Level Class', () => {
   describe('integration with createLevel1', () => {
     it('should create level from createLevel1 config', () => {
       const level1Config = createLevel1();
-      const level = new Level(level1Config);
+      const level = LevelFactory.createLevel(level1Config);
       expect(level.getId()).toBe(1);
       expect(level.getBricks().length).toBeGreaterThan(0);
     });
 
     it('should have correct level configuration', () => {
       const level1Config = createLevel1();
-      const level = new Level(level1Config);
+      const level = LevelFactory.createLevel(level1Config);
       expect(level.getId()).toBe(1);
       expect(level.getName()).toBeDefined();
     });
     
     it('should center bricks when canvas width provided', () => {
       const level1Config = createLevel1();
-      const level = new Level(level1Config, 1920);
+      const level = LevelFactory.createLevel(level1Config, 1920);
       const bricks = level.getBricks();
       const firstBrick = bricks[0];
       
@@ -360,10 +361,10 @@ describe('Level Class', () => {
     });
   });
 
-  describe('Level.createFromPattern factory method', () => {
+  describe('LevelFactory.createFromPattern factory method', () => {
     it('should create level from pattern', () => {
       const pattern = ["NNN", "NNN"];
-      const level = Level.createFromPattern(1, "Test Level", pattern);
+      const level = LevelFactory.createFromPattern(1, "Test Level", pattern);
       
       expect(level.getId()).toBe(1);
       expect(level.getName()).toBe("Test Level");
@@ -373,14 +374,14 @@ describe('Level Class', () => {
 
     it('should center bricks when canvas width provided', () => {
       const pattern = ["N"];
-      const level = Level.createFromPattern(1, "Test", pattern, 1920);
+      const level = LevelFactory.createFromPattern(1, "Test", pattern, 1920);
       const brick = level.getBricks()[0];
       expect(brick.getPosition().x).toBeGreaterThan(0);
     });
 
     it('should handle mixed brick types', () => {
       const pattern = ["NHN"];
-      const level = Level.createFromPattern(1, "Test", pattern);
+      const level = LevelFactory.createFromPattern(1, "Test", pattern);
       const bricks = level.getBricks();
       
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
@@ -389,9 +390,9 @@ describe('Level Class', () => {
     });
   });
 
-  describe('Level.createFromWord factory method', () => {
+  describe('LevelFactory.createFromWord factory method', () => {
     it('should create level from word', () => {
-      const level = Level.createFromWord(1, "Test Level", "HI");
+      const level = LevelFactory.createFromWord(1, "Test Level", "HI");
       
       expect(level.getId()).toBe(1);
       expect(level.getName()).toBe("Test Level");
@@ -399,26 +400,26 @@ describe('Level Class', () => {
     });
 
     it('should use default brick type (NORMAL)', () => {
-      const level = Level.createFromWord(1, "Test", "B");
+      const level = LevelFactory.createFromWord(1, "Test", "B");
       const bricks = level.getBricks();
       expect(bricks[0].getHealth()).toBe(1); // NORMAL
     });
 
     it('should accept custom brick type', () => {
-      const level = Level.createFromWord(1, "Test", "B", BrickType.HEALTHY);
+      const level = LevelFactory.createFromWord(1, "Test", "B", BrickType.HEALTHY);
       const bricks = level.getBricks();
       expect(bricks[0].getHealth()).toBe(3); // HEALTHY
     });
 
 
     it('should center bricks when canvas width provided', () => {
-      const level = Level.createFromWord(1, "Test", "B", BrickType.NORMAL, 1920);
+      const level = LevelFactory.createFromWord(1, "Test", "B", BrickType.NORMAL, 1920);
       const brick = level.getBricks()[0];
       expect(brick.getPosition().x).toBeGreaterThan(0);
     });
 
     it('should handle multi-letter words', () => {
-      const level = Level.createFromWord(1, "Test", "BRICKS");
+      const level = LevelFactory.createFromWord(1, "Test", "BRICKS");
       expect(level.getBricks().length).toBeGreaterThan(20); // Multiple letters worth of bricks
     });
   });

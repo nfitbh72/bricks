@@ -36,9 +36,9 @@ describe('Debris', () => {
   describe('update', () => {
     it('should move in the direction of velocity with gravity', () => {
       const deltaTime = 0.1;
-      
+
       debris.update(deltaTime);
-      
+
       const pos = debris.getPosition();
       // X velocity is constant
       expect(pos.x).toBeCloseTo(initialX + velocityX * deltaTime, 1);
@@ -50,18 +50,18 @@ describe('Debris', () => {
 
     it('should accelerate downward due to gravity', () => {
       const deltaTime = 0.1;
-      
+
       debris.update(deltaTime);
       const pos1 = debris.getPosition();
-      
+
       debris.update(deltaTime);
       const pos2 = debris.getPosition();
-      
+
       // X distance should be constant (no horizontal acceleration)
       const dist1X = pos1.x - initialX;
       const dist2X = pos2.x - pos1.x;
       expect(dist2X).toBeCloseTo(dist1X, 1);
-      
+
       // Y distance should increase due to gravity (acceleration)
       const dist1Y = pos1.y - initialY;
       const dist2Y = pos2.y - pos1.y;
@@ -71,9 +71,9 @@ describe('Debris', () => {
     it('should not update when inactive', () => {
       debris.deactivate();
       const initialPos = debris.getPosition();
-      
+
       debris.update(0.1);
-      
+
       const newPos = debris.getPosition();
       expect(newPos.x).toBe(initialPos.x);
       expect(newPos.y).toBe(initialPos.y);
@@ -115,23 +115,23 @@ describe('Debris', () => {
 
   describe('getBounds', () => {
     it('should return correct bounds centered on position', () => {
-      const bounds = debris.getBounds();
       const halfSize = EXPLODING_BRICK_DEBRIS_SIZE / 2;
-      
-      expect(bounds.x).toBe(initialX - halfSize);
-      expect(bounds.y).toBe(initialY - halfSize);
-      expect(bounds.width).toBe(EXPLODING_BRICK_DEBRIS_SIZE);
-      expect(bounds.height).toBe(EXPLODING_BRICK_DEBRIS_SIZE);
+      const bounds = debris.getBounds();
+      expect(bounds).not.toBeNull();
+      expect(bounds!.x).toBe(initialX - halfSize);
+      expect(bounds!.y).toBe(initialY - halfSize);
+      expect(bounds!.width).toBe(EXPLODING_BRICK_DEBRIS_SIZE);
+      expect(bounds!.height).toBe(EXPLODING_BRICK_DEBRIS_SIZE);
     });
 
     it('should update bounds after movement', () => {
       debris.update(0.1);
-      const bounds = debris.getBounds();
       const halfSize = EXPLODING_BRICK_DEBRIS_SIZE / 2;
       const pos = debris.getPosition();
-      
-      expect(bounds.x).toBe(pos.x - halfSize);
-      expect(bounds.y).toBe(pos.y - halfSize);
+      const bounds = debris.getBounds();
+      expect(bounds).not.toBeNull();
+      expect(bounds!.x).toBe(pos.x - halfSize);
+      expect(bounds!.y).toBe(pos.y - halfSize);
     });
   });
 });

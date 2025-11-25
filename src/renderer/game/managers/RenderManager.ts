@@ -13,6 +13,7 @@ import { ScreenManager } from './ScreenManager';
 import { GameState } from '../core/types';
 import { LanguageManager } from '../../i18n/LanguageManager';
 import { FONT_TITLE_NORMAL, GLOW_LARGE, COLOR_GREEN } from '../../config/constants';
+import { BaseBoss } from '../entities/offensive/BaseBoss';
 
 export class RenderManager {
   private canvas: HTMLCanvasElement;
@@ -58,6 +59,8 @@ export class RenderManager {
     effectsManager: EffectsManager,
     weaponManager: WeaponManager,
     offensiveEntityManager: OffensiveEntityManager,
+    boss: BaseBoss | null,
+    bossCopies: BaseBoss[],
     showParticles: boolean,
     showDamageNumbers: boolean
   ): void {
@@ -71,10 +74,10 @@ export class RenderManager {
     // Apply screen shake and slow-motion zoom
     const shake = effectsManager.getScreenShakeOffset();
     this.ctx.save();
-    
+
     // Apply slow-motion zoom transform (handled by EffectsManager)
     effectsManager.applySlowMotionTransform(this.ctx);
-    
+
     this.ctx.translate(shake.x, shake.y);
 
     // Render level (bricks)
@@ -95,6 +98,18 @@ export class RenderManager {
 
     // Render offensive brick entities
     offensiveEntityManager.render(this.ctx);
+
+    // Render boss if active
+    if (boss && boss.isActive()) {
+      boss.render(this.ctx);
+    }
+
+    // Render boss copies
+    for (const copy of bossCopies) {
+      if (copy.isActive()) {
+        copy.render(this.ctx);
+      }
+    }
 
     // Render visual effects (if enabled)
     effectsManager.render(this.ctx, showParticles, showDamageNumbers);
@@ -122,12 +137,12 @@ export class RenderManager {
   private renderLaunchInstruction(): void {
     const langManager = LanguageManager.getInstance();
     const instructionText = langManager.t('game.status.launchBall');
-    
+
     this.ctx.save();
-    
+
     // Position text in upper third of screen
     const textY = this.canvas.height * 0.3;
-    
+
     // Draw text with glow effect
     this.ctx.font = FONT_TITLE_NORMAL;
     this.ctx.textAlign = 'center';
@@ -136,7 +151,7 @@ export class RenderManager {
     this.ctx.shadowBlur = GLOW_LARGE;
     this.ctx.shadowColor = COLOR_GREEN;
     this.ctx.fillText(instructionText, this.canvas.width / 2, textY);
-    
+
     this.ctx.restore();
   }
 
@@ -145,15 +160,15 @@ export class RenderManager {
    */
   private renderCRTOverlay(): void {
     this.ctx.save();
-    
+
     // Draw scanlines
     this.ctx.globalAlpha = 0.1;
     this.ctx.fillStyle = '#000000';
-    
+
     for (let y = 0; y < this.canvas.height; y += 2) {
       this.ctx.fillRect(0, y, this.canvas.width, 1);
     }
-    
+
     // Add slight vignette effect
     const gradient = this.ctx.createRadialGradient(
       this.canvas.width / 2,
@@ -165,11 +180,11 @@ export class RenderManager {
     );
     gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-    
+
     this.ctx.globalAlpha = 1;
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
+
     this.ctx.restore();
   }
 }

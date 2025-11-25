@@ -15,7 +15,10 @@ import {
   COLOR_WHITE,
   PARTICLE_GLOW_BLUR,
 } from '../../../config/constants';
+import { Bounds } from '../../core/IEntity';
 
+// Note: HomingMissile does not implement IEntity because it has a special update signature
+// that requires targetX and targetY parameters for homing behavior
 export class HomingMissile {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
@@ -63,7 +66,7 @@ export class HomingMissile {
 
     // Calculate angle difference
     let angleDiff = targetAngle - this.angle;
-    
+
     // Normalize angle difference to [-PI, PI]
     while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
     while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
@@ -158,7 +161,8 @@ export class HomingMissile {
   /**
    * Get missile bounds for collision detection
    */
-  getBounds(): { x: number; y: number; width: number; height: number } {
+  getBounds(): Bounds | null {
+    if (!this.active) return null;
     return {
       x: this.position.x - this.size,
       y: this.position.y - this.size,

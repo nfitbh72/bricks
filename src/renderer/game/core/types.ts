@@ -140,5 +140,6 @@ export interface CollisionResult {
   collided: boolean;
   normal?: Vector2D;
   penetration?: number;
+  point?: Vector2D;
 }
 

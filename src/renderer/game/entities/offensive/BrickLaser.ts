@@ -3,15 +3,16 @@
  * Fires after a delay and travels straight down toward the bat
  */
 
-import { 
-  LASER_BRICK_LASER_WIDTH, 
+import {
+  LASER_BRICK_LASER_WIDTH,
   LASER_BRICK_LASER_SPEED,
   LASER_BRICK_FIRE_DELAY,
   LASER_BRICK_WARNING_COLOR,
   COLOR_WHITE,
 } from '../../../config/constants';
+import { IEntity, Bounds } from '../../core/IEntity';
 
-export class BrickLaser {
+export class BrickLaser implements IEntity { // Modified
   private position: { x: number; y: number };
   private readonly targetX: number; // Target bat X position
   private readonly width: number = LASER_BRICK_LASER_WIDTH;
@@ -57,13 +58,13 @@ export class BrickLaser {
       // Draw warning indicator during charge
       const chargeProgress = this.chargeTimer / this.chargeDelay;
       const alpha = 0.3 + (chargeProgress * 0.7); // Fade in from 0.3 to 1.0
-      
+
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = LASER_BRICK_WARNING_COLOR;
       ctx.lineWidth = this.width;
       ctx.shadowBlur = 15;
       ctx.shadowColor = LASER_BRICK_WARNING_COLOR;
-      
+
       // Draw vertical warning line
       ctx.beginPath();
       ctx.moveTo(this.position.x, this.position.y);
@@ -72,11 +73,11 @@ export class BrickLaser {
     } else {
       // Draw active laser beam
       const height = 20; // Laser beam length
-      
+
       ctx.fillStyle = this.color;
       ctx.shadowBlur = 20;
       ctx.shadowColor = this.color;
-      
+
       // Draw laser as a vertical rectangle
       ctx.fillRect(
         this.position.x - this.width / 2,
@@ -84,7 +85,7 @@ export class BrickLaser {
         this.width,
         height
       );
-      
+
       // Draw bright core
       ctx.fillStyle = COLOR_WHITE;
       ctx.fillRect(
@@ -102,9 +103,9 @@ export class BrickLaser {
    * Get laser bounds for collision detection
    * Only returns bounds when laser is active (not charging)
    */
-  getBounds(): { x: number; y: number; width: number; height: number } | null {
-    if (this.charging) return null;
-    
+  getBounds(): Bounds | null {
+    if (this.charging || !this.active) return null;
+
     const height = 20;
     return {
       x: this.position.x - this.width / 2,

@@ -32,8 +32,9 @@ describe('FallingBrick', () => {
 
     it('should have correct dimensions', () => {
       const bounds = fallingBrick.getBounds();
-      expect(bounds.width).toBe(BRICK_WIDTH);
-      expect(bounds.height).toBe(BRICK_HEIGHT);
+      expect(bounds).not.toBeNull();
+      expect(bounds!.width).toBe(BRICK_WIDTH);
+      expect(bounds!.height).toBe(BRICK_HEIGHT);
     });
   });
 
@@ -41,9 +42,9 @@ describe('FallingBrick', () => {
     it('should apply gravity to velocity', () => {
       const deltaTime = 0.1;
       const initialPos = fallingBrick.getPosition();
-      
+
       fallingBrick.update(deltaTime);
-      
+
       const newPos = fallingBrick.getPosition();
       // Should have moved down due to gravity
       expect(newPos.y).toBeGreaterThan(initialPos.y);
@@ -51,21 +52,21 @@ describe('FallingBrick', () => {
 
     it('should accelerate over time', () => {
       const deltaTime = 0.1;
-      
+
       fallingBrick.update(deltaTime);
       const pos1 = fallingBrick.getPosition();
-      
+
       fallingBrick.update(deltaTime);
       const pos2 = fallingBrick.getPosition();
-      
+
       fallingBrick.update(deltaTime);
       const pos3 = fallingBrick.getPosition();
-      
+
       // Distance should increase each frame (acceleration)
       const dist1 = pos1.y - initialY;
       const dist2 = pos2.y - pos1.y;
       const dist3 = pos3.y - pos2.y;
-      
+
       expect(dist2).toBeGreaterThan(dist1);
       expect(dist3).toBeGreaterThan(dist2);
     });
@@ -73,9 +74,9 @@ describe('FallingBrick', () => {
     it('should not update when inactive', () => {
       fallingBrick.deactivate();
       const initialPos = fallingBrick.getPosition();
-      
+
       fallingBrick.update(0.1);
-      
+
       const newPos = fallingBrick.getPosition();
       expect(newPos.y).toBe(initialPos.y);
     });
@@ -100,12 +101,12 @@ describe('FallingBrick', () => {
 
     it('should return true after falling off screen', () => {
       const canvasHeight = 300;
-      
+
       // Update many times to make it fall
       for (let i = 0; i < 100; i++) {
         fallingBrick.update(0.1);
       }
-      
+
       expect(fallingBrick.isOffScreen(canvasHeight)).toBe(true);
     });
   });
@@ -113,16 +114,18 @@ describe('FallingBrick', () => {
   describe('getBounds', () => {
     it('should return correct bounds', () => {
       const bounds = fallingBrick.getBounds();
-      expect(bounds.x).toBe(initialX);
-      expect(bounds.y).toBe(initialY);
-      expect(bounds.width).toBe(BRICK_WIDTH);
-      expect(bounds.height).toBe(BRICK_HEIGHT);
+      expect(bounds).not.toBeNull();
+      expect(bounds!.x).toBe(initialX);
+      expect(bounds!.y).toBe(initialY);
+      expect(bounds!.width).toBe(BRICK_WIDTH);
+      expect(bounds!.height).toBe(BRICK_HEIGHT);
     });
 
     it('should update bounds after movement', () => {
       fallingBrick.update(0.1);
       const bounds = fallingBrick.getBounds();
-      expect(bounds.y).toBeGreaterThan(initialY);
+      expect(bounds).not.toBeNull();
+      expect(bounds!.y).toBeGreaterThan(initialY);
     });
   });
 });
