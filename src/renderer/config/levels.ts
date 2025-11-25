@@ -304,7 +304,7 @@ export function createLevel13(): LevelConfig {
     id: 13,
     name: t('game.levels.level13Name'),
     bricks: createBricksFromPattern(pattern),
-    baseHealth: 2,
+    baseHealth: 10,
   };
 }
 

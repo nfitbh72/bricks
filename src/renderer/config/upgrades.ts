@@ -164,6 +164,18 @@ export function getUpgrades() : Upgrade[] {
                 { type: UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT, level: 3 },
             ],
         },
+
+        // === MULTI BALL (requires Sticky Bat and More Lasers maxed) ===
+        {
+            name: t('game.upgrades.multiBall.name'),
+            description: t('game.upgrades.multiBall.description'),
+            times: 10,
+            type: UpgradeType.BALL_ADD_MULTIBALL,
+            prerequisites: [
+                { type: UpgradeType.BAT_ADD_STICKY, level: 1 }, // Primary parent (first)
+                { type: UpgradeType.BAT_ADDITIONAL_SHOOTER, level: 2 }, // Requires More Lasers maxed
+            ],
+        },
     ]
 }
 

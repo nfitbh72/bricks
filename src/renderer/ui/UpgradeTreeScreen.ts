@@ -42,6 +42,8 @@ interface UpgradeTreeState {
   availablePoints: number;
   selectedNode: UpgradeNode | null;
   hoveredNode: UpgradeNode | null;
+  mouseX: number;
+  mouseY: number;
 }
 
 export class UpgradeTreeScreen extends Screen {
@@ -56,9 +58,9 @@ export class UpgradeTreeScreen extends Screen {
   private hasVisitedBefore: boolean = false;
   
   // Layout constants
-  private readonly NODE_WIDTH = 180;
-  private readonly NODE_HEIGHT = 100;
-  private readonly NODE_SPACING = 250; // Distance from parent to child
+  private readonly NODE_WIDTH = 140;
+  private readonly NODE_HEIGHT = 70;
+  private readonly NODE_SPACING = 200; // Distance from parent to child
   private readonly HEADER_HEIGHT = 80;
   private readonly STATS_PANEL_WIDTH = 280;
   private readonly STATS_PANEL_PADDING = 20;
@@ -81,6 +83,8 @@ export class UpgradeTreeScreen extends Screen {
       availablePoints: 0,
       selectedNode: null,
       hoveredNode: null,
+      mouseX: 0,
+      mouseY: 0,
     };
     
     // Load upgrade sound
@@ -497,6 +501,10 @@ export class UpgradeTreeScreen extends Screen {
     // Check button hover
     super.handleMouseMove(x, y);
     
+    // Update mouse position for tooltip
+    this.state.mouseX = x;
+    this.state.mouseY = y;
+    
     // Check node hover
     this.state.hoveredNode = this.findNodeAtPosition(x, y);
   }
@@ -797,6 +805,11 @@ export class UpgradeTreeScreen extends Screen {
     // Render buttons
     for (const button of this.buttons) {
       button.render(this.ctx);
+    }
+    
+    // Render hover tooltip (on top of everything except welcome dialog)
+    if (this.state.hoveredNode) {
+      this.renderHoverTooltip(this.state.hoveredNode);
     }
     
     // Render welcome dialog on top of everything
@@ -1162,47 +1175,96 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.fillText(progressText, x, y - halfHeight + 25);
     
     if (isPreview) {
-      // Preview state: show ??? and LOCKED
+      // Preview state: show LOCKED
       this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_TITLE_TINY;
-      this.ctx.fillText(t('game.upgrades.preview'), x, y - halfHeight + 55);
-      
       this.ctx.font = FONT_TITLE_MICRO;
       this.ctx.fillText(t('game.upgrades.locked'), x, y + halfHeight - 14);
     } else {
-      // Unlocked or maxed: show full details
-      
-      // Maxed indicator
-      if (isMaxed) {
-        this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = FONT_TITLE_MICRO;
-        this.ctx.fillText(t('game.upgrades.maxed'), x, y - halfHeight + 40);
-      }
-      
-      // Description (word wrap)
-      this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_TITLE_MICRO;
-      this.renderWrappedText(
-        node.upgrade.description,
-        x,
-        y - halfHeight + (isMaxed ? 54 : 42),
-        this.NODE_WIDTH - 16,
-        14
-      );
-      
-      // Cost indicator (bottom)
+      // Unlocked or maxed: show cost indicator
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
         this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
         this.ctx.fillText(t('game.upgrades.cost'), x, y + halfHeight - 14);
-      } else {
-        this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
-        this.ctx.fillText(t('game.upgrades.fullyUpgraded'), x, y + halfHeight - 14);
       }
     }
     
     this.ctx.restore();
+  }
+
+  /**
+   * Render hover tooltip showing upgrade description
+   */
+  private renderHoverTooltip(node: UpgradeNode): void {
+    const tooltipWidth = 300;
+    const tooltipPadding = 15;
+    const lineHeight = 16;
+    
+    // Position tooltip near mouse, but keep it on screen
+    let tooltipX = this.state.mouseX + 20;
+    let tooltipY = this.state.mouseY + 20;
+    
+    // Measure text to calculate tooltip height
+    this.ctx.font = FONT_TITLE_MICRO;
+    const lines = this.wrapText(node.upgrade.description, tooltipWidth - tooltipPadding * 2);
+    const tooltipHeight = tooltipPadding * 2 + lines.length * lineHeight;
+    
+    // Keep tooltip on screen
+    if (tooltipX + tooltipWidth > this.canvas.width) {
+      tooltipX = this.state.mouseX - tooltipWidth - 20;
+    }
+    if (tooltipY + tooltipHeight > this.canvas.height) {
+      tooltipY = this.canvas.height - tooltipHeight - 10;
+    }
+    if (tooltipX < 10) tooltipX = 10;
+    if (tooltipY < 10) tooltipY = 10;
+    
+    // Draw tooltip background
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    this.ctx.fillRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+    
+    // Draw tooltip border
+    this.ctx.strokeStyle = node.state === 'maxed' ? '#ff00ff' : '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+    
+    // Draw description text
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = FONT_TITLE_MICRO;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
+    
+    let currentY = tooltipY + tooltipPadding;
+    for (const line of lines) {
+      this.ctx.fillText(line, tooltipX + tooltipPadding, currentY);
+      currentY += lineHeight;
+    }
+  }
+
+  /**
+   * Wrap text into lines that fit within maxWidth
+   */
+  private wrapText(text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      const metrics = this.ctx.measureText(testLine);
+      
+      if (metrics.width > maxWidth && currentLine !== '') {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    
+    return lines;
   }
 
   /**

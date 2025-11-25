@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Super Stats",
         "description": "Improve all ball stats"
+      },
+      "multiBall": {
+        "name": "Multi Ball",
+        "description": "Ball overload"
       }
     }
   }

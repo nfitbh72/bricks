@@ -284,6 +284,38 @@ export class GameUpgrades {
   }
 
   /**
+   * Check if multi-ball is unlocked
+   */
+  hasMultiBall(): boolean {
+    return this.getUpgradeLevel(UpgradeType.BALL_ADD_MULTIBALL) > 0;
+  }
+
+  /**
+   * Get multi-ball trigger chance (0 to 1)
+   * Base chance is 10%, increases by 10% per level
+   * Level 1 = 10%, Level 10 = 100%
+   */
+  getMultiBallChance(): number {
+    const level = this.getUpgradeLevel(UpgradeType.BALL_ADD_MULTIBALL);
+    if (level === 0) return 0;
+    
+    const chance = level * 0.1; // 10% per level
+    return Math.min(chance, 1.0); // Cap at 100%
+  }
+
+  /**
+   * Get number of balls to spawn when multi-ball triggers
+   * Starts at 2 balls, increases by 1 per level
+   * Level 1 = 2 balls, Level 10 = 11 balls
+   */
+  getMultiBallCount(): number {
+    const level = this.getUpgradeLevel(UpgradeType.BALL_ADD_MULTIBALL);
+    if (level === 0) return 0;
+    
+    return 2 + (level - 1); // Level 1 = 2, Level 2 = 3, ..., Level 10 = 11
+  }
+
+  /**
    * Get all active upgrades as a readable summary
    */
   getSummary(): string[] {
@@ -360,6 +392,13 @@ export class GameUpgrades {
     // Bombs - show tick when enabled
     const hasBombs = this.hasBombs();
     stats.push({ label: 'Bombs', value: hasBombs ? '✓' : '—', active: hasBombs });
+    
+    // Multi Ball - show chance and count
+    const hasMultiBall = this.hasMultiBall();
+    const multiBallChance = hasMultiBall ? (this.getMultiBallChance() * 100).toFixed(0) : '0';
+    const multiBallCount = hasMultiBall ? this.getMultiBallCount() : 0;
+    stats.push({ label: 'Multi Ball Chance', value: `${multiBallChance}%`, active: hasMultiBall });
+    stats.push({ label: 'Multi Ball Count', value: `${multiBallCount}`, active: hasMultiBall });
     
     // Lives - show total lives (base 1 + bonus)
     const healthBonus = this.getHealthBonus();

@@ -471,6 +471,15 @@ export class Game {
           console.warn('Achievement tracker error:', error);
         });
         
+        // Multi-ball upgrade - chance to spawn additional balls on brick destruction
+        if (this.gameUpgrades.hasMultiBall() && this.balls.length > 0) {
+          const multiBallChance = this.gameUpgrades.getMultiBallChance();
+          if (Math.random() < multiBallChance) {
+            const multiBallCount = this.gameUpgrades.getMultiBallCount();
+            this.spawnAdditionalBalls(this.balls[0], multiBallCount);
+          }
+        }
+        
         if (!this.level) return;
         
         const remainingBricks = this.level.getRemainingBricks();
