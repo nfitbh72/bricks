@@ -105,20 +105,31 @@ export enum UpgradeType {
     BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT = 'BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT',
     BALL_ADD_CRITICAL_HITS = 'BALL_ADD_CRITICAL_HITS',
     BALL_CHANCE_CRITICAL_HITS_10_PERCENT = 'BALL_CHANCE_CRITICAL_HITS_10_PERCENT',
-    BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT = 'BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT',
+    BALL_SUPER_STATS = 'BALL_SUPER_STATS',
 }
 
 /**
- * Upgrade definition
+ * Prerequisite requirement for an upgrade
+ */
+export interface UpgradePrerequisite {
+  type: UpgradeType;
+  level: number; // Required level (e.g., 3 means must be at level 3 or higher)
+}
+
+/**
+ * Upgrade definition (flat structure)
  */
 export interface Upgrade {
   name: string;
   description: string;
   times: number;
-  previewNextUpgrades: number;
-  unlockNextUpgradesAfterTimes: number;
-  nextUpgrades: Upgrade[];
   type: UpgradeType;
+  prerequisites?: UpgradePrerequisite[]; // Optional: requires ALL listed upgrades to be at specified levels
+  
+  // Legacy tree structure fields (deprecated, kept for backward compatibility)
+  previewNextUpgrades?: number;
+  unlockNextUpgradesAfterTimes?: number;
+  nextUpgrades?: Upgrade[];
 }
 
 /**

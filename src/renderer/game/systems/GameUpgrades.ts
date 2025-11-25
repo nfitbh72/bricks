@@ -111,15 +111,18 @@ export class GameUpgrades {
 
   /**
    * Get ball piercing chance (0 to 1)
+   * BALL_SUPER_STATS adds 10% per level
    */
   getBallPiercingChance(): number {
     if (!this.hasBallPiercing()) return 0;
     
     const piercingLevel = this.getUpgradeLevel(UpgradeType.BALL_CHANCE_PIERCING_10_PERCENT);
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
     const baseChance = 0.1; // 10% base chance
     const bonusChance = piercingLevel * 0.1; // +10% per level
+    const superStatsBonus = superStatsLevel * 0.1; // +10% per level
     
-    return Math.min(baseChance + bonusChance, 1.0); // Cap at 100%
+    return Math.min(baseChance + bonusChance + superStatsBonus, 1.0); // Cap at 100%
   }
 
   /**
@@ -131,10 +134,12 @@ export class GameUpgrades {
 
   /**
    * Get piercing duration in seconds
+   * BALL_SUPER_STATS adds 1 second per level
    */
   getPiercingDuration(): number {
     const level = this.getUpgradeLevel(UpgradeType.BALL_PIERCING_DURATION);
-    return level; // 1 second per level (0, 1, 2, or 3 seconds)
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    return level + superStatsLevel; // 1 second per level + super stats bonus
   }
 
   /**
@@ -183,27 +188,35 @@ export class GameUpgrades {
    * Get ball explosion damage multiplier
    * Base explosion damage is 10% of ball damage
    * Each upgrade level increases this by 10%
+   * BALL_SUPER_STATS adds 10% per level
    */
   getBallExplosionDamageMultiplier(): number {
     if (!this.hasBallExplosions()) return 0;
     
     const explosionLevel = this.getUpgradeLevel(UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT);
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
     const baseMultiplier = 0.1; // 10% base explosion damage
     const bonusMultiplier = explosionLevel * 0.1; // +10% per level
+    const superStatsBonus = superStatsLevel * 0.1; // +10% per level
     
-    return baseMultiplier + bonusMultiplier;
+    return baseMultiplier + bonusMultiplier + superStatsBonus;
   }
 
   /**
    * Get ball explosion radius multiplier
    * Base multiplier is 1.0 (100%)
    * Each upgrade level increases this by 20%
+   * BALL_SUPER_STATS adds 10% per level
    */
   getBallExplosionRadiusMultiplier(): number {
     if (!this.hasBallExplosions()) return 1.0;
     
     const radiusLevel = this.getUpgradeLevel(UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT);
-    return 1.0 + (radiusLevel * 0.2); // +20% per level
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const radiusBonus = radiusLevel * 0.2; // +20% per level
+    const superStatsBonus = superStatsLevel * 0.1; // +10% per level
+    
+    return 1.0 + radiusBonus + superStatsBonus;
   }
 
   /**
@@ -229,29 +242,29 @@ export class GameUpgrades {
 
   /**
    * Get critical hit damage multiplier
-   * Base multiplier is 2.0x (double damage), increases by 10% per upgrade level
-   * Also increases crit chance by 10% per level
+   * Base multiplier is 2.0x (double damage)
+   * BALL_SUPER_STATS increases by 10% per level
    */
   getCriticalHitDamageMultiplier(): number {
     if (!this.hasCriticalHits()) return 2.0;
     
-    const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT);
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
     const baseDamage = 2.0; // 2x damage base
-    const bonusDamage = damageLevel * 0.1; // +10% per level
+    const bonusDamage = superStatsLevel * 0.1; // +10% per level
     
     return baseDamage + bonusDamage;
   }
 
   /**
-   * Get total critical hit chance including damage upgrade bonus
-   * Critical Damage upgrade also increases crit chance by 10% per level
+   * Get total critical hit chance including super stats bonus
+   * BALL_SUPER_STATS increases crit chance by 10% per level
    */
   getTotalCriticalHitChance(): number {
     if (!this.hasCriticalHits()) return 0;
     
     const baseChance = this.getCriticalHitChance();
-    const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_CRITICAL_DAMAGE_INCREASE_10_PERCENT);
-    const bonusChance = damageLevel * 0.1; // +10% chance per level
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const bonusChance = superStatsLevel * 0.1; // +10% chance per level
     
     return Math.min(baseChance + bonusChance, 1.0); // Cap at 100%
   }

@@ -5,7 +5,7 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Upgrade } from '../game/core/types';
+import { Upgrade, UpgradeType } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
 import { TOTAL_LEVELS } from '../config/levels';
@@ -167,16 +167,12 @@ export class UpgradeTreeScreen extends Screen {
           node.state = 'unlocked';
         }
         
-        // Check if children should be unlocked/previewed
-        if (node.currentLevel >= node.upgrade.unlockNextUpgradesAfterTimes) {
-          for (const child of node.children) {
-            if (child.state === 'locked') {
+        // Check if children should be unlocked or previewed (based on prerequisites)
+        for (const child of node.children) {
+          if (child.state === 'locked' || child.state === 'preview') {
+            if (this.checkPrerequisites(child)) {
               child.state = 'unlocked';
-            }
-          }
-        } else if (node.currentLevel >= node.upgrade.previewNextUpgrades) {
-          for (const child of node.children) {
-            if (child.state === 'locked') {
+            } else if (this.checkPrerequisitesForPreview(child)) {
               child.state = 'preview';
             }
           }
@@ -229,39 +225,49 @@ export class UpgradeTreeScreen extends Screen {
 
   /**
    * Build the upgrade tree structure from flat upgrade list
+   * Uses prerequisites to determine parent-child relationships
    */
   private buildUpgradeTree(upgrades: Upgrade[]): UpgradeNode[] {
+    // Create all nodes first
+    const nodeMap = new Map<UpgradeType, UpgradeNode>();
+    
+    for (const upgrade of upgrades) {
+      const node: UpgradeNode = {
+        upgrade,
+        currentLevel: 0,
+        state: 'locked', // Will be updated for roots
+        position: { x: 0, y: 0 },
+        children: [],
+        parent: null,
+        animation: null,
+      };
+      nodeMap.set(upgrade.type, node);
+    }
+    
+    // Build parent-child relationships based on prerequisites
     const rootNodes: UpgradeNode[] = [];
     
     for (const upgrade of upgrades) {
-      const node = this.createUpgradeNode(upgrade, null);
-      rootNodes.push(node);
+      const node = nodeMap.get(upgrade.type);
+      if (!node) continue; // Skip if node wasn't created (shouldn't happen)
+      
+      if (!upgrade.prerequisites || upgrade.prerequisites.length === 0) {
+        // No prerequisites = root node
+        node.state = 'unlocked';
+        rootNodes.push(node);
+      } else {
+        // Has prerequisites - find the primary parent (first prerequisite)
+        const primaryPrereq = upgrade.prerequisites[0];
+        const parentNode = nodeMap.get(primaryPrereq.type);
+        
+        if (parentNode) {
+          node.parent = parentNode;
+          parentNode.children.push(node);
+        }
+      }
     }
     
     return rootNodes;
-  }
-
-  /**
-   * Recursively create upgrade nodes
-   */
-  private createUpgradeNode(upgrade: Upgrade, parent: UpgradeNode | null): UpgradeNode {
-    const node: UpgradeNode = {
-      upgrade,
-      currentLevel: 0,
-      state: parent === null ? 'unlocked' : 'locked', // Root nodes start unlocked
-      position: { x: 0, y: 0 }, // Will be calculated in layout
-      children: [],
-      parent,
-      animation: null,
-    };
-    
-    // Recursively create children
-    for (const childUpgrade of upgrade.nextUpgrades) {
-      const childNode = this.createUpgradeNode(childUpgrade, node);
-      node.children.push(childNode);
-    }
-    
-    return node;
   }
 
   /**
@@ -579,6 +585,9 @@ export class UpgradeTreeScreen extends Screen {
     
     // Update children states based on thresholds
     this.updateChildrenStates(node);
+    
+    // Check all nodes globally for prerequisite unlocks (handles cross-branch prerequisites)
+    this.updateAllNodeStates();
   }
 
   /**
@@ -599,23 +608,108 @@ export class UpgradeTreeScreen extends Screen {
     for (const child of node.children) {
       const previousState = child.state;
       
-      // Check unlock threshold first (takes priority)
-      if (node.currentLevel >= node.upgrade.unlockNextUpgradesAfterTimes) {
-        if (child.state === 'locked' || child.state === 'preview') {
+      // Check if prerequisites are met for unlock or preview
+      if (child.state === 'locked' || child.state === 'preview') {
+        if (this.checkPrerequisites(child)) {
+          // All prerequisites met - unlock
           child.state = 'unlocked';
-          // Trigger unlock animation if transitioning from preview
           if (previousState === 'preview') {
             this.startAnimation(child, 'unlock', 500);
+          } else if (previousState === 'locked') {
+            this.startAnimation(child, 'reveal', 400);
+          }
+        } else if (this.checkPrerequisitesForPreview(child)) {
+          // Partial prerequisites met - preview
+          if (child.state === 'locked') {
+            child.state = 'preview';
+            this.startAnimation(child, 'reveal', 400);
           }
         }
       }
-      // Check preview threshold (only if not already unlocked)
-      else if (node.currentLevel >= node.upgrade.previewNextUpgrades && child.state === 'locked') {
-        child.state = 'preview';
-        // Trigger reveal animation
-        this.startAnimation(child, 'reveal', 400);
+    }
+  }
+
+  /**
+   * Update all nodes globally to check for prerequisite unlocks
+   * This handles cross-branch prerequisites (e.g., BALL_SUPER_STATS)
+   */
+  private updateAllNodeStates(): void {
+    const updateNode = (node: UpgradeNode) => {
+      const previousState = node.state;
+      
+      // Check if this node should be unlocked or previewed based on prerequisites
+      if (node.state === 'locked' || node.state === 'preview') {
+        if (this.checkPrerequisites(node)) {
+          node.state = 'unlocked';
+          if (previousState === 'preview') {
+            this.startAnimation(node, 'unlock', 500);
+          }
+        } else if (this.checkPrerequisitesForPreview(node)) {
+          node.state = 'preview';
+          if (previousState === 'locked') {
+            this.startAnimation(node, 'reveal', 400);
+          }
+        }
+      }
+      
+      // Recursively check children
+      for (const child of node.children) {
+        updateNode(child);
+      }
+    };
+    
+    for (const rootNode of this.state.rootNodes) {
+      updateNode(rootNode);
+    }
+  }
+
+  /**
+   * Check if all prerequisites for a node are met (for unlock)
+   */
+  private checkPrerequisites(node: UpgradeNode): boolean {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length === 0) {
+      return true; // No prerequisites
+    }
+
+    const currentLevels = this.getUpgradeLevels();
+    
+    for (const prereq of node.upgrade.prerequisites) {
+      const currentLevel = currentLevels.get(prereq.type) || 0;
+      if (currentLevel < prereq.level) {
+        return false; // Prerequisite not met
       }
     }
+    
+    return true; // All prerequisites met
+  }
+
+  /**
+   * Check if prerequisites qualify for preview state
+   * Preview when: all prerequisites have at least 1 level BUT not all are complete
+   */
+  private checkPrerequisitesForPreview(node: UpgradeNode): boolean {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length === 0) {
+      return false; // No prerequisites = no preview needed
+    }
+
+    const currentLevels = this.getUpgradeLevels();
+    let allHaveAtLeastOne = true;
+    let allComplete = true;
+    
+    for (const prereq of node.upgrade.prerequisites) {
+      const currentLevel = currentLevels.get(prereq.type) || 0;
+      
+      if (currentLevel === 0) {
+        allHaveAtLeastOne = false;
+      }
+      
+      if (currentLevel < prereq.level) {
+        allComplete = false;
+      }
+    }
+    
+    // Preview when all have at least 1 level but not all are complete
+    return allHaveAtLeastOne && !allComplete;
   }
 
   /**
@@ -765,6 +859,8 @@ export class UpgradeTreeScreen extends Screen {
       // Only render connections to visible nodes (not locked)
       if (child.state !== 'locked') {
         this.renderConnection(node, child);
+        // Also render additional prerequisite connections
+        this.renderAdditionalPrerequisiteConnections(child);
       }
       this.renderConnectionsRecursive(child);
     }
@@ -773,15 +869,15 @@ export class UpgradeTreeScreen extends Screen {
   /**
    * Render connection line between parent and child
    */
-  private renderConnection(parent: UpgradeNode, child: UpgradeNode): void {
+  private renderConnection(parent: UpgradeNode, child: UpgradeNode, isAdditionalPrereq: boolean = false): void {
     this.ctx.save();
     
     const isActive = child.state === 'unlocked' || child.state === 'maxed';
     
     if (isActive) {
-      // Active connection: solid cyan with glow
+      // Active connection: solid cyan with glow (all connections use cyan)
       this.ctx.strokeStyle = '#00ffff';
-      this.ctx.lineWidth = 3;
+      this.ctx.lineWidth = isAdditionalPrereq ? 2 : 3;
       this.ctx.shadowBlur = 10;
       this.ctx.shadowColor = 'rgba(0, 255, 255, 0.6)';
     } else {
@@ -798,6 +894,48 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.stroke();
     
     this.ctx.restore();
+  }
+
+  /**
+   * Render additional prerequisite connections (for cross-branch requirements)
+   */
+  private renderAdditionalPrerequisiteConnections(node: UpgradeNode): void {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length <= 1) {
+      return; // No additional prerequisites
+    }
+
+    // Skip the first prerequisite (already rendered as parent connection)
+    const additionalPrereqs = node.upgrade.prerequisites.slice(1);
+    
+    for (const prereq of additionalPrereqs) {
+      // Find the prerequisite node
+      const prereqNode = this.findNodeByType(prereq.type);
+      if (prereqNode && prereqNode.state !== 'locked') {
+        this.renderConnection(prereqNode, node, true);
+      }
+    }
+  }
+
+  /**
+   * Find a node by its upgrade type (searches entire tree)
+   */
+  private findNodeByType(type: UpgradeType): UpgradeNode | null {
+    const search = (node: UpgradeNode): UpgradeNode | null => {
+      if (node.upgrade.type === type) {
+        return node;
+      }
+      for (const child of node.children) {
+        const found = search(child);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    for (const rootNode of this.state.rootNodes) {
+      const found = search(rootNode);
+      if (found) return found;
+    }
+    return null;
   }
 
   /**
