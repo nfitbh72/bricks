@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Super-Statistiken",
         "description": "Verbessert alle Ball-Statistiken"
+      },
+      "multiBall": {
+        "name": "Multi Ball",
+        "description": "Ball-Überlastung"
       }
     }
   }

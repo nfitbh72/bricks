@@ -86,7 +86,8 @@ export class GameUpgrades {
   applyBallUpgrades(): { speed: number; radius: number; damage: number } {
     // Ball damage upgrade
     const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1);
-    const damage = BALL_BASE_DAMAGE + damageLevel;
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const damage = BALL_BASE_DAMAGE + damageLevel + superStatsLevel; // +1 per Super Stats level
     
     return {
       speed: this.baseBallSpeed, // No speed upgrades yet
@@ -337,13 +338,14 @@ export class GameUpgrades {
   getDisplayStats(): DisplayStat[] {
     const stats: DisplayStat[] = [];
     
-    // Ball Damage - starts at 1, increments by 1 per level
+    // Ball Damage - starts at 1, increments by 1 per level, +1 per Super Stats level
     const damageLevel = this.getUpgradeLevel(UpgradeType.BALL_DAMAGE_INCREASE_INCREMENT_1);
-    const ballDamage = BALL_BASE_DAMAGE + damageLevel;
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const ballDamage = BALL_BASE_DAMAGE + damageLevel + superStatsLevel;
     stats.push({ 
       label: 'Ball Damage', 
       value: `${ballDamage}`, 
-      active: damageLevel > 0 
+      active: damageLevel > 0 || superStatsLevel > 0
     });
     
     // Bat Width - show in pixels

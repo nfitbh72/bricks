@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Super Stats",
         "description": "Pagbutihin ang lahat ng stats ng bola"
+      },
+      "multiBall": {
+        "name": "Multi Ball",
+        "description": "Sobrang dami ng bola"
       }
     }
   }

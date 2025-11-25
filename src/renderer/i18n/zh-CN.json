@@ -161,6 +161,10 @@
       "superStats": {
         "name": "超级属性",
         "description": "提升所有球的属性"
+      },
+      "multiBall": {
+        "name": "多重球",
+        "description": "球过载"
       }
     }
   }

@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Siêu Chỉ Số",
         "description": "Cải thiện tất cả chỉ số bóng"
+      },
+      "multiBall": {
+        "name": "Đa Bóng",
+        "description": "Quá tải bóng"
       }
     }
   }

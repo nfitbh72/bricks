@@ -161,6 +161,10 @@
       "superStats": {
         "name": "スーパー能力",
         "description": "すべてのボール能力を向上"
+      },
+      "multiBall": {
+        "name": "マルチボール",
+        "description": "ボール過負荷"
       }
     }
   }

@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Super Statistiques",
         "description": "Améliore toutes les statistiques de la balle"
+      },
+      "multiBall": {
+        "name": "Multi Balle",
+        "description": "Surcharge de balles"
       }
     }
   }

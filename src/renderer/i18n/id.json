@@ -161,6 +161,10 @@
       "superStats": {
         "name": "Statistik Super",
         "description": "Meningkatkan semua statistik bola"
+      },
+      "multiBall": {
+        "name": "Multi Bola",
+        "description": "Kelebihan bola"
       }
     }
   }
