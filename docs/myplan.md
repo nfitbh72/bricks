@@ -5,10 +5,14 @@ Just some notes about future features so that I don't forget
 ## Future Features
 
 - [] new special bricks
-    - [] Multi-ball
+    - [X] Multi-ball
     - [] 15 second piercing
     - [] make explosive brick much more damaging and wider
-- [] multi-lasers that hit the same brick should show damage per laser - this is about moving the damage above the block to a horizontal position where the damage was taken
+- [X] more upgrades
+    - [X] super stats
+    - [X] multi-ball
+    - [X] super stats should also increase ball damage by 1 for each upgrade
+- [] move the damage above the block to a horizontal position where the damage was taken, e.g. if 2 lasers hit the same block, show 2 damage values above the brick
 - [X] 0.0 brick health should destroy brick
 - [X] Final boss spawned blocks do not damage bat (the thrown bricks do damage bat as expected)
 - [?] Greyed out ball should reset to normal ball if it hits the edge or top of the screen (as well as the other current resets)

@@ -5,7 +5,7 @@
 
 import { steamAPI } from '../../steam/steamAPI';
 import { TOTAL_LEVELS, TOTAL_BOSSES } from '../../config/constants';
-import { UpgradeType } from '../core/types';
+import { getUpgrades } from '../../config/upgrades';
 
 // Progress persistence interface
 interface AchievementProgress {
@@ -245,7 +245,9 @@ export class AchievementTracker {
       this.cumulativeProgress.upgradesActivated.push(upgradeType);
       this.saveProgress();
       
-      if (this.cumulativeProgress.upgradesActivated.length >= Object.keys(UpgradeType).length) {
+      // Check against actual upgrades defined in upgrades.ts
+      const totalUpgrades = getUpgrades().length;
+      if (this.cumulativeProgress.upgradesActivated.length >= totalUpgrades) {
         await this.unlock('UPGRADE_MASTER');
       }
     }

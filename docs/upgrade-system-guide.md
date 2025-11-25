@@ -93,31 +93,38 @@ export enum UpgradeType {
   - `BAT_ADD_SHOOTER`
   - `BALL_CHANCE_PIERCING_10_PERCENT`
 
-### Step 2: Add to Upgrade Tree
+### Step 2: Add to Flat Upgrade Array
 
 **File:** `src/renderer/config/upgrades.ts`
 
-Add your upgrade to the tree structure inside the `getUpgrades()` function:
+Add your upgrade to the flat array inside the `getUpgrades()` function. The tree structure is built automatically based on prerequisites:
 
 ```typescript
 export function getUpgrades(): Upgrade[] {
     return [
+        // Root upgrades (no prerequisites)
         {
             name: t('game.upgrades.yourUpgrade.name'),
             description: t('game.upgrades.yourUpgrade.description'),
             times: 3,  // How many times it can be purchased
-            previewNextUpgrades: 1,  // How many child upgrades to show before unlock
-            unlockNextUpgradesAfterTimes: 2,  // Purchase count before children unlock
             type: UpgradeType.YOUR_NEW_UPGRADE,
-            nextUpgrades: [
-                // Child upgrades (if any)
+        },
+        
+        // Child upgrade (requires parent)
+        {
+            name: t('game.upgrades.yourChildUpgrade.name'),
+            description: t('game.upgrades.yourChildUpgrade.description'),
+            times: 1,
+            type: UpgradeType.YOUR_CHILD_UPGRADE,
+            prerequisites: [
+                { type: UpgradeType.YOUR_NEW_UPGRADE, level: 2 },  // Requires parent at level 2
             ],
-        }
+        },
     ];
 }
 ```
 
-**Note:** The upgrade tree uses the i18n translation system (`t()` function) for names and descriptions.
+**Note:** The upgrade system uses the i18n translation system (`t()` function) for names and descriptions.
 
 **Upgrade Properties:**
 
@@ -126,16 +133,14 @@ export function getUpgrades(): Upgrade[] {
 | `name` | string | Display name shown to player |
 | `description` | string | What the upgrade does |
 | `times` | number | Max purchase count (1 for unlocks) |
-| `previewNextUpgrades` | number | Purchases needed to preview children |
-| `unlockNextUpgradesAfterTimes` | number | Purchases needed to unlock children |
 | `type` | UpgradeType | Enum value for this upgrade |
-| `nextUpgrades` | Upgrade[] | Array of child upgrades |
+| `prerequisites` | UpgradePrerequisite[] | (Optional) Required upgrades and their levels |
 
-**Tree Structure Tips:**
-- Root upgrades are top-level entries in the array
-- Child upgrades go in the `nextUpgrades` array
-- You can nest upgrades multiple levels deep
-- Use `previewNextUpgrades: 0` for leaf nodes
+**Prerequisites:**
+- Upgrades with no `prerequisites` are root nodes (shown at the top)
+- The first prerequisite determines the parent in the tree
+- Additional prerequisites create cross-branch requirements
+- Format: `{ type: UpgradeType.PARENT, level: 2 }` means parent must be at level 2 or higher
 
 ### Step 3: Implement Upgrade Logic
 
@@ -397,6 +402,7 @@ if (collision.collided) {
 export enum UpgradeType {
     BALL_ADD_CRITICAL_HITS = 'BALL_ADD_CRITICAL_HITS',
     BALL_CHANCE_CRITICAL_HITS_10_PERCENT = 'BALL_CHANCE_CRITICAL_HITS_10_PERCENT',
+    BALL_SUPER_STATS = 'BALL_SUPER_STATS',
 }
 ```
 
@@ -414,10 +420,20 @@ export enum UpgradeType {
             name: 'Critical Chance+',
             description: 'Increase crit chance by 10%',
             times: 3,
-            previewNextUpgrades: 0,
-            unlockNextUpgradesAfterTimes: 0,
+            previewNextUpgrades: 1,
+            unlockNextUpgradesAfterTimes: 2,
             type: UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT,
-            nextUpgrades: [],
+            nextUpgrades: [
+                {
+                    name: 'SUPER STATS',
+                    description: 'Improve all ball stats',
+                    times: 10,
+                    previewNextUpgrades: 0,
+                    unlockNextUpgradesAfterTimes: 0,
+                    type: UpgradeType.BALL_SUPER_STATS,
+                    nextUpgrades: [],
+                }
+            ],
         }
     ],
 }
@@ -444,6 +460,35 @@ getCriticalHitChance(): number {
     
     return Math.min(baseChance + bonusChance, 1.0);
 }
+
+/**
+ * Get total critical hit chance including super stats bonus
+ * BALL_SUPER_STATS increases crit chance by 10% per level
+ */
+getTotalCriticalHitChance(): number {
+    if (!this.hasCriticalHits()) return 0;
+    
+    const baseChance = this.getCriticalHitChance();
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const bonusChance = superStatsLevel * 0.1; // +10% chance per level
+    
+    return Math.min(baseChance + bonusChance, 1.0); // Cap at 100%
+}
+
+/**
+ * Get critical hit damage multiplier
+ * Base multiplier is 2.0x (double damage)
+ * BALL_SUPER_STATS increases by 10% per level
+ */
+getCriticalHitDamageMultiplier(): number {
+    if (!this.hasCriticalHits()) return 2.0;
+    
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const baseDamage = 2.0; // 2x damage base
+    const bonusDamage = superStatsLevel * 0.1; // +10% per level
+    
+    return baseDamage + bonusDamage;
+}
 ```
 
 #### Step 4: Apply in Game.ts
@@ -454,9 +499,10 @@ if (collision.collided) {
     
     // Check for critical hit
     if (this.gameUpgrades.hasCriticalHits()) {
-        const critChance = this.gameUpgrades.getCriticalHitChance();
+        const critChance = this.gameUpgrades.getTotalCriticalHitChance();
         if (Math.random() < critChance) {
-            damage *= 2; // Critical hits deal double damage
+            const critMultiplier = this.gameUpgrades.getCriticalHitDamageMultiplier();
+            damage *= critMultiplier;
             // Show critical hit visual effect
             this.showCriticalHitEffect();
         }
@@ -465,6 +511,81 @@ if (collision.collided) {
     brick.takeDamage(damage);
 }
 ```
+
+---
+
+### Example 4: Multi-Stat Enhancement with Multiple Prerequisites (Super Stats)
+
+The `BALL_SUPER_STATS` upgrade demonstrates how to create an upgrade that requires multiple other upgrades to be maxed out first. This creates a powerful late-game upgrade that rewards players for fully investing in multiple upgrade paths.
+
+#### Step 1: Define in upgrades.ts
+
+```typescript
+{
+    name: 'SUPER STATS',
+    description: 'Improve all ball stats',
+    times: 10,
+    type: UpgradeType.BALL_SUPER_STATS,
+    prerequisites: [
+        { type: UpgradeType.BALL_PIERCING_DURATION, level: 3 },
+        { type: UpgradeType.BALL_CHANCE_CRITICAL_HITS_10_PERCENT, level: 3 },
+        { type: UpgradeType.BALL_EXPLOSION_RADIUS_INCREASE_20_PERCENT, level: 3 },
+    ],
+}
+```
+
+**How it works:**
+- The upgrade appears as a child of the first prerequisite (Piercing Duration)
+- It only unlocks when ALL three prerequisites are at level 3
+- This creates a convergence point for three separate upgrade branches
+
+#### Step 2: Implement Multi-Stat Effects
+
+Each level of `BALL_SUPER_STATS` provides:
+- +10% critical hit chance
+- +10% critical hit damage
+- +10% piercing chance
+- +10% explosion damage
+- +10% explosion radius
+- +1 second piercing duration
+
+```typescript
+// In GameUpgrades.ts - Each affected method checks for BALL_SUPER_STATS bonus
+
+getBallPiercingChance(): number {
+    if (!this.hasBallPiercing()) return 0;
+    
+    const piercingLevel = this.getUpgradeLevel(UpgradeType.BALL_CHANCE_PIERCING_10_PERCENT);
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const baseChance = 0.1;
+    const bonusChance = piercingLevel * 0.1;
+    const superStatsBonus = superStatsLevel * 0.1; // Super stats contribution
+    
+    return Math.min(baseChance + bonusChance + superStatsBonus, 1.0);
+}
+
+getBallExplosionDamageMultiplier(): number {
+    if (!this.hasBallExplosions()) return 0;
+    
+    const explosionLevel = this.getUpgradeLevel(UpgradeType.BALL_EXPLOSIONS_INCREASE_10_PERCENT);
+    const superStatsLevel = this.getUpgradeLevel(UpgradeType.BALL_SUPER_STATS);
+    const baseMultiplier = 0.1;
+    const bonusMultiplier = explosionLevel * 0.1;
+    const superStatsBonus = superStatsLevel * 0.1; // Super stats contribution
+    
+    return baseMultiplier + bonusMultiplier + superStatsBonus;
+}
+
+// Similar pattern for other affected stats...
+```
+
+**Key Points:**
+- Multiple prerequisites create cross-branch requirements
+- Super stats only affect features that are already unlocked
+- Each method independently checks the super stats level
+- Bonuses stack additively with other upgrades
+- Allows for powerful late-game scaling across multiple mechanics
+- Encourages diverse upgrade strategies
 
 ---
 

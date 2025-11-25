@@ -227,10 +227,16 @@ export const DYNAMITE_BAT_DAMAGE_PERCENT = 10; // Percentage of bat width to rem
 export const DYNAMITE_BRICK_DAMAGE_MULTIPLIER = 1.0; // Damage = current ball damage * 1.0
 
 // Multi-ball brick constants
-export const MULTIBALL_SPAWN_COUNT = 2; // Number of extra balls to spawn
+export const MULTIBALL_BRICK_SPAWN_COUNT = 2; // Number of extra balls to spawn from brick
 export const MULTIBALL_MIN_ANGLE = -150; // Degrees (upward-left)
 export const MULTIBALL_MAX_ANGLE = -30;  // Degrees (upward-right)
 export const MULTIBALL_DESPAWN_PARTICLE_COUNT = 8; // Particles when ball despawns
+
+// Multi-ball upgrade constants
+export const MULTIBALL_UPGRADE_CHANCE_PER_LEVEL = 0.02; // 2% chance per level
+export const MULTIBALL_UPGRADE_BALL_EVERY_N_LEVELS = 2; // Add 1 ball every 2 levels
+export const MULTIBALL_UPGRADE_BASE_BALLS = 2; // Base number of balls spawned at level 1
+export const MAX_BALLS_ON_SCREEN = 10; // Maximum number of balls allowed on screen
 
 // Boss1 constants
 export const BOSS1_HEALTH_MULTIPLIER = 6; // Boss1 health = base health * 6

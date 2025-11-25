@@ -5,11 +5,12 @@
 
 import { Screen } from './Screen';
 import { Button } from './Button';
-import { Upgrade } from '../game/core/types';
+import { Upgrade, UpgradeType } from '../game/core/types';
 import { t } from '../i18n/LanguageManager';
 import { getUpgrades } from '../config/upgrades';
 import { TOTAL_LEVELS } from '../config/levels';
 import { FONT_TITLE_NORMAL, FONT_TITLE_XSMALL, FONT_TITLE_SMALL, FONT_TITLE_TINY, FONT_TITLE_MICRO, GLOW_LARGE } from '../config/constants';
+import { GameUpgrades } from '../game/systems/GameUpgrades';
 
 /**
  * Animation types for upgrade nodes
@@ -41,6 +42,8 @@ interface UpgradeTreeState {
   availablePoints: number;
   selectedNode: UpgradeNode | null;
   hoveredNode: UpgradeNode | null;
+  mouseX: number;
+  mouseY: number;
 }
 
 export class UpgradeTreeScreen extends Screen {
@@ -55,17 +58,20 @@ export class UpgradeTreeScreen extends Screen {
   private hasVisitedBefore: boolean = false;
   
   // Layout constants
-  private readonly NODE_WIDTH = 180;
-  private readonly NODE_HEIGHT = 100;
-  private readonly NODE_SPACING = 250; // Distance from parent to child
+  private readonly NODE_WIDTH = 140;
+  private readonly NODE_HEIGHT = 70;
+  private readonly NODE_SPACING = 200; // Distance from parent to child
   private readonly HEADER_HEIGHT = 80;
+  private readonly STATS_PANEL_WIDTH = 280;
+  private readonly STATS_PANEL_PADDING = 20;
 
   constructor(
     canvas: HTMLCanvasElement,
     onContinue: () => void,
     onStartLevel: (levelId: number) => void,
     upgrades: Upgrade[],
-    private onUpgradeActivated: (upgradeType: string) => void
+    private onUpgradeActivated: (upgradeType: string) => void,
+    private gameUpgrades?: GameUpgrades
   ) {
     super(canvas);
     this.onContinue = onContinue;
@@ -77,6 +83,8 @@ export class UpgradeTreeScreen extends Screen {
       availablePoints: 0,
       selectedNode: null,
       hoveredNode: null,
+      mouseX: 0,
+      mouseY: 0,
     };
     
     // Load upgrade sound
@@ -135,6 +143,11 @@ export class UpgradeTreeScreen extends Screen {
     
     // Reset points
     this.state.availablePoints = 0;
+    
+    // Update GameUpgrades with empty levels
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(new Map());
+    }
   }
 
   /**
@@ -167,16 +180,12 @@ export class UpgradeTreeScreen extends Screen {
           node.state = 'unlocked';
         }
         
-        // Check if children should be unlocked/previewed
-        if (node.currentLevel >= node.upgrade.unlockNextUpgradesAfterTimes) {
-          for (const child of node.children) {
-            if (child.state === 'locked') {
+        // Check if children should be unlocked or previewed (based on prerequisites)
+        for (const child of node.children) {
+          if (child.state === 'locked' || child.state === 'preview') {
+            if (this.checkPrerequisites(child)) {
               child.state = 'unlocked';
-            }
-          }
-        } else if (node.currentLevel >= node.upgrade.previewNextUpgrades) {
-          for (const child of node.children) {
-            if (child.state === 'locked') {
+            } else if (this.checkPrerequisitesForPreview(child)) {
               child.state = 'preview';
             }
           }
@@ -191,6 +200,11 @@ export class UpgradeTreeScreen extends Screen {
     
     for (const rootNode of this.state.rootNodes) {
       restoreLevels(rootNode);
+    }
+    
+    // Update GameUpgrades with restored levels
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
     }
     
     // Recalculate layout
@@ -229,39 +243,49 @@ export class UpgradeTreeScreen extends Screen {
 
   /**
    * Build the upgrade tree structure from flat upgrade list
+   * Uses prerequisites to determine parent-child relationships
    */
   private buildUpgradeTree(upgrades: Upgrade[]): UpgradeNode[] {
+    // Create all nodes first
+    const nodeMap = new Map<UpgradeType, UpgradeNode>();
+    
+    for (const upgrade of upgrades) {
+      const node: UpgradeNode = {
+        upgrade,
+        currentLevel: 0,
+        state: 'locked', // Will be updated for roots
+        position: { x: 0, y: 0 },
+        children: [],
+        parent: null,
+        animation: null,
+      };
+      nodeMap.set(upgrade.type, node);
+    }
+    
+    // Build parent-child relationships based on prerequisites
     const rootNodes: UpgradeNode[] = [];
     
     for (const upgrade of upgrades) {
-      const node = this.createUpgradeNode(upgrade, null);
-      rootNodes.push(node);
+      const node = nodeMap.get(upgrade.type);
+      if (!node) continue; // Skip if node wasn't created (shouldn't happen)
+      
+      if (!upgrade.prerequisites || upgrade.prerequisites.length === 0) {
+        // No prerequisites = root node
+        node.state = 'unlocked';
+        rootNodes.push(node);
+      } else {
+        // Has prerequisites - find the primary parent (first prerequisite)
+        const primaryPrereq = upgrade.prerequisites[0];
+        const parentNode = nodeMap.get(primaryPrereq.type);
+        
+        if (parentNode) {
+          node.parent = parentNode;
+          parentNode.children.push(node);
+        }
+      }
     }
     
     return rootNodes;
-  }
-
-  /**
-   * Recursively create upgrade nodes
-   */
-  private createUpgradeNode(upgrade: Upgrade, parent: UpgradeNode | null): UpgradeNode {
-    const node: UpgradeNode = {
-      upgrade,
-      currentLevel: 0,
-      state: parent === null ? 'unlocked' : 'locked', // Root nodes start unlocked
-      position: { x: 0, y: 0 }, // Will be calculated in layout
-      children: [],
-      parent,
-      animation: null,
-    };
-    
-    // Recursively create children
-    for (const childUpgrade of upgrade.nextUpgrades) {
-      const childNode = this.createUpgradeNode(childUpgrade, node);
-      node.children.push(childNode);
-    }
-    
-    return node;
   }
 
   /**
@@ -290,6 +314,50 @@ export class UpgradeTreeScreen extends Screen {
         const x = startX + index * spacing;
         this.positionNodeWithChildren(node, x, topY, 0);
       });
+    }
+    
+    // Second pass: adjust positions for nodes with multiple prerequisites
+    // Position them in the middle of all their parent nodes
+    this.centerNodesWithMultiplePrerequisites();
+  }
+  
+  /**
+   * Center nodes that have multiple prerequisites between all their parent nodes
+   */
+  private centerNodesWithMultiplePrerequisites(): void {
+    const nodeMap = new Map<UpgradeType, UpgradeNode>();
+    
+    // Build a map of all nodes
+    const collectNodes = (node: UpgradeNode) => {
+      nodeMap.set(node.upgrade.type, node);
+      for (const child of node.children) {
+        collectNodes(child);
+      }
+    };
+    
+    for (const root of this.state.rootNodes) {
+      collectNodes(root);
+    }
+    
+    // Find and reposition nodes with multiple prerequisites
+    for (const node of nodeMap.values()) {
+      const prereqs = node.upgrade.prerequisites;
+      if (prereqs && prereqs.length > 1) {
+        // Get all parent nodes
+        const parentNodes = prereqs
+          .map(p => nodeMap.get(p.type))
+          .filter(p => p !== undefined) as UpgradeNode[];
+        
+        if (parentNodes.length > 1) {
+          // Calculate average position of all parents
+          const avgX = parentNodes.reduce((sum, p) => sum + p.position.x, 0) / parentNodes.length;
+          const avgY = parentNodes.reduce((sum, p) => sum + p.position.y, 0) / parentNodes.length;
+          
+          // Position this node below the average position
+          node.position.x = avgX;
+          node.position.y = avgY + this.NODE_SPACING;
+        }
+      }
     }
   }
 
@@ -454,6 +522,11 @@ export class UpgradeTreeScreen extends Screen {
     // Unlock all root nodes and their children
     this.state.rootNodes.forEach(root => unlockNode(root));
 
+    // Update GameUpgrades with new levels for stats panel
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
+    }
+
     // Play sound
     try {
       this.upgradeSound.currentTime = 0;
@@ -471,6 +544,10 @@ export class UpgradeTreeScreen extends Screen {
   handleMouseMove(x: number, y: number): void {
     // Check button hover
     super.handleMouseMove(x, y);
+    
+    // Update mouse position for tooltip
+    this.state.mouseX = x;
+    this.state.mouseY = y;
     
     // Check node hover
     this.state.hoveredNode = this.findNodeAtPosition(x, y);
@@ -563,6 +640,11 @@ export class UpgradeTreeScreen extends Screen {
     this.state.availablePoints--;
     node.currentLevel++;
     
+    // Update GameUpgrades with new levels for stats panel
+    if (this.gameUpgrades) {
+      this.gameUpgrades.setUpgradeLevels(this.getUpgradeLevels());
+    }
+    
     // Track upgrade activation for achievements
     this.onUpgradeActivated(node.upgrade.type);
     
@@ -579,6 +661,9 @@ export class UpgradeTreeScreen extends Screen {
     
     // Update children states based on thresholds
     this.updateChildrenStates(node);
+    
+    // Check all nodes globally for prerequisite unlocks (handles cross-branch prerequisites)
+    this.updateAllNodeStates();
   }
 
   /**
@@ -599,23 +684,108 @@ export class UpgradeTreeScreen extends Screen {
     for (const child of node.children) {
       const previousState = child.state;
       
-      // Check unlock threshold first (takes priority)
-      if (node.currentLevel >= node.upgrade.unlockNextUpgradesAfterTimes) {
-        if (child.state === 'locked' || child.state === 'preview') {
+      // Check if prerequisites are met for unlock or preview
+      if (child.state === 'locked' || child.state === 'preview') {
+        if (this.checkPrerequisites(child)) {
+          // All prerequisites met - unlock
           child.state = 'unlocked';
-          // Trigger unlock animation if transitioning from preview
           if (previousState === 'preview') {
             this.startAnimation(child, 'unlock', 500);
+          } else if (previousState === 'locked') {
+            this.startAnimation(child, 'reveal', 400);
+          }
+        } else if (this.checkPrerequisitesForPreview(child)) {
+          // Partial prerequisites met - preview
+          if (child.state === 'locked') {
+            child.state = 'preview';
+            this.startAnimation(child, 'reveal', 400);
           }
         }
       }
-      // Check preview threshold (only if not already unlocked)
-      else if (node.currentLevel >= node.upgrade.previewNextUpgrades && child.state === 'locked') {
-        child.state = 'preview';
-        // Trigger reveal animation
-        this.startAnimation(child, 'reveal', 400);
+    }
+  }
+
+  /**
+   * Update all nodes globally to check for prerequisite unlocks
+   * This handles cross-branch prerequisites (e.g., BALL_SUPER_STATS)
+   */
+  private updateAllNodeStates(): void {
+    const updateNode = (node: UpgradeNode) => {
+      const previousState = node.state;
+      
+      // Check if this node should be unlocked or previewed based on prerequisites
+      if (node.state === 'locked' || node.state === 'preview') {
+        if (this.checkPrerequisites(node)) {
+          node.state = 'unlocked';
+          if (previousState === 'preview') {
+            this.startAnimation(node, 'unlock', 500);
+          }
+        } else if (this.checkPrerequisitesForPreview(node)) {
+          node.state = 'preview';
+          if (previousState === 'locked') {
+            this.startAnimation(node, 'reveal', 400);
+          }
+        }
+      }
+      
+      // Recursively check children
+      for (const child of node.children) {
+        updateNode(child);
+      }
+    };
+    
+    for (const rootNode of this.state.rootNodes) {
+      updateNode(rootNode);
+    }
+  }
+
+  /**
+   * Check if all prerequisites for a node are met (for unlock)
+   */
+  private checkPrerequisites(node: UpgradeNode): boolean {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length === 0) {
+      return true; // No prerequisites
+    }
+
+    const currentLevels = this.getUpgradeLevels();
+    
+    for (const prereq of node.upgrade.prerequisites) {
+      const currentLevel = currentLevels.get(prereq.type) || 0;
+      if (currentLevel < prereq.level) {
+        return false; // Prerequisite not met
       }
     }
+    
+    return true; // All prerequisites met
+  }
+
+  /**
+   * Check if prerequisites qualify for preview state
+   * Preview when: all prerequisites have at least 1 level BUT not all are complete
+   */
+  private checkPrerequisitesForPreview(node: UpgradeNode): boolean {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length === 0) {
+      return false; // No prerequisites = no preview needed
+    }
+
+    const currentLevels = this.getUpgradeLevels();
+    let allHaveAtLeastOne = true;
+    let allComplete = true;
+    
+    for (const prereq of node.upgrade.prerequisites) {
+      const currentLevel = currentLevels.get(prereq.type) || 0;
+      
+      if (currentLevel === 0) {
+        allHaveAtLeastOne = false;
+      }
+      
+      if (currentLevel < prereq.level) {
+        allComplete = false;
+      }
+    }
+    
+    // Preview when all have at least 1 level but not all are complete
+    return allHaveAtLeastOne && !allComplete;
   }
 
   /**
@@ -668,12 +838,22 @@ export class UpgradeTreeScreen extends Screen {
     // Render header
     this.renderHeader();
     
+    // Render stats panel
+    if (this.gameUpgrades) {
+      this.renderStatsPanel();
+    }
+    
     // Render all nodes and connections
     this.renderTree();
     
     // Render buttons
     for (const button of this.buttons) {
       button.render(this.ctx);
+    }
+    
+    // Render hover tooltip (on top of everything except welcome dialog)
+    if (this.state.hoveredNode) {
+      this.renderHoverTooltip(this.state.hoveredNode);
     }
     
     // Render welcome dialog on top of everything
@@ -743,6 +923,60 @@ export class UpgradeTreeScreen extends Screen {
   }
 
   /**
+   * Render stats panel on the left side
+   */
+  private renderStatsPanel(): void {
+    if (!this.gameUpgrades) return;
+
+    this.ctx.save();
+    
+    const panelX = this.STATS_PANEL_PADDING;
+    const panelY = this.HEADER_HEIGHT + this.STATS_PANEL_PADDING;
+    const panelWidth = this.STATS_PANEL_WIDTH;
+    
+    // Panel background
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.fillRect(panelX, panelY, panelWidth, this.canvas.height - panelY - this.STATS_PANEL_PADDING);
+    
+    // Panel border
+    this.ctx.strokeStyle = '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.shadowBlur = 5;
+    this.ctx.shadowColor = '#00ffff';
+    this.ctx.strokeRect(panelX, panelY, panelWidth, this.canvas.height - panelY - this.STATS_PANEL_PADDING);
+    
+    // Title
+    this.ctx.fillStyle = '#00ffff';
+    this.ctx.font = FONT_TITLE_SMALL;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
+    this.ctx.shadowBlur = 10;
+    this.ctx.fillText('CURRENT STATS', panelX + 15, panelY + 15);
+    
+    // Get all stats from GameUpgrades (all calculation logic is there)
+    const stats = this.gameUpgrades.getDisplayStats();
+    
+    // Render stats
+    this.ctx.font = FONT_TITLE_TINY;
+    this.ctx.shadowBlur = 0;
+    let yOffset = panelY + 55;
+    const lineHeight = 24;
+    
+    for (const stat of stats) {
+      this.ctx.fillStyle = stat.active ? '#00ffff' : '#666666';
+      this.ctx.fillText(stat.label, panelX + 15, yOffset);
+      
+      this.ctx.textAlign = 'right';
+      this.ctx.fillText(stat.value, panelX + panelWidth - 15, yOffset);
+      this.ctx.textAlign = 'left';
+      
+      yOffset += lineHeight;
+    }
+    
+    this.ctx.restore();
+  }
+
+  /**
    * Render the entire tree (connections and nodes)
    */
   private renderTree(): void {
@@ -765,6 +999,8 @@ export class UpgradeTreeScreen extends Screen {
       // Only render connections to visible nodes (not locked)
       if (child.state !== 'locked') {
         this.renderConnection(node, child);
+        // Also render additional prerequisite connections
+        this.renderAdditionalPrerequisiteConnections(child);
       }
       this.renderConnectionsRecursive(child);
     }
@@ -773,15 +1009,15 @@ export class UpgradeTreeScreen extends Screen {
   /**
    * Render connection line between parent and child
    */
-  private renderConnection(parent: UpgradeNode, child: UpgradeNode): void {
+  private renderConnection(parent: UpgradeNode, child: UpgradeNode, isAdditionalPrereq: boolean = false): void {
     this.ctx.save();
     
     const isActive = child.state === 'unlocked' || child.state === 'maxed';
     
     if (isActive) {
-      // Active connection: solid cyan with glow
+      // Active connection: solid cyan with glow (all connections use cyan)
       this.ctx.strokeStyle = '#00ffff';
-      this.ctx.lineWidth = 3;
+      this.ctx.lineWidth = isAdditionalPrereq ? 2 : 3;
       this.ctx.shadowBlur = 10;
       this.ctx.shadowColor = 'rgba(0, 255, 255, 0.6)';
     } else {
@@ -798,6 +1034,48 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.stroke();
     
     this.ctx.restore();
+  }
+
+  /**
+   * Render additional prerequisite connections (for cross-branch requirements)
+   */
+  private renderAdditionalPrerequisiteConnections(node: UpgradeNode): void {
+    if (!node.upgrade.prerequisites || node.upgrade.prerequisites.length <= 1) {
+      return; // No additional prerequisites
+    }
+
+    // Skip the first prerequisite (already rendered as parent connection)
+    const additionalPrereqs = node.upgrade.prerequisites.slice(1);
+    
+    for (const prereq of additionalPrereqs) {
+      // Find the prerequisite node
+      const prereqNode = this.findNodeByType(prereq.type);
+      if (prereqNode && prereqNode.state !== 'locked') {
+        this.renderConnection(prereqNode, node, true);
+      }
+    }
+  }
+
+  /**
+   * Find a node by its upgrade type (searches entire tree)
+   */
+  private findNodeByType(type: UpgradeType): UpgradeNode | null {
+    const search = (node: UpgradeNode): UpgradeNode | null => {
+      if (node.upgrade.type === type) {
+        return node;
+      }
+      for (const child of node.children) {
+        const found = search(child);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    for (const rootNode of this.state.rootNodes) {
+      const found = search(rootNode);
+      if (found) return found;
+    }
+    return null;
   }
 
   /**
@@ -941,47 +1219,96 @@ export class UpgradeTreeScreen extends Screen {
     this.ctx.fillText(progressText, x, y - halfHeight + 25);
     
     if (isPreview) {
-      // Preview state: show ??? and LOCKED
+      // Preview state: show LOCKED
       this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_TITLE_TINY;
-      this.ctx.fillText(t('game.upgrades.preview'), x, y - halfHeight + 55);
-      
       this.ctx.font = FONT_TITLE_MICRO;
       this.ctx.fillText(t('game.upgrades.locked'), x, y + halfHeight - 14);
     } else {
-      // Unlocked or maxed: show full details
-      
-      // Maxed indicator
-      if (isMaxed) {
-        this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = FONT_TITLE_MICRO;
-        this.ctx.fillText(t('game.upgrades.maxed'), x, y - halfHeight + 40);
-      }
-      
-      // Description (word wrap)
-      this.ctx.fillStyle = textColor;
-      this.ctx.font = FONT_TITLE_MICRO;
-      this.renderWrappedText(
-        node.upgrade.description,
-        x,
-        y - halfHeight + (isMaxed ? 54 : 42),
-        this.NODE_WIDTH - 16,
-        14
-      );
-      
-      // Cost indicator (bottom)
+      // Unlocked or maxed: show cost indicator
       if (!isMaxed) {
         this.ctx.fillStyle = '#00ffff';
         this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
         this.ctx.fillText(t('game.upgrades.cost'), x, y + halfHeight - 14);
-      } else {
-        this.ctx.fillStyle = '#ff00ff';
-        this.ctx.font = `bold ${FONT_TITLE_MICRO}`;
-        this.ctx.fillText(t('game.upgrades.fullyUpgraded'), x, y + halfHeight - 14);
       }
     }
     
     this.ctx.restore();
+  }
+
+  /**
+   * Render hover tooltip showing upgrade description
+   */
+  private renderHoverTooltip(node: UpgradeNode): void {
+    const tooltipWidth = 300;
+    const tooltipPadding = 15;
+    const lineHeight = 16;
+    
+    // Position tooltip near mouse, but keep it on screen
+    let tooltipX = this.state.mouseX + 20;
+    let tooltipY = this.state.mouseY + 20;
+    
+    // Measure text to calculate tooltip height
+    this.ctx.font = FONT_TITLE_MICRO;
+    const lines = this.wrapText(node.upgrade.description, tooltipWidth - tooltipPadding * 2);
+    const tooltipHeight = tooltipPadding * 2 + lines.length * lineHeight;
+    
+    // Keep tooltip on screen
+    if (tooltipX + tooltipWidth > this.canvas.width) {
+      tooltipX = this.state.mouseX - tooltipWidth - 20;
+    }
+    if (tooltipY + tooltipHeight > this.canvas.height) {
+      tooltipY = this.canvas.height - tooltipHeight - 10;
+    }
+    if (tooltipX < 10) tooltipX = 10;
+    if (tooltipY < 10) tooltipY = 10;
+    
+    // Draw tooltip background
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+    this.ctx.fillRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+    
+    // Draw tooltip border
+    this.ctx.strokeStyle = node.state === 'maxed' ? '#ff00ff' : '#00ffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+    
+    // Draw description text
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = FONT_TITLE_MICRO;
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
+    
+    let currentY = tooltipY + tooltipPadding;
+    for (const line of lines) {
+      this.ctx.fillText(line, tooltipX + tooltipPadding, currentY);
+      currentY += lineHeight;
+    }
+  }
+
+  /**
+   * Wrap text into lines that fit within maxWidth
+   */
+  private wrapText(text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      const metrics = this.ctx.measureText(testLine);
+      
+      if (metrics.width > maxWidth && currentLine !== '') {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    
+    return lines;
   }
 
   /**

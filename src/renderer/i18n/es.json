@@ -157,6 +157,14 @@
       "stickyBat": {
         "name": "Bate Pegajoso",
         "description": "Mantén Espacio para Bate Pegajoso"
+      },
+      "superStats": {
+        "name": "Súper Estadísticas",
+        "description": "Mejora todas las estadísticas de la bola"
+      },
+      "multiBall": {
+        "name": "Multi Bola",
+        "description": "Sobrecarga de bolas"
       }
     }
   }

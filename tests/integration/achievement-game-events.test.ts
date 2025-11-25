@@ -33,6 +33,7 @@ jest.mock('path', () => ({
 
 import { AchievementTracker } from '../../src/renderer/game/managers/AchievementTracker';
 import { AchievementManager } from '../../src/main/steam/AchievementManager';
+import { getUpgrades } from '../../src/renderer/config/upgrades';
 
 // Mock dependencies
 const mockElectronAPI = {
@@ -201,27 +202,25 @@ describe('Achievement System Integration', () => {
     });
 
     it('should track upgrades and unlock UPGRADE_MASTER at threshold', async () => {
-      // Track progress towards UPGRADE_MASTER (17 upgrades)
-      const upgrades = [
-        'RAPID_FIRE', 'MULTI_BALL', 'POWER_BALL', 'WIDER_PADDLE', 'SLOWER_BALL',
-        'EXTRA_LIFE', 'SHIELD', 'LASER', 'MAGNET', 'EXPLOSIVE_BALL',
-        'PIERCE_BALL', 'SPLIT_BALL', 'TIME_SLOW', 'SCORE_MULTIPLIER', 'BRICK_DAMAGE',
-        'BOSS_DAMAGE', 'SPEED_BOOST'
-      ];
+      // Get all actual upgrades from the game dynamically
+      const allUpgrades = getUpgrades();
+      const upgradeTypes = allUpgrades.map(u => u.type);
+      const totalUpgrades = upgradeTypes.length;
 
-      for (let i = 0; i < 16; i++) {
-        await tracker.onUpgradeActivated(upgrades[i]);
+      // Track all upgrades except the last one
+      for (let i = 0; i < totalUpgrades - 1; i++) {
+        await tracker.onUpgradeActivated(upgradeTypes[i]);
       }
 
       let progress = tracker.getProgress();
-      expect(progress.upgradesActivated).toHaveLength(16);
+      expect(progress.upgradesActivated).toHaveLength(totalUpgrades - 1);
       expect(mockElectronAPI.unlockAchievement).not.toHaveBeenCalledWith('UPGRADE_MASTER');
 
       // Final upgrade that should unlock the achievement
-      await tracker.onUpgradeActivated(upgrades[16]);
+      await tracker.onUpgradeActivated(upgradeTypes[totalUpgrades - 1]);
 
       progress = tracker.getProgress();
-      expect(progress.upgradesActivated).toHaveLength(17);
+      expect(progress.upgradesActivated).toHaveLength(totalUpgrades);
       
       // Should trigger achievement unlock
       expect(mockElectronAPI.unlockAchievement).toHaveBeenCalledWith('UPGRADE_MASTER');
