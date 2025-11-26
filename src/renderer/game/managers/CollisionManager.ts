@@ -576,4 +576,88 @@ export class CollisionManager {
       a.y + a.height > b.y
     );
   }
+
+  /**
+   * Orchestrate all collision checks for a frame
+   * Handles sticky ball logic, ball collisions, entity registration, and generic collision processing
+   */
+  checkAllCollisions(
+    level: Level,
+    balls: Ball[],
+    bat: Bat,
+    gameUpgrades: GameUpgrades,
+    inputManager: { isSpaceHeld: () => boolean },
+    weaponManager: { getLasers: () => ICollidable[]; getBombs: () => ICollidable[] },
+    offensiveEntityManager: { getEntities: () => ICollidable[]; getDynamiteSticks: () => DynamiteStick[] },
+    bossManager: { registerForCollisions: (cm: CollisionManager) => void }
+  ): void {
+    // Sticky ball logic - check if primary ball should stick to bat
+    const primaryBall = balls[0];
+    if (gameUpgrades.hasStickyBat() && inputManager.isSpaceHeld() && !primaryBall.getIsSticky()) {
+      const ballBounds = primaryBall.getCircleBounds();
+      const batBounds = bat.getBounds();
+      const ballRadius = primaryBall.getRadius();
+
+      // Check if primary ball is touching bat
+      if (ballBounds.y + ballRadius >= batBounds.y &&
+        ballBounds.x + ballRadius >= batBounds.x &&
+        ballBounds.x - ballRadius <= batBounds.x + batBounds.width) {
+        // Make primary ball sticky on top of bat (not initial, so uses hold/release behavior)
+        primaryBall.setSticky(true, 0, -ballRadius, false);
+      }
+    }
+
+    // Populate spatial hash with bricks for optimized collision detection
+    this.populateSpatialHash(level);
+
+    // Check ball collisions
+    for (const ball of balls) {
+      this.checkBallBatCollision(ball, bat);
+      // Ball-brick collisions (with spatial hash optimization)
+      this.checkBallBrickCollisions(ball, level, gameUpgrades);
+    }
+
+    // Generic Collision Processing (Phase 4.2)
+    // Clear previous frame's collidables
+    this.clearCollidables();
+    
+    // Register entities
+    this.register(bat);
+    
+    // Register bricks
+    for (const brick of level.getActiveBricks()) {
+      this.register(brick);
+    }
+    
+    // Register lasers
+    for (const laser of weaponManager.getLasers()) {
+      this.register(laser);
+    }
+    
+    // Register bombs
+    for (const bomb of weaponManager.getBombs()) {
+      this.register(bomb);
+    }
+    
+    // Register offensive entities
+    const offensiveEntities = offensiveEntityManager.getEntities();
+    for (const entity of offensiveEntities) {
+      this.register(entity);
+    }
+
+    // Register boss fragments for collision
+    bossManager.registerForCollisions(this);
+
+    // Process generic collisions (handles BOMB vs BRICK, LASER vs BRICK, BAT vs OFFENSIVE)
+    this.processCollisions();
+
+    // Dynamite explosion handling (area of effect, distinct from direct collision)
+    // Only primary ball damage is used for reference
+    this.checkDynamiteStickCollisions(
+      offensiveEntityManager.getDynamiteSticks(),
+      bat,
+      level.getActiveBricks(),
+      primaryBall.getDamage()
+    );
+  }
 }

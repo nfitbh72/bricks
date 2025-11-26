@@ -290,4 +290,42 @@ export class AchievementTracker {
     this.achievementsThisRun = [];
     this.levelStats = this.resetLevelStats();
   }
+
+  /**
+   * Get list of achievements that had progress changes during this level
+   * Compares start-of-level progress snapshot with current progress
+   */
+  getAchievementsWithProgressChange(levelStartProgress: {
+    totalBricksDestroyed: number;
+    totalBossesDefeated: number;
+    totalDamageDealt: number;
+    levelsCompleted: number;
+    upgradesActivated: number;
+    bossTypesDefeated: number;
+  }): string[] {
+    const achievementsWithProgressChange: string[] = [];
+    const endProgress = this.getProgress();
+
+    // Check each cumulative achievement for progress changes
+    if (endProgress.totalBricksDestroyed > levelStartProgress.totalBricksDestroyed) {
+      achievementsWithProgressChange.push('BRICK_SMASHER');
+    }
+    if (endProgress.totalBossesDefeated > levelStartProgress.totalBossesDefeated) {
+      achievementsWithProgressChange.push('BOSS_SMASHER');
+    }
+    if (endProgress.totalDamageDealt > levelStartProgress.totalDamageDealt) {
+      achievementsWithProgressChange.push('DAMAGE_DEALER');
+    }
+    if (endProgress.levelsCompleted.length > levelStartProgress.levelsCompleted) {
+      achievementsWithProgressChange.push('FIRST_LEVEL', 'HALFWAY_THERE', 'LEVEL_MASTER');
+    }
+    if (endProgress.upgradesActivated.length > levelStartProgress.upgradesActivated) {
+      achievementsWithProgressChange.push('UPGRADE_MASTER');
+    }
+    if (endProgress.bossTypesDefeated.length > levelStartProgress.bossTypesDefeated) {
+      achievementsWithProgressChange.push('ALL_BOSSES');
+    }
+
+    return achievementsWithProgressChange;
+  }
 }

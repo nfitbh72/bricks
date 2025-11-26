@@ -37,11 +37,9 @@ export function createLevel1(): LevelConfig {
  */
 export function createLevel2(): LevelConfig {
   const pattern = [
-    "FFFFFFFFF",
+    "NNNNNNNNN",
     "F F F F F",
-    "FFFFFFFFF",
-    "F F F F F",
-    "FFFFFFFFF"
+    "NNNNNNNNN",
   ];
 
   return {
