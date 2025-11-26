@@ -80,23 +80,4 @@ export class Level {
   getPlayerHealth(): number {
     return 1; // Base health, actual health managed by Game
   }
-
-  /**
-   * Reset all bricks to full health
-   */
-  reset(): void {
-    // Resetting requires recreating bricks from config, which now lives in Factory
-    // However, we can just restore existing bricks
-    this.bricks.forEach(brick => brick.restore());
-  }
-
-
-  /**
-   * Render all active bricks
-   */
-  render(ctx: CanvasRenderingContext2D): void {
-    for (const brick of this.bricks) {
-      brick.render(ctx);
-    }
-  }
 }

@@ -312,26 +312,27 @@ describe('Level Class', () => {
   // getPlayerHealth is deprecated - health is now managed centrally in Game class
 
   describe('reset', () => {
-    it('should restore all bricks', () => {
+    it('should restore all bricks via brick.restore()', () => {
       const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks.forEach((brick) => brick.takeDamage(10));
       expect(level.isComplete()).toBe(true);
       
-      level.reset();
+      // Reset is now done by restoring individual bricks
+      bricks.forEach((brick) => brick.restore());
       expect(level.isComplete()).toBe(false);
       expect(level.getRemainingBricks()).toBe(3);
     });
 
-    it('should restore brick health', () => {
+    it('should restore brick health via brick.restore()', () => {
       const level = LevelFactory.createLevel(testConfig);
       const bricks = level.getBricks();
       bricks[1].takeDamage(1); // HEALTHY brick: 3 -> 2
       expect(bricks[1].getHealth()).toBe(2);
       
-      level.reset();
-      const newBricks = level.getBricks();
-      expect(newBricks[1].getHealth()).toBe(3); // Restored to HEALTHY max
+      // Reset is now done by restoring individual bricks
+      bricks[1].restore();
+      expect(bricks[1].getHealth()).toBe(3); // Restored to HEALTHY max
     });
   });
 

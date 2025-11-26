@@ -80,9 +80,11 @@ export class RenderManager {
 
     this.ctx.translate(shake.x, shake.y);
 
-    // Render level (bricks)
+    // Render level bricks
     if (level) {
-      level.render(this.ctx);
+      for (const brick of level.getBricks()) {
+        brick.render(this.ctx);
+      }
     }
 
     // Render bat
