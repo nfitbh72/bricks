@@ -4,9 +4,11 @@
  */
 
 import { EXPLODING_BRICK_DEBRIS_SIZE, PARTICLE_GLOW_BLUR, SPLITTING_FRAGMENT_GRAVITY } from '../../../config/constants';
-import { IEntity, Bounds } from '../../core/IEntity';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class Debris implements IEntity {
+export class Debris implements ICollidable {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly size: number = EXPLODING_BRICK_DEBRIS_SIZE;
@@ -112,5 +114,13 @@ export class Debris implements IEntity {
       this.position.y < -this.size ||
       this.position.y > canvasHeight + this.size
     );
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.OFFENSIVE;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision handlers
   }
 }

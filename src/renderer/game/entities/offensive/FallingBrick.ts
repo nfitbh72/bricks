@@ -4,9 +4,11 @@
  */
 
 import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../../../config/constants';
-import { IEntity, Bounds } from '../../core/IEntity';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class FallingBrick implements IEntity {
+export class FallingBrick implements ICollidable {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly width: number = BRICK_WIDTH;
@@ -182,5 +184,13 @@ export class FallingBrick implements IEntity {
     const g = Math.max(0, ((num >> 8) & 0xff) - percent);
     const b = Math.max(0, (num & 0xff) - percent);
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.OFFENSIVE;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision handlers
   }
 }

@@ -99,7 +99,7 @@ export class Boss3 extends BaseBoss {
     return copies;
   }
 
-  update(deltaTime: number, batX: number, batY: number): void {
+  updateBoss(deltaTime: number, batX: number, batY: number): void {
     if (!this.active) return;
 
     this.updateMovement(deltaTime);

@@ -10,9 +10,11 @@ import {
   LASER_BRICK_WARNING_COLOR,
   COLOR_WHITE,
 } from '../../../config/constants';
-import { IEntity, Bounds } from '../../core/IEntity';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class BrickLaser implements IEntity { // Modified
+export class BrickLaser implements ICollidable {
   private position: { x: number; y: number };
   private readonly targetX: number; // Target bat X position
   private readonly width: number = LASER_BRICK_LASER_WIDTH;
@@ -155,5 +157,19 @@ export class BrickLaser implements IEntity { // Modified
    */
   isOffScreen(canvasHeight: number): boolean {
     return this.position.y > canvasHeight;
+  }
+
+  /**
+   * Get collision group for generic collision system
+   */
+  getCollisionGroup(): CollisionGroup {
+    return CollisionGroup.OFFENSIVE;
+  }
+
+  /**
+   * Handle collision (delegated to collision handlers)
+   */
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+    // Handled by collision handlers
   }
 }

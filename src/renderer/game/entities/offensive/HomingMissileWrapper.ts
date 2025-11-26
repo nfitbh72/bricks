@@ -1,11 +1,13 @@
-import { IEntity, Bounds } from '../../core/IEntity';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 import { HomingMissile } from './HomingMissile';
 
 /**
  * Wrapper for HomingMissile that implements IEntity
  * Stores target coordinates and delegates to the underlying HomingMissile
  */
-export class HomingMissileWrapper implements IEntity {
+export class HomingMissileWrapper implements ICollidable {
     private missile: HomingMissile;
     private targetX: number = 0;
     private targetY: number = 0;
@@ -57,5 +59,13 @@ export class HomingMissileWrapper implements IEntity {
      */
     isOffScreen(canvasWidth: number, canvasHeight: number): boolean {
         return this.missile.isOffScreen(canvasWidth, canvasHeight);
+    }
+
+    getCollisionGroup(): CollisionGroup {
+        return CollisionGroup.OFFENSIVE;
+    }
+
+    onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+        // Handled by collision handlers
     }
 }

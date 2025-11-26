@@ -4,6 +4,7 @@
  */
 
 import { IEntity } from '../core/IEntity';
+import { ICollidable } from '../core/ICollidable';
 import { FallingBrick } from '../entities/offensive/FallingBrick';
 import { Debris } from '../entities/offensive/Debris';
 import { BrickLaser } from '../entities/offensive/BrickLaser';
@@ -131,6 +132,13 @@ export class OffensiveEntityManager {
    */
   getDynamiteSticks(): DynamiteStick[] {
     return this.entities.filter((e): e is DynamiteStick => e instanceof DynamiteStick);
+  }
+
+  /**
+   * Get all offensive entities (ICollidable)
+   */
+  getEntities(): ICollidable[] {
+    return this.entities as ICollidable[];
   }
 
   /**

@@ -45,6 +45,7 @@ import { InputManager } from '../managers/InputManager';
 import { ScreenManager } from '../managers/ScreenManager';
 import { EffectsManager } from '../managers/EffectsManager';
 import { CollisionManager } from '../managers/CollisionManager';
+import { CollisionHandlerRegistry } from '../managers/CollisionHandlerRegistry';
 import { WeaponManager } from '../managers/WeaponManager';
 import { OffensiveEntityManager } from '../managers/OffensiveEntityManager';
 import { SlowMotionManager } from '../managers/SlowMotionManager';
@@ -224,6 +225,7 @@ export class Game {
     // Initialize collision manager
     this.collisionManager = new CollisionManager(this.context);
     this.setupEventListeners();
+    this.setupCollisionHandlers();
 
     // Initialize weapon manager
     this.weaponManager = new WeaponManager();
@@ -578,6 +580,16 @@ export class Game {
         this.audioManager.playBatDamage();
       }
     });
+  }
+
+  /**
+   * Set up collision handlers for generic collision processing
+   */
+  private setupCollisionHandlers(): void {
+    CollisionHandlerRegistry.registerAllHandlers(
+      this.collisionManager,
+      this.context
+    );
   }
 
   /**
@@ -969,9 +981,9 @@ export class Game {
       this.bat.getCenterY()
     );
 
-    // Update boss if active (use effective deltaTime for slow-mo)
+    // Update boss if active
     if (this.boss && this.boss.isActive()) {
-      this.boss.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+      this.boss.updateBoss(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
 
       // Check if Boss3 should split
       if (this.boss instanceof Boss3 && this.boss.shouldSplit()) {
@@ -994,13 +1006,14 @@ export class Game {
     }
 
     // Update boss copies
-    for (const copy of this.bossCopies) {
-      if (copy.isActive()) {
-        copy.update(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+    if (this.bossCopies.length > 0) {
+      this.bossCopies = this.bossCopies.filter(copy => copy.isActive());
+      for (const copy of this.bossCopies) {
+        if (copy.isActive()) {
+          copy.updateBoss(effectiveDeltaTime, this.bat.getCenterX(), this.bat.getCenterY());
+        }
       }
     }
-    // Remove destroyed copies
-    this.bossCopies = this.bossCopies.filter(c => c.isActive());
 
     // Update collision manager for all balls (use effective deltaTime for slow-mo)
     for (const ball of this.balls) {
@@ -1234,7 +1247,7 @@ export class Game {
     // Only primary ball can become sticky
     const primaryBall = this.getPrimaryBall();
     if (this.gameUpgrades.hasStickyBat() && this.inputManager.isSpaceHeld() && !primaryBall.getIsSticky()) {
-      const ballBounds = primaryBall.getBounds();
+      const ballBounds = primaryBall.getCircleBounds();
       const batBounds = this.bat.getBounds();
       const ballRadius = primaryBall.getRadius();
 
@@ -1257,18 +1270,53 @@ export class Game {
       this.collisionManager.checkBallBrickCollisions(ball, this.level, this.gameUpgrades);
     }
 
-    // Weapon collisions (with spatial hash optimization)
-    this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
+    // Generic Collision Processing (Phase 4.2)
+    // Clear previous frame's collidables
+    this.collisionManager.clearCollidables();
+    
+    // Register entities
+    this.collisionManager.register(this.bat);
+    
+    // Register bricks
+    for (const brick of this.level.getActiveBricks()) {
+      this.collisionManager.register(brick);
+    }
+    
+    // Register lasers
+    for (const laser of this.weaponManager.getLasers()) {
+      this.collisionManager.register(laser);
+    }
+    
+    // Register bombs
+    for (const bomb of this.weaponManager.getBombs()) {
+      this.collisionManager.register(bomb);
+    }
+    
+    // Register offensive entities
+    const offensiveEntities = this.offensiveEntityManager.getEntities();
+    for (const entity of offensiveEntities) {
+        this.collisionManager.register(entity);
+    }
 
-    // Bomb collisions (with spatial hash optimization)
-    this.collisionManager.checkBombBrickCollisions(this.weaponManager.getBombs(), this.level);
+    // Register Boss3 splitting fragments
+    if (this.boss && this.boss.isActive() && this.boss instanceof Boss3) {
+      for (const fragment of this.boss.getSplittingFragments()) {
+        this.collisionManager.register(fragment);
+      }
+    }
+    for (const copy of this.bossCopies) {
+      if (copy.isActive() && copy instanceof Boss3) {
+        for (const fragment of copy.getSplittingFragments()) {
+          this.collisionManager.register(fragment);
+        }
+      }
+    }
 
-    // Offensive entity collisions
-    this.collisionManager.checkFallingBrickBatCollisions(this.offensiveEntityManager.getFallingBricks(), this.bat);
-    this.collisionManager.checkDebrisBatCollisions(this.offensiveEntityManager.getDebris(), this.bat);
-    this.collisionManager.checkBrickLaserBatCollisions(this.offensiveEntityManager.getBrickLasers(), this.bat);
-    this.collisionManager.checkHomingMissileBatCollisions(this.offensiveEntityManager.getHomingMissiles(), this.bat);
-    this.collisionManager.checkSplittingFragmentBatCollisions(this.offensiveEntityManager.getSplittingFragments(), this.bat);
+    // Process generic collisions (handles BOMB vs BRICK, LASER vs BRICK, BAT vs OFFENSIVE)
+    this.collisionManager.processCollisions();
+
+    // Dynamite explosion handling (area of effect, distinct from direct collision)
+    // Only primary ball damage is used for reference
     this.collisionManager.checkDynamiteStickCollisions(
       this.offensiveEntityManager.getDynamiteSticks(),
       this.bat,
@@ -1326,14 +1374,6 @@ export class Game {
           this.effectsManager.createParticles(x, y, 15, '#ff0000', 150);
         }
       );
-
-      // Boss3 splitting fragment-Bat collision
-      if (this.boss instanceof Boss3) {
-        this.collisionManager.checkSplittingFragmentBatCollisions(
-          this.boss.getSplittingFragments(),
-          this.bat
-        );
-      }
     }
 
     // Boss copy collisions (for Boss3 split copies)
@@ -1377,14 +1417,6 @@ export class Game {
             this.effectsManager.createParticles(x, y, 15, '#cc00ff', 150);
           }
         );
-
-        // Boss3 copy splitting fragment-Bat collision
-        if (copy instanceof Boss3) {
-          this.collisionManager.checkSplittingFragmentBatCollisions(
-            copy.getSplittingFragments(),
-            this.bat
-          );
-        }
       }
     }
   }

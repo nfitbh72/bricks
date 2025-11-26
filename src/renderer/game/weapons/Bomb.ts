@@ -4,8 +4,11 @@
  */
 
 import { Vector2D } from '../core/types';
+import { ICollidable } from '../core/ICollidable';
+import { Bounds } from '../core/IEntity';
+import { CollisionGroup } from '../core/CollisionTypes';
 
-export class Bomb {
+export class Bomb implements ICollidable {
   private position: Vector2D;
   private readonly speed: number;
   private readonly damage: number;
@@ -143,5 +146,13 @@ export class Bomb {
    */
   isOffScreen(minY: number): boolean {
     return this.position.y < minY;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.BOMB;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision handlers
   }
 }

@@ -13,9 +13,11 @@ import {
   COLOR_BLACK,
   COLOR_WHITE,
 } from '../../../config/constants';
-import { IEntity, Bounds } from '../../core/IEntity';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class SplittingFragment implements IEntity {
+export class SplittingFragment implements ICollidable {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly size: number = SPLITTING_FRAGMENT_SIZE;
@@ -187,5 +189,19 @@ export class SplittingFragment implements IEntity {
       this.position.y < -this.size ||
       this.position.y > canvasHeight + this.size
     );
+  }
+
+  /**
+   * Get collision group for generic collision system
+   */
+  getCollisionGroup(): CollisionGroup {
+    return CollisionGroup.OFFENSIVE;
+  }
+
+  /**
+   * Handle collision (delegated to collision handlers)
+   */
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+    // Handled by collision handlers
   }
 }

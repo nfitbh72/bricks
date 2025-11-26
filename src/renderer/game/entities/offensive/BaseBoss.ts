@@ -6,8 +6,11 @@
 import { Brick } from '../Brick';
 import { ThrownBrick } from './ThrownBrick';
 import { BRICK_WIDTH, BRICK_HEIGHT } from '../../../config/constants';
+import { ICollidable } from '../../core/ICollidable';
+import { Bounds } from '../../core/IEntity';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export abstract class BaseBoss {
+export abstract class BaseBoss implements ICollidable {
   // Shared properties
   protected x: number;
   protected y: number;
@@ -215,8 +218,17 @@ export abstract class BaseBoss {
   }
   
   // Abstract methods - must be implemented by subclasses
-  abstract update(deltaTime: number, batX: number, batY: number): void;
   abstract render(ctx: CanvasRenderingContext2D): void;
+  abstract updateBoss(deltaTime: number, batX: number, batY: number): void;
+
+  // IEntity interface implementation
+  update(deltaTime: number): void {
+      // Use stored targets or default behavior if needed
+      // For bosses, the game loop calls update(dt, batX, batY) explicitly
+      // This method satisfies IEntity interface but shouldn't be the primary update call
+      // We can default batX/batY to center or handle this differently
+      this.updateBoss(deltaTime, this.canvasWidth / 2, this.canvasHeight - 100);
+  }
   
   // Standard interface methods
   setAvailableBricks(bricks: Brick[]): void {
@@ -232,7 +244,7 @@ export abstract class BaseBoss {
     }
   }
 
-  getBounds(): { x: number; y: number; width: number; height: number } | null {
+  getBounds(): Bounds | null {
     if (!this.active) return null;
     return {
       x: this.x,
@@ -250,6 +262,10 @@ export abstract class BaseBoss {
     return this.active;
   }
 
+  deactivate(): void {
+      this.active = false;
+  }
+
   isDestroyed(): boolean {
     return !this.active;
   }
@@ -260,5 +276,13 @@ export abstract class BaseBoss {
 
   getMaxHealth(): number {
     return this.maxHealth;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.OFFENSIVE;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision manager
   }
 }

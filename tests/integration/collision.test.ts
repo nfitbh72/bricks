@@ -89,7 +89,7 @@ describe('Collision Detection Integration', () => {
       // Place ball in center of brick
       const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y + BRICK_HEIGHT / 2, BALL_RADIUS, 300);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -101,7 +101,7 @@ describe('Collision Detection Integration', () => {
       // Place ball far away from brick
       const ball = new Ball(100, 100, BALL_RADIUS, 300);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -114,7 +114,7 @@ describe('Collision Detection Integration', () => {
       // Place ball above brick (approaching from top) - within collision distance
       const ball = new Ball(brickPos.x + BRICK_WIDTH / 2, brickPos.y - TEST_BALL_COLLISION_OFFSET, BALL_RADIUS, 300);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -131,7 +131,7 @@ describe('Collision Detection Integration', () => {
       
       ball.setVelocity(0, 100); // Moving down
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -151,7 +151,7 @@ describe('Collision Detection Integration', () => {
       
       ball.setVelocity(100, 0); // Moving right
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -171,7 +171,7 @@ describe('Collision Detection Integration', () => {
       
       expect(brick.getHealth()).toBe(3);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -190,7 +190,7 @@ describe('Collision Detection Integration', () => {
       
       expect(brick.isDestroyed()).toBe(false);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
@@ -301,7 +301,7 @@ describe('Collision Detection Integration', () => {
       ball.setPosition(brickBounds.x + brickBounds.width / 2, brickBounds.y + brickBounds.height + 5);
       ball.setVelocity(0, -100); // Moving up toward brick
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       
       expect(result.collided).toBe(true); // Should collide
@@ -327,7 +327,7 @@ describe('Collision Detection Integration', () => {
       ball.setVelocity(100, 0);
       
       // Check collision with first brick
-      let ballBounds = ball.getBounds();
+      let ballBounds = ball.getCircleBounds();
       let result1 = checkCircleRectCollision(ballBounds, brick1.getBounds());
       
       if (result1.collided) {
@@ -338,7 +338,7 @@ describe('Collision Detection Integration', () => {
       ball.setPosition(brick2Pos.x + BRICK_WIDTH / 2, brick2Pos.y + BRICK_HEIGHT / 2);
       
       // Check collision with second brick
-      ballBounds = ball.getBounds();
+      ballBounds = ball.getCircleBounds();
       let result2 = checkCircleRectCollision(ballBounds, brick2.getBounds());
       
       if (result2.collided) {
@@ -385,7 +385,7 @@ describe('Collision Detection Integration', () => {
       
       ball.setVelocity(0, 0);
       
-      const ballBounds = ball.getBounds();
+      const ballBounds = ball.getCircleBounds();
       const brickBounds = brick.getBounds();
       const result = checkCircleRectCollision(ballBounds, brickBounds);
       

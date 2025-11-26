@@ -2,7 +2,9 @@
  * Brick entity - represents a destructible brick in the game
  */
 
-import { IEntity, Bounds } from '../core/IEntity';
+import { Bounds } from '../core/IEntity';
+import { ICollidable } from '../core/ICollidable';
+import { CollisionGroup } from '../core/CollisionTypes';
 import { BrickConfig } from '../core/types';
 import { BrickType } from '../core/types';
 import {
@@ -22,7 +24,7 @@ export interface BrickDestructionInfo {
   centerY: number;
 }
 
-export class Brick implements IEntity {
+export class Brick implements ICollidable {
   private position: { x: number; y: number };
   private readonly width: number = BRICK_WIDTH;
   private readonly height: number = BRICK_HEIGHT;
@@ -530,5 +532,13 @@ export class Brick implements IEntity {
    */
   deactivate(): void {
     this.health = 0;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.BRICK;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Default behavior handled by collision manager for now
   }
 }

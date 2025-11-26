@@ -65,7 +65,7 @@ describe('Boss1', () => {
     it('should update position over time', () => {
       const initialBounds = boss.getBounds()!;
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       const newBounds = boss.getBounds()!;
       // Position should change (either x or y)
@@ -78,14 +78,14 @@ describe('Boss1', () => {
       boss.takeDamage(100);
       const bounds = boss.getBounds();
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       expect(boss.getBounds()).toBe(bounds);
     });
 
     it('should update arms position', () => {
       // Arms should follow boss position
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       // Verify by rendering - arms should be rendered
       boss.render(mockCtx);
@@ -101,7 +101,7 @@ describe('Boss1', () => {
       expect(boss.getThrownBricks()).toHaveLength(0);
       
       // Wait for throw interval (2 seconds)
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       
       expect(boss.getThrownBricks().length).toBeGreaterThan(0);
     });
@@ -134,7 +134,7 @@ describe('Boss1', () => {
       ];
       boss.setAvailableBricks(mockBricks);
       
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       
       const thrownBricks = boss.getThrownBricks();
       expect(thrownBricks.length).toBeGreaterThan(0);
@@ -148,13 +148,13 @@ describe('Boss1', () => {
       ];
       boss.setAvailableBricks(mockBricks);
       
-      boss.update(0.1, 400, 500); // Throw first (cooldown starts at 0)
-      boss.update(2.1, 400, 500); // Throw second
+      boss.updateBoss(0.1, 400, 500); // Throw first (cooldown starts at 0)
+      boss.updateBoss(2.1, 400, 500); // Throw second
       
       // Bricks may have gone off-screen and been removed
       // Try to throw again - should not throw (no bricks left in available)
       const countBefore = boss.getThrownBricks().length;
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       const countAfter = boss.getThrownBricks().length;
       
       // Count should not increase (no new bricks thrown)
@@ -164,7 +164,7 @@ describe('Boss1', () => {
     it('should not throw when no bricks available', () => {
       boss.setAvailableBricks([]);
       
-      boss.update(3, 400, 500);
+      boss.updateBoss(3, 400, 500);
       
       expect(boss.getThrownBricks()).toHaveLength(0);
     });
@@ -208,7 +208,7 @@ describe('Boss1', () => {
         new Brick({ row: 0, col: 0, type: BrickType.NORMAL }, 1),
       ];
       boss.setAvailableBricks(mockBricks);
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       
       boss.render(mockCtx);
       
@@ -229,7 +229,7 @@ describe('Boss1', () => {
     it('should stay within canvas bounds', () => {
       // Update many times to test boundary clamping
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 0, 0);
+        boss.updateBoss(0.1, 0, 0);
       }
       
       const bounds = boss.getBounds()!;

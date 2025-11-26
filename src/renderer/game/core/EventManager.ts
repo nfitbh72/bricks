@@ -67,4 +67,5 @@ export const GameEvents = {
     PLAYER_HEALTH_CHANGED: 'player_health_changed',
     BOSS_SPAWNED: 'boss_spawned',
     BOSS_DEFEATED: 'boss_defeated',
+    GENERIC_COLLISION: 'generic_collision',
 };
