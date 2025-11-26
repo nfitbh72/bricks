@@ -6,6 +6,7 @@ import { Laser } from '../weapons/Laser';
 import { Bomb } from '../weapons/Bomb';
 import { Bat } from '../entities/Bat';
 import { Ball } from '../entities/Ball';
+import { Brick } from '../entities/Brick';
 import { GameUpgrades } from '../systems/GameUpgrades';
 import { 
   LASER_SPEED_MULTIPLIER, 
@@ -16,10 +17,18 @@ import {
   BOMB_COOLDOWN_MS
 } from '../../config/constants';
 
+interface DelayedExplosion {
+  brick: Brick;
+  x: number;
+  y: number;
+  delay: number;
+}
+
 export class WeaponManager {
   private lasers: Laser[] = [];
   private bombs: Bomb[] = [];
   private lastBombTime: number = 0;
+  private delayedBombExplosions: DelayedExplosion[] = [];
 
   /**
    * Shoot lasers from all bat turrets (if shooter upgrade is unlocked)
@@ -169,6 +178,7 @@ export class WeaponManager {
   clear(): void {
     this.lasers = [];
     this.bombs = [];
+    this.delayedBombExplosions = [];
   }
 
   /**
@@ -183,5 +193,65 @@ export class WeaponManager {
    */
   getActiveBombCount(): number {
     return this.bombs.filter(bomb => bomb.isActive()).length;
+  }
+
+  /**
+   * Queue delayed bomb explosions for chain reactions
+   * Used when a bomb brick is destroyed to create cascading explosions
+   */
+  queueDelayedExplosions(bricksToDamage: Brick[]): void {
+    const totalDuration = 1.5; // Total time for all explosions
+    const delayPerBrick = totalDuration / bricksToDamage.length;
+
+    for (let i = 0; i < bricksToDamage.length; i++) {
+      const targetBrick = bricksToDamage[i];
+      const targetBounds = targetBrick.getBounds();
+      const targetX = targetBounds.x + targetBounds.width / 2;
+      const targetY = targetBounds.y + targetBounds.height / 2;
+
+      // Queue this brick for delayed explosion damage
+      this.delayedBombExplosions.push({
+        brick: targetBrick,
+        x: targetX,
+        y: targetY,
+        delay: i * delayPerBrick
+      });
+    }
+  }
+
+  /**
+   * Update delayed bomb explosions
+   * Processes queued explosions and applies damage when their delay expires
+   */
+  updateDelayedExplosions(
+    deltaTime: number,
+    bombDamage: number,
+    onExplosion: (brick: Brick, x: number, y: number, damage: number, justDestroyed: boolean) => void
+  ): void {
+    // Decrease delay timers
+    for (let i = this.delayedBombExplosions.length - 1; i >= 0; i--) {
+      const explosion = this.delayedBombExplosions[i];
+      explosion.delay -= deltaTime;
+
+      // If delay has elapsed, trigger the explosion
+      if (explosion.delay <= 0) {
+        const targetBrick = explosion.brick;
+
+        // Skip if brick is already destroyed
+        if (targetBrick.isDestroyed()) {
+          this.delayedBombExplosions.splice(i, 1);
+          continue;
+        }
+
+        // Apply damage - brick's onDestroy callback will handle offensive entity spawning
+        const destructionInfo = targetBrick.takeDamage(bombDamage);
+
+        // Notify caller about the explosion
+        onExplosion(targetBrick, explosion.x, explosion.y, bombDamage, destructionInfo.justDestroyed);
+
+        // Remove this explosion from the queue
+        this.delayedBombExplosions.splice(i, 1);
+      }
+    }
   }
 }

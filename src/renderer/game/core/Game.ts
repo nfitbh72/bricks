@@ -108,12 +108,6 @@ export class Game {
   private isDevUpgradeMode: boolean = false;
   private levelTime: number = 0; // Time spent on current level in seconds
   private bombDamage: number = 0; // Bomb brick damage (3x ball damage at level start)
-  private delayedBombExplosions: Array<{
-    brick: Brick;
-    x: number;
-    y: number;
-    delay: number;
-  }> = [];
 
   // Upgrades
   private gameUpgrades: GameUpgrades;
@@ -363,23 +357,8 @@ export class Game {
     // Handle bomb chain reactions - ONLY for bomb bricks
     // Bomb bricks damage adjacent bricks, which may trigger their own effects
     if (bricksToDamage && bricksToDamage.length > 0) {
-      const totalDuration = 1.5; // Total time for all explosions
-      const delayPerBrick = totalDuration / bricksToDamage.length;
-
-      for (let i = 0; i < bricksToDamage.length; i++) {
-        const targetBrick = bricksToDamage[i];
-        const targetBounds = targetBrick.getBounds();
-        const targetX = targetBounds.x + targetBounds.width / 2;
-        const targetY = targetBounds.y + targetBounds.height / 2;
-
-        // Queue this brick for delayed explosion damage
-        this.delayedBombExplosions.push({
-          brick: targetBrick,
-          x: targetX,
-          y: targetY,
-          delay: i * delayPerBrick
-        });
-      }
+      // Queue delayed explosions in WeaponManager
+      this.weaponManager.queueDelayedExplosions(bricksToDamage);
 
       // Extra particles for bomb explosion
       this.effectsManager.createParticles(info.centerX, info.centerY, 40, destroyedBrick.getColor(), 200);
@@ -720,9 +699,6 @@ export class Game {
     this.bombDamage = result.bombDamage;
     this.levelStartProgress = result.levelStartProgress;
 
-    // Clear delayed bomb explosions
-    this.delayedBombExplosions = [];
-
     // Reset level timer
     this.levelTime = 0;
 
@@ -788,7 +764,29 @@ export class Game {
     }
 
     // Update delayed bomb explosions
-    this.updateDelayedBombExplosions(deltaTime);
+    this.weaponManager.updateDelayedExplosions(
+      deltaTime,
+      this.bombDamage,
+      (brick, x, y, damage, justDestroyed) => {
+        // Show damage number
+        this.effectsManager.addDamageNumber(x, y - 5, damage, false);
+
+        // If brick was just destroyed by bomb damage, create particles and update counts
+        if (justDestroyed) {
+          this.effectsManager.createParticles(x, y, 8, brick.getColor(), 120);
+
+          // Update brick counts
+          this.totalBricksDestroyed++;
+          if (this.level) {
+            const remainingBricksAfterBomb = this.level.getRemainingBricks();
+            this.statusBar.setBrickCounts(
+              remainingBricksAfterBomb,
+              this.level.getTotalBricks()
+            );
+          }
+        }
+      }
+    );
 
     // Handle input (use effective deltaTime for movement)
     this.handleInput(effectiveDeltaTime);
@@ -907,53 +905,6 @@ export class Game {
     this.achievementsUnlockedThisRun.add(id);
   }
 
-  /**
-   * Update delayed bomb explosions
-   */
-  private updateDelayedBombExplosions(deltaTime: number): void {
-    // Decrease delay timers
-    for (let i = this.delayedBombExplosions.length - 1; i >= 0; i--) {
-      const explosion = this.delayedBombExplosions[i];
-      explosion.delay -= deltaTime;
-
-      // If delay has elapsed, trigger the explosion
-      if (explosion.delay <= 0) {
-        const targetBrick = explosion.brick;
-
-        // Skip if brick is already destroyed
-        if (targetBrick.isDestroyed()) {
-          this.delayedBombExplosions.splice(i, 1);
-          continue;
-        }
-
-        // Apply damage - brick's onDestroy callback will handle offensive entity spawning
-        const destructionInfo = targetBrick.takeDamage(this.bombDamage);
-        this.effectsManager.addDamageNumber(explosion.x, explosion.y - 5, this.bombDamage, false);
-
-        // If brick was just destroyed by bomb damage, create particles and update counts
-        if (destructionInfo.justDestroyed) {
-          this.effectsManager.createParticles(explosion.x, explosion.y, 8, targetBrick.getColor(), 120);
-
-          // Note: Offensive entity spawning and chain reactions are now handled by
-          // the brick's onDestroy callback, ensuring consistent behavior regardless
-          // of damage source (ball, laser, bomb, etc.)
-
-          // Update brick counts
-          this.totalBricksDestroyed++;
-          if (this.level) {
-            const remainingBricksAfterBomb = this.level.getRemainingBricks();
-            this.statusBar.setBrickCounts(
-              remainingBricksAfterBomb,
-              this.level.getTotalBricks()
-            );
-          }
-        }
-
-        // Remove this explosion from the queue
-        this.delayedBombExplosions.splice(i, 1);
-      }
-    }
-  }
 
   /**
    * Handle keyboard and mouse input

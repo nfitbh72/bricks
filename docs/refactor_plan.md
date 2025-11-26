@@ -184,7 +184,7 @@ The `Game` class now delegates to 12 focused managers:
 | `ScreenManager` | UI screens and transitions | ~330 |
 | `EffectsManager` | Particles, screen shake, damage numbers | ~310 |
 | `CollisionManager` | Collision detection with spatial hash | 663 |
-| `WeaponManager` | Lasers and bombs | ~165 |
+| `WeaponManager` | Lasers, bombs, delayed explosions | 257 |
 | `OffensiveEntityManager` | Enemy entities (unified list) | ~170 |
 | `SlowMotionManager` | Time dilation effects | ~205 |
 | `StateTransitionHandler` | Game state transitions | ~315 |
@@ -195,7 +195,7 @@ The `Game` class now delegates to 12 focused managers:
 | `BallManager` | Ball spawning, removal, lifecycle | 193 |
 | `LevelInitializer` | Level setup and initialization | 178 |
 
-**Impact**: `Game.ts` reduced from ~2000+ lines to 1117 lines, with clear delegation patterns
+**Impact**: `Game.ts` reduced from ~2000+ lines to 1068 lines, with clear delegation patterns
 
 #### ✅ **Unified Entity Management** (Phase 2)
 - Created `IEntity` interface for common entity operations
@@ -229,7 +229,7 @@ The `Game` class is now a **coordinator** rather than a "God Object". Its respon
 
 **Key Metrics**:
 - **Before**: ~2000+ lines, ~30+ responsibilities
-- **After**: 1117 lines, ~5 core responsibilities
+- **After**: 1068 lines, ~5 core responsibilities
 - **Manager Count**: 15 specialized managers (including BossManager, BallManager, LevelInitializer)
 - **Cyclomatic Complexity**: Significantly reduced
 - **Latest Reductions**: 
@@ -238,6 +238,7 @@ The `Game` class is now a **coordinator** rather than a "God Object". Its respon
   - LevelInitializer: 54 lines removed (178 lines in new manager)
   - Collision Orchestration: 58 lines removed (83 lines added to CollisionManager)
   - Achievement Progress Comparison: 21 lines removed (38 lines added to AchievementTracker)
+  - Delayed Bomb Explosions: 49 lines removed (69 lines added to WeaponManager)
 
 ### Recent Improvements ✅
 
@@ -280,15 +281,23 @@ The `Game` class is now a **coordinator** rather than a "God Object". Its respon
 - Achievement-specific business logic now properly encapsulated
 - All tests passing (3 test suites, 60 tests)
 
+**Delayed Bomb Explosions Extracted** (Nov 26, 2025):
+- Enhanced `WeaponManager` with delayed explosion queue and processing (69 lines)
+- Extracted `updateDelayedBombExplosions()` method and related state
+- Removed 49 lines of bomb explosion logic from `Game.ts` (1117 → 1068 lines)
+- Bomb chain reaction logic now properly encapsulated in weapon system
+- All tests passing (5 test suites, 92 tests)
+
 ### Remaining Concerns
 
-While substantial progress has been made, `Game.ts` still has some minor areas for improvement:
+While substantial progress has been made, `Game.ts` is now in excellent shape:
 
-1. **Delayed Bomb Explosions** - `updateDelayedBombExplosions()` and related state (lines ~930-980)
-   - **Recommendation**: Could be moved to `WeaponManager` or a dedicated `ExplosionManager`
-
-2. **Event Listeners** - `setupEventListeners()` is ~100 lines (lines ~395-500)
+1. **Event Listeners** - `setupEventListeners()` is ~100 lines (lines ~395-500)
    - **Note**: This is acceptable as it's just wiring up event handlers, not business logic
+   - This is appropriate for a coordinator class
+
+2. **Minor State Management** - Some game state remains (health, level timer, etc.)
+   - **Note**: This is appropriate for the game coordinator to maintain
 
 ### Modularity Assessment
 
