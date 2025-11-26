@@ -1247,20 +1247,23 @@ export class Game {
       }
     }
 
-    // Check collisions for all balls
+    // Populate spatial hash with bricks for optimized collision detection
+    this.collisionManager.populateSpatialHash(this.level);
+
+    // Check collisions
     for (const ball of this.balls) {
       this.collisionManager.checkBallBatCollision(ball, this.bat);
-      // Ball-Brick collisions
+      // Ball-brick collisions (with spatial hash optimization)
       this.collisionManager.checkBallBrickCollisions(ball, this.level, this.gameUpgrades);
     }
 
-    // Laser-Brick collisions
+    // Weapon collisions (with spatial hash optimization)
     this.collisionManager.checkLaserBrickCollisions(this.weaponManager.getLasers(), this.level);
 
-    // Bomb-Brick collisions
+    // Bomb collisions (with spatial hash optimization)
     this.collisionManager.checkBombBrickCollisions(this.weaponManager.getBombs(), this.level);
 
-    // Offensive entity-Bat collisions
+    // Offensive entity collisions
     this.collisionManager.checkFallingBrickBatCollisions(this.offensiveEntityManager.getFallingBricks(), this.bat);
     this.collisionManager.checkDebrisBatCollisions(this.offensiveEntityManager.getDebris(), this.bat);
     this.collisionManager.checkBrickLaserBatCollisions(this.offensiveEntityManager.getBrickLasers(), this.bat);

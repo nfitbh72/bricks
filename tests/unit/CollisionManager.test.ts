@@ -115,6 +115,8 @@ describe('CollisionManager', () => {
       const brickBounds = brick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       expect(bounceSpy).toHaveBeenCalled();
@@ -124,6 +126,7 @@ describe('CollisionManager', () => {
       const brickBounds = brick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.objectContaining({
@@ -137,6 +140,7 @@ describe('CollisionManager', () => {
       const brickBounds = brick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.objectContaining({
@@ -160,6 +164,7 @@ describe('CollisionManager', () => {
       const brickBounds = indestructibleBrick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should hit but not destroy
@@ -183,6 +188,7 @@ describe('CollisionManager', () => {
 
       const brickBounds = brick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should be called with critical flag
@@ -201,6 +207,7 @@ describe('CollisionManager', () => {
       const brickBounds = brick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       expect(restoreToNormalSpy).toHaveBeenCalled();
@@ -222,6 +229,7 @@ describe('CollisionManager', () => {
       const brickBounds = firstBrick.getBounds();
       ball.setPosition(brickBounds.x + 10, brickBounds.y + 10);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should destroy first brick
@@ -250,6 +258,7 @@ describe('CollisionManager', () => {
     it('should detect laser hitting brick', () => {
       const deactivateSpy = jest.spyOn(laser, 'deactivate');
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions([laser], level);
 
       expect(deactivateSpy).toHaveBeenCalled();
@@ -258,6 +267,7 @@ describe('CollisionManager', () => {
     it('should apply laser damage to brick', () => {
       const brick = level.getActiveBricks()[0];
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions([laser], level);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.objectContaining({
@@ -273,6 +283,7 @@ describe('CollisionManager', () => {
 
       const deactivateSpy = jest.spyOn(laser, 'deactivate');
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions([laser], level);
 
       expect(deactivateSpy).not.toHaveBeenCalled();
@@ -287,6 +298,7 @@ describe('CollisionManager', () => {
       };
       level = LevelFactory.createLevel(config, 800);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions([laser], level);
 
       expect(emitSpy).not.toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
@@ -295,6 +307,7 @@ describe('CollisionManager', () => {
     it('should trigger onBrickDestroyed when laser destroys brick', () => {
       const brick = level.getActiveBricks()[0];
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions([laser], level);
 
       if (brick.isDestroyed()) {

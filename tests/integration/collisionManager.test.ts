@@ -105,7 +105,8 @@ describe('CollisionManager Integration', () => {
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
         ball.setDamage(1);
 
-        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+        collisionManager.populateSpatialHash(level);
+      collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
       }
@@ -120,7 +121,8 @@ describe('CollisionManager Integration', () => {
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
         ball.setDamage(10); // Enough to destroy
 
-        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+        collisionManager.populateSpatialHash(level);
+      collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
         expect(normalBrick.isDestroyed()).toBe(true);
@@ -138,7 +140,8 @@ describe('CollisionManager Integration', () => {
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
         ball.setDamage(999);
 
-        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+        collisionManager.populateSpatialHash(level);
+      collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         expect(indestructibleBrick.getHealth()).toBe(initialHealth);
         expect(indestructibleBrick.isDestroyed()).toBe(false);
@@ -167,7 +170,8 @@ describe('CollisionManager Integration', () => {
         brick.setHealth(10);
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 
-        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+        collisionManager.populateSpatialHash(level);
+      collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         const calls = emitSpy.mock.calls.filter(call => call[0] === GameEvents.BRICK_HIT);
         if (calls.length > 0) {
@@ -192,6 +196,7 @@ describe('CollisionManager Integration', () => {
       const bounds = brick.getBounds();
       ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should trigger explosion damage to nearby bricks
@@ -211,7 +216,8 @@ describe('CollisionManager Integration', () => {
         const bounds = indestructibleBrick.getBounds();
         ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 
-        collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
+        collisionManager.populateSpatialHash(level);
+      collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
         // Should NOT trigger explosion damage for indestructible bricks
         expect(emitSpy).not.toHaveBeenCalledWith('explosion_damage', expect.anything());
@@ -228,6 +234,7 @@ describe('CollisionManager Integration', () => {
       const bounds = brick.getBounds();
       ball.setPosition(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       // Should hit brick (piercing allows hitting multiple)
@@ -266,6 +273,7 @@ describe('CollisionManager Integration', () => {
       );
       lasers.push(laser);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
@@ -286,6 +294,7 @@ describe('CollisionManager Integration', () => {
 
       expect(laser.isActive()).toBe(true);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
       expect(laser.isActive()).toBe(false);
@@ -304,6 +313,7 @@ describe('CollisionManager Integration', () => {
       );
       lasers.push(laser);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_DESTROYED, expect.anything());
@@ -325,6 +335,7 @@ describe('CollisionManager Integration', () => {
         lasers.push(laser);
       });
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
       // Check that BRICK_HIT was emitted for each brick
@@ -346,6 +357,7 @@ describe('CollisionManager Integration', () => {
       laser.deactivate();
       lasers.push(laser);
 
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkLaserBrickCollisions(lasers, level);
 
       expect(emitSpy).not.toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());
@@ -375,6 +387,7 @@ describe('CollisionManager Integration', () => {
       ball.setDamage(1);
 
       // Hit should destroy brick (1 damage = 1 health with baseHealth 1)
+      collisionManager.populateSpatialHash(level);
       collisionManager.checkBallBrickCollisions(ball, level, gameUpgrades);
 
       expect(emitSpy).toHaveBeenCalledWith(GameEvents.BRICK_HIT, expect.anything());

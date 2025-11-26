@@ -65,6 +65,18 @@ export class CollisionManager {
     ball.setPiercing(this.piercingTimeRemaining > 0, this.piercingTimeRemaining);
   }
 
+  /**
+   * Populate spatial hash with all active bricks
+   * Call this once per frame before collision detection
+   */
+  populateSpatialHash(level: Level): void {
+    this.spatialHash.clear();
+    const bricks = level.getActiveBricks();
+    for (const brick of bricks) {
+      this.spatialHash.insert(brick);
+    }
+  }
+
 
   /**
    * Check ball-bat collision
@@ -92,7 +104,18 @@ export class CollisionManager {
     gameUpgrades: GameUpgrades
   ): void {
     const ballBounds = ball.getBounds();
-    const bricks = level.getActiveBricks();
+
+    // Convert circle bounds to rectangular bounds for spatial query
+    const queryBounds = {
+      x: ballBounds.x - ballBounds.radius,
+      y: ballBounds.y - ballBounds.radius,
+      width: ballBounds.radius * 2,
+      height: ballBounds.radius * 2
+    };
+
+    // Query nearby bricks using spatial hash
+    const nearbyEntities = this.spatialHash.query(queryBounds);
+    const bricks = nearbyEntities.filter((e): e is Brick => e instanceof Brick);
 
     for (const brick of bricks) {
       const brickBounds = brick.getBounds();
@@ -167,7 +190,7 @@ export class CollisionManager {
 
           // Apply explosion damage to nearby bricks if upgrade is active
           if (gameUpgrades.hasBallExplosions()) {
-            this.applyExplosionDamage(brick, brickBounds, bricks, ball.getDamage(), gameUpgrades);
+            this.applyExplosionDamage(brick, brickBounds, ball.getDamage(), gameUpgrades);
           }
 
           // Track destroyed bricks and create particles
@@ -208,15 +231,18 @@ export class CollisionManager {
    */
   checkLaserBrickCollisions(
     lasers: Laser[],
-    level: Level
+    _level: Level
   ): void {
-    const bricks = level.getActiveBricks();
     const lasersToCheck = [...lasers];
 
     for (const laser of lasersToCheck) {
       if (!laser.isActive()) continue;
 
       const laserBounds = laser.getBounds();
+
+      // Query nearby bricks using spatial hash
+      const nearbyEntities = this.spatialHash.query(laserBounds);
+      const bricks = nearbyEntities.filter((e): e is Brick => e instanceof Brick);
 
       for (const brick of bricks) {
         const brickBounds = brick.getBounds();
@@ -272,15 +298,18 @@ export class CollisionManager {
    */
   checkBombBrickCollisions(
     bombs: Bomb[],
-    level: Level
+    _level: Level
   ): void {
-    const bricks = level.getActiveBricks();
     const bombsToCheck = [...bombs];
 
     for (const bomb of bombsToCheck) {
       if (!bomb.isActive() || bomb.hasExploded()) continue;
 
       const bombBounds = bomb.getBounds();
+
+      // Query nearby bricks using spatial hash
+      const nearbyEntities = this.spatialHash.query(bombBounds);
+      const bricks = nearbyEntities.filter((e): e is Brick => e instanceof Brick);
 
       for (const brick of bricks) {
         const brickBounds = brick.getBounds();
@@ -623,7 +652,6 @@ export class CollisionManager {
   private applyExplosionDamage(
     hitBrick: Brick,
     hitBrickBounds: { x: number; y: number; width: number; height: number },
-    allBricks: Brick[],
     baseDamage: number,
     gameUpgrades: GameUpgrades
   ): void {
@@ -635,6 +663,16 @@ export class CollisionManager {
     // Get impact point (center of the brick that was hit)
     const impactX = hitBrickBounds.x + hitBrickBounds.width / 2;
     const impactY = hitBrickBounds.y + hitBrickBounds.height / 2;
+
+    // Query spatial hash for bricks within explosion radius
+    const explosionBounds = {
+      x: impactX - explosionRadius,
+      y: impactY - explosionRadius,
+      width: explosionRadius * 2,
+      height: explosionRadius * 2
+    };
+    const nearbyEntities = this.spatialHash.query(explosionBounds);
+    const allBricks = nearbyEntities.filter((e): e is Brick => e instanceof Brick);
 
     // Check all other bricks for explosion damage
     for (const otherBrick of allBricks) {
