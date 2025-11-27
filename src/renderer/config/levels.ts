@@ -9,7 +9,7 @@ import { t } from '../i18n/LanguageManager';
 /**
  * Total number of levels in the game
  */
-export const TOTAL_LEVELS = 13;
+export const TOTAL_LEVELS = 16;
 
 /**
  * Create Level 1 configuration
@@ -22,7 +22,7 @@ export function createLevel1(): LevelConfig {
     "NFFN",
     "NNNN"
   ];
-  
+
   return {
     id: 1,
     name: t('game.levels.level1Name'),
@@ -66,7 +66,7 @@ export function createLevel3(): LevelConfig {
     "         ",
     "L L L L L"
   ];
-  
+
   return {
     id: 3,
     name: t('game.levels.level3Name'),
@@ -87,7 +87,7 @@ export function createLevel4(): LevelConfig {
     "........",
     "FFFFFFFF"
   ];
-  
+
   return {
     id: 4,
     name: t('game.levels.level4Name'),
@@ -108,7 +108,7 @@ export function createLevel5(): LevelConfig {
     "NBNBNBNB",
     "BNBNBNBN"
   ];
-  
+
   return {
     id: 5,
     name: t('game.levels.level5Name'),
@@ -131,7 +131,7 @@ export function createLevel6(): LevelConfig {
     "S      S",
     "SSSSSSSS"
   ];
-  
+
   return {
     id: 6,
     name: t('game.levels.level6Name'),
@@ -155,7 +155,7 @@ export function createLevel7(): LevelConfig {
     "M      M",
     "MMMMMMMM"
   ];
-  
+
   return {
     id: 7,
     name: t('game.levels.level7Name'),
@@ -176,7 +176,7 @@ export function createLevel8(): LevelConfig {
     "........",
     "FFFFFFFF"
   ];
-  
+
   return {
     id: 8,
     name: t('game.levels.level8Name'),
@@ -201,7 +201,7 @@ export function createLevel9(): LevelConfig {
     "   DDD   ",
     "   DDD   "
   ];
-  
+
   return {
     id: 9,
     name: t('game.levels.level9Name'),
@@ -225,7 +225,7 @@ export function createLevel10(): LevelConfig {
     "MBFFFFSM",
     "LMSDSBML"
   ];
-  
+
   return {
     id: 10,
     name: t('game.levels.level10Name'),
@@ -250,7 +250,7 @@ export function createLevel11(): LevelConfig {
     "   BBB   ",
     "    B    "
   ];
-  
+
   return {
     id: 11,
     name: t('game.levels.level11Name'),
@@ -271,7 +271,7 @@ export function createLevel12(): LevelConfig {
     "........",
     "FFFFFFFF"
   ];
-  
+
   return {
     id: 12,
     name: t('game.levels.level12Name'),
@@ -299,12 +299,75 @@ export function createLevel13(): LevelConfig {
     "N.OOOO.N",
     "NNNNNNNN"
   ];
-  
+
   return {
     id: 13,
     name: t('game.levels.level13Name'),
     bricks: createBricksFromPattern(pattern),
     baseHealth: 10,
+  };
+}
+
+/**
+ * Create Level 14 configuration
+ * Boss 4 - The Graviton
+ */
+export function createLevel14(): LevelConfig {
+  const pattern = [
+    "NNNNNNNN",
+    "........",
+    "...4....",
+    "........",
+    "FFFFFFFF"
+  ];
+
+  return {
+    id: 14,
+    name: t('game.levels.level14Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 7,
+  };
+}
+
+/**
+ * Create Level 15 configuration
+ * Boss 5 - The Builder
+ */
+export function createLevel15(): LevelConfig {
+  const pattern = [
+    "NNNNNNNN",
+    "........",
+    "...5....",
+    "........",
+    "FFFFFFFF"
+  ];
+
+  return {
+    id: 15,
+    name: t('game.levels.level15Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 8,
+  };
+}
+
+/**
+ * Create Level 16 configuration
+ * Boss 6 - The Specter
+ */
+export function createLevel16(): LevelConfig {
+  const pattern = [
+    "NNNNNNNN",
+    "........",
+    "...6....",
+    "........",
+    "FFFFFFFF"
+  ];
+
+  return {
+    id: 16,
+    name: t('game.levels.level16Name'),
+    bricks: createBricksFromPattern(pattern),
+    baseHealth: 9,
   };
 }
 
@@ -339,6 +402,12 @@ export function getLevel(id: number): LevelConfig | undefined {
       return createLevel12();
     case 13:
       return createLevel13();
+    case 14:
+      return createLevel14();
+    case 15:
+      return createLevel15();
+    case 16:
+      return createLevel16();
     default:
       return undefined;
   }

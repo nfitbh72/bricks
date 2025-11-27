@@ -17,6 +17,8 @@ import { SplittingFragment } from '../entities/offensive/SplittingFragment';
 import { DynamiteStick } from '../entities/offensive/DynamiteStick';
 import { BaseBoss } from '../entities/offensive/BaseBoss';
 import { Boss2 } from '../entities/offensive/Boss2';
+import { ConstructBoss } from '../entities/offensive/ConstructBoss';
+import { PhantomBoss } from '../entities/offensive/PhantomBoss';
 import { checkCircleRectCollision } from '../core/utils';
 import {
   BRICK_WIDTH,
@@ -52,7 +54,7 @@ export class CollisionManager {
         this.piercingTimeRemaining = 0;
       }
     }
-    
+
     // Update ball's piercing visual state with time remaining for flash effect
     ball.setPiercing(this.piercingTimeRemaining > 0, this.piercingTimeRemaining);
   }
@@ -75,7 +77,7 @@ export class CollisionManager {
     const ballBounds = ball.getBounds();
     const batBounds = bat.getBounds();
     const batCollision = checkCircleRectCollision(ballBounds, batBounds);
-    
+
     if (batCollision.collided) {
       ball.bounceOffBat(bat);
     }
@@ -95,15 +97,15 @@ export class CollisionManager {
     for (const brick of bricks) {
       const brickBounds = brick.getBounds();
       const collision = checkCircleRectCollision(ballBounds, brickBounds);
-      
+
       if (collision.collided) {
         // Indestructible bricks always cause bounce and never trigger piercing
         const isIndestructible = brick.isIndestructible();
-        
+
         // Check for piercing (only on destructible bricks)
         const piercingChance = gameUpgrades.getBallPiercingChance();
         const piercingDuration = gameUpgrades.getPiercingDuration();
-        
+
         // Check if piercing is active (either from chance or from duration)
         let piercingAttempted = false;
         if (!isIndestructible) {
@@ -119,7 +121,7 @@ export class CollisionManager {
             }
           }
         }
-        
+
         // For indestructible bricks, always bounce immediately
         if (isIndestructible && collision.normal) {
           ball.bounce(collision.normal);
@@ -128,16 +130,16 @@ export class CollisionManager {
             this.callbacks.onBrickHit(brick, 0, false);
           }
         }
-        
+
         // Track if brick was destroyed (for piercing logic)
         let brickDestroyed = false;
-        
+
         // Skip damage, explosions, and notifications for indestructible bricks
         if (!isIndestructible) {
           // Calculate damage (with critical hit check)
           let damage = ball.getDamage();
           let isCritical = false;
-          
+
           if (gameUpgrades.hasCriticalHits()) {
             const critChance = gameUpgrades.getTotalCriticalHitChance();
             if (Math.random() < critChance) {
@@ -145,40 +147,40 @@ export class CollisionManager {
               isCritical = true;
             }
           }
-          
+
           // Damage brick and get destruction info
           const destructionInfo = brick.takeDamage(damage);
           brickDestroyed = destructionInfo.justDestroyed;
-          
+
           // Notify hit (show damage numbers)
           if (this.callbacks.onBrickHit) {
             this.callbacks.onBrickHit(brick, damage, isCritical);
           }
-          
+
           // Apply explosion damage to nearby bricks if upgrade is active
           if (gameUpgrades.hasBallExplosions()) {
             this.applyExplosionDamage(brick, brickBounds, bricks, ball.getDamage(), gameUpgrades);
           }
-          
+
           // Track destroyed bricks and create particles
           if (destructionInfo.justDestroyed) {
             if (this.callbacks.onBrickDestroyed) {
               this.callbacks.onBrickDestroyed(brick, destructionInfo.centerX, destructionInfo.centerY, isCritical, ball);
             }
           }
-          
+
           // Bounce ball if piercing didn't destroy the brick
           // (Only skip bounce if piercing was attempted AND brick was destroyed)
           if ((!piercingAttempted || !brickDestroyed) && collision.normal) {
             ball.bounce(collision.normal);
           }
         }
-        
+
         // Restore ball to normal if it was grey
         if (ball.getIsGrey()) {
           ball.restoreToNormal();
         }
-        
+
         // Continue piercing only if piercing was attempted AND brick was destroyed
         const shouldContinuePiercing = piercingAttempted && brickDestroyed;
         if (!shouldContinuePiercing) {
@@ -216,7 +218,7 @@ export class CollisionManager {
         ) {
           // Deactivate laser after hitting any brick
           laser.deactivate();
-          
+
           // Skip damage and notifications for indestructible bricks
           if (!brick.isIndestructible()) {
             // Damage brick and get destruction info
@@ -235,7 +237,7 @@ export class CollisionManager {
               }
             }
           }
-          
+
           break;
         }
       }
@@ -269,7 +271,7 @@ export class CollisionManager {
         ) {
           // Trigger explosion
           bomb.explode();
-          
+
           // Skip damage for indestructible bricks
           if (brick.isIndestructible()) {
             break;
@@ -278,7 +280,7 @@ export class CollisionManager {
           // Get explosion center
           const bombPos = bomb.getPosition();
           const explosionRadius = bomb.getExplosionRadius();
-          
+
           // Damage all bricks within explosion radius
           for (const targetBrick of bricks) {
             if (targetBrick.isIndestructible()) continue;
@@ -312,7 +314,7 @@ export class CollisionManager {
               }
             }
           }
-          
+
           break;
         }
       }
@@ -342,7 +344,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(FALLING_BRICK_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(FALLING_BRICK_DAMAGE_PERCENT);
@@ -377,7 +379,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(EXPLODING_BRICK_DEBRIS_DAMAGE_PERCENT);
@@ -413,7 +415,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(LASER_BRICK_LASER_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(LASER_BRICK_LASER_DAMAGE_PERCENT);
@@ -448,7 +450,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(HOMING_MISSILE_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(HOMING_MISSILE_DAMAGE_PERCENT);
@@ -483,7 +485,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(SPLITTING_FRAGMENT_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(SPLITTING_FRAGMENT_DAMAGE_PERCENT);
@@ -512,15 +514,15 @@ export class CollisionManager {
       // Check if dynamite has exploded
       if (dynamite.hasExploded()) {
         const explosionResult = dynamite.getExplosionResult(allBricks);
-        
+
         // Apply damage if explosion result is available (only happens once)
         if (explosionResult) {
           // Damage all bricks in explosion radius
           const brickDamage = currentBallDamage * DYNAMITE_BRICK_DAMAGE_MULTIPLIER;
-          
+
           for (const brick of explosionResult.bricksToDamage) {
             const destructionInfo = brick.takeDamage(brickDamage);
-            
+
             // Notify explosion damage
             if (this.callbacks.onExplosionDamage) {
               const brickBounds = brick.getBounds();
@@ -528,7 +530,7 @@ export class CollisionManager {
               const centerY = brickBounds.y + brickBounds.height / 2;
               this.callbacks.onExplosionDamage(brick, brickDamage, centerX, centerY);
             }
-            
+
             // Track if explosion destroyed this brick
             if (destructionInfo.justDestroyed) {
               if (this.callbacks.onBrickDestroyed) {
@@ -536,25 +538,25 @@ export class CollisionManager {
               }
             }
           }
-          
+
           // Check if bat is in explosion radius
           const batCenterX = batBounds.x + batBounds.width / 2;
           const batCenterY = batBounds.y + batBounds.height / 2;
           const dx = batCenterX - explosionResult.centerX;
           const dy = batCenterY - explosionResult.centerY;
           const distanceToBat = Math.sqrt(dx * dx + dy * dy);
-          
+
           if (distanceToBat <= explosionResult.radius) {
             // Damage bat
             bat.takeDamage(DYNAMITE_BAT_DAMAGE_PERCENT);
-            
+
             // Notify bat damaged
             if (this.callbacks.onBatDamaged) {
               this.callbacks.onBatDamaged(DYNAMITE_BAT_DAMAGE_PERCENT);
             }
           }
         }
-        
+
         // Deactivate dynamite only after explosion animation completes
         if (dynamite.isExplosionComplete()) {
           dynamite.deactivate();
@@ -575,7 +577,7 @@ export class CollisionManager {
       ) {
         // Damage bat
         bat.takeDamage(DYNAMITE_BAT_DAMAGE_PERCENT);
-        
+
         // Notify bat damaged
         if (this.callbacks.onBatDamaged) {
           this.callbacks.onBatDamaged(DYNAMITE_BAT_DAMAGE_PERCENT);
@@ -601,36 +603,36 @@ export class CollisionManager {
     const explosionDamage = baseDamage * explosionDamageMultiplier;
     const explosionRadiusMultiplier = gameUpgrades.getBallExplosionRadiusMultiplier();
     const explosionRadius = BRICK_WIDTH * EXPLOSION_RADIUS_MULTIPLIER * explosionRadiusMultiplier;
-    
+
     // Get impact point (center of the brick that was hit)
     const impactX = hitBrickBounds.x + hitBrickBounds.width / 2;
     const impactY = hitBrickBounds.y + hitBrickBounds.height / 2;
-    
+
     // Check all other bricks for explosion damage
     for (const otherBrick of allBricks) {
       if (otherBrick === hitBrick || otherBrick.isDestroyed()) continue;
-      
+
       // Skip indestructible bricks - explosions don't damage them
       if (otherBrick.isIndestructible()) continue;
-      
+
       const otherBounds = otherBrick.getBounds();
       const otherCenterX = otherBounds.x + otherBounds.width / 2;
       const otherCenterY = otherBounds.y + otherBounds.height / 2;
-      
+
       // Calculate distance from impact point to brick center
       const dx = otherCenterX - impactX;
       const dy = otherCenterY - impactY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      
+
       // Apply explosion damage if within radius
       if (distance <= explosionRadius) {
         const destructionInfo = otherBrick.takeDamage(explosionDamage);
-        
+
         // Notify explosion damage
         if (this.callbacks.onExplosionDamage) {
           this.callbacks.onExplosionDamage(otherBrick, explosionDamage, otherCenterX, otherCenterY);
         }
-        
+
         // Track if explosion destroyed this brick
         if (destructionInfo.justDestroyed) {
           if (this.callbacks.onBrickDestroyed) {
@@ -653,7 +655,7 @@ export class CollisionManager {
   ): void {
     const ballBounds = ball.getBounds();
     const bossBounds = boss.getBounds();
-    
+
     if (!ballBounds || !bossBounds) return;
 
     // For Boss2, check shield arc collisions first (before body collision)
@@ -662,28 +664,42 @@ export class CollisionManager {
       if (shieldAngle !== null) {
         // Shield arc hit - reflect the ball velocity across the radial normal
         const ballVelocity = ball.getVelocity();
-        
+
         // Calculate radial direction (normal to the shield surface)
         const centerX = bossBounds.x + bossBounds.width / 2;
         const centerY = bossBounds.y + bossBounds.height / 2;
         const dx = ballBounds.x - centerX;
         const dy = ballBounds.y - centerY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         // Normalize the radial vector (surface normal pointing outward)
         const normalX = dx / distance;
         const normalY = dy / distance;
-        
+
         // Reflect velocity: v' = v - 2(v·n)n
         const dotProduct = ballVelocity.x * normalX + ballVelocity.y * normalY;
         const newVx = ballVelocity.x - 2 * dotProduct * normalX;
         const newVy = ballVelocity.y - 2 * dotProduct * normalY;
-        
+
         ball.setVelocity(newVx, newVy);
-        
+
         // Visual effects
         onShieldBlocked(centerX, centerY);
         return;
+      }
+    }
+
+    // For ConstructBoss, check wall collisions
+    if (boss instanceof ConstructBoss) {
+      if (boss.checkWallCollision(ball)) {
+        return; // Collision handled by boss
+      }
+    }
+
+    // For PhantomBoss, check illusion collisions
+    if (boss instanceof PhantomBoss) {
+      if (boss.checkIllusionCollision(ball)) {
+        return; // Collision handled by boss (illusion disappears)
       }
     }
 
@@ -700,7 +716,7 @@ export class CollisionManager {
       const damage = ball.getDamage();
       boss.takeDamage(damage);
       ball.reverseY();
-      
+
       // Notify damage
       const centerX = bossBounds.x + bossBounds.width / 2;
       const centerY = bossBounds.y + bossBounds.height / 2;
@@ -728,10 +744,10 @@ export class CollisionManager {
       const brickBounds = thrownBrick.getBounds();
       if (brickBounds && this.checkRectCollision(brickBounds, batBounds)) {
         thrownBrick.deactivate();
-        
+
         // Damage bat
         bat.takeDamage(BAT_DAMAGE_FROM_BOMB_BRICK_PERCENT);
-        
+
         // Notify hit for effects
         const centerX = brickBounds.x + brickBounds.width / 2;
         const centerY = brickBounds.y + brickBounds.height / 2;

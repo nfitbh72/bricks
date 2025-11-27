@@ -268,3 +268,36 @@ export const BOSS3_SPLIT_COUNT = 2; // Number of copies to split into
 export const BOSS3_COPY_HEALTH_MULTIPLIER = 0.4; // Each copy has 40% of original max health
 export const BOSS3_COPY_SPEED_MULTIPLIER = 1.5; // Copies move 50% faster
 export const BOSS3_COPY_SIZE_MULTIPLIER = 0.75; // Copies are 75% of original size
+
+// Boss4 (The Graviton) constants
+export const BOSS4_HEALTH_MULTIPLIER = 6;
+export const BOSS4_MOVE_SPEED = 200;
+export const BOSS4_THROW_INTERVAL = 1.5;
+export const BOSS4_THROWN_BRICK_SPEED = 500;
+export const BOSS4_SPAWN_OFFSET_Y = -2;
+export const BOSS4_GRAVITY_PULL_FORCE = 400; // pixels per second squared
+export const BOSS4_GRAVITY_WAVE_INTERVAL = 3.0; // seconds
+export const BOSS4_GRAVITY_WAVE_DURATION = 1.0; // seconds
+
+// Boss5 (The Builder) constants
+export const BOSS5_HEALTH_MULTIPLIER = 8;
+export const BOSS5_MOVE_SPEED = 100;
+export const BOSS5_THROW_INTERVAL = 2.0;
+export const BOSS5_THROWN_BRICK_SPEED = 550;
+export const BOSS5_SPAWN_OFFSET_Y = -2;
+export const BOSS5_WALL_SPAWN_INTERVAL = 5.0; // seconds
+export const BOSS5_WALL_DURATION = 3.0; // seconds
+export const BOSS5_REPAIR_RATE = 5; // health per second
+export const BOSS5_REPAIR_DELAY = 3.0; // seconds without taking damage before repair starts
+
+// Boss6 (The Specter) constants
+export const BOSS6_HEALTH_MULTIPLIER = 5;
+export const BOSS6_MOVE_SPEED = 250;
+export const BOSS6_THROW_INTERVAL = 1.2;
+export const BOSS6_THROWN_BRICK_SPEED = 600;
+export const BOSS6_SPAWN_OFFSET_Y = -2;
+export const BOSS6_PHASE_INTERVAL = 4.0; // seconds
+export const BOSS6_PHASE_DURATION = 1.5; // seconds
+export const BOSS6_TELEPORT_COOLDOWN = 3.0; // seconds
+export const BOSS6_ILLUSION_CHANCE = 0.3; // 30% chance to spawn illusion on teleport
+

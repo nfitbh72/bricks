@@ -4,9 +4,9 @@
 
 import { BrickConfig } from '../core/types';
 import { BrickType } from '../core/types';
-import { 
-  BRICK_WIDTH, 
-  BRICK_HEIGHT, 
+import {
+  BRICK_WIDTH,
+  BRICK_HEIGHT,
   BRICK_CORNER_RADIUS,
   BRICK_GLOW_BLUR,
   FONT_MONO_BRICK,
@@ -54,6 +54,9 @@ export class Brick {
     [BrickType.BOSS_1]: 1,
     [BrickType.BOSS_2]: 1,
     [BrickType.BOSS_3]: 1,
+    [BrickType.BOSS_4]: 1,
+    [BrickType.BOSS_5]: 1,
+    [BrickType.BOSS_6]: 1,
   };
 
 
@@ -62,12 +65,12 @@ export class Brick {
     const pixelPos = gridToPixel(config.col, config.row);
     this.position = pixelPos;
     this.type = config.type;
-    
+
     // Calculate health: baseHealth * type multiplier
     const multiplier = Brick.BRICK_TYPE_MULTIPLIER[config.type];
     this.maxHealth = baseHealth * multiplier;
     this.health = this.maxHealth;
-    
+
     this.customColor = config.color || null;
   }
 
@@ -85,7 +88,7 @@ export class Brick {
       this.health = 0;
     }
     const justDestroyed = !wasDestroyed && this.isDestroyed();
-    
+
     const bounds = this.getBounds();
     const info: BrickDestructionInfo = {
       wasDestroyed,
@@ -93,12 +96,12 @@ export class Brick {
       centerX: bounds.x + bounds.width / 2,
       centerY: bounds.y + bounds.height / 2,
     };
-    
+
     // Trigger destruction callback if brick was just destroyed
     if (justDestroyed && this.onDestroyCallback) {
       this.onDestroyCallback(this, info);
     }
-    
+
     return info;
   }
 
@@ -202,7 +205,7 @@ export class Brick {
     if (this.customColor) {
       return this.customColor;
     }
-    
+
     // Use centralized brick color configuration
     return getBrickColorByType(this.type);
   }
@@ -232,12 +235,12 @@ export class Brick {
     if (Brick.cacheEnabled && typeof document !== 'undefined') {
       const cacheKey = this.getCacheKey();
       let cachedCanvas = Brick.renderCache.get(cacheKey);
-      
+
       if (!cachedCanvas) {
         cachedCanvas = this.renderToCache();
         Brick.renderCache.set(cacheKey, cachedCanvas);
       }
-      
+
       // Draw cached image with opacity
       ctx.globalAlpha = opacity;
       ctx.drawImage(cachedCanvas, x, y);
@@ -260,7 +263,7 @@ export class Brick {
     const cornerRadius = BRICK_CORNER_RADIUS;
     ctx.fillStyle = gradient;
     ctx.globalAlpha = opacity;
-    
+
     // Draw rounded rectangle
     ctx.beginPath();
     ctx.moveTo(x + cornerRadius, y);
@@ -289,7 +292,7 @@ export class Brick {
     ctx.strokeStyle = this.lightenColor(color, 70); // Very bright inner highlight
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.8; // More visible
-    
+
     // Draw inner rounded rectangle (slightly smaller)
     const innerPadding = 2;
     ctx.beginPath();
@@ -312,18 +315,25 @@ export class Brick {
       ctx.font = FONT_MONO_BRICK;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      
+
       // Display "BOSS" for boss bricks, otherwise display health
       let displayText: string;
-      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
+      if (
+        this.type === BrickType.BOSS_1 ||
+        this.type === BrickType.BOSS_2 ||
+        this.type === BrickType.BOSS_3 ||
+        this.type === BrickType.BOSS_4 ||
+        this.type === BrickType.BOSS_5 ||
+        this.type === BrickType.BOSS_6
+      ) {
         displayText = 'BOSS';
       } else {
         // Display health rounded to 1 decimal place if fractional, otherwise as integer
-        displayText = this.health % 1 === 0 
-          ? this.health.toString() 
+        displayText = this.health % 1 === 0
+          ? this.health.toString()
           : this.health.toFixed(1);
       }
-      
+
       ctx.fillText(displayText, x + w / 2, y + h / 2);
     }
 
@@ -360,7 +370,14 @@ export class Brick {
     let healthText: string;
     if (this.isIndestructible()) {
       healthText = 'I';
-    } else if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
+    } else if (
+      this.type === BrickType.BOSS_1 ||
+      this.type === BrickType.BOSS_2 ||
+      this.type === BrickType.BOSS_3 ||
+      this.type === BrickType.BOSS_4 ||
+      this.type === BrickType.BOSS_5 ||
+      this.type === BrickType.BOSS_6
+    ) {
       healthText = 'BOSS';
     } else {
       healthText = this.health % 1 === 0 ? this.health.toString() : this.health.toFixed(1);
@@ -398,7 +415,7 @@ export class Brick {
     // Draw brick with gradient and rounded corners
     const cornerRadius = BRICK_CORNER_RADIUS;
     ctx.fillStyle = gradient;
-    
+
     // Draw rounded rectangle
     ctx.beginPath();
     ctx.moveTo(cornerRadius, 0);
@@ -427,7 +444,7 @@ export class Brick {
     ctx.strokeStyle = this.lightenColor(color, 70); // Very bright inner highlight
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.8; // More visible
-    
+
     // Draw inner rounded rectangle (slightly smaller)
     const innerPadding = 2;
     ctx.beginPath();
@@ -451,17 +468,24 @@ export class Brick {
       ctx.font = FONT_MONO_BRICK;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      
+
       // Display "BOSS" for boss bricks, otherwise display health
       let displayText: string;
-      if (this.type === BrickType.BOSS_1 || this.type === BrickType.BOSS_2 || this.type === BrickType.BOSS_3) {
+      if (
+        this.type === BrickType.BOSS_1 ||
+        this.type === BrickType.BOSS_2 ||
+        this.type === BrickType.BOSS_3 ||
+        this.type === BrickType.BOSS_4 ||
+        this.type === BrickType.BOSS_5 ||
+        this.type === BrickType.BOSS_6
+      ) {
         displayText = 'BOSS';
       } else {
-        displayText = this.health % 1 === 0 
-          ? this.health.toString() 
+        displayText = this.health % 1 === 0
+          ? this.health.toString()
           : this.health.toFixed(1);
       }
-      
+
       ctx.fillText(displayText, w / 2, h / 2);
     }
 

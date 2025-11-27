@@ -47,6 +47,9 @@ const BRICK_CHAR_MAP: Record<string, BrickCharConfig> = {
   '1': { type: BrickType.BOSS_1, color: COLOR_PURPLE, description: 'Boss 1 - The Thrower' },
   '2': { type: BrickType.BOSS_2, color: '#00ccff', description: 'Boss 2 - The Shielder' },
   '3': { type: BrickType.BOSS_3, color: '#cc00ff', description: 'Boss 3 - The Splitter' },
+  '4': { type: BrickType.BOSS_4, color: '#4b0082', description: 'Boss 4 - The Graviton' },
+  '5': { type: BrickType.BOSS_5, color: '#ffa500', description: 'Boss 5 - The Builder' },
+  '6': { type: BrickType.BOSS_6, color: '#00ffff', description: 'Boss 6 - The Specter' },
 };
 
 /**
@@ -55,19 +58,19 @@ const BRICK_CHAR_MAP: Record<string, BrickCharConfig> = {
  */
 export function createBricksFromPattern(pattern: string[]): BrickConfig[] {
   const bricks: BrickConfig[] = [];
-  
+
   for (let row = 0; row < pattern.length; row++) {
     const line = pattern[row];
     for (let col = 0; col < line.length; col++) {
       const char = line[col];
       const config = BRICK_CHAR_MAP[char];
-      
+
       if (config !== undefined) {
         bricks.push({ col, row, type: config.type });
       }
     }
   }
-  
+
   return bricks;
 }
 
@@ -526,15 +529,15 @@ export function createBrickAtGrid(
 export function calculateWordWidth(word: string): number {
   const letterCount = word.replace(/\s/g, '').length; // Count non-space letters
   const spaceCount = (word.match(/\s/g) || []).length;
-  
+
   // Each letter: 5 columns (each column = BRICK_WIDTH + BRICK_SPACING)
   // Between letters: LETTER_SPACING
   // Spaces: 3 columns + LETTER_SPACING
   const letterWidth = 5 * (BRICK_WIDTH + BRICK_SPACING);
   const spaceWidth = 3 * (BRICK_WIDTH + BRICK_SPACING) + LETTER_SPACING;
-  
-  return (letterCount * letterWidth) + 
-         ((letterCount - 1) * LETTER_SPACING) + 
-         (spaceCount * spaceWidth) -
-         BRICK_SPACING; // Remove trailing spacing
+
+  return (letterCount * letterWidth) +
+    ((letterCount - 1) * LETTER_SPACING) +
+    (spaceCount * spaceWidth) -
+    BRICK_SPACING; // Remove trailing spacing
 }

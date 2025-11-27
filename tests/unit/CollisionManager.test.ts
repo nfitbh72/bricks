@@ -166,7 +166,8 @@ describe('CollisionManager', () => {
         brick,
         expect.any(Number),
         expect.any(Number),
-        false
+        false,
+        ball // Ball parameter added to BRICK_DESTROYED event
       );
     });
 

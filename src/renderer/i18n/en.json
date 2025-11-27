@@ -58,7 +58,10 @@
       "level10Name": "Level 10: Offensive Chaos",
       "level11Name": "Level 11: Explosive Diamond",
       "level12Name": "Level 12: Final Boss - The Splitter",
-      "level13Name": "Level 13: Multi-Ball Test"
+      "level13Name": "Level 13: Multi-Ball Test",
+      "level14Name": "Level 14: Boss - The Graviton",
+      "level15Name": "Level 15: Boss - The Builder",
+      "level16Name": "Level 16: Boss - The Specter"
     },
     "bricks": {
       "offensive": {

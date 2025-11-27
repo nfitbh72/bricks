@@ -139,7 +139,10 @@ describe('Boss2', () => {
     it('should update position over time', () => {
       const initialBounds = boss.getBounds()!;
       
-      boss.update(1, 400, 500);
+      // Update multiple times with bat at a different position to ensure movement
+      boss.update(0.5, 100, 500); // Bat far to the left
+      boss.update(0.5, 100, 500);
+      boss.update(0.5, 100, 500);
       
       const newBounds = boss.getBounds()!;
       expect(
