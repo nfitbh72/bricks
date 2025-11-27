@@ -136,6 +136,9 @@ export class Game {
     // Initialize upgrade manager
     this.gameUpgrades = new GameUpgrades();
     this.gameUpgrades.setBaseValues(batWidth, batHeight, ballSpeed, ballRadius);
+    
+    // Set game upgrades in context for dependency injection
+    this.context.setGameUpgrades(this.gameUpgrades);
 
     const centerX = canvas.width / 2;
     const batY = canvas.height - 100; // Bat higher up
@@ -149,8 +152,8 @@ export class Game {
     // Initialize audio manager
     this.audioManager = new AudioManager();
 
-    // Initialize screen manager
-    this.screenManager = new ScreenManager(canvas, {
+    // Initialize screen manager with context for dependency injection
+    this.screenManager = new ScreenManager(canvas, this.context, {
       onStartGame: () => this.handleStartGame(),
       onQuit: () => this.handleQuit(),
       onDevUpgrades: () => this.handleDevUpgrades(),
@@ -166,24 +169,6 @@ export class Game {
       onCloseOptions: () => this.handleCloseOptions(),
       onCloseTutorial: () => this.handleCloseTutorial(),
       onCloseAchievements: () => this.handleCloseAchievements(),
-    });
-
-    // Set volume change callback for real-time updates
-    this.screenManager.optionsScreen.setVolumeChangeCallback((musicVolume: number, sfxVolume: number) => {
-      this.audioManager.setMusicVolume(musicVolume);
-      this.audioManager.setSFXVolume(sfxVolume);
-    });
-
-    // Set language change callback to refresh UI
-    this.screenManager.optionsScreen.setLanguageChangeCallback(() => {
-      // Refresh all screen translations
-      this.screenManager.introScreen.refreshTranslations();
-      this.screenManager.pauseScreen.refreshTranslations();
-      this.screenManager.gameOverScreen.refreshTranslations();
-      this.screenManager.levelCompleteScreen.refreshTranslations();
-      this.screenManager.upgradeTreeScreen.refreshTranslations();
-      // Force a re-render to update all translated text
-      this.render();
     });
 
     // Initialize effects manager
@@ -207,14 +192,14 @@ export class Game {
     // Initialize slow-motion manager
     this.slowMotionManager = new SlowMotionManager();
 
-    // Initialize state transition handler
-    this.stateTransitionHandler = new StateTransitionHandler(this.getTransitionContext());
-
     // Initialize render manager
     this.renderManager = new RenderManager(canvas, this.ctx);
 
     // Initialize achievement tracker
     this.achievementTracker = new AchievementTracker();
+    
+    // Set achievement tracker in context for dependency injection
+    this.context.setAchievementTracker(this.achievementTracker);
 
     // Initialize boss manager
     this.bossManager = new BossManager(canvas.width, canvas.height);
@@ -225,6 +210,28 @@ export class Game {
     // Initialize level initializer
     this.levelInitializer = new LevelInitializer(canvas.width, canvas.height);
 
+    // Initialize state transition handler (requires ballManager to be initialized)
+    this.stateTransitionHandler = new StateTransitionHandler(this.getTransitionContext());
+    
+    // Now that all dependencies are set, configure screen callbacks
+    // Set volume change callback for real-time updates
+    this.screenManager.optionsScreen.setVolumeChangeCallback((musicVolume: number, sfxVolume: number) => {
+      this.audioManager.setMusicVolume(musicVolume);
+      this.audioManager.setSFXVolume(sfxVolume);
+    });
+
+    // Set language change callback to refresh UI
+    this.screenManager.optionsScreen.setLanguageChangeCallback(() => {
+      // Refresh all screen translations
+      this.screenManager.introScreen.refreshTranslations();
+      this.screenManager.pauseScreen.refreshTranslations();
+      this.screenManager.gameOverScreen.refreshTranslations();
+      this.screenManager.levelCompleteScreen.refreshTranslations();
+      this.screenManager.upgradeTreeScreen.refreshTranslations();
+      // Force a re-render to update all translated text
+      this.render();
+    });
+
     // Expose for debugging (remove in production)
     (window as unknown as Record<string, unknown>).achievementTracker = this.achievementTracker;
     (window as unknown as Record<string, unknown>).resetAchievements = () => this.achievementTracker.resetProgress();
@@ -234,12 +241,6 @@ export class Game {
 
     // Load background image
     this.loadBackgroundImage();
-
-    // Set achievement tracker in screen manager for progress display
-    this.screenManager.setAchievementTracker(this.achievementTracker);
-
-    // Set game upgrades in screen manager for stats display
-    this.screenManager.setGameUpgrades(this.gameUpgrades);
 
     // Initialize game loop
     this.gameLoop = new GameLoop(
