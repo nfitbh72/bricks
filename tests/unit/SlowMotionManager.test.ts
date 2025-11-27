@@ -5,6 +5,7 @@
 import { SlowMotionManager } from '../../src/renderer/game/managers/SlowMotionManager';
 import { Ball } from '../../src/renderer/game/entities/Ball';
 import { Level } from '../../src/renderer/game/entities/Level';
+import { LevelFactory } from '../../src/renderer/game/factories/LevelFactory';
 import { StatusBar } from '../../src/renderer/game/ui/StatusBar';
 import { EffectsManager } from '../../src/renderer/game/managers/EffectsManager';
 import { BrickType } from '../../src/renderer/game/core/types';
@@ -46,7 +47,7 @@ describe('SlowMotionManager', () => {
           { col: 0, row: 0, type: BrickType.NORMAL }
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
@@ -90,7 +91,7 @@ describe('SlowMotionManager', () => {
           { col: 0, row: 0, type: BrickType.NORMAL }
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       
@@ -130,7 +131,7 @@ describe('SlowMotionManager', () => {
           { col: 0, row: 0, type: BrickType.NORMAL }
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       
@@ -163,7 +164,7 @@ describe('SlowMotionManager', () => {
           { col: 1, row: 0, type: BrickType.NORMAL }
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       
@@ -179,7 +180,7 @@ describe('SlowMotionManager', () => {
         name: 'Test Level',
         bricks: []
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       
@@ -199,7 +200,7 @@ describe('SlowMotionManager', () => {
           { col: 10, row: 10, type: BrickType.NORMAL } // Far away
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       
@@ -217,7 +218,7 @@ describe('SlowMotionManager', () => {
           { col: 0, row: 0, type: BrickType.NORMAL }
         ]
       };
-      const level = new Level(levelConfig, 1920);
+      const level = LevelFactory.createLevel(levelConfig, 1920);
       const statusBar = new StatusBar(1920, 1080);
       const effectsManager = new EffectsManager();
       

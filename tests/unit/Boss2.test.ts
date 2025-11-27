@@ -59,13 +59,13 @@ describe('Boss2', () => {
 
   describe('shield rotation', () => {
     it('should rotate shield over time', () => {
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       boss.render(mockCtx);
       const arcCalls1 = mockCtx.arc.mock.calls.length;
       
       mockCtx.arc.mockClear();
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       boss.render(mockCtx);
       const arcCalls2 = mockCtx.arc.mock.calls.length;
       
@@ -76,7 +76,7 @@ describe('Boss2', () => {
     it('should wrap rotation angle', () => {
       // Update many times to wrap angle
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 400, 500);
+        boss.updateBoss(0.1, 400, 500);
       }
       
       // Should not crash
@@ -139,7 +139,7 @@ describe('Boss2', () => {
     it('should update position over time', () => {
       const initialBounds = boss.getBounds()!;
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       const newBounds = boss.getBounds()!;
       expect(
@@ -151,7 +151,7 @@ describe('Boss2', () => {
       boss.takeDamage(100);
       const bounds = boss.getBounds();
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       expect(boss.getBounds()).toBe(bounds);
     });
@@ -162,7 +162,7 @@ describe('Boss2', () => {
       ];
       boss.setAvailableBricks(mockBricks);
       
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       
       expect(boss.getThrownBricks().length).toBeGreaterThan(0);
     });
@@ -223,7 +223,7 @@ describe('Boss2', () => {
   describe('movement', () => {
     it('should stay within boundaries', () => {
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 0, 0);
+        boss.updateBoss(0.1, 0, 0);
       }
       
       const bounds = boss.getBounds()!;

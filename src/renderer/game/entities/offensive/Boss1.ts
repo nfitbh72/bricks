@@ -25,7 +25,7 @@ export class Boss1 extends BaseBoss {
     this.arms.push(new BossArm(this.x, this.y, this.width + 5, 5, this.color));
   }
 
-  update(deltaTime: number, batX: number, batY: number): void {
+  updateBoss(deltaTime: number, batX: number, batY: number): void {
     if (!this.active) return;
 
     this.updateMovement(deltaTime);

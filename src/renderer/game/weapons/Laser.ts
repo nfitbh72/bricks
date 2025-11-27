@@ -3,9 +3,12 @@
  */
 
 import { Vector2D } from '../core/types';
+import { ICollidable } from '../core/ICollidable';
+import { Bounds } from '../core/IEntity';
+import { CollisionGroup } from '../core/CollisionTypes';
 import { LASER_WIDTH, LASER_HEIGHT } from '../../config/constants';
 
-export class Laser {
+export class Laser implements ICollidable {
   private position: Vector2D;
   private readonly speed: number;
   private readonly damage: number;
@@ -90,5 +93,13 @@ export class Laser {
    */
   isOffScreen(minY: number): boolean {
     return this.position.y < minY;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.LASER;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision handlers
   }
 }

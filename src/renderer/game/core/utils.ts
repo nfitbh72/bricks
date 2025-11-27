@@ -64,6 +64,7 @@ export function checkCircleRectCollision(
       collided: true,
       normal,
       penetration,
+      point: { x: closestX, y: closestY },
     };
   }
 

@@ -481,7 +481,7 @@ describe('Ball - Enhanced Coverage', () => {
 
   describe('getBounds', () => {
     it('should return circular bounds', () => {
-      const bounds = ball.getBounds();
+      const bounds = ball.getCircleBounds();
       
       expect(bounds).toHaveProperty('x');
       expect(bounds).toHaveProperty('y');
@@ -492,7 +492,7 @@ describe('Ball - Enhanced Coverage', () => {
     it('should update bounds with position', () => {
       ball.setPosition(200, 300);
       
-      const bounds = ball.getBounds();
+      const bounds = ball.getCircleBounds();
       expect(bounds.x).toBe(200);
       expect(bounds.y).toBe(300);
     });

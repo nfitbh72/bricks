@@ -3,6 +3,9 @@
  */
 
 import { Vector2D } from '../core/types';
+import { ICollidable } from '../core/ICollidable';
+import { Bounds } from '../core/IEntity';
+import { CollisionGroup } from '../core/CollisionTypes';
 import {
   BAT_GLOW_BLUR,
   BAT_TURRET_WIDTH_MULTIPLIER,
@@ -15,7 +18,7 @@ import {
   COLOR_CYAN,
 } from '../../config/constants';
 
-export class Bat {
+export class Bat implements ICollidable {
   private position: Vector2D;
   private width: number; // Changed from readonly to allow shrinking
   private readonly originalWidth: number; // Track original width for damage calculation
@@ -357,5 +360,22 @@ export class Bat {
    */
   getTurretCount(): number {
     return this.turretCount;
+  }
+
+  isActive(): boolean {
+    return !this.isDestroyed();
+  }
+
+  deactivate(): void {
+    // Bat destruction is handled by width reduction, but this satisfies interface
+    this.width = 0;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+    return CollisionGroup.BAT;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Default behavior handled by collision manager for now
   }
 }

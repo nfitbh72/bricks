@@ -13,7 +13,7 @@ class TestBoss extends BaseBoss {
   protected readonly throwInterval: number = 2;
   protected readonly thrownBrickSpeed: number = 300;
 
-  update(deltaTime: number, batX: number, batY: number): void {
+  updateBoss(deltaTime: number, batX: number, batY: number): void {
     this.updateMovement(deltaTime);
     this.updateThrownBricks(deltaTime);
     this.updateThrowCooldown(deltaTime, batX, batY);
@@ -114,7 +114,7 @@ describe('BaseBoss', () => {
       const initialX = boss.getBounds()!.x;
       const initialY = boss.getBounds()!.y;
       
-      boss.update(1, 400, 500); // 1 second
+      boss.updateBoss(1, 400, 500); // 1 second
       
       const newBounds = boss.getBounds()!;
       // Position should have changed
@@ -124,7 +124,7 @@ describe('BaseBoss', () => {
     it('should stay within boundaries', () => {
       // Force boss to extreme position
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 0, 0);
+        boss.updateBoss(0.1, 0, 0);
       }
       
       const bounds = boss.getBounds()!;
@@ -139,7 +139,7 @@ describe('BaseBoss', () => {
       
       // Update many times to ensure target is reached and new one picked
       for (let i = 0; i < 50; i++) {
-        boss.update(0.1, 400, 500);
+        boss.updateBoss(0.1, 400, 500);
       }
       
       // Boss should have moved
@@ -168,7 +168,7 @@ describe('BaseBoss', () => {
       boss.setAvailableBricks(mockBricks);
       
       // Should only have 2 bricks available
-      boss.update(3, 400, 500); // Wait for throw cooldown
+      boss.updateBoss(3, 400, 500); // Wait for throw cooldown
       expect(boss.getThrownBricks().length).toBeLessThanOrEqual(2);
     });
 
@@ -177,7 +177,7 @@ describe('BaseBoss', () => {
       mockBricks.push(indestructibleBrick);
       
       boss.setAvailableBricks(mockBricks);
-      boss.update(3, 400, 500);
+      boss.updateBoss(3, 400, 500);
       
       // Should not throw indestructible brick
       const thrownBricks = boss.getThrownBricks();
@@ -189,7 +189,7 @@ describe('BaseBoss', () => {
       
       expect(boss.getThrownBricks()).toHaveLength(0);
       
-      boss.update(2.1, 400, 500); // Wait for throw interval
+      boss.updateBoss(2.1, 400, 500); // Wait for throw interval
       
       expect(boss.getThrownBricks().length).toBeGreaterThan(0);
     });
@@ -197,21 +197,21 @@ describe('BaseBoss', () => {
     it('should not throw brick before cooldown', () => {
       boss.setAvailableBricks(mockBricks);
       
-      boss.update(2.1, 400, 500); // First throw
-      boss.update(1, 400, 500); // Less than throw interval - should not throw again
+      boss.updateBoss(2.1, 400, 500); // First throw
+      boss.updateBoss(1, 400, 500); // Less than throw interval - should not throw again
       
       expect(boss.getThrownBricks()).toHaveLength(1); // Only first throw
     });
 
     it('should update thrown bricks', () => {
       boss.setAvailableBricks(mockBricks);
-      boss.update(2.1, 400, 500); // Throw a brick
+      boss.updateBoss(2.1, 400, 500); // Throw a brick
       
       const thrownBricks = boss.getThrownBricks();
       expect(thrownBricks.length).toBeGreaterThan(0);
       
       // Update again to move thrown bricks
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       // Thrown bricks should still exist (not off screen yet)
       expect(boss.getThrownBricks().length).toBeGreaterThan(0);
@@ -219,11 +219,11 @@ describe('BaseBoss', () => {
 
     it('should remove off-screen thrown bricks', () => {
       boss.setAvailableBricks(mockBricks);
-      boss.update(2.1, 400, 500); // Throw a brick
+      boss.updateBoss(2.1, 400, 500); // Throw a brick
       
       // Update many times to move brick off screen
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 400, 500);
+        boss.updateBoss(0.1, 400, 500);
       }
       
       // Thrown bricks should be removed
@@ -233,7 +233,7 @@ describe('BaseBoss', () => {
     it('should not throw when no bricks available', () => {
       boss.setAvailableBricks([]);
       
-      boss.update(3, 400, 500);
+      boss.updateBoss(3, 400, 500);
       
       expect(boss.getThrownBricks()).toHaveLength(0);
     });
@@ -242,15 +242,15 @@ describe('BaseBoss', () => {
       boss.setAvailableBricks(mockBricks);
       const initialAvailable = 3;
       
-      boss.update(0.1, 400, 500); // Throw first brick (cooldown starts at 0)
-      boss.update(2.1, 400, 500); // Throw second brick
-      boss.update(2.1, 400, 500); // Throw third brick
+      boss.updateBoss(0.1, 400, 500); // Throw first brick (cooldown starts at 0)
+      boss.updateBoss(2.1, 400, 500); // Throw second brick
+      boss.updateBoss(2.1, 400, 500); // Throw third brick
       
       // All bricks should have been thrown (removed from available)
       // Some may have gone off-screen and been removed from thrown bricks
       // Try to throw again - should not throw (no bricks left in available)
       const countBefore = boss.getThrownBricks().length;
-      boss.update(2.1, 400, 500);
+      boss.updateBoss(2.1, 400, 500);
       const countAfter = boss.getThrownBricks().length;
       
       // Count should not increase (no new bricks thrown)
@@ -263,7 +263,7 @@ describe('BaseBoss', () => {
       boss.takeDamage(100);
       const initialBounds = boss.getBounds();
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       expect(boss.getBounds()).toBe(initialBounds);
     });

@@ -6,8 +6,8 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000, // 10 second timeout
-  forceExit: true, // Force exit to prevent hanging
-  detectOpenHandles: false, // Disable for now to reduce noise
+  // Removed forceExit - let tests complete naturally
+  // Removed detectOpenHandles - not needed with proper cleanup
   maxWorkers: 1, // Use single worker to prevent race conditions
   collectCoverageFrom: [
     'src/**/*.ts',

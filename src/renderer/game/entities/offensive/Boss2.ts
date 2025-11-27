@@ -50,7 +50,7 @@ export class Boss2 extends BaseBoss {
     }
   }
 
-  update(deltaTime: number, batX: number, batY: number): void {
+  updateBoss(deltaTime: number, batX: number, batY: number): void {
     if (!this.active) return;
 
     // Rotate shield

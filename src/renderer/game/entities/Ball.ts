@@ -3,6 +3,9 @@
  */
 
 import { Vector2D } from '../core/types';
+import { ICollidable } from '../core/ICollidable';
+import { Bounds } from '../core/IEntity';
+import { CollisionGroup } from '../core/CollisionTypes';
 import { reflect, normalize, magnitude } from '../core/utils';
 import { Bat } from '../entities/Bat';
 import {
@@ -28,7 +31,7 @@ import {
   STICKY_BALL_INDICATOR_GLOW,
 } from '../../config/constants';
 
-export class Ball {
+export class Ball implements ICollidable {
   private position: Vector2D;
   private velocity: Vector2D;
   private readonly initialPosition: Vector2D;
@@ -307,14 +310,42 @@ export class Ball {
   }
 
   /**
-   * Get ball bounds for collision detection
+   * Get ball bounds (AABB) for spatial hash and ICollidable interface
    */
-  getBounds(): { x: number; y: number; radius: number } {
+  getBounds(): Bounds {
+    return {
+      x: this.position.x - this.radius,
+      y: this.position.y - this.radius,
+      width: this.radius * 2,
+      height: this.radius * 2,
+    };
+  }
+
+  /**
+   * Get ball circle bounds for precise collision detection
+   */
+  getCircleBounds(): { x: number; y: number; radius: number } {
     return {
       x: this.position.x,
       y: this.position.y,
       radius: this.radius,
     };
+  }
+
+  isActive(): boolean {
+      return true;
+  }
+
+  deactivate(): void {
+      // Ball usually isn't deactivated unless it falls out of bounds, handled by GameLoop/Level
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.BALL;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Default behavior handled by collision manager for now
   }
 
   /**

@@ -1,5 +1,5 @@
 /**
- * ScreenManager - Manages UI screens and transitions
+ * ScreenManager - Manages UI screens and transitions with lazy initialization
  */
 
 import { IntroScreen } from '../../ui/IntroScreen';
@@ -13,8 +13,7 @@ import { TutorialScreen } from '../../ui/TutorialScreen';
 import { AchievementsScreen } from '../../ui/AchievementsScreen';
 import { GameState } from '../core/types';
 import { getUpgrades } from '../../config/upgrades';
-import { AchievementTracker } from './AchievementTracker';
-import { GameUpgrades } from '../systems/GameUpgrades';
+import { GameContext } from '../core/GameContext';
 
 export interface ScreenCallbacks {
   onStartGame: () => void;
@@ -36,76 +35,155 @@ export interface ScreenCallbacks {
 
 export class ScreenManager {
   private canvas: HTMLCanvasElement;
+  private context: GameContext;
+  private callbacks: ScreenCallbacks;
   
-  // UI Screens
-  public introScreen: IntroScreen;
-  public tutorialScreen: TutorialScreen;
-  public gameOverScreen: GameOverScreen;
-  public levelCompleteScreen: LevelCompleteScreen;
-  public upgradeTreeScreen: UpgradeTreeScreen;
-  public transitionScreen: TransitionScreen;
-  public pauseScreen: PauseScreen;
-  public optionsScreen: OptionsScreen;
-  public achievementsScreen: AchievementsScreen;
+  // UI Screens (lazy initialized)
+  private _introScreen?: IntroScreen;
+  private _tutorialScreen?: TutorialScreen;
+  private _gameOverScreen?: GameOverScreen;
+  private _levelCompleteScreen?: LevelCompleteScreen;
+  private _upgradeTreeScreen?: UpgradeTreeScreen;
+  private _transitionScreen?: TransitionScreen;
+  private _pauseScreen?: PauseScreen;
+  private _optionsScreen?: OptionsScreen;
+  private _achievementsScreen?: AchievementsScreen;
   
   private isTransitioning: boolean = false;
   private previousState: GameState | null = null;
 
-  constructor(canvas: HTMLCanvasElement, callbacks: ScreenCallbacks) {
+  constructor(canvas: HTMLCanvasElement, context: GameContext, callbacks: ScreenCallbacks) {
     this.canvas = canvas;
+    this.context = context;
+    this.callbacks = callbacks;
     
-    // Initialize UI screens
-    this.introScreen = new IntroScreen(
-      canvas,
-      callbacks.onStartGame,
-      callbacks.onQuit,
-      callbacks.onDevUpgrades,
-      callbacks.onOpenOptions,
-      callbacks.onOpenAchievements
-    );
-    
-    this.tutorialScreen = new TutorialScreen(
-      canvas,
-      callbacks.onCloseTutorial
-    );
-    
-    this.gameOverScreen = new GameOverScreen(
-      canvas,
-      callbacks.onRestart,
-      callbacks.onQuit
-    );
-    
-    this.levelCompleteScreen = new LevelCompleteScreen(
-      canvas,
-      callbacks.onLevelCompleteTransition
-    );
-    
-    this.upgradeTreeScreen = new UpgradeTreeScreen(
-      canvas,
-      callbacks.onUpgradeComplete,
-      callbacks.onStartLevel,
-      getUpgrades(),
-      callbacks.onUpgradeActivated
-    );
-    
-    this.transitionScreen = new TransitionScreen(canvas);
-    
-    this.pauseScreen = new PauseScreen(
-      canvas,
-      callbacks.onResume,
-      callbacks.onQuitFromPause,
-      callbacks.onOpenOptions
-    );
-    
-    this.optionsScreen = new OptionsScreen(
-      canvas,
-      callbacks.onCloseOptions
-    );
+    // Screens are now lazily initialized when accessed
+  }
 
-    this.achievementsScreen = new AchievementsScreen(
-      canvas,
-      callbacks.onCloseAchievements
-    );
+  /**
+   * Lazy getter for intro screen
+   */
+  get introScreen(): IntroScreen {
+    if (!this._introScreen) {
+      this._introScreen = new IntroScreen(
+        this.canvas,
+        this.callbacks.onStartGame,
+        this.callbacks.onQuit,
+        this.callbacks.onDevUpgrades,
+        this.callbacks.onOpenOptions,
+        this.callbacks.onOpenAchievements
+      );
+    }
+    return this._introScreen;
+  }
+
+  /**
+   * Lazy getter for tutorial screen
+   */
+  get tutorialScreen(): TutorialScreen {
+    if (!this._tutorialScreen) {
+      this._tutorialScreen = new TutorialScreen(
+        this.canvas,
+        this.callbacks.onCloseTutorial
+      );
+    }
+    return this._tutorialScreen;
+  }
+
+  /**
+   * Lazy getter for game over screen
+   */
+  get gameOverScreen(): GameOverScreen {
+    if (!this._gameOverScreen) {
+      this._gameOverScreen = new GameOverScreen(
+        this.canvas,
+        this.callbacks.onRestart,
+        this.callbacks.onQuit
+      );
+    }
+    return this._gameOverScreen;
+  }
+
+  /**
+   * Lazy getter for level complete screen
+   */
+  get levelCompleteScreen(): LevelCompleteScreen {
+    if (!this._levelCompleteScreen) {
+      this._levelCompleteScreen = new LevelCompleteScreen(
+        this.canvas,
+        this.callbacks.onLevelCompleteTransition
+      );
+    }
+    return this._levelCompleteScreen;
+  }
+
+  /**
+   * Lazy getter for upgrade tree screen
+   */
+  get upgradeTreeScreen(): UpgradeTreeScreen {
+    if (!this._upgradeTreeScreen) {
+      this._upgradeTreeScreen = new UpgradeTreeScreen(
+        this.canvas,
+        this.callbacks.onUpgradeComplete,
+        this.callbacks.onStartLevel,
+        getUpgrades(),
+        this.callbacks.onUpgradeActivated,
+        this.context.gameUpgrades // May be undefined initially, but set before first access
+      );
+    }
+    return this._upgradeTreeScreen;
+  }
+
+  /**
+   * Lazy getter for transition screen
+   */
+  get transitionScreen(): TransitionScreen {
+    if (!this._transitionScreen) {
+      this._transitionScreen = new TransitionScreen(this.canvas);
+    }
+    return this._transitionScreen;
+  }
+
+  /**
+   * Lazy getter for pause screen
+   */
+  get pauseScreen(): PauseScreen {
+    if (!this._pauseScreen) {
+      this._pauseScreen = new PauseScreen(
+        this.canvas,
+        this.callbacks.onResume,
+        this.callbacks.onQuitFromPause,
+        this.callbacks.onOpenOptions
+      );
+    }
+    return this._pauseScreen;
+  }
+
+  /**
+   * Lazy getter for options screen
+   */
+  get optionsScreen(): OptionsScreen {
+    if (!this._optionsScreen) {
+      this._optionsScreen = new OptionsScreen(
+        this.canvas,
+        this.callbacks.onCloseOptions
+      );
+    }
+    return this._optionsScreen;
+  }
+
+  /**
+   * Lazy getter for achievements screen
+   */
+  get achievementsScreen(): AchievementsScreen {
+    if (!this._achievementsScreen) {
+      this._achievementsScreen = new AchievementsScreen(
+        this.canvas,
+        this.callbacks.onCloseAchievements,
+        this.context.achievementTracker
+      );
+    }
+    return this._achievementsScreen;
   }
 
   /**
@@ -297,47 +375,5 @@ export class ScreenManager {
    */
   getPreviousState(): GameState | null {
     return this.previousState;
-  }
-
-  /**
-   * Set AchievementTracker for achievements screen progress tracking
-   */
-  setAchievementTracker(achievementTracker: AchievementTracker): void {
-    // Store the original callback
-    const originalCallback = this.achievementsScreen['onBack'];
-    
-    // Update the achievements screen with the tracker
-    this.achievementsScreen = new AchievementsScreen(
-      this.canvas,
-      originalCallback,
-      achievementTracker
-    );
-  }
-
-  /**
-   * Set GameUpgrades for upgrade tree screen stats display
-   */
-  setGameUpgrades(gameUpgrades: GameUpgrades): void {
-    // Recreate the upgrade tree screen with GameUpgrades
-    const callbacks = {
-      onUpgradeComplete: this.upgradeTreeScreen['onContinue'],
-      onStartLevel: this.upgradeTreeScreen['onStartLevel'],
-      onUpgradeActivated: this.upgradeTreeScreen['onUpgradeActivated']
-    };
-    
-    // Get current upgrade levels from the existing screen
-    const currentLevels = this.upgradeTreeScreen.getUpgradeLevels();
-    
-    // Initialize GameUpgrades with current levels
-    gameUpgrades.setUpgradeLevels(currentLevels);
-    
-    this.upgradeTreeScreen = new UpgradeTreeScreen(
-      this.canvas,
-      callbacks.onUpgradeComplete,
-      callbacks.onStartLevel,
-      getUpgrades(),
-      callbacks.onUpgradeActivated,
-      gameUpgrades
-    );
   }
 }

@@ -13,8 +13,11 @@ import {
   COLOR_BLACK,
   COLOR_WHITE,
 } from '../../../config/constants';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class SplittingFragment {
+export class SplittingFragment implements ICollidable {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly size: number = SPLITTING_FRAGMENT_SIZE;
@@ -63,7 +66,7 @@ export class SplittingFragment {
     // Handle shaking phase
     if (this.isShaking) {
       this.shakeTimer += deltaTime;
-      
+
       if (this.shakeTimer >= SPLITTING_FRAGMENT_SHAKE_DURATION) {
         // End shake, start falling
         this.isShaking = false;
@@ -138,7 +141,8 @@ export class SplittingFragment {
   /**
    * Get fragment bounds for collision detection
    */
-  getBounds(): { x: number; y: number; width: number; height: number } {
+  getBounds(): Bounds | null {
+    if (!this.active) return null;
     return {
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,
@@ -185,5 +189,19 @@ export class SplittingFragment {
       this.position.y < -this.size ||
       this.position.y > canvasHeight + this.size
     );
+  }
+
+  /**
+   * Get collision group for generic collision system
+   */
+  getCollisionGroup(): CollisionGroup {
+    return CollisionGroup.OFFENSIVE;
+  }
+
+  /**
+   * Handle collision (delegated to collision handlers)
+   */
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+    // Handled by collision handlers
   }
 }

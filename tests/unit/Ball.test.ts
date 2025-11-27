@@ -286,7 +286,7 @@ describe('Ball', () => {
   describe('getBounds', () => {
     it('should return correct bounds', () => {
       const ball = new Ball(100, 200, 10, 5);
-      const bounds = ball.getBounds();
+      const bounds = ball.getCircleBounds();
       expect(bounds.x).toBe(100);
       expect(bounds.y).toBe(200);
       expect(bounds.radius).toBe(10);
@@ -295,7 +295,7 @@ describe('Ball', () => {
     it('should update bounds after position change', () => {
       const ball = new Ball(100, 200, 10, 5);
       ball.setPosition(300, 400);
-      const bounds = ball.getBounds();
+      const bounds = ball.getCircleBounds();
       expect(bounds.x).toBe(300);
       expect(bounds.y).toBe(400);
       expect(bounds.radius).toBe(10);

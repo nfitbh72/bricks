@@ -4,8 +4,11 @@
  */
 
 import { FALLING_BRICK_GRAVITY, BRICK_WIDTH, BRICK_HEIGHT, BRICK_GLOW_BLUR } from '../../../config/constants';
+import { Bounds } from '../../core/IEntity';
+import { ICollidable } from '../../core/ICollidable';
+import { CollisionGroup } from '../../core/CollisionTypes';
 
-export class FallingBrick {
+export class FallingBrick implements ICollidable {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly width: number = BRICK_WIDTH;
@@ -71,7 +74,7 @@ export class FallingBrick {
     // Draw brick with gradient and rounded corners
     const cornerRadius = 3;
     ctx.fillStyle = gradient;
-    
+
     ctx.beginPath();
     ctx.moveTo(cornerRadius, 0);
     ctx.lineTo(w - cornerRadius, 0);
@@ -95,7 +98,7 @@ export class FallingBrick {
     ctx.strokeStyle = this.lightenColor(this.color, 50);
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.6;
-    
+
     const innerPadding = 2;
     ctx.beginPath();
     ctx.moveTo(cornerRadius + innerPadding, innerPadding);
@@ -116,7 +119,8 @@ export class FallingBrick {
   /**
    * Get brick bounds for collision detection
    */
-  getBounds(): { x: number; y: number; width: number; height: number } {
+  getBounds(): Bounds | null {
+    if (!this.active) return null;
     return {
       x: this.position.x,
       y: this.position.y,
@@ -180,5 +184,13 @@ export class FallingBrick {
     const g = Math.max(0, ((num >> 8) & 0xff) - percent);
     const b = Math.max(0, (num & 0xff) - percent);
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+
+  getCollisionGroup(): CollisionGroup {
+      return CollisionGroup.OFFENSIVE;
+  }
+
+  onCollision(_other: ICollidable, _bounds: Bounds, _otherBounds: Bounds): void {
+      // Handled by collision handlers
   }
 }

@@ -134,14 +134,14 @@ describe('Boss3', () => {
 
   describe('fragment throwing', () => {
     it('should throw splitting fragments', () => {
-      boss.update(2, 400, 500); // Wait for cooldown
+      boss.updateBoss(2, 400, 500); // Wait for cooldown
       
       const fragments = boss.getSplittingFragments();
       expect(fragments.length).toBeGreaterThan(0);
     });
 
     it('should throw in spread pattern', () => {
-      boss.update(2, 400, 500);
+      boss.updateBoss(2, 400, 500);
       
       const fragments = boss.getSplittingFragments();
       // Should throw 3 fragments in spread
@@ -153,7 +153,7 @@ describe('Boss3', () => {
     it('should move horizontally', () => {
       const initialX = boss.getBounds()!.x;
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       const newX = boss.getBounds()!.x;
       expect(newX).not.toBe(initialX);
@@ -163,8 +163,8 @@ describe('Boss3', () => {
       const normalBoss = new Boss3(400, 200, 100, '#ff0000', canvasWidth, canvasHeight, false, 1.0);
       const copyBoss = new Boss3(400, 200, 50, '#ff0000', canvasWidth, canvasHeight, true, 0.7);
       
-      normalBoss.update(1, 400, 500);
-      copyBoss.update(1, 400, 500);
+      normalBoss.updateBoss(1, 400, 500);
+      copyBoss.updateBoss(1, 400, 500);
       
       const normalBounds = normalBoss.getBounds()!;
       const copyBounds = copyBoss.getBounds()!;
@@ -176,7 +176,7 @@ describe('Boss3', () => {
 
     it('should stay within boundaries', () => {
       for (let i = 0; i < 100; i++) {
-        boss.update(0.1, 0, 0);
+        boss.updateBoss(0.1, 0, 0);
       }
       
       const bounds = boss.getBounds()!;
@@ -235,7 +235,7 @@ describe('Boss3', () => {
     });
 
     it('should render fragments', () => {
-      boss.update(2, 400, 500); // Throw fragments
+      boss.updateBoss(2, 400, 500); // Throw fragments
       
       boss.render(mockCtx);
       
@@ -268,7 +268,7 @@ describe('Boss3', () => {
       boss.takeDamage(100);
       const bounds = boss.getBounds();
       
-      boss.update(1, 400, 500);
+      boss.updateBoss(1, 400, 500);
       
       expect(boss.getBounds()).toBe(bounds);
     });
@@ -280,7 +280,7 @@ describe('Boss3', () => {
     });
 
     it('should return fragments after throwing', () => {
-      boss.update(2, 400, 500);
+      boss.updateBoss(2, 400, 500);
       
       expect(boss.getSplittingFragments().length).toBeGreaterThan(0);
     });

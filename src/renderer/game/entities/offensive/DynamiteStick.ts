@@ -13,6 +13,7 @@ import {
   DYNAMITE_EXPLOSION_DURATION,
   BRICK_GLOW_BLUR,
 } from '../../../config/constants';
+import { IEntity, Bounds } from '../../core/IEntity';
 import { Brick } from '../Brick';
 
 export interface DynamiteExplosionResult {
@@ -23,7 +24,7 @@ export interface DynamiteExplosionResult {
   bricksToDamage: Brick[];
 }
 
-export class DynamiteStick {
+export class DynamiteStick implements IEntity {
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private readonly width: number = DYNAMITE_STICK_WIDTH;
@@ -41,9 +42,9 @@ export class DynamiteStick {
 
   constructor(x: number, y: number, color: string) {
     // Center the dynamite stick on the brick position
-    this.position = { 
+    this.position = {
       x: x + (104 - this.width) / 2, // BRICK_WIDTH is 104
-      y: y 
+      y: y
     };
     // Random drift direction
     const angle = Math.random() * Math.PI * 2;
@@ -88,7 +89,7 @@ export class DynamiteStick {
     // Apply drift movement
     this.position.x += this.velocity.x * deltaTime;
     this.position.y += this.velocity.y * deltaTime;
-    
+
     // Update rotation for visual effect
     this.rotation += this.rotationSpeed * deltaTime;
   }
@@ -128,7 +129,7 @@ export class DynamiteStick {
     // Draw dynamite stick body (rounded rectangle)
     const cornerRadius = 2;
     ctx.fillStyle = bodyColor;
-    
+
     ctx.beginPath();
     ctx.moveTo(cornerRadius, 0);
     ctx.lineTo(w - cornerRadius, 0);
@@ -176,13 +177,13 @@ export class DynamiteStick {
     const progress = Math.min(this.explosionTimer / DYNAMITE_EXPLOSION_DURATION, 1);
     const centerX = this.position.x + this.width / 2;
     const centerY = this.position.y + this.height / 2;
-    
+
     ctx.save();
-    
+
     // Outer expanding circle
     const outerRadius = DYNAMITE_EXPLOSION_RADIUS * progress;
     const outerAlpha = 1 - progress;
-    
+
     ctx.beginPath();
     ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
     ctx.strokeStyle = this.color;
@@ -191,11 +192,11 @@ export class DynamiteStick {
     ctx.shadowBlur = 20;
     ctx.shadowColor = this.color;
     ctx.stroke();
-    
+
     // Inner filled circle (shrinks as it fades)
     const innerRadius = DYNAMITE_EXPLOSION_RADIUS * (1 - progress * 0.5);
     const innerAlpha = (1 - progress) * 0.3;
-    
+
     ctx.beginPath();
     ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
@@ -203,16 +204,16 @@ export class DynamiteStick {
     ctx.shadowBlur = 30;
     ctx.shadowColor = this.color;
     ctx.fill();
-    
+
     ctx.restore();
   }
 
   /**
    * Get bounds for collision detection (before explosion)
    */
-  getBounds(): { x: number; y: number; width: number; height: number } | null {
+  getBounds(): Bounds | null {
     if (!this.active || this.exploded) return null;
-    
+
     return {
       x: this.position.x,
       y: this.position.y,
@@ -228,7 +229,7 @@ export class DynamiteStick {
    */
   getExplosionResult(allBricks: Brick[]): DynamiteExplosionResult | null {
     if (!this.exploded || this.damageApplied) return null;
-    
+
     this.damageApplied = true;
 
     const centerX = this.position.x + this.width / 2;
